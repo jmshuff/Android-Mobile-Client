@@ -253,7 +253,7 @@ public class PatientDetailActivity extends AppCompatActivity {
                 // Toast.makeText(PatientDetailActivity.this,"PMH: "+phistory,Toast.LENGTH_SHORT).sƒhow();
                 // Toast.makeText(PatientDetailActivity.this,"FH: "+fhistory,Toast.LENGTH_SHORT).show();
 
-                Intent intent2 = new Intent(PatientDetailActivity.this, VitalsActivity.class);
+                Intent intent2 = new Intent(PatientDetailActivity.this, IdentificationActivity.class);
                 String fullName = patient_new.getFirst_name() + " " + patient_new.getLast_name();
                 intent2.putExtra("patientUuid", patientUuid);
 
