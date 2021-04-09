@@ -80,6 +80,8 @@ public class Node implements Serializable {
     private String jobAidFile;
     private String jobAidType;
     private String pop_up;
+    private String pop_up_hi;
+    private String pop_up_or;
     private String gender;
     private String min_age;
     private String max_age;
@@ -236,7 +238,23 @@ public class Node implements Serializable {
             this.negativeCondition = jsonNode.optString("neg-condition");
 
             this.pop_up = jsonNode.optString("pop-up");
-            this.hasPopUp = !pop_up.isEmpty();
+          //  this.hasPopUp = !pop_up.isEmpty();
+            this.pop_up_hi = jsonNode.optString("pop-up-hi"); //pop-up for Hindi...
+            if (this.pop_up_hi.isEmpty()) {
+                this.pop_up_hi = this.pop_up;
+            }
+
+            this.pop_up_or = jsonNode.optString("pop-up-or"); //pop-up for Odiya...
+            if (this.pop_up_or.isEmpty()) {
+                this.pop_up_or = this.pop_up;
+            }
+
+            // this.hasPopUp = !pop_up.isEmpty();
+            if (!pop_up.isEmpty() || !pop_up_hi.isEmpty() || !pop_up_or.isEmpty()) {
+                this.hasPopUp = true;
+            }
+
+
 
         } catch (JSONException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
@@ -264,6 +282,8 @@ public class Node implements Serializable {
         this.physicalExams = source.physicalExams;
         this.complaint = source.complaint;
         this.pop_up = source.pop_up;
+        this.pop_up_hi = source.pop_up_hi;
+        this.pop_up_or = source.pop_up_or;
         this.jobAidFile = source.jobAidFile;
         this.jobAidType = source.jobAidType;
         this.aidAvailable = source.aidAvailable;
@@ -762,13 +782,22 @@ public class Node implements Serializable {
     }
 
     public void generatePopUp(final Activity context) {
+        SessionManager sessionManager = null;
+        sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
 
         HashSet<String> messages = new HashSet<String>();
         List<Node> mOptions = optionsList;
         if (optionsList != null && !optionsList.isEmpty()) {
             for (Node node_opt : mOptions) {
                 if (node_opt.isSelected() && node_opt.hasPopUp) {
-                    messages.add(node_opt.pop_up);
+                  //  messages.add(node_opt.pop_up);
+                    if (sessionManager.getAppLanguage().equalsIgnoreCase("hi")) {
+                        messages.add(node_opt.pop_up_hi);
+                    } else if (sessionManager.getAppLanguage().equalsIgnoreCase("or")) {
+                        messages.add(node_opt.pop_up_or);
+                    } else {
+                        messages.add(node_opt.pop_up);
+                    }
                 }
             }
         }
