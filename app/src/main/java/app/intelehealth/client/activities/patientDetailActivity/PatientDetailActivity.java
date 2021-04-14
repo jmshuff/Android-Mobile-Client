@@ -1,5 +1,6 @@
 package app.intelehealth.client.activities.patientDetailActivity;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -74,6 +75,7 @@ import app.intelehealth.client.utilities.UuidDictionary;
 
 import app.intelehealth.client.activities.homeActivity.HomeActivity;
 import app.intelehealth.client.activities.identificationActivity.IdentificationActivity;
+import app.intelehealth.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.intelehealth.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.intelehealth.client.activities.vitalActivity.VitalsActivity;
 import app.intelehealth.client.utilities.NetworkConnection;
@@ -165,7 +167,7 @@ public class PatientDetailActivity extends AppCompatActivity {
         editbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent2 = new Intent(PatientDetailActivity.this, IdentificationActivity.class);
+                Intent intent2 = new Intent(PatientDetailActivity.this, ComplaintNodeActivity.class);
                 intent2.putExtra("patientUuid", patientUuid);
                 startActivity(intent2);
 
@@ -253,7 +255,7 @@ public class PatientDetailActivity extends AppCompatActivity {
                 // Toast.makeText(PatientDetailActivity.this,"PMH: "+phistory,Toast.LENGTH_SHORT).sƒhow();
                 // Toast.makeText(PatientDetailActivity.this,"FH: "+fhistory,Toast.LENGTH_SHORT).show();
 
-                Intent intent2 = new Intent(PatientDetailActivity.this, IdentificationActivity.class);
+                Intent intent2 = new Intent(PatientDetailActivity.this, ComplaintNodeActivity.class);
                 String fullName = patient_new.getFirst_name() + " " + patient_new.getLast_name();
                 intent2.putExtra("patientUuid", patientUuid);
 
