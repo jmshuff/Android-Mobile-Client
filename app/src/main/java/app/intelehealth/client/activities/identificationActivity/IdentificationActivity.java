@@ -810,9 +810,7 @@ public class IdentificationActivity extends AppCompatActivity {
                     }
                 }, dayText);
                 mAgePicker.setPositiveButton(R.string.generic_ok, (dialog, which) -> {
-                    String ageString = mAgeYears + getString(R.string.identification_screen_text_years) + " - " +
-                            mAgeMonths + getString(R.string.identification_screen_text_months) + " - " +
-                            mAgeDays + getString(R.string.days);
+                    String ageString = mAgeYears + getString(R.string.identification_screen_text_years);
                     mAge.setText(ageString);
 
 
