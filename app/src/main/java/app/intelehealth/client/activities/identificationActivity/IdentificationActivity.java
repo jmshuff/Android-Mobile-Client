@@ -115,7 +115,7 @@ public class IdentificationActivity extends AppCompatActivity {
     EditText mDOB;
     EditText mPhoneNum;
     EditText mAge;
-    MaterialAlertDialogBuilder mAgePicker;
+    //MaterialAlertDialogBuilder mAgePicker;
     EditText mAddress1;
     EditText mAddress2;
     AutoCompleteTextView mCity;
@@ -719,7 +719,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 mAgeYears = Integer.valueOf(yearData[0]);
                 mAgeMonths = Integer.valueOf(monthData[1]);
                 mAgeDays = Integer.valueOf(daysData[1]);
-                mAge.setText(age);
+                //mAge.setText(age);
 
             }
         }, mDOBYear, mDOBMonth, mDOBDay);
@@ -744,114 +744,142 @@ public class IdentificationActivity extends AppCompatActivity {
             mAgeDays = Integer.valueOf(ymdData[2]);
             mAge.setText(yrMoDays);
         }
-        mAge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        //mAge.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) {
 
-                mAgePicker = new MaterialAlertDialogBuilder(IdentificationActivity.this, R.style.AlertDialogStyle);
-                mAgePicker.setTitle(R.string.identification_screen_prompt_age);
-                final LayoutInflater inflater = getLayoutInflater();
-                View convertView = inflater.inflate(R.layout.dialog_2_numbers_picker, null);
-                mAgePicker.setView(convertView);
-                NumberPicker yearPicker = convertView.findViewById(R.id.dialog_2_numbers_quantity);
-                NumberPicker monthPicker = convertView.findViewById(R.id.dialog_2_numbers_unit);
-                NumberPicker dayPicker = convertView.findViewById(R.id.dialog_3_numbers_unit);
-                dayPicker.setVisibility(View.VISIBLE);
+                //mAgePicker = new MaterialAlertDialogBuilder(IdentificationActivity.this, R.style.AlertDialogStyle);
+                //mAgePicker.setTitle(R.string.identification_screen_prompt_age);
+                //final LayoutInflater inflater = getLayoutInflater();
+                //View convertView = inflater.inflate(R.layout.dialog_2_numbers_picker, null);
+                //mAgePicker.setView(convertView);
+                //NumberPicker yearPicker = convertView.findViewById(R.id.dialog_2_numbers_quantity);
+                //NumberPicker monthPicker = convertView.findViewById(R.id.dialog_2_numbers_unit);
+                //NumberPicker dayPicker = convertView.findViewById(R.id.dialog_3_numbers_unit);
+                //dayPicker.setVisibility(View.VISIBLE);
 
-                final TextView middleText = convertView.findViewById(R.id.dialog_2_numbers_text);
-                final TextView endText = convertView.findViewById(R.id.dialog_2_numbers_text_2);
-                final TextView dayTv = convertView.findViewById(R.id.dialog_2_numbers_text_3);
-                dayPicker.setVisibility(View.VISIBLE);
+               //final TextView middleText = convertView.findViewById(R.id.dialog_2_numbers_text);
+                //final TextView endText = convertView.findViewById(R.id.dialog_2_numbers_text_2);
+                //final TextView dayTv = convertView.findViewById(R.id.dialog_2_numbers_text_3);
+                //dayPicker.setVisibility(View.VISIBLE);
 
-                int totalDays = today.getActualMaximum(Calendar.DAY_OF_MONTH);
-                dayTv.setText(getString(R.string.days));
-                middleText.setText(getString(R.string.identification_screen_picker_years));
-                endText.setText(getString(R.string.identification_screen_picker_months));
-
-
-                yearPicker.setMinValue(0);
-                yearPicker.setMaxValue(100);
-                monthPicker.setMinValue(0);
-                monthPicker.setMaxValue(12);
-
-                dayPicker.setMinValue(0);
-                dayPicker.setMaxValue(31);
-
-                EditText yearText = yearPicker.findViewById(Resources.getSystem().getIdentifier("numberpicker_input", "id", "android"));
-                EditText monthText = monthPicker.findViewById(Resources.getSystem().getIdentifier("numberpicker_input", "id", "android"));
-                EditText dayText = dayPicker.findViewById(Resources.getSystem().getIdentifier("numberpicker_input", "id", "android"));
+                //int totalDays = today.getActualMaximum(Calendar.DAY_OF_MONTH);
+                //dayTv.setText(getString(R.string.days));
+                //middleText.setText(getString(R.string.identification_screen_picker_years));
+                //endText.setText(getString(R.string.identification_screen_picker_months));
 
 
-                yearPicker.setValue(mAgeYears);
-                monthPicker.setValue(mAgeMonths);
-                dayPicker.setValue(mAgeDays);
+                //yearPicker.setMinValue(0);
+                //yearPicker.setMaxValue(100);
+                //monthPicker.setMinValue(0);
+                //monthPicker.setMaxValue(12);
+
+                //dayPicker.setMinValue(0);
+                //dayPicker.setMaxValue(31);
+
+                //EditText yearText = yearPicker.findViewById(Resources.getSystem().getIdentifier("numberpicker_input", "id", "android"));
+                //EditText monthText = monthPicker.findViewById(Resources.getSystem().getIdentifier("numberpicker_input", "id", "android"));
+                //EditText dayText = dayPicker.findViewById(Resources.getSystem().getIdentifier("numberpicker_input", "id", "android"));
+
+
+                //yearPicker.setValue(mAgeYears);
+                //monthPicker.setValue(mAgeMonths);
+                //dayPicker.setValue(mAgeDays);
 
                 //year
-                EditTextUtils.returnEditextValues(new IReturnValues() {
-                    @Override
-                    public void onReturnValue(String value) {
-                        mAgeYears = Integer.valueOf(value);
-                    }
-                }, yearText);
+                //EditTextUtils.returnEditextValues(new IReturnValues() {
+                //    @Override
+                //    public void onReturnValue(String value) {
+                //        mAgeYears = Integer.valueOf(value);
+                //    }
+                //}, yearText);
 
                 //month
-                EditTextUtils.returnEditextValues(new IReturnValues() {
-                    @Override
-                    public void onReturnValue(String value) {
-                        mAgeMonths = Integer.valueOf(value);
-                    }
-                }, monthText);
+                //EditTextUtils.returnEditextValues(new IReturnValues() {
+                //    @Override
+                //    public void onReturnValue(String value) {
+                //        mAgeMonths = Integer.valueOf(value);
+                //    }
+                //}, monthText);
 
                 //day
-                EditTextUtils.returnEditextValues(new IReturnValues() {
-                    @Override
-                    public void onReturnValue(String value) {
-                        mAgeDays = Integer.valueOf(value);
-                    }
-                }, dayText);
-                mAgePicker.setPositiveButton(R.string.generic_ok, (dialog, which) -> {
-                    String ageString = mAgeYears + getString(R.string.identification_screen_text_years);
-                    mAge.setText(ageString);
+                //EditTextUtils.returnEditextValues(new IReturnValues() {
+                //   @Override
+                //    public void onReturnValue(String value) {
+                //        mAgeDays = Integer.valueOf(value);
+                //   }
+                //}, dayText);
+                //mAgePicker.setPositiveButton(R.string.generic_ok, (dialog, which) -> {
+                //    String ageString = mAgeYears + getString(R.string.identification_screen_text_years);
+                //   mAge.setText(ageString);
 
 
+                //    Calendar calendar = Calendar.getInstance();
+                //    int curYear = calendar.get(Calendar.YEAR);
+                    //int birthYear = curYear - yearPicker.getValue();
+                //    int birthYear = curYear - mAgeYears;
+                //    int curMonth = calendar.get(Calendar.MONTH);
+                //    //int birthMonth = curMonth - monthPicker.getValue();
+                //    int birthMonth = curMonth - mAgeMonths;
+                    //int birthDay = calendar.get(Calendar.DAY_OF_MONTH) - dayPicker.getValue();
+                //    int birthDay = calendar.get(Calendar.DAY_OF_MONTH) - mAgeDays;
+                //    mDOBYear = birthYear;
+                //    mDOBMonth = birthMonth;
+
+                //    if (birthDay < 0) {
+                //        mDOBDay = birthDay + totalDays - 1;
+                //        mDOBMonth--;
+
+                //    } else {
+                //        mDOBDay = birthDay;
+                //    }
+                //    Locale.setDefault(Locale.ENGLISH);
+                //    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+                //    dob.set(mDOBYear, mDOBMonth, mDOBDay);
+                //    String dobString = simpleDateFormat.format(dob.getTime());
+                //    mDOB.setText(dobString);
+                //    mDOBPicker.updateDate(mDOBYear, mDOBMonth, mDOBDay);
+                //    dialog.dismiss();
+                //});
+                //mAgePicker.setNegativeButton(R.string.generic_cancel, new DialogInterface.OnClickListener() {
+                //    @Override
+                //    public void onClick(DialogInterface dialog, int which) {
+                //        dialog.dismiss();
+                //    }
+                //});
+
+                //AlertDialog alertDialog = mAgePicker.show();
+                //IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
+            //}
+        //});
+        //JS MAge
+        mAge.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus) {
                     Calendar calendar = Calendar.getInstance();
                     int curYear = calendar.get(Calendar.YEAR);
-                    //int birthYear = curYear - yearPicker.getValue();
-                    int birthYear = curYear - mAgeYears;
+                    int mAgeYear=Integer.parseInt(mAge.getText().toString());
+                    int birthYear = curYear - mAgeYear; //mAge will just be the year JS
                     int curMonth = calendar.get(Calendar.MONTH);
-                    //int birthMonth = curMonth - monthPicker.getValue();
-                    int birthMonth = curMonth - mAgeMonths;
-                    //int birthDay = calendar.get(Calendar.DAY_OF_MONTH) - dayPicker.getValue();
-                    int birthDay = calendar.get(Calendar.DAY_OF_MONTH) - mAgeDays;
+                    int birthMonth = curMonth; //There is no birth month JS
+                    int birthDay = calendar.get(Calendar.DAY_OF_MONTH);
+                    //int totalDays = today.getActualMaximum(Calendar.DAY_OF_MONTH);
                     mDOBYear = birthYear;
                     mDOBMonth = birthMonth;
+                    mDOBDay= birthDay;
 
-                    if (birthDay < 0) {
-                        mDOBDay = birthDay + totalDays - 1;
-                        mDOBMonth--;
-
-                    } else {
-                        mDOBDay = birthDay;
-                    }
                     Locale.setDefault(Locale.ENGLISH);
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
                     dob.set(mDOBYear, mDOBMonth, mDOBDay);
                     String dobString = simpleDateFormat.format(dob.getTime());
                     mDOB.setText(dobString);
                     mDOBPicker.updateDate(mDOBYear, mDOBMonth, mDOBDay);
-                    dialog.dismiss();
-                });
-                mAgePicker.setNegativeButton(R.string.generic_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-                AlertDialog alertDialog = mAgePicker.show();
-                IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
+                }
             }
         });
+
+
 
         ma_checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
