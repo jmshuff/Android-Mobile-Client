@@ -73,6 +73,7 @@ import app.intelehealth.client.database.dao.SyncDAO;
 import app.intelehealth.client.models.Patient;
 import app.intelehealth.client.models.dto.PatientAttributesDTO;
 import app.intelehealth.client.models.dto.PatientDTO;
+import app.intelehealth.client.models.pushRequestApiCall.Attribute;
 import app.intelehealth.client.utilities.DateAndTimeUtils;
 import app.intelehealth.client.utilities.EditTextUtils;
 import app.intelehealth.client.utilities.FileUtils;
@@ -177,6 +178,8 @@ public class IdentificationActivity extends AppCompatActivity {
     //random value assigned to check while editing. If user didnt updated the dob and just clicked on fab
     //in that case, the edit() will get the dob_indexValue as 15 and we  will check if the
     //dob_indexValue == 15 then just get the mDOB editText value and add in the db.
+    String patientUUID_Fam_Registration;
+    List<String> list_patientUuids;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -308,7 +311,24 @@ public class IdentificationActivity extends AppCompatActivity {
                 patient1.setUuid(patientID_edit);
                 setscreen(patientID_edit);
             }
+            else if(intent.hasExtra("patient_uuid_registr")) {
+                 patientUUID_Fam_Registration = intent.getStringExtra("patient_uuid_registr");
+            }
         }
+
+        //Fetch all patientUUIDs against that householdID....
+        if(patientUUID_Fam_Registration != null) {
+            list_patientUuids = new ArrayList<>();
+            if (!sessionManager.getHouseholdUuid().equalsIgnoreCase("")) {
+                try {
+                    list_patientUuids = patientsDAO.getPatientUUIDs(sessionManager.getHouseholdUuid());
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
+                //list_patientUuids.add(patientUUID_Fam_Registration);
+            }
+        }
+
 //        if (sessionManager.valueContains("licensekey"))
         if (!sessionManager.getLicenseKey().isEmpty())
             hasLicense = true;
@@ -436,6 +456,45 @@ public class IdentificationActivity extends AppCompatActivity {
             showAlertDialogButtonClicked(e.toString());
         }
 
+         /* Family Registration checking AEAT-85
+            write function in PatientsDAO class to fetch total_no_of_family_members value from the
+            patient uuid that we get in intent from PatientDetail screen. Then check if there is any value
+            for no of members if yes than Visible.GONE checkbox else Visible... */
+        boolean no_of_family_exists = false;
+        if(patientUUID_Fam_Registration != null) {
+            Log.d("id", "id__id: "+patientUUID_Fam_Registration);
+            try {
+                //Check attributes for all the patientUUIDs of same family members...
+                for (int j = 0; j < list_patientUuids.size(); j++) {
+                    //Check for each patientUUIs attributes...
+                    List<Attribute> no_of_fam_members = patientsDAO
+                            .getPatientAttributes(list_patientUuids.get(j)); //get each patientuuid...
+                    for (int i = 0; i < no_of_fam_members.size(); i++) {
+                        if(no_of_fam_members.get(i).getAttributeType()
+                                .equalsIgnoreCase("2143ba61-113e-488d-a553-295666a84cfa")) {
+                            /* This states that total no of family members field exists.
+                            So, hide the checkbox of family if exists... */
+                            //familyhead_checkbox.setVisibility(View.GONE);
+                            no_of_family_exists = true;
+                        }
+                        else {
+                            //  familyhead_checkbox.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+            if (!sessionManager.getHouseholdUuid().equalsIgnoreCase("") && no_of_family_exists) {
+                familyhead_checkbox.setVisibility(View.GONE);
+            }
+            else {
+                familyhead_checkbox.setVisibility(View.VISIBLE);
+            }
+        }
+
+
         //setting the fields when user clicks edit details
         mFirstName.setText(patient1.getFirst_name());
         mMiddleName.setText(patient1.getMiddle_name());
@@ -538,6 +597,7 @@ public class IdentificationActivity extends AppCompatActivity {
         //Household Head
 //        occupation_adapt = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
 //                getResources().getStringArray(R.array.occupation_spinner));
+
 
         occupation_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -939,14 +999,17 @@ public class IdentificationActivity extends AppCompatActivity {
             }
 
             //Houselhold Head...
-            if (patient1.getNo_of_family_members() != null && !patient1.getNo_of_family_members().equalsIgnoreCase("")
-                    && !patient1.getNo_of_family_members().isEmpty()) {
+            if (patient1.getNo_of_family_members() != null && !patient1.getNo_of_family_members()
+                    .equalsIgnoreCase("") && !patient1.getNo_of_family_members().isEmpty()) {
                 familyhead_checkbox.setChecked(true);
+                familyhead_checkbox.setEnabled(false); //disable the checkbox...
                 cardview_household.setVisibility(View.VISIBLE);
                 //sessionManager.setHOH_checkbox(false);
             } else {
-                familyhead_checkbox.setChecked(false);
-                cardview_household.setVisibility(View.GONE);
+                /*familyhead_checkbox.setChecked(false);
+                cardview_household.setVisibility(View.GONE);*/
+                familyhead_checkbox.setVisibility(View.GONE);
+                //just hide this so that again on edit the hoh cant be changed...
             }
 
             if (patient1.getOccupation() != null && !patient1.getOccupation().equalsIgnoreCase("")) {
@@ -2168,7 +2231,7 @@ public class IdentificationActivity extends AppCompatActivity {
             patientAttributesDTO.setValue(AppConstants.dateAndTimeUtils.currentDateTime());
 
             //House Hold Registration
-            if (sessionManager.getHouseholdUuid().equals("")) {
+            if (sessionManager.getHouseholdUuid().equals("")) { //Patient Create...
 
                 String HouseHold_UUID = UUID.randomUUID().toString();
                 sessionManager.setHouseholdUuid(HouseHold_UUID);
@@ -2903,7 +2966,7 @@ public class IdentificationActivity extends AppCompatActivity {
 
 
             //House Hold Registration
-            if (sessionManager.getHouseholdUuid().equals("")) {
+            if (sessionManager.getHouseholdUuid().equals("")) { //Patient Update...
 
                 String HouseHold_UUID = UUID.randomUUID().toString();
                 sessionManager.setHouseholdUuid(HouseHold_UUID);
