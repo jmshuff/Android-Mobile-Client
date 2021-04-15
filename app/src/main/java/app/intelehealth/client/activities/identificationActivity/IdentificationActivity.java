@@ -857,24 +857,26 @@ public class IdentificationActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus) {
-                    Calendar calendar = Calendar.getInstance();
-                    int curYear = calendar.get(Calendar.YEAR);
-                    int mAgeYear=Integer.parseInt(mAge.getText().toString());
-                    int birthYear = curYear - mAgeYear; //mAge will just be the year JS
-                    int curMonth = calendar.get(Calendar.MONTH);
-                    int birthMonth = curMonth; //There is no birth month JS
-                    int birthDay = calendar.get(Calendar.DAY_OF_MONTH);
-                    //int totalDays = today.getActualMaximum(Calendar.DAY_OF_MONTH);
-                    mDOBYear = birthYear;
-                    mDOBMonth = birthMonth;
-                    mDOBDay= birthDay;
+                    if (!mAge.getText().toString().isEmpty()) {
+                        Calendar calendar = Calendar.getInstance();
+                        int curYear = calendar.get(Calendar.YEAR);
+                        int mAgeYear = Integer.parseInt(mAge.getText().toString());
+                        int birthYear = curYear - mAgeYear; //mAge will just be the year JS
+                        int curMonth = calendar.get(Calendar.MONTH);
+                        int birthMonth = curMonth; //There is no birth month JS
+                        int birthDay = calendar.get(Calendar.DAY_OF_MONTH);
+                        //int totalDays = today.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        mDOBYear = birthYear;
+                        mDOBMonth = birthMonth;
+                        mDOBDay = birthDay;
 
-                    Locale.setDefault(Locale.ENGLISH);
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-                    dob.set(mDOBYear, mDOBMonth, mDOBDay);
-                    String dobString = simpleDateFormat.format(dob.getTime());
-                    mDOB.setText(dobString);
-                    mDOBPicker.updateDate(mDOBYear, mDOBMonth, mDOBDay);
+                        Locale.setDefault(Locale.ENGLISH);
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+                        dob.set(mDOBYear, mDOBMonth, mDOBDay);
+                        String dobString = simpleDateFormat.format(dob.getTime());
+                        mDOB.setText(dobString);
+                        mDOBPicker.updateDate(mDOBYear, mDOBMonth, mDOBDay);
+                    }
                 }
             }
         });
