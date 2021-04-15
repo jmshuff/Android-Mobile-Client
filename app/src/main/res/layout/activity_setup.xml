@@ -112,65 +112,6 @@
                     </androidx.cardview.widget.CardView>
 
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/cardview2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        app:cardCornerRadius="10sp"
-                        android:layout_marginTop="15dp"
-                        app:cardElevation="5sp"
-                        app:cardPreventCornerOverlap="false"
-                        >
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:includeFontPadding="false"
-                                android:fontFamily="@font/lato_bold"
-                                android:text="@string/choose_an_option_for_protocols"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-
-                            <Space
-                                android:layout_width="match_parent"
-                                android:layout_height="10dp" />
-
-                            <RadioButton
-                                android:id="@+id/demoMindmap"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:checked="true"
-                                android:textSize="14sp"
-                                android:includeFontPadding="false"
-                                android:fontFamily="@font/lato_regular"
-                                android:onClick="onRadioClick"
-                                android:textAppearance="@style/RobotoTextViewStyle"
-                                android:text="@string/setup_use_demo_mindmap" />
-
-
-
-                            <RadioButton
-                                android:id="@+id/downloadMindmap"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:onClick="onRadioClick"
-                                android:textSize="14sp"
-                                android:includeFontPadding="false"
-                                android:fontFamily="@font/lato_regular"
-                                android:textAppearance="@style/RobotoTextViewStyle"
-                                android:text="@string/setup_download_mindmap" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
                     android:id="@+id/cardview3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
