@@ -437,6 +437,11 @@ public class PatientDetailActivity extends AppCompatActivity {
             } else {
                 casteRow.setVisibility(View.GONE);
             }
+            if (obj.getBoolean("mDOB")) {
+                dobView.setVisibility(View.VISIBLE);
+            } else {
+                dobView.setVisibility(View.GONE);
+            }
             if (obj.getBoolean("educationLayout")) {
                 educationRow.setVisibility(View.VISIBLE);
             } else {
