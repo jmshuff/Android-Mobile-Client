@@ -142,10 +142,7 @@ public class SetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (NetworkConnection.isOnline(v.getContext())) {
-                    //MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(this);
-                    // AlertDialog.Builder dialog = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
-                    //LayoutInflater li = LayoutInflater.from(this);
-                   // View promptsView = li.inflate(R.layout.dialog_mindmap_cred, null);
+                    //JS
                     licenseUrl= mUrlField.getText().toString();
                     sessionManager.setMindMapServerUrl(licenseUrl);
                     getMindmapDownloadURL("https://" + licenseUrl + ":3004/");
@@ -544,7 +541,9 @@ public class SetupActivity extends AppCompatActivity {
                                             Log.i(TAG, "onPostExecute: Parse init");
                                             Intent intent = new Intent(SetupActivity.this, HomeActivity.class);
                                             intent.putExtra("setup", true);
-                                            if (r2.isChecked()) {
+                                            startActivity(intent);
+                                            finish();
+                                            /*if (r2.isChecked()) {
                                                 if (!sessionManager.getLicenseKey().isEmpty()) {
                                                     sessionManager.setTriggerNoti("no");
                                                     startActivity(intent);
@@ -556,7 +555,7 @@ public class SetupActivity extends AppCompatActivity {
                                                 sessionManager.setTriggerNoti("no");
                                                 startActivity(intent);
                                                 finish();
-                                            }
+                                            }*/
                                             progress.dismiss();
                                         }
                                     }
