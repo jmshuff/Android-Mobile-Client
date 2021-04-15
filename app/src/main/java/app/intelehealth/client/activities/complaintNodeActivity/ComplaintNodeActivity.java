@@ -337,54 +337,53 @@ public class ComplaintNodeActivity extends AppCompatActivity {
                 //pb.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
                 IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
             } else {
-                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
-//                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
-                alertDialogBuilder.setTitle(R.string.complaint_dialog_title);
-                final LayoutInflater inflater = getLayoutInflater();
-                View convertView = inflater.inflate(R.layout.list_dialog_complaint, null);
-                alertDialogBuilder.setView(convertView);
-                ListView listView = convertView.findViewById(R.id.complaint_dialog_list_view);
-                listView.setDivider(null);
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, displaySelection);
-                listView.setAdapter(arrayAdapter);
-                alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        Intent intent = new Intent(
-                                ComplaintNodeActivity.this, QuestionNodeActivity.class);
-                        intent.putExtra("patientUuid", patientUuid);
-                        intent.putExtra("visitUuid", visitUuid);
-                        intent.putExtra("encounterUuidVitals", encounterVitals);
-                        intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
-                        intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
-                        intent.putExtra("state", state);
-                        intent.putExtra("name", patientName);
-                        intent.putExtra("float_ageYear_Month", float_ageYear_Month);
-                        if (intentTag != null) {
-                            intent.putExtra("tag", intentTag);
-                        }
-                        intent.putStringArrayListExtra("complaints", selection);
+                //MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+//              //  AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
+                //alertDialogBuilder.setTitle(R.string.complaint_dialog_title);
+                //final LayoutInflater inflater = getLayoutInflater();
+                //View convertView = inflater.inflate(R.layout.list_dialog_complaint, null);
+                //alertDialogBuilder.setView(convertView);
+                //ListView listView = convertView.findViewById(R.id.complaint_dialog_list_view);
+                //listView.setDivider(null);
+                //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, displaySelection);
+                //listView.setAdapter(arrayAdapter);
+                //alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                //    @Override
+                //    public void onClick(DialogInterface dialog, int which) {
+                //    dialog.dismiss();
+                Intent intent = new Intent(
+                        ComplaintNodeActivity.this, QuestionNodeActivity.class);
+                intent.putExtra("patientUuid", patientUuid);
+                intent.putExtra("visitUuid", visitUuid);
+                intent.putExtra("encounterUuidVitals", encounterVitals);
+                intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+                intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+                intent.putExtra("state", state);
+                intent.putExtra("name", patientName);
+                intent.putExtra("float_ageYear_Month", float_ageYear_Month);
+                if (intentTag != null) {
+                    intent.putExtra("tag", intentTag);
+                }
+                intent.putStringArrayListExtra("complaints", selection);
 
-                        startActivity(intent);
-                    }
-                });
-                alertDialogBuilder.setNegativeButton(getResources().getString(R.string.complaint_change_selected), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = alertDialogBuilder.show();
-                //alertDialog.show();
-                Button pb = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                Button nb = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                pb.setTextColor(getResources().getColor((R.color.colorPrimary)));
-                // pb.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
-                nb.setTextColor(getResources().getColor((R.color.colorPrimary)));
-                //nb.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
-                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+                startActivity(intent);
             }
+                //alertDialogBuilder.setNegativeButton(getResources().getString(R.string.complaint_change_selected), new DialogInterface.OnClickListener() {
+                //    @Override
+                //    public void onClick(DialogInterface dialog, int which) {
+                //        dialog.dismiss();
+                //   }
+                //});
+                //AlertDialog alertDialog = alertDialogBuilder.show();
+                //alertDialog.show();
+                //Button pb = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                //Button nb = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                //pb.setTextColor(getResources().getColor((R.color.colorPrimary)));
+                //// pb.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+                //nb.setTextColor(getResources().getColor((R.color.colorPrimary)));
+                ////nb.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+                //IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            //}
         }
     }
 
