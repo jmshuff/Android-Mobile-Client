@@ -95,7 +95,7 @@ public class SetupActivity extends AppCompatActivity {
     String encoded = null;
     AlertDialog.Builder dialog;
     String key = "aravind20212"; //JS
-    String licenseUrl = "testing.intelehealth.org"; //JS
+    String licenseUrl = null; //JS
     SessionManager sessionManager = null;
     public File base_dir;
     public String[] FILES;
@@ -405,6 +405,7 @@ public class SetupActivity extends AppCompatActivity {
                         // AlertDialog.Builder dialog = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
                         LayoutInflater li = LayoutInflater.from(this);
                         View promptsView = li.inflate(R.layout.dialog_mindmap_cred, null);
+                        licenseUrl= mUrlField.getText().toString();
 
 
 
