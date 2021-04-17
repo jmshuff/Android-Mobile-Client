@@ -143,9 +143,6 @@ public class SetupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (NetworkConnection.isOnline(v.getContext())) {
                     //JS
-                    licenseUrl= mUrlField.getText().toString();
-                    sessionManager.setMindMapServerUrl(licenseUrl);
-                    getMindmapDownloadURL("https://" + licenseUrl + ":3004/");
                     attemptLogin();
                 } else {
                     Toast.makeText(context, getString(R.string.mindmap_internect_connection), Toast.LENGTH_SHORT).show();
@@ -221,9 +218,12 @@ public class SetupActivity extends AppCompatActivity {
                     if (!mUrlField.getText().toString().trim().isEmpty() && mUrlField.getText().toString().length() >= 12) {
                         if (Patterns.WEB_URL.matcher(mUrlField.getText().toString()).matches()) {
                             String BASE_URL = "https://" + mUrlField.getText().toString() + "/openmrs/ws/rest/v1/";
-                            if (URLUtil.isValidUrl(BASE_URL) && !isLocationFetched)
+                            if (URLUtil.isValidUrl(BASE_URL) && !isLocationFetched) {
                                 getLocationFromServer(BASE_URL);
-                            else
+                                licenseUrl= mUrlField.getText().toString();
+                                sessionManager.setMindMapServerUrl(licenseUrl);
+                                getMindmapDownloadURL("https://" + licenseUrl + ":3004/", key);
+                            }else
                                 Toast.makeText(SetupActivity.this, getString(R.string.url_invalid), Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -624,7 +624,7 @@ public class SetupActivity extends AppCompatActivity {
 
     }
 
-    private void getMindmapDownloadURL(String url) {
+    private void getMindmapDownloadURL(String url, String key) {
         customProgressDialog.show();
         ApiClient.changeApiBaseUrl(url);
         ApiInterface apiService = ApiClient.createService(ApiInterface.class);
