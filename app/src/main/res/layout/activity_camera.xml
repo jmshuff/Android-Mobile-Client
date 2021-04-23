@@ -20,6 +20,14 @@
             app:aspectRatio="4:3"
             app:facing="back" />
 
+         <ImageView android:id="@+id/myImageView"
+             android:layout_width="160dp"
+             android:layout_height="160dp"
+             android:src="@drawable/circle_intelehealth"
+             android:layout_centerHorizontal="true"
+             android:layout_marginTop="200dp"/>
+
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
