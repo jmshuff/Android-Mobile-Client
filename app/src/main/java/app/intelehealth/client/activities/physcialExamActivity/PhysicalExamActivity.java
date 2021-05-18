@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 
@@ -118,11 +119,29 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         sessionManager = new SessionManager(this);
         MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
         // AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
-        alertDialogBuilder.setTitle(R.string.wash_hands);
+        alertDialogBuilder.setTitle(R.string.open_peek_acuity);
         LayoutInflater factory = LayoutInflater.from(this);
-        final View view = factory.inflate(R.layout.hand_wash, null);
+        final View view = factory.inflate(R.layout.peek_acuity_open, null);
         alertDialogBuilder.setView(view);
         alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent2 = getPackageManager().getLaunchIntentForPackage("org.peekvision.public.android"); //JS
+                if (intent2 != null) {
+                    // We found the activity now start the activity
+                    intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent2);
+                } else {
+                    // Bring user to the market or let them choose an app?
+                    intent2 = new Intent(Intent.ACTION_VIEW);
+                    intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent2.setData(Uri.parse("market://details?id=" + "org.peekvision.public.android"));
+                    startActivity(intent2);
+                }
+
+            }
+        });
+        alertDialogBuilder.setNegativeButton(R.string.generic_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

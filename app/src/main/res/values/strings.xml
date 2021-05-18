@@ -203,6 +203,7 @@
 
     //Physical Exam Dialog
     <string name="wash_hands" translatable="false">Remember to wash your hands</string>
+    <string name="open_peek_acuity" translatable="false">Do you want to open Peek Acuity?</string>
 
 
     //Patient Detail Screen
