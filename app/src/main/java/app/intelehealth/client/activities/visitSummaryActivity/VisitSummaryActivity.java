@@ -568,7 +568,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                                         //Toast.makeText(context, R.string.whatsapp_presc_toast, Toast.LENGTH_LONG).show();
                                         startActivity(new Intent(Intent.ACTION_VIEW,
                                                 Uri.parse(
-                                                        String.format("https://api.whatsapp.com/send?phone=%s&text=%s",
+                                                        String.format("http://api.whatsapp.com/send?phone=%s&text=%s",
                                                                 phoneNumber, whatsappMessage))));
 
                                         //isreturningWhatsapp = true;

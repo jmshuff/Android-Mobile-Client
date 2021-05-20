@@ -262,7 +262,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         startActivity(new Intent(Intent.ACTION_VIEW,
                                 Uri.parse(
-                                        String.format("https://api.whatsapp.com/send?phone=%s&text=%s",
+                                        String.format("http://api.whatsapp.com/send?phone=%s&text=%s",
                                                 phoneNumberWithCountryCode, message))));
 
                     }
