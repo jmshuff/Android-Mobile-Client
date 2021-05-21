@@ -1181,7 +1181,7 @@ public class IdentificationActivity extends AppCompatActivity {
 
 
         // New Validation
-        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && !mGenderF.isChecked() && !mGenderM.isChecked() && mDOB.getText().toString().equals("") && mDOB.getText().toString().isEmpty() && mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty() && mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty())
+        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && !mGenderF.isChecked() && !mGenderM.isChecked() && mDOB.getText().toString().equals("") && mDOB.getText().toString().isEmpty() && mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty() && mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty())
         {
             personal_info_textview.requestFocus();
 
@@ -1206,7 +1206,7 @@ public class IdentificationActivity extends AppCompatActivity {
 //            stateText.setError(getString(R.string.error_field_required));
 //            stateText.requestFocus();
 
-            mCity.setError(getString(R.string.error_field_required));
+            mPhoneNum.setError(getString(R.string.error_field_required));
 //            mCity.requestFocus();
 
             if (frameLayout.getVisibility() == View.VISIBLE) {
