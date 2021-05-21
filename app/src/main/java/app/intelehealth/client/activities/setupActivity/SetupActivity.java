@@ -95,7 +95,7 @@ public class SetupActivity extends AppCompatActivity {
     String encoded = null;
     AlertDialog.Builder dialog;
     String key = "aravind20212"; //JS
-    String licenseUrl = null; //JS
+    String licenseUrl = "testing.intelehealth.org"; //JS
     SessionManager sessionManager = null;
     public File base_dir;
     public String[] FILES;
@@ -136,6 +136,8 @@ public class SetupActivity extends AppCompatActivity {
         // Set up the login form.
         mEmailView = findViewById(R.id.email);
         // populateAutoComplete(); TODO: create our own autocomplete code
+        sessionManager.setMindMapServerUrl(licenseUrl);//JS
+        getMindmapDownloadURL("https://" + licenseUrl + ":3004/", key);//JS
 
         mLoginButton = findViewById(R.id.setup_submit_button);
         mLoginButton.setOnClickListener(new View.OnClickListener() {
@@ -220,9 +222,9 @@ public class SetupActivity extends AppCompatActivity {
                             String BASE_URL = "http://" + mUrlField.getText().toString() + "/openmrs/ws/rest/v1/";
                             if (URLUtil.isValidUrl(BASE_URL) && !isLocationFetched) {
                                 getLocationFromServer(BASE_URL);
-                                licenseUrl= mUrlField.getText().toString();
-                                sessionManager.setMindMapServerUrl(licenseUrl);
-                                getMindmapDownloadURL("http://" + licenseUrl + ":3004/", key);
+                                //licenseUrl= mUrlField.getText().toString();
+                                //sessionManager.setMindMapServerUrl(licenseUrl);
+                                //getMindmapDownloadURL("https://" + licenseUrl + ":3004/", key);
                             }else
                                 Toast.makeText(SetupActivity.this, getString(R.string.url_invalid), Toast.LENGTH_SHORT).show();
                         }
@@ -494,8 +496,8 @@ public class SetupActivity extends AppCompatActivity {
                                             //Parse.initialize(new Parse.Configuration.Builder(getApplicationContext())
                                             //        .applicationId(AppConstants.IMAGE_APP_ID)
                                             //        .server("http://" + CLEAN_URL + ":1337/parse/")
-                                            //        .build()
-                                            //); JS
+                                            //       .build()
+                                            //);
 
                                             SQLiteDatabase sqLiteDatabase = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
                                             //SQLiteDatabase read_db = AppConstants.inteleHealthDatabaseHelper.getReadableDatabase();
