@@ -423,7 +423,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             setHasOptionsMenu(true);
 
 
-            bindPreferenceSummaryToValue(findPreference("hindiLang"));
             // bindPreferenceSummaryToValue(findPreference("bengaliLang"));
             //  bindPreferenceSummaryToValue(findPreference("OriyaLang"));
 

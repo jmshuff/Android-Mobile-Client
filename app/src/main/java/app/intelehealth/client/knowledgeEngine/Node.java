@@ -72,6 +72,7 @@ public class Node implements Serializable {
     private String display_oriya;
     private String display_cebuno;
     private String display_hindi;
+    private String display_tamil;
     private String language;
     private String choiceType;
     private String inputType;
@@ -195,6 +196,14 @@ public class Node implements Serializable {
                 this.display_hindi = this.display;
             }
 
+            this.display_tamil = jsonNode.optString("display-or");
+            if (this.display_tamil.isEmpty()) {
+                this.display_tamil = jsonNode.optString("display-or");
+            }//JS
+            if (this.display_tamil.isEmpty()) {
+                this.display_tamil = this.display;
+            }
+
             this.language = jsonNode.optString("language");
             if (this.language.isEmpty()) {
                 this.language = this.text;
@@ -254,6 +263,7 @@ public class Node implements Serializable {
         this.display = source.display;
         this.display_oriya = source.display_oriya;
         this.display_cebuno = source.display_cebuno;
+        this.display_tamil=source.display_tamil;
         this.optionsList = source.optionsList;
         this.terminal = source.terminal;
         this.language = source.language;
@@ -451,6 +461,21 @@ public class Node implements Serializable {
                     }
                 }
             }
+            case "ta": {
+                //Log.i(TAG, "findDisplay: ta");
+                if (display_tamil != null && !display_tamil.isEmpty()) {
+                    //Log.i(TAG, "findDisplay: cb ");
+                    return display_tamil;
+                } else {
+                    if (display == null || display.isEmpty()) {
+                        //Log.i(TAG, "findDisplay: eng/o txt");
+                        return text;
+                    } else {
+                        //Log.i(TAG, "findDisplay: eng/o dis");
+                        return display;
+                    }
+                }
+            }//JS
             default: {
                 {
                     if (display != null && display.isEmpty()) {
@@ -1671,6 +1696,12 @@ public class Node implements Serializable {
         this.display_hindi = display_hindi;
     }
 
+    public String getDisplay_tamil() {
+        return display_tamil;
+    }
+
+    public void setDisplay_tamil(String display_tamil) {this.display_tamil = display_tamil; }
+
     public void setOptionsList(List<Node> optionsList) {
         this.optionsList = optionsList;
     }
@@ -1998,6 +2029,7 @@ public class Node implements Serializable {
                 ", display_oriya='" + display_oriya + '\'' +
                 ", display_cebuno='" + display_cebuno + '\'' +
                 ", display_hindi='" + display_hindi + '\'' +
+                ", display_tamil='" + display_tamil + '\'' +
                 ", language='" + language + '\'' +
                 ", choiceType='" + choiceType + '\'' +
                 ", inputType='" + inputType + '\'' +

@@ -134,7 +134,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     private WebView mWebView;
     private LinearLayout mLayout;
 
-    String mHeight, mWeight, mBMI, mBP, mPulse, mTemp, mSPO2, mresp;
+  // String mHeight, mWeight, mBMI, mBP, mPulse, mTemp, mSPO2, mresp; JS
     String speciality_selected = "";
 
     boolean uploaded = false;
@@ -162,14 +162,14 @@ public class VisitSummaryActivity extends AppCompatActivity {
     ObsDTO famHistory = new ObsDTO();
     ObsDTO patHistory = new ObsDTO();
     ObsDTO phyExam = new ObsDTO();
-    ObsDTO height = new ObsDTO();
-    ObsDTO weight = new ObsDTO();
-    ObsDTO pulse = new ObsDTO();
-    ObsDTO bpSys = new ObsDTO();
-    ObsDTO bpDias = new ObsDTO();
-    ObsDTO temperature = new ObsDTO();
-    ObsDTO spO2 = new ObsDTO();
-    ObsDTO resp = new ObsDTO();
+    //ObsDTO height = new ObsDTO(); JS
+    //ObsDTO weight = new ObsDTO();
+    //ObsDTO pulse = new ObsDTO();
+    //ObsDTO bpSys = new ObsDTO();
+    //ObsDTO bpDias = new ObsDTO();
+    //ObsDTO temperature = new ObsDTO();
+    //ObsDTO spO2 = new ObsDTO();
+    //ObsDTO resp = new ObsDTO();
 
     String diagnosisReturned = "";
     String rxReturned = "";
@@ -179,7 +179,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     String additionalReturned = "";
     String followUpDate = "";
 
-    ImageButton editVitals;
+    //ImageButton editVitals; JS
     ImageButton editComplaint;
     ImageButton editPhysical;
     ImageButton editFamHist;
@@ -190,13 +190,13 @@ public class VisitSummaryActivity extends AppCompatActivity {
     TextView nameView;
     TextView idView;
     TextView visitView;
-    TextView heightView;
-    TextView weightView;
-    TextView pulseView;
-    TextView bpView;
-    TextView tempView;
-    TextView spO2View;
-    TextView bmiView;
+    //TextView heightView;
+    //TextView weightView;
+    //TextView pulseView;
+    //TextView bpView;
+    //TextView tempView;
+    //TextView spO2View;
+    //TextView bmiView; JS
     TextView complaintView;
     TextView famHistView;
     TextView patHistView;
@@ -205,10 +205,10 @@ public class VisitSummaryActivity extends AppCompatActivity {
     TextView mDoctorName;
     TextView mCHWname;
     //    //    Respiratory added by mahiti dev team
-    TextView respiratory;
-    TextView respiratoryText;
-    TextView tempfaren;
-    TextView tempcel;
+    //TextView respiratory;
+    //TextView respiratoryText;
+    //TextView tempfaren;
+    //TextView tempcel;
     String medHistory;
     String baseDir;
     String filePathPhyExam;
@@ -611,6 +611,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
 //        mDoctorTitle.setVisibility(View.GONE);
 //        mDoctorName.setVisibility(View.GONE);
         speciality_spinner = findViewById(R.id.speciality_spinner);
+        speciality_spinner.setVisibility(View.GONE); //JS
         diagnosisTextView = findViewById(R.id.textView_content_diagnosis);
         prescriptionTextView = findViewById(R.id.textView_content_rx);
         medicalAdviceTextView = findViewById(R.id.textView_content_medical_advice);
@@ -625,7 +626,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         isVisitSpecialityExists = speciality_row_exist_check(visitUuid);
         if (isVisitSpecialityExists)
             speciality_spinner.setEnabled(false);
-
+        else
+            speciality_spinner.setEnabled(false); //JS
 
         //spinner is being populated with the speciality values...
         ProviderAttributeLIstDAO providerAttributeLIstDAO = new ProviderAttributeLIstDAO();
@@ -700,7 +702,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
         mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        editVitals = findViewById(R.id.imagebutton_edit_vitals);
+        //editVitals = findViewById(R.id.imagebutton_edit_vitals);
         editComplaint = findViewById(R.id.imagebutton_edit_complaint);
         editPhysical = findViewById(R.id.imagebutton_edit_physexam);
         editFamHist = findViewById(R.id.imagebutton_edit_famhist);
@@ -736,7 +738,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
         downloadButton.setEnabled(false);
         downloadButton.setVisibility(View.GONE);
         if (isPastVisit) {
-            editVitals.setVisibility(View.GONE);
+            //editVitals.setVisibility(View.GONE);
             editComplaint.setVisibility(View.GONE);
             editPhysical.setVisibility(View.GONE);
             editFamHist.setVisibility(View.GONE);
@@ -938,14 +940,14 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
         nameView.setText(patientName);
 
-        heightView = findViewById(R.id.textView_height_value);
-        weightView = findViewById(R.id.textView_weight_value);
-        pulseView = findViewById(R.id.textView_pulse_value);
-        bpView = findViewById(R.id.textView_bp_value);
-        tempView = findViewById(R.id.textView_temp_value);
+        //heightView = findViewById(R.id.textView_height_value);
+        //weightView = findViewById(R.id.textView_weight_value);
+        //pulseView = findViewById(R.id.textView_pulse_value);
+        //bpView = findViewById(R.id.textView_bp_value);
+        //tempView = findViewById(R.id.textView_temp_value);
 
-        tempfaren = findViewById(R.id.textView_temp_faren);
-        tempcel = findViewById(R.id.textView_temp);
+        //tempfaren = findViewById(R.id.textView_temp_faren);
+        //tempcel = findViewById(R.id.textView_temp); JS
         try {
             JSONObject obj = null;
             if (hasLicense) {
@@ -955,7 +957,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             } else {
                 obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(VisitSummaryActivity.this, mFileName)));
             }
-            if (obj.getBoolean("mCelsius")) {
+/*            if (obj.getBoolean("mCelsius")) {
                 tempcel.setVisibility(View.VISIBLE);
                 tempfaren.setVisibility(View.GONE);
                 tempView.setText(temperature.getValue());
@@ -967,20 +969,20 @@ public class VisitSummaryActivity extends AppCompatActivity {
                     tempView.setText(convertCtoF(temperature.getValue()));
                     Log.d("temp", "temp_F: " + tempView.getText().toString());
                 }
-            }
+            }*/ //JS
         } catch (JSONException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
-        spO2View = findViewById(R.id.textView_pulseox_value);
-        respiratory = findViewById(R.id.textView_respiratory_value);
-        respiratoryText = findViewById(R.id.textView_respiratory);
-        bmiView = findViewById(R.id.textView_bmi_value);
+        //spO2View = findViewById(R.id.textView_pulseox_value);
+        //respiratory = findViewById(R.id.textView_respiratory_value);
+        //respiratoryText = findViewById(R.id.textView_respiratory);
+        //bmiView = findViewById(R.id.textView_bmi_value);
         complaintView = findViewById(R.id.textView_content_complaint);
         famHistView = findViewById(R.id.textView_content_famhist);
         patHistView = findViewById(R.id.textView_content_pathist);
         physFindingsView = findViewById(R.id.textView_content_physexam);
 
-        if (isRespiratory) {
+        /*if (isRespiratory) {
             respiratoryText.setVisibility(View.VISIBLE);
             respiratory.setVisibility(View.VISIBLE);
         } else {
@@ -1007,9 +1009,9 @@ public class VisitSummaryActivity extends AppCompatActivity {
             bpView.setText("");
         } else {
             bpView.setText(bpText);
-        }
+        }*/ //JS
 
-        Log.d(TAG, "onCreate: " + weight.getValue());
+/*        Log.d(TAG, "onCreate: " + weight.getValue());
         String mWeight = weight.getValue();
         String mHeight = height.getValue();
         if ((mHeight != null && mWeight != null) && !mHeight.isEmpty() && !mWeight.isEmpty()) {
@@ -1019,14 +1021,14 @@ public class VisitSummaryActivity extends AppCompatActivity {
             mBMI = String.format(Locale.ENGLISH, "%.2f", bmi_value);
         } else {
             mBMI = "";
-        }
+        }*/
         patHistory.setValue(medHistory);
 
-        bmiView.setText(mBMI);
+/*        bmiView.setText(mBMI);
 //        tempView.setText(temperature.getValue());
         //    Respiratory added by mahiti dev team
         respiratory.setText(resp.getValue());
-        spO2View.setText(spO2.getValue());
+        spO2View.setText(spO2.getValue());*/
         if (complaint.getValue() != null)
             complaintView.setText(Html.fromHtml(complaint.getValue()));
         if (famHistory.getValue() != null)
@@ -1037,6 +1039,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
 
 
+/*
         editVitals.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1050,6 +1053,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 startActivity(intent1);
             }
         });
+*/
 
         editFamHist.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1788,10 +1792,10 @@ public class VisitSummaryActivity extends AppCompatActivity {
         if (mFamHist == null) {
             mFamHist = "";
         }
-        mHeight = height.getValue();
-        mWeight = weight.getValue();
-        mBP = bpSys.getValue() + "/" + bpDias.getValue();
-        mPulse = pulse.getValue();
+        //mHeight = height.getValue();
+        //mWeight = weight.getValue();
+        //mBP = bpSys.getValue() + "/" + bpDias.getValue();
+        //mPulse = pulse.getValue();
         try {
             JSONObject obj = null;
             if (hasLicense) {
@@ -1802,7 +1806,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(this, mFileName)));
             }//Load the config file
 
-            if (obj.getBoolean("mTemperature")) {
+            /*if (obj.getBoolean("mTemperature")) {
                 if (obj.getBoolean("mCelsius")) {
 
                     mTemp = "Temperature(C): " + (!TextUtils.isEmpty(temperature.getValue()) ? temperature.getValue().toString() : "");
@@ -1813,12 +1817,12 @@ public class VisitSummaryActivity extends AppCompatActivity {
                     mTemp = "Temperature(F): " + (!TextUtils.isEmpty(temperature.getValue()) ?
                             convertCtoF(temperature.getValue()) : "");
                 }
-            }
+            }*/
         } catch (Exception e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
-        mresp = resp.getValue();
-        mSPO2 = "SpO2(%): " + (!TextUtils.isEmpty(spO2.getValue()) ? spO2.getValue() : "");
+        //mresp = resp.getValue();
+        //mSPO2 = "SpO2(%): " + (!TextUtils.isEmpty(spO2.getValue()) ? spO2.getValue() : "");
         String mComplaint = complaint.getValue();
 
         //Show only the headers of the complaints in the printed prescription
@@ -1916,8 +1920,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         String heading2 = prescription2;
         String heading3 = "<br/>";
 
-        String bp = mBP;
-        if (bp.equals("/") || bp.equals("null/null")) bp = "";
+        //String bp = mBP;
+        //if (bp.equals("/") || bp.equals("null/null")) bp = "";
 
         String address = mAddress + " " + mCityState + ((!TextUtils.isEmpty(mPhone)) ? ", " + mPhone : "");
 
@@ -2005,8 +2009,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                                     doctorDetailStr +
                                     "<p style=\"font-size:12pt; margin-top:-0px; padding: 0px;\">" + doctrRegistartionNum + "</p>" +
                                     "</div>"
-                            , heading, heading2, heading3, mPatientName, age, mGender, /*mSdw*/ address, mPatientOpenMRSID, mDate, (!TextUtils.isEmpty(mHeight)) ? mHeight : "", (!TextUtils.isEmpty(mWeight)) ? mWeight : "",
-                            (!TextUtils.isEmpty(mBMI)) ? mBMI : "", (!TextUtils.isEmpty(bp)) ? bp : "", (!TextUtils.isEmpty(mPulse)) ? mPulse : "", (!TextUtils.isEmpty(mTemp)) ? mTemp : "", (!TextUtils.isEmpty(mresp)) ? mresp : "", (!TextUtils.isEmpty(mSPO2)) ? mSPO2 : "",
+                            , heading, heading2, heading3, mPatientName, age, mGender, /*mSdw*/ address, mPatientOpenMRSID, mDate,
                             /*pat_hist, fam_hist,*/ mComplaint, diagnosis_web, rx_web, tests_web, advice_web, followUp_web, doctor_web);
             webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null);
         } else {
@@ -2042,8 +2045,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                                     doctorDetailStr +
                                     "<span style=\"font-size:12pt; margin-top:5px; padding: 0px;\">" + doctrRegistartionNum + "</span>" +
                                     "</div>"
-                            , heading, heading2, heading3, mPatientName, age, mGender, /*mSdw*/ address, mPatientOpenMRSID, mDate, (!TextUtils.isEmpty(mHeight)) ? mHeight : "", (!TextUtils.isEmpty(mWeight)) ? mWeight : "",
-                            (!TextUtils.isEmpty(mBMI)) ? mBMI : "", (!TextUtils.isEmpty(bp)) ? bp : "", (!TextUtils.isEmpty(mPulse)) ? mPulse : "", (!TextUtils.isEmpty(mTemp)) ? mTemp : "", (!TextUtils.isEmpty(mresp)) ? mresp : "", (!TextUtils.isEmpty(mSPO2)) ? mSPO2 : "",
+                            , heading, heading2, heading3, mPatientName, age, mGender, /*mSdw*/ address, mPatientOpenMRSID, mDate,
                             /*pat_hist, fam_hist,*/ mComplaint, diagnosis_web, rx_web, tests_web, advice_web, followUp_web, doctor_web);
             webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null);
         }
@@ -2118,10 +2120,10 @@ public class VisitSummaryActivity extends AppCompatActivity {
         if (mFamHist == null) {
             mFamHist = "";
         }
-        mHeight = height.getValue();
-        mWeight = weight.getValue();
-        mBP = bpSys.getValue() + "/" + bpDias.getValue();
-        mPulse = pulse.getValue();
+        //mHeight = height.getValue();
+        //mWeight = weight.getValue();
+        //mBP = bpSys.getValue() + "/" + bpDias.getValue();
+        //mPulse = pulse.getValue();
         try {
             JSONObject obj = null;
             if (hasLicense) {
@@ -2132,7 +2134,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(this, mFileName)));
             }//Load the config file
 
-            if (obj.getBoolean("mTemperature")) {
+/*            if (obj.getBoolean("mTemperature")) {
                 if (obj.getBoolean("mCelsius")) {
 
                     mTemp = getString(R.string.temperature_C) + (!TextUtils.isEmpty(temperature.getValue()) ? temperature.getValue().toString() : "");
@@ -2142,12 +2144,12 @@ public class VisitSummaryActivity extends AppCompatActivity {
 //                    mTemp = "Temperature(F): " + temperature.getValue();
                     mTemp = getString(R.string.temperature_F) + (!TextUtils.isEmpty(temperature.getValue()) ? convertCtoF(temperature.getValue()) : "");
                 }
-            }
+            }*/
         } catch (Exception e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
-        mresp = resp.getValue();
-        mSPO2 = "SpO2(%): " + (!TextUtils.isEmpty(spO2.getValue()) ? spO2.getValue() : "");
+        //mresp = resp.getValue();
+        //mSPO2 = "SpO2(%): " + (!TextUtils.isEmpty(spO2.getValue()) ? spO2.getValue() : "");
         String mComplaint = complaint.getValue();
 
         //Show only the headers of the complaints in the printed prescription
@@ -2245,8 +2247,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         String heading2 = prescription2;
         String heading3 = "<br/>";
 
-        String bp = mBP;
-        if (bp.equals("/") || bp.equals("null/null")) bp = "";
+        //String bp = mBP;
+        //if (bp.equals("/") || bp.equals("null/null")) bp = "";
 
         String address = mAddress + " " + mCityState + ((!TextUtils.isEmpty(mPhone)) ? ", " + mPhone : "");
 
@@ -2336,8 +2338,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                                     doctorDetailStr +
                                     "<p style=\"font-size:12pt; margin-top:-0px; padding: 0px;\">" + doctrRegistartionNum + "</p>" +
                                     "</div>"
-                            , heading, heading2, heading3, mPatientName, age, mGender, /*mSdw*/ address, mPatientOpenMRSID, mDate, (!TextUtils.isEmpty(mHeight)) ? mHeight : "", (!TextUtils.isEmpty(mWeight)) ? mWeight : "",
-                            (!TextUtils.isEmpty(mBMI)) ? mBMI : "", (!TextUtils.isEmpty(bp)) ? bp : "", (!TextUtils.isEmpty(mPulse)) ? mPulse : "", (!TextUtils.isEmpty(mTemp)) ? mTemp : "", (!TextUtils.isEmpty(mresp)) ? mresp : "", (!TextUtils.isEmpty(mSPO2)) ? mSPO2 : "",
+                            , heading, heading2, heading3, mPatientName, age, mGender, /*mSdw*/ address, mPatientOpenMRSID, mDate,
                             /*pat_hist, fam_hist,*/ mComplaint, diagnosis_web, rx_web, tests_web, advice_web, followUp_web, doctor_web);
             webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null);
         } else {
@@ -2373,8 +2374,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                                     doctorDetailStr +
                                     "<span style=\"font-size:12pt; margin-top:5px; padding: 0px;\">" + doctrRegistartionNum + "</span>" +
                                     "</div>"
-                            , heading, heading2, heading3, mPatientName, age, mGender, /*mSdw*/ address, mPatientOpenMRSID, mDate, (!TextUtils.isEmpty(mHeight)) ? mHeight : "", (!TextUtils.isEmpty(mWeight)) ? mWeight : "",
-                            (!TextUtils.isEmpty(mBMI)) ? mBMI : "", (!TextUtils.isEmpty(bp)) ? bp : "", (!TextUtils.isEmpty(mPulse)) ? mPulse : "", (!TextUtils.isEmpty(mTemp)) ? mTemp : "", (!TextUtils.isEmpty(mSPO2)) ? mSPO2 : "",
+                            , heading, heading2, heading3, mPatientName, age, mGender, /*mSdw*/ address, mPatientOpenMRSID, mDate,
                             /*pat_hist, fam_hist,*/ mComplaint, diagnosis_web, rx_web, tests_web, advice_web, followUp_web, doctor_web);
             webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null);
         }
@@ -3173,7 +3173,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 phyExam.setValue(value);
                 break;
             }
-            case UuidDictionary.HEIGHT: //Height
+            /*case UuidDictionary.HEIGHT: //Height
             {
                 height.setValue(value);
                 break;
@@ -3213,7 +3213,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             {
                 spO2.setValue(value);
                 break;
-            }
+            }*/
             case UuidDictionary.TELEMEDICINE_DIAGNOSIS: {
                 if (!diagnosisReturned.isEmpty()) {
                     diagnosisReturned = diagnosisReturned + ",\n" + value;

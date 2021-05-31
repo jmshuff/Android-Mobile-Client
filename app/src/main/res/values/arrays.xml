@@ -3,6 +3,7 @@
 
     <string-array name="language_names">
         <item>English</item>
+        <item> Tamil</item>
 <!--        <item>Hindi</item>-->
 <!--        <item>Odiya</item>-->
 <!--        <item>Cebuano</item>-->
@@ -10,6 +11,7 @@
 
     <string-array name="language_values">
         <item>en</item>
+        <item>ta</item>
 <!--        <item>hi</item>-->
 <!--        <item>or</item>-->
 <!--        <item>cb</item>-->

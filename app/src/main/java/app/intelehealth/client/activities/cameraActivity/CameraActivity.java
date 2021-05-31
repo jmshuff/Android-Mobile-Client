@@ -12,18 +12,15 @@ import android.media.ExifInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,8 +37,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import app.intelehealth.client.R;
-import app.intelehealth.client.activities.cameraActivity.CameraActivityPermissionsDispatcher;
-
 import app.intelehealth.client.app.AppConstants;
 import app.intelehealth.client.app.IntelehealthApplication;
 import permissions.dispatcher.NeedsPermission;
@@ -123,7 +118,7 @@ public class CameraActivity extends AppCompatActivity {
     };
 
 
-    void compressImageAndSave(final byte[] data) {
+    void compressImageAndSave(final byte[] data){
         getBackgroundHandler().post(new Runnable() {
             @Override
             public void run() {
@@ -132,7 +127,7 @@ public class CameraActivity extends AppCompatActivity {
                 }
 
 
-                String filePath = AppConstants.IMAGE_PATH + mImageName + ".jpg";
+                String filePath=AppConstants.IMAGE_PATH + mImageName + ".jpg";
 
                 File file;
                 if (mFilePath == null) {
@@ -150,6 +145,9 @@ public class CameraActivity extends AppCompatActivity {
                     os.flush();
                     os.close();
                     bitmap.recycle();
+
+
+
 
 
                     Bitmap scaledBitmap = null;
@@ -255,7 +253,7 @@ public class CameraActivity extends AppCompatActivity {
                     setResult(RESULT_OK, intent);
                     Log.i(TAG, file.getAbsolutePath());
                     finish();
-                } catch (IOException e) {
+                }catch (IOException e) {
                     Log.w(TAG, "Cannot write to " + file, e);
                     setResult(RESULT_CANCELED, new Intent());
                     finish();
@@ -320,7 +318,8 @@ public class CameraActivity extends AppCompatActivity {
             mFab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mCameraView != null) {
+                    if (mCameraView != null)
+                    {
                         mCameraView.takePicture();
                     }
                 }
@@ -331,7 +330,6 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mCameraView != null) mCameraView.stop();
         CameraActivityPermissionsDispatcher.startCameraWithCheck(this);
     }
 
@@ -372,7 +370,7 @@ public class CameraActivity extends AppCompatActivity {
     @NeedsPermission(Manifest.permission.CAMERA)
     void startCamera() {
         if (mDialogMessage != null) {
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+            MaterialAlertDialogBuilder builder =  new MaterialAlertDialogBuilder(this)
                     .setMessage(mDialogMessage)
                     .setNeutralButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
                         @Override
@@ -381,15 +379,14 @@ public class CameraActivity extends AppCompatActivity {
                         }
                     });
             AlertDialog dialog = builder.show();
-            IntelehealthApplication.setAlertDialogCustomTheme(this, dialog);
+            IntelehealthApplication.setAlertDialogCustomTheme(this,dialog);
         }
-        if (mCameraView != null)
-            mCameraView.start();
+        mCameraView.start();
     }
 
     @OnShowRationale(Manifest.permission.CAMERA)
     void showRationaleForCamera(final PermissionRequest request) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+        MaterialAlertDialogBuilder builder =  new MaterialAlertDialogBuilder(this)
                 .setMessage(getString(R.string.permission_camera_rationale))
                 .setPositiveButton(getString(R.string.button_allow), new DialogInterface.OnClickListener() {
                     @Override
@@ -404,7 +401,7 @@ public class CameraActivity extends AppCompatActivity {
                     }
                 });
         AlertDialog dialog = builder.show();
-        IntelehealthApplication.setAlertDialogCustomTheme(this, dialog);
+        IntelehealthApplication.setAlertDialogCustomTheme(this,dialog);
     }
 
     @OnPermissionDenied(Manifest.permission.CAMERA)
