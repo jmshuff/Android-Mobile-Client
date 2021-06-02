@@ -207,20 +207,20 @@
 
 
     //Patient Detail Screen
-    <string name="header_patient_detail">நோயாளியின் தகவல்</string>
-    <string name="button_history">மருத்துவ வரலாறு</string>
+    <string name="header_patient_detail">Patient Details</string>
+    <string name="button_history">Patient History</string>
     <string name="title_activity_patient_detail">Patient Detail</string>
     <string name="header_medical_history">History</string>
-    <string name="button_new_visit">புதிய சந்திப்பைத் தொடங்கவும்</string>
+    <string name="button_new_visit">Start new visit</string>
     <string name="header_previous_visits">Previous visits</string>
-    <string name="header_patient_history">மருத்துவ வரலாறு</string>
-    <string name="header_family_history">குடும்ப மருத்துவ வரலாறு</string>
+    <string name="header_patient_history">Medical history</string>
+    <string name="header_family_history">Family history</string>
     <string name="string_no_hist">No history of illness</string>
     <string name="row_patient_id">Patient ID</string>
     <string name="row_dob">DOB</string>
-    <string name="row_age">வயது</string>
-    <string name="row_address">முகவரி</string>
-    <string name="row_phone_number">தொலைபேசி எண்</string>
+    <string name="row_age">Age</string>
+    <string name="row_address">Address</string>
+    <string name="row_phone_number">Phone number</string>
     <string name="row_open_visit">Click to open visit</string>
     <string name="title_activity_settings">Settings</string>
 
