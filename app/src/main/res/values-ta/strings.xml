@@ -77,26 +77,26 @@
 
     //Identification Screen
     <string name="title_activity_identification">Add New Patient</string>
-    <string name="identification_screen_prompt_first_name">First name *</string>
+    <string name="identification_screen_prompt_first_name">முதல் பெயர் *</string>
     <string name="identification_screen_prompt_middle_name">Middle name</string>
-    <string name="identification_screen_prompt_last_name">Last name *</string>
-    <string name="identification_screen_prompt_address">Taluk</string>
-    <string name="identification_screen_prompt_address2">District</string>
-    <string name="identification_screen_prompt_phone_number">Phone number *</string>
+    <string name="identification_screen_prompt_last_name">கடைசி பெயர் *</string>
+    <string name="identification_screen_prompt_address">தாலுகா</string>
+    <string name="identification_screen_prompt_address2">மாவட்டம்</string>
+    <string name="identification_screen_prompt_phone_number">தொலைபேசி எண் *</string>
     <string name="admin_password_dialog_heading">Enter Admin Password</string>
-    <string name="identification_screen_prompt_gender">Gender *</string>
-    <string name="identification_screen_checkbox_male">Male</string>
-    <string name="identification_screen_checkbox_female">Female</string>
+    <string name="identification_screen_prompt_gender">பாலினம் *</string>
+    <string name="identification_screen_checkbox_male">ஆண்</string>
+    <string name="identification_screen_checkbox_female">பெண்</string>
     <string name="identification_screen_prompt_birthday">Date of birth*</string>
-    <string name="identification_screen_prompt_age">Age *</string>
-    <string name="identification_screen_prompt_city">Village</string>
-    <string name="identification_screen_prompt_state">State *</string>
+    <string name="identification_screen_prompt_age">வயது *</string>
+    <string name="identification_screen_prompt_city">கிராமம்</string>
+    <string name="identification_screen_prompt_state">மாநிலம் *</string>
     <string name="identification_screen_prompt_caste">Caste</string>
     <string name="identification_screen_prompt_economic_status">Economic status</string>
     <string name="identification_screen_prompt_education">Education level</string>
-    <string name="identification_screen_prompt_country">Country *</string>
+    <string name="identification_screen_prompt_country">நாடு *</string>
     <string name="identification_screen_prompt_postal_code">Postal code</string>
-    <string name="identification_screen_prompt_relationship">Next of Kin</string>
+    <string name="identification_screen_prompt_relationship">மிக நெருக்கமான பராமரிப்பாளர்</string>
     <string name="identification_screen_prompt_occupation">Occupation</string>
     <string name="identification_screen_snack_patient_created">Patient created! Uploading to server.</string>
     <string name="identification_screen_error_data_fields">Error: data fields are not formatted correctly</string>
@@ -207,20 +207,20 @@
 
 
     //Patient Detail Screen
-    <string name="header_patient_detail">Patient information</string>
-    <string name="button_history">Patient History</string>
+    <string name="header_patient_detail">நோயாளியின் தகவல்</string>
+    <string name="button_history">மருத்துவ வரலாறு</string>
     <string name="title_activity_patient_detail">Patient Detail</string>
     <string name="header_medical_history">History</string>
-    <string name="button_new_visit">Start new visit</string>
+    <string name="button_new_visit">புதிய சந்திப்பைத் தொடங்கவும்</string>
     <string name="header_previous_visits">Previous visits</string>
-    <string name="header_patient_history">Medical history</string>
-    <string name="header_family_history">Family history</string>
+    <string name="header_patient_history">மருத்துவ வரலாறு</string>
+    <string name="header_family_history">குடும்ப மருத்துவ வரலாறு</string>
     <string name="string_no_hist">No history of illness</string>
     <string name="row_patient_id">Patient ID</string>
     <string name="row_dob">DOB</string>
-    <string name="row_age">Age</string>
-    <string name="row_address">Address</string>
-    <string name="row_phone_number">Phone number</string>
+    <string name="row_age">வயது</string>
+    <string name="row_address">முகவரி</string>
+    <string name="row_phone_number">தொலைபேசி எண்</string>
     <string name="row_open_visit">Click to open visit</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -558,7 +558,7 @@
 
 
     <!--New Ayu Related Changes-->
-    <string name="what_is_the_reason_for_your_visit" >What is the reason for your visit?</string>
+    <string name="what_is_the_reason_for_your_visit" >உங்கள் வருகைக்கான காரணம் என்ன?</string>
     <string name="swipe_down_to_return">Swipe Down for previous / Up for next</string>
     <string name="swipe_up">Swipe to Up for Next</string>
     <string name="swipe_down">Swipe to Down for previous</string>
