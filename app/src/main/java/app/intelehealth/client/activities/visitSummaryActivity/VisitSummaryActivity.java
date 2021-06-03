@@ -135,7 +135,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     private LinearLayout mLayout;
 
   // String mHeight, mWeight, mBMI, mBP, mPulse, mTemp, mSPO2, mresp; JS
-    String speciality_selected = "";
+    String speciality_selected = "General Physician";
 
     boolean uploaded = false;
     boolean downloaded = false;
