@@ -1919,13 +1919,13 @@ public class IdentificationActivity extends AppCompatActivity {
             stateText.setError(null);
         }
 
-        if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
+       /* if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
             mCity.setError(getString(R.string.error_field_required));
             address_details_textview.requestFocus();
             Toast.makeText(this, "Please enter Village/Town/City", Toast.LENGTH_SHORT).show();
             address_details_textview.clearFocus();
             return;
-        }
+        }*/
 
         if (frameLayout.getVisibility() == View.VISIBLE) {
             if (!ma_checkbox.isChecked() && !ab_checkbox.isChecked() && !none_checkbox.isChecked()) {
