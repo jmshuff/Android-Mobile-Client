@@ -494,22 +494,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp">
 
-                            <AutoCompleteTextView
-                                android:id="@+id/identification_city"
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                android:drawableStart="@drawable/home_icon"
-                                android:drawableLeft="@drawable/home_icon"
-                                android:drawablePadding="10dp"
-                                android:fontFamily="@font/lato_regular"
-                                android:freezesText="true"
-                                android:hint="@string/identification_screen_prompt_city"
-                                android:imeOptions="actionUnspecified"
-                                android:inputType="textCapWords"
-                                android:maxLength="25"
-                                android:maxLines="1"
-                                android:textSize="@dimen/card_content_sub_text_size" />
-
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -560,6 +544,22 @@
                                 android:textSize="@dimen/card_content_sub_text_size" />
 
                         </com.google.android.material.textfield.TextInputLayout>
+
+                        <AutoCompleteTextView
+                            android:id="@+id/identification_city"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/home_icon"
+                            android:drawableLeft="@drawable/home_icon"
+                            android:drawablePadding="10dp"
+                            android:fontFamily="@font/lato_regular"
+                            android:freezesText="true"
+                            android:hint="@string/identification_screen_prompt_city"
+                            android:imeOptions="actionUnspecified"
+                            android:inputType="textCapWords"
+                            android:maxLength="25"
+                            android:maxLines="1"
+                            android:textSize="@dimen/card_content_sub_text_size" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"

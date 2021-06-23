@@ -80,8 +80,8 @@
     <string name="identification_screen_prompt_first_name">First name *</string>
     <string name="identification_screen_prompt_middle_name">Middle name</string>
     <string name="identification_screen_prompt_last_name">Last name *</string>
-    <string name="identification_screen_prompt_address">Taluk</string>
-    <string name="identification_screen_prompt_address2">District</string>
+    <string name="identification_screen_prompt_address">Village</string>
+    <string name="identification_screen_prompt_address2">Taluk</string>
     <string name="identification_screen_prompt_phone_number">Phone number *</string>
     <string name="admin_password_dialog_heading">Enter Admin Password</string>
     <string name="identification_screen_prompt_gender">Gender *</string>
@@ -89,7 +89,7 @@
     <string name="identification_screen_checkbox_female">Female</string>
     <string name="identification_screen_prompt_birthday">Date of birth*</string>
     <string name="identification_screen_prompt_age">Age *</string>
-    <string name="identification_screen_prompt_city">Village</string>
+    <string name="identification_screen_prompt_city">District</string>
     <string name="identification_screen_prompt_state">State *</string>
     <string name="identification_screen_prompt_caste">Caste</string>
     <string name="identification_screen_prompt_economic_status">Economic status</string>

@@ -204,6 +204,7 @@
                             android:layout_height="match_parent">
 
                             <TextView
+                                android:id="@+id/tableRow_DOB"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/lato_bold"
@@ -271,7 +272,7 @@
                                 android:fontFamily="@font/lato_bold"
                                 android:includeFontPadding="false"
                                 android:paddingTop="@dimen/padding_card_action"
-                                android:text="@string/row_address"
+                                android:text="@string/identification_screen_prompt_address"
                                 android:textSize="@dimen/card_content_sub_text_size" />
 
 
@@ -303,6 +304,7 @@
                                 android:fontFamily="@font/lato_bold"
                                 android:includeFontPadding="false"
                                 android:paddingTop="@dimen/padding_card_action"
+                                android:text="@string/identification_screen_prompt_address2"
                                 android:textSize="@dimen/card_content_sub_text_size" />
 
 
@@ -334,6 +336,7 @@
                                 android:fontFamily="@font/lato_bold"
                                 android:includeFontPadding="false"
                                 android:paddingTop="@dimen/padding_card_action"
+                                android:text="@string/identification_screen_prompt_city"
                                 android:textSize="@dimen/card_content_sub_text_size" />
 
 

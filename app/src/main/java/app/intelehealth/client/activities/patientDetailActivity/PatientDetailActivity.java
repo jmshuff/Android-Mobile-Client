@@ -394,6 +394,7 @@ public class PatientDetailActivity extends AppCompatActivity {
         idView = findViewById(R.id.textView_ID);
         TextView patinetName = findViewById(R.id.textView_name);
         TextView dobView = findViewById(R.id.textView_DOB);
+        TextView dobRow= findViewById(R.id.tableRow_DOB);
         TextView ageView = findViewById(R.id.textView_age);
         TextView addr1View = findViewById(R.id.textView_address_1);
         TableRow addr2Row = findViewById(R.id.tableRow_addr2);
@@ -438,9 +439,10 @@ public class PatientDetailActivity extends AppCompatActivity {
                 casteRow.setVisibility(View.GONE);
             }
             if (obj.getBoolean("mDOB")) {
-                dobView.setVisibility(View.VISIBLE);
+                dobView.setVisibility(View.VISIBLE);//JS
             } else {
                 dobView.setVisibility(View.GONE);
+                dobRow.setVisibility(View.GONE);
             }
             if (obj.getBoolean("educationLayout")) {
                 educationRow.setVisibility(View.VISIBLE);
