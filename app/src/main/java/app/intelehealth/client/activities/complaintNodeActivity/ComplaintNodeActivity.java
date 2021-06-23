@@ -42,6 +42,9 @@ import java.util.List;
 import java.util.UUID;
 
 import app.intelehealth.client.R;
+import app.intelehealth.client.activities.homeActivity.HomeActivity;
+import app.intelehealth.client.activities.identificationActivity.IdentificationActivity;
+import app.intelehealth.client.activities.patientDetailActivity.PatientDetailActivity;
 import app.intelehealth.client.activities.questionNodeActivity.QuestionNodeActivity;
 import app.intelehealth.client.app.AppConstants;
 import app.intelehealth.client.app.IntelehealthApplication;
@@ -389,7 +392,9 @@ public class ComplaintNodeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
+        Intent intent2 = new Intent(ComplaintNodeActivity.this, HomeActivity.class);
+        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent2);
     }
 
     @Override

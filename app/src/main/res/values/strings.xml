@@ -257,7 +257,7 @@
 
     <string name="title_activity_camera">Camera</string>
     <string name="title_activity_today_patient">Today\'s Visits</string>
-    <string name="title_activity_additional_documents">Additional Documents</string>
+    <string name="title_activity_additional_documents">Additional Photos or Documents</string>
     <string name="title_activity_video_library">Video Library</string>
     <string name="visit_summary_patient_details">Visit details</string>
 
@@ -501,7 +501,7 @@
     <string name="sure_to_logout">Are you sure you want to Logout?</string>
     <string name="lastsync_normal">Last Refresh</string>
     <string name="update_patient_identification">Update Patient</string>
-    <string name="are_you_want_go_back">Are you sure you want to go back ?</string>
+    <string name="are_you_want_go_back">Do you want to return to Home?</string>
     <string name="error">Error</string>
     <string name="patient_data_upload">Patient Data Upload</string>
     <string name="patient_image_download_notifi">Patient Image Download</string>

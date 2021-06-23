@@ -3,6 +3,7 @@ package app.intelehealth.client.activities.patientDetailActivity;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -13,6 +14,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.appcompat.widget.Toolbar;
@@ -38,6 +40,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 
@@ -56,6 +59,7 @@ import java.util.UUID;
 
 import app.intelehealth.client.R;
 import app.intelehealth.client.app.AppConstants;
+import app.intelehealth.client.app.IntelehealthApplication;
 import app.intelehealth.client.database.InteleHealthDatabaseHelper;
 import app.intelehealth.client.database.dao.EncounterDAO;
 import app.intelehealth.client.database.dao.ImagesDAO;
@@ -167,7 +171,7 @@ public class PatientDetailActivity extends AppCompatActivity {
         editbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent2 = new Intent(PatientDetailActivity.this, ComplaintNodeActivity.class);
+                Intent intent2 = new Intent(PatientDetailActivity.this, IdentificationActivity.class);
                 intent2.putExtra("patientUuid", patientUuid);
                 startActivity(intent2);
 
@@ -842,9 +846,29 @@ public class PatientDetailActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(this, HomeActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(i);
+        MaterialAlertDialogBuilder alertdialogBuilder = new MaterialAlertDialogBuilder(this);
+        alertdialogBuilder.setMessage(R.string.are_you_want_go_back);
+        alertdialogBuilder.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent i_back = new Intent(getApplicationContext(), HomeActivity.class);
+                startActivity(i_back);
+            }
+        });
+        alertdialogBuilder.setNegativeButton(R.string.generic_no, null);
+
+        AlertDialog alertDialog = alertdialogBuilder.create();
+        alertDialog.show();
+
+        Button positiveButton = alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE);
+
+        positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+        //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+
+        negativeButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+        //negativeButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
     }
 
     public class Myreceiver extends BroadcastReceiver {

@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.UUID;
 
 import app.intelehealth.client.R;
+import app.intelehealth.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
+import app.intelehealth.client.activities.questionNodeActivity.QuestionNodeActivity;
 import app.intelehealth.client.activities.questionNodeActivity.QuestionsAdapter;
 import app.intelehealth.client.app.AppConstants;
 import app.intelehealth.client.app.IntelehealthApplication;
@@ -460,6 +462,22 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
 
     @Override
     public void onBackPressed() {
+        Intent intent = new Intent(
+                FamilyHistoryActivity.this, PastMedicalHistoryActivity.class);
+        intent.putExtra("patientUuid", patientUuid);
+        intent.putExtra("visitUuid", visitUuid);
+        intent.putExtra("encounterUuidVitals", encounterVitals);
+        intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+        intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+        intent.putExtra("state", state);
+        intent.putExtra("name", patientName);
+        intent.putExtra("float_ageYear_Month", float_ageYear_Month);
+        if (intentTag != null) {
+            intent.putExtra("tag", intentTag);
+        }
+        //intent.putStringArrayListExtra("complaints", selection);
+
+        startActivity(intent);
     }
 
     @Override
