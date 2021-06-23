@@ -230,7 +230,7 @@ public class IdentificationActivity extends AppCompatActivity {
         mRelationship.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25), inputFilter_Others}); //maxlength 25
 
         mOccupation = findViewById(R.id.identification_occupation);
-        mOccupation.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25), inputFilter_Others}); //maxlength 25
+        //mOccupation.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25), inputFilter_Others}); //maxlength 25
 
         mCaste = findViewById(R.id.spinner_caste);
         mEducation = findViewById(R.id.spinner_education);
@@ -381,6 +381,13 @@ public class IdentificationActivity extends AppCompatActivity {
             } else if (country1.equalsIgnoreCase("Philippines")) {
                 EditTextUtils.setEditTextMaxLength(11, mPhoneNum);
             }
+
+
+            if (country1.equalsIgnoreCase("India")) {
+                EditTextUtils.setEditTextMaxLength(10, mOccupation);
+            } else if (country1.equalsIgnoreCase("Philippines")) {
+                EditTextUtils.setEditTextMaxLength(11, mOccupation);
+            } //JS Next of Kin Phone
 
             if (obj.getBoolean("health_scheme_card")) {
                 frameLayout.setVisibility(View.VISIBLE);
@@ -1377,6 +1384,15 @@ public class IdentificationActivity extends AppCompatActivity {
             }
         }
 
+        //Next of Kin Phone, JS
+        if(mOccupation.getText().toString().trim().length() > 0) {
+            if(mOccupation.getText().toString().trim().length() < 10) {
+                mOccupation.requestFocus();
+                mOccupation.setError("Enter 10 digits");
+                return;
+            }
+        }
+
    /*     ArrayList<EditText> values = new ArrayList<>();
         values.add(mFirstName);
         values.add(mMiddleName);
@@ -1956,6 +1972,15 @@ public class IdentificationActivity extends AppCompatActivity {
             if(mPhoneNum.getText().toString().trim().length() < 10) {
                 mPhoneNum.requestFocus();
                 mPhoneNum.setError("Enter 10 digits");
+                return;
+            }
+        }
+
+        //Next of kin phone
+        if(mOccupation.getText().toString().trim().length() > 0) {
+            if(mOccupation.getText().toString().trim().length() < 10) {
+                mOccupation.requestFocus();
+                mOccupation.setError("Enter 10 digits");
                 return;
             }
         }
