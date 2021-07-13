@@ -1,0 +1,302 @@
+[33mcommit 1d606da463fff8f87f8c3d9c1f76609325c58f2e[m[33m ([m[1;36mHEAD[m[33m)[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Mon May 31 19:35:16 2021 -0400
+
+    Add Tamil Language
+
+:100644 100644 0e115450 ce3eaddf M	app/build.gradle
+:100644 100644 f2af20d4 f379c03a M	app/src/main/java/app/intelehealth/client/activities/cameraActivity/CameraActivity.java
+:100644 100644 a7357a8e d78ba861 M	app/src/main/java/app/intelehealth/client/activities/settingsActivity/SettingsActivity.java
+:100644 100644 f2d3c520 8db4539e M	app/src/main/java/app/intelehealth/client/activities/visitSummaryActivity/VisitSummaryActivity.java
+:100644 100644 830c80c2 f9692fd2 M	app/src/main/java/app/intelehealth/client/knowledgeEngine/Node.java
+:100755 100755 c1f5d4ad 7279f58d M	app/src/main/res/layout/activity_visit_summary.xml
+:100755 100755 29c566b8 bc50c53b M	app/src/main/res/layout/content_visit_summary.xml
+:000000 100644 00000000 4dbc1838 A	app/src/main/res/values-ta/strings.xml
+:100755 100755 f559333d 7ad12d14 M	app/src/main/res/values/arrays.xml
+:100755 100755 f166ae29 0ebec97d M	app/src/main/res/values/strings.xml
+
+[33mcommit 5d7275dc329f7a1305b865e651fc0f4f2e43e07f[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Fri May 21 14:50:25 2021 -0400
+
+    Update mandatory fields in identification
+
+:100644 100644 a9e32dd4 96645300 M	app/src/main/java/app/intelehealth/client/activities/identificationActivity/IdentificationActivity.java
+:100755 100755 9be5eee2 f166ae29 M	app/src/main/res/values/strings.xml
+
+[33mcommit 1b5f8c4069840e086d75029c45d8072736cb83ab[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Fri May 21 14:42:40 2021 -0400
+
+    Updated URL and setup information
+
+:100644 100644 4f671141 fe6f9d5d M	app/src/main/java/app/intelehealth/client/activities/homeActivity/HomeActivity.java
+:100644 100644 be75c427 f4b40788 M	app/src/main/java/app/intelehealth/client/activities/setupActivity/SetupActivity.java
+:100644 100644 0ab54cb3 50c85b32 M	app/src/main/java/app/intelehealth/client/app/IntelehealthApplication.java
+
+[33mcommit 84631044192b943ba669441d904f3613622c1fab[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Fri May 21 09:56:14 2021 -0400
+
+    Update URLs in Setup activity
+
+:100644 100644 e112ecdb be75c427 M	app/src/main/java/app/intelehealth/client/activities/setupActivity/SetupActivity.java
+
+[33mcommit fb9a03fd0e0987e0090b13632bc5726c5506e892[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Thu May 20 00:15:37 2021 -0400
+
+    Pointed to http and port changed
+
+:100644 100644 4c2aa188 8811ee6d M	app/src/main/java/app/intelehealth/client/activities/IntroActivity/IntroActivity.java
+:100644 100644 fa456466 4f671141 M	app/src/main/java/app/intelehealth/client/activities/homeActivity/HomeActivity.java
+:100644 100644 17fc21fd 6aae3514 M	app/src/main/java/app/intelehealth/client/activities/loginActivity/LoginActivity.java
+:100644 100644 b7c5c900 e112ecdb M	app/src/main/java/app/intelehealth/client/activities/setupActivity/SetupActivity.java
+:100644 100644 6e0de053 f2d3c520 M	app/src/main/java/app/intelehealth/client/activities/visitSummaryActivity/VisitSummaryActivity.java
+:100644 100644 d0243aee 0ab54cb3 M	app/src/main/java/app/intelehealth/client/app/IntelehealthApplication.java
+:100644 100644 c1e4d69c 25495c87 M	app/src/main/java/app/intelehealth/client/database/dao/SyncDAO.java
+:100644 100644 dc99f36d 334fa764 M	app/src/main/java/app/intelehealth/client/networkApiCalls/ApiClient.java
+:100644 100644 8caf7f4d 80acf572 M	app/src/main/java/app/intelehealth/client/services/DownloadProtocolsTask.java
+:100644 100644 621e67c7 865c6920 M	app/src/main/java/app/intelehealth/client/utilities/SessionManager.java
+:100644 100644 a481fa03 938e3ac7 M	app/src/main/java/app/intelehealth/client/utilities/UrlModifiers.java
+:100644 100644 d3e672cf 3af9ee76 M	app/src/main/res/xml/network_security_configuration.xml
+
+[33mcommit e493a7b5ad53527ea1cc844d8e3beb1cdd554d50[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Mon May 17 21:46:15 2021 -0400
+
+    Setup open peek acuity
+
+:100644 100644 e0e6c7d4 a6f8a957 M	app/src/main/java/app/intelehealth/client/activities/physcialExamActivity/PhysicalExamActivity.java
+:000000 100644 00000000 e669a127 A	app/src/main/res/drawable/peek_acuity_E.png
+:100755 100644 c6cf6ebf b9736e04 R077	app/src/main/res/layout/hand_wash.xml	app/src/main/res/layout/peek_acuity_open.xml
+:100755 100755 35570553 9be5eee2 M	app/src/main/res/values/strings.xml
+
+[33mcommit 47ed8496014aa2167a1876e9d46de7e2c6fd5dd9[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Thu Apr 22 22:59:39 2021 -0400
+
+    Set up circle overlay
+
+:100755 100755 61bc4450 0864cd86 M	app/src/main/res/layout/activity_camera.xml
+
+[33mcommit 1a24c7edbf5b6d6b771b2282ee6f85e827fd56b7[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Sat Apr 17 12:47:43 2021 -0400
+
+    Move download protocols to occur on location find. Now getLicenseKey() works
+
+:100644 100644 c6457b99 b7c5c900 M	app/src/main/java/app/intelehealth/client/activities/setupActivity/SetupActivity.java
+
+[33mcommit 2489e6de2f0d0b27cbef9afd2de80946f76e49da[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Thu Apr 15 09:05:53 2021 -0400
+
+    Fix r2 button remove problem; create intent to switch from Setup to home screen
+
+:100644 100644 e1af1d89 c6457b99 M	app/src/main/java/app/intelehealth/client/activities/setupActivity/SetupActivity.java
+
+[33mcommit fcb3ae805fa2a3ca7ddd98c844536ddef0ad2152[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Thu Apr 15 08:38:35 2021 -0400
+
+    Remove r1 r2 download/demo protocol buttons
+
+:100644 100644 22c53c71 e1af1d89 M	app/src/main/java/app/intelehealth/client/activities/setupActivity/SetupActivity.java
+:100755 100755 966a9a6b 1cf8c593 M	app/src/main/res/layout/activity_setup.xml
+
+[33mcommit 31e19b577155a4b7cc61915471f3433127849d52[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Wed Apr 14 22:19:02 2021 -0400
+
+    Set download protocols url (license URL) as mURl
+
+:100644 100644 257672d4 22c53c71 M	app/src/main/java/app/intelehealth/client/activities/setupActivity/SetupActivity.java
+
+[33mcommit d42e46e4e74ad57ed97f4f4cd8b2e148de608682[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Wed Apr 14 22:12:02 2021 -0400
+
+    Remove Setup Enter license key and server url
+
+:100644 100644 9b0a8fb4 257672d4 M	app/src/main/java/app/intelehealth/client/activities/setupActivity/SetupActivity.java
+
+[33mcommit 756412ca8603bea8d7659d28f7c454e6f805be1b[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Wed Apr 14 21:38:01 2021 -0400
+
+    Remove confirmation for reason for visit
+
+:100644 100644 e8d6469e 3e80099a M	app/src/main/java/app/intelehealth/client/activities/complaintNodeActivity/ComplaintNodeActivity.java
+
+[33mcommit 52503913757309c8352b60eae52a4083670d1444[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Wed Apr 14 21:25:49 2021 -0400
+
+    Surpress DOB View in Patient Detail
+
+:100644 100644 7ecc43ef 5b37b39e M	app/src/main/java/app/intelehealth/client/activities/patientDetailActivity/PatientDetailActivity.java
+
+[33mcommit 1dd88b422a4288e84230d98782c1dcae005a560a[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Wed Apr 14 21:15:51 2021 -0400
+
+    Check if Age is empty to prevent onFocusChange Crash
+
+:100644 100644 89c5b240 a9e32dd4 M	app/src/main/java/app/intelehealth/client/activities/identificationActivity/IdentificationActivity.java
+
+[33mcommit 5c1e1f4427ec5660000dbe5ed84eeb4a1ff2ceee[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Wed Apr 14 19:54:30 2021 -0400
+
+    Make Age a Focusable edittext. On lose focus, calculate birthday from age, delete material alert dialog builder
+
+:100644 100644 4b1ebb93 89c5b240 M	app/src/main/java/app/intelehealth/client/activities/identificationActivity/IdentificationActivity.java
+:100755 100755 4ae0331f c92b817c M	app/src/main/res/layout/activity_identification.xml
+
+[33mcommit 88f29d61e053bdab3f3568308c612cb7297c7e98[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Wed Apr 14 11:52:52 2021 -0400
+
+    Change age display to just say "years"
+
+:100644 100644 c4ebdf97 4b1ebb93 M	app/src/main/java/app/intelehealth/client/activities/identificationActivity/IdentificationActivity.java
+
+[33mcommit 91d1e25d1eed020b23ba8994d213315d5dc0aa65[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Wed Apr 14 09:13:15 2021 -0400
+
+    Fix vitalActivity removal
+
+:100644 100644 b2116a39 7ecc43ef M	app/src/main/java/app/intelehealth/client/activities/patientDetailActivity/PatientDetailActivity.java
+
+[33mcommit d2e1713561a16a5ec94955e96b61cb043bea64cc[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Mon Apr 5 16:29:54 2021 -0400
+
+    Updated address hints
+
+:100755 100755 65dd2fe8 35570553 M	app/src/main/res/values/strings.xml
+
+[33mcommit cca341ac606868f08f9e4439353c85756c4d2c94[m
+Author: jmshuff <37374473+jmshuff@users.noreply.github.com>
+Date:   Mon Apr 5 16:23:39 2021 -0400
+
+    Removed vital activity from workflow and changed Son/Daughter of to Next of Kin in strings.xml
+
+:100644 100644 54ec28a0 b2116a39 M	app/src/main/java/app/intelehealth/client/activities/patientDetailActivity/PatientDetailActivity.java
+:100755 100755 ebdbc453 65dd2fe8 M	app/src/main/res/values/strings.xml
+
+[33mcommit 2309bdb5060a81096369f64accfccdebdc40e712[m
+Author: Sagar S <30573522+SagarS23@users.noreply.github.com>
+Date:   Thu Mar 11 16:11:46 2021 +0530
+
+    Delete myteledoc_app_logo-playstore.png
+
+:100644 000000 f9ee47b6 00000000 D	app/src/main/myteledoc_app_logo-playstore.png
+
+[33mcommit 771013c0ce10825cd8ab36096a0e7d0054af9efc[m
+Author: SagarS23 <seasapps@gmail,.com>
+Date:   Thu Mar 11 16:05:47 2021 +0530
+
+    Intelehealth Default Branch - Done some minor changes
+
+:100644 000000 5056acdc 00000000 D	app/src/main/res/mipmap-anydpi-v26/myteledoc_app_logo.xml
+:100644 000000 5056acdc 00000000 D	app/src/main/res/mipmap-anydpi-v26/myteledoc_app_logo_round.xml
+:100644 000000 2876889e 00000000 D	app/src/main/res/mipmap-hdpi/myteledoc_app_logo.png
+:100644 000000 605a6a0c 00000000 D	app/src/main/res/mipmap-hdpi/myteledoc_app_logo_foreground.png
+:100644 000000 2876889e 00000000 D	app/src/main/res/mipmap-hdpi/myteledoc_app_logo_round.png
+:100644 000000 2855b83b 00000000 D	app/src/main/res/mipmap-hdpi/myteledoc_splash_icon.png
+:100644 000000 e6e3c2e5 00000000 D	app/src/main/res/mipmap-mdpi/myteledoc_app_logo.png
+:100644 000000 89b75c43 00000000 D	app/src/main/res/mipmap-mdpi/myteledoc_app_logo_foreground.png
+:100644 000000 e6e3c2e5 00000000 D	app/src/main/res/mipmap-mdpi/myteledoc_app_logo_round.png
+:100644 000000 1267eec0 00000000 D	app/src/main/res/mipmap-mdpi/myteledoc_splash_icon.png
+:100644 000000 2709e46d 00000000 D	app/src/main/res/mipmap-xhdpi/myteledoc_app_logo.png
+:100644 000000 5854436d 00000000 D	app/src/main/res/mipmap-xhdpi/myteledoc_app_logo_foreground.png
+:100644 000000 2709e46d 00000000 D	app/src/main/res/mipmap-xhdpi/myteledoc_app_logo_round.png
+:100644 000000 76edf9df 00000000 D	app/src/main/res/mipmap-xhdpi/myteledoc_splash_icon.png
+:100644 000000 96134176 00000000 D	app/src/main/res/mipmap-xxhdpi/myteledoc_app_logo.png
+:100644 000000 abb88d05 00000000 D	app/src/main/res/mipmap-xxhdpi/myteledoc_app_logo_foreground.png
+:100644 000000 96134176 00000000 D	app/src/main/res/mipmap-xxhdpi/myteledoc_app_logo_round.png
+:100644 000000 f591f40c 00000000 D	app/src/main/res/mipmap-xxhdpi/myteledoc_splash_icon.png
+:100644 000000 bd039656 00000000 D	app/src/main/res/mipmap-xxxhdpi/myteledoc_app_logo.png
+:100644 000000 5b99b67a 00000000 D	app/src/main/res/mipmap-xxxhdpi/myteledoc_app_logo_foreground.png
+:100644 000000 bd039656 00000000 D	app/src/main/res/mipmap-xxxhdpi/myteledoc_app_logo_round.png
+:100644 000000 3f12a6f9 00000000 D	app/src/main/res/mipmap-xxxhdpi/myteledoc_splash_icon.png
+:100644 100644 18b3ff0d 6c62eb0b M	app/src/main/res/values-sw600dp/strings.xml
+:100644 100644 02f17318 77079f16 M	app/src/main/res/values-v21/strings.xml
+:100644 000000 2b6ce52b 00000000 D	app/src/main/res/values/myteledoc_app_logo_background.xml
+:100755 100755 cc4cf7af ebdbc453 M	app/src/main/res/values/strings.xml
+
+[33mcommit 9b0a90000a999a70e1561133003b2f73b3d384ca[m
+Author: SagarS23 <seasapps@gmail,.com>
+Date:   Wed Jan 27 19:12:17 2021 +0530
+
+    Removed images
+
+:100644 000000 5d61ebd2 00000000 D	app/src/main/assets/physicalExamAssets/cataracts.png
+:100644 000000 797d1bef 00000000 D	app/src/main/assets/physicalExamAssets/conjunctival_hemorrhage.png
+:100644 000000 6e4cfc08 00000000 D	app/src/main/assets/physicalExamAssets/iol.png
+:100644 000000 9a2be4d2 00000000 D	app/src/main/assets/physicalExamAssets/pterygium.png
+:100644 000000 09d616d2 00000000 D	app/src/main/assets/physicalExamAssets/swelling.png
+:100644 000000 0a8859e3 00000000 D	app/src/main/assets/physicalExamAssets/thick_secretion.png
+:100644 000000 bfd3e7c2 00000000 D	app/src/main/assets/physicalExamAssets/thin_secretion.png
+:100644 000000 b0ea6f98 00000000 D	app/src/main/assets/physicalExamAssets/white_cells.png
+:100644 000000 cbc97c52 00000000 D	app/src/main/assets/physicalExamAssets/white_center.png
+:100644 100644 172459e3 dc99f36d M	app/src/main/java/app/intelehealth/client/networkApiCalls/ApiClient.java
+
+[33mcommit 7cbf2fcb28baa4ad49ed8a5f1fb3107b0f10f0ea[m
+Author: SagarS23 <seasapps@gmail,.com>
+Date:   Fri Jan 22 20:10:37 2021 +0530
+
+    Intelehealth default app changes
+
+:100755 100755 d3da3f25 94b50da6 M	app/src/main/AndroidManifest.xml
+:000000 100644 00000000 5d61ebd2 A	app/src/main/assets/physicalExamAssets/cataracts.png
+:000000 100644 00000000 797d1bef A	app/src/main/assets/physicalExamAssets/conjunctival_hemorrhage.png
+:000000 100644 00000000 6e4cfc08 A	app/src/main/assets/physicalExamAssets/iol.png
+:000000 100644 00000000 9a2be4d2 A	app/src/main/assets/physicalExamAssets/pterygium.png
+:000000 100644 00000000 09d616d2 A	app/src/main/assets/physicalExamAssets/swelling.png
+:000000 100644 00000000 0a8859e3 A	app/src/main/assets/physicalExamAssets/thick_secretion.png
+:000000 100644 00000000 bfd3e7c2 A	app/src/main/assets/physicalExamAssets/thin_secretion.png
+:000000 100644 00000000 b0ea6f98 A	app/src/main/assets/physicalExamAssets/white_cells.png
+:000000 100644 00000000 cbc97c52 A	app/src/main/assets/physicalExamAssets/white_center.png
+:100644 100644 b869f2cd 6e0de053 M	app/src/main/java/app/intelehealth/client/activities/visitSummaryActivity/VisitSummaryActivity.java
+:100644 100644 c355ac7f d0243aee M	app/src/main/java/app/intelehealth/client/app/IntelehealthApplication.java
+:100755 100755 ecc6d76d 4c7b9938 M	app/src/main/res/layout/activity_login.xml
+:100755 100755 f5bec8c2 b228bceb M	app/src/main/res/layout/activity_splash_activity.xml
+:100644 100644 6f28168a dc0c24bb M	app/src/main/res/layout/welcome_slide1.xml
+:100644 100644 d7644092 18b3ff0d M	app/src/main/res/values-sw600dp/strings.xml
+:100644 100644 0c1cef79 02f17318 M	app/src/main/res/values-v21/strings.xml
+:100755 100755 e8228d16 cc4cf7af M	app/src/main/res/values/strings.xml
+
+[33mcommit e60573d1b6d7016ed15853dc63a63164883c088c[m
+Author: SagarS23 <seasapps@gmail,.com>
+Date:   Mon Jan 18 12:53:45 2021 +0530
+
+    Updated version code & version name
+
+:100644 100644 4dc1529a 0e115450 M	app/build.gradle
+
+[33mcommit 44a228cbe9f4b9d6e0ff3338d0e06e76a361155e[m
+Merge: 399e0640 04b4a4e5
+Author: SagarS23 <seasapps@gmail,.com>
+Date:   Mon Jan 18 12:51:49 2021 +0530
+
+    Merge branch 'myteledoc_bug_fixes' into morbi-master
+
+[33mcommit 04b4a4e598f54ff6066a3f828e5ad0c758aacd30[m
+Author: SagarS23 <seasapps@gmail,.com>
+Date:   Sun Jan 17 18:58:41 2021 +0530
+
+    Minor changes
+
+:100644 100644 7ad96ee5 d1c4897f M	app/build.gradle
+:100644 100644 372b72f0 4e7b89f1 M	app/src/main/java/app/intelehealth/client/activities/privacyNoticeActivity/PrivacyNotice_Activity.java
+:100755 000000 055b4870 00000000 D	app/src/main/res/values-b+cb/strings.xml
+:100755 000000 b31f910b 00000000 D	app/src/main/res/values-or/strings.xml
+:100755 100755 3895b2e0 f559333d M	app/src/main/res/values/arrays.xml
+:100755 100755 4bfab55d ccd282b8 M	app/src/main/res/values/colors.xml
+
+[33mcommit 9de74335840aaa3a851cc301ab63b8dbfd848a69[m
+Author: Prajwal W <prajwal

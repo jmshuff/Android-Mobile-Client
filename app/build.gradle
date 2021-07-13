@@ -9,12 +9,13 @@ android {
         minSdkVersion 19
         targetSdkVersion 30
         versionCode 3
+
         buildToolsVersion('29.0.2')
         versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //Change this to true to enable multidex support for Kitkat
         multiDexEnabled true
-        vectorDrawables.useSupportLibrary = true
+        //vectorDrawables.useSupportLibrary = true
 
     }
     compileOptions {
