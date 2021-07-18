@@ -1578,7 +1578,7 @@ public class Node implements Serializable {
         LayoutInflater inflater = context.getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.image_confirmation_dialog, null);
 
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT || Build.VERSION.SDK_INT==Build.VERSION_CODES.M || Build.VERSION.SDK_INT==Build.VERSION_CODES.LOLLIPOP || Build.VERSION.SDK_INT==Build.VERSION_CODES.LOLLIPOP_MR1) {
             dialog.supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         } else {
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
