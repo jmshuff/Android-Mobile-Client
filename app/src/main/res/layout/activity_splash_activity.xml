@@ -23,15 +23,29 @@
         android:layout_gravity="center"
         android:src="@mipmap/ic_launcher_round" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/app_name"
-        android:fontFamily="@font/lato_bold"
-        android:textColor="@color/white"
-        android:layout_gravity="center_horizontal"
-        android:textSize="36sp" />
+        <TextView
+            android:layout_width="162dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/lato_bold"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="36sp" />
+
+        <TextView
+            android:layout_width="225dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:fontFamily="@font/lato_bold"
+            android:textColor="@color/white"
+            android:text="@string/powered_by_intelehealth"
+            android:textSize="20sp" />
     </LinearLayout>
+
+
 
 </RelativeLayout>
