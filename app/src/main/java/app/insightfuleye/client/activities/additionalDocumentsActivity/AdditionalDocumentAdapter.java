@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -133,7 +134,11 @@ public class AdditionalDocumentAdapter extends RecyclerView.Adapter<AdditionalDo
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View dialogLayout = inflater.inflate(R.layout.image_confirmation_dialog, null);
         dialog.setView(dialogLayout);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT || Build.VERSION.SDK_INT==Build.VERSION_CODES.M || Build.VERSION.SDK_INT==Build.VERSION_CODES.LOLLIPOP || Build.VERSION.SDK_INT==Build.VERSION_CODES.LOLLIPOP_MR1) {
+            dialog.supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        } else {
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
 
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
