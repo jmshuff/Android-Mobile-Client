@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">InSightful</string>
+    <string name="app_name">InSightful Test</string>
 
-    //Generic
+    //Gene
     <string name="generic_the_flipping_word_next">Next</string>
     <string name="hint_required">Required</string>
     <string name="hint_optional">Optional</string>

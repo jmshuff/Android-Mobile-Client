@@ -5,7 +5,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "app.insightfuleye.client"
+        applicationId "app.insightfultest.client"
         minSdkVersion 19
         targetSdkVersion 30
         versionCode 3

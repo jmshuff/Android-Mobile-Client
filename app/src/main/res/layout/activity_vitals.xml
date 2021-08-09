@@ -6,7 +6,7 @@
     android:id="@+id/cl_table"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="app.insightfuleye.client.activities.vitalActivity.VitalsActivity">
+    tools:context="app.insightfultest.client.activities.vitalActivity.VitalsActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
