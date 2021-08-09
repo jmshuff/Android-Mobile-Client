@@ -190,7 +190,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 startActivity(new Intent(Intent.ACTION_VIEW,
                         Uri.parse(
-                                String.format("http://api.whatsapp.com/send?phone=%s&text=%s",
+                                String.format("https://api.whatsapp.com/send?phone=%s&text=%s",
                                         phoneNumberWithCountryCode, message))));
             }
         });
@@ -449,7 +449,7 @@ public class HomeActivity extends AppCompatActivity {
                                         }
 
                                         sessionManager.setMindMapServerUrl(url);
-                                        getMindmapDownloadURL("http://" + url + ":3004/", key);
+                                        getMindmapDownloadURL("https://" + url + ":3004/", key);
 
                                     }
                                 })
@@ -769,7 +769,7 @@ public class HomeActivity extends AppCompatActivity {
                                             try {
                                                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
                                             } catch (ActivityNotFoundException anfe) {
-                                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
+                                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                                             }
 
                                         }

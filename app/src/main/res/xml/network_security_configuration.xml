@@ -10,5 +10,8 @@
         <domain includeSubdomains="true">13.235.137.183</domain>
         <domain includeSubdomains="true">aravind.org</domain>
         <domain includeSubdomains="true">community.aravind.org:8080</domain>
+        <domain includeSubdomains="true">visilant.org</domain>
+        <domain includeSubdomains="true">13.68.152.45</domain>
+
     </domain-config>
 </network-security-config>
