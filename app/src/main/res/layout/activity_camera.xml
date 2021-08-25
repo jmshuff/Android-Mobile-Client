@@ -8,8 +8,8 @@
     android:background="@color/colorPrimary"
     tools:context="app.insightfuleye.client.activities.cameraActivity.CameraActivity">
 
-    <com.google.android.cameraview.CameraView
-        android:id="@+id/camera_surface_CameraView"
+    <androidx.camera.view.PreviewView
+        android:id="@+id/camera"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:adjustViewBounds="true"
@@ -28,8 +28,8 @@
         android:src="@drawable/circle_intelehealth"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/camera_surface_CameraView"
-        app:layout_constraintBottom_toBottomOf="@id/camera_surface_CameraView"
+        app:layout_constraintTop_toTopOf="@id/camera"
+        app:layout_constraintBottom_toBottomOf="@id/camera"
         />
 
 
