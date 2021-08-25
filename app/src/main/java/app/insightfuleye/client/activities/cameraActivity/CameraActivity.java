@@ -1,7 +1,6 @@
 package app.insightfuleye.client.activities.cameraActivity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -18,22 +16,29 @@ import androidx.annotation.NonNull;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
+import androidx.camera.core.CameraControl;
+import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
+import androidx.camera.core.ZoomState;
 import androidx.camera.extensions.HdrImageCaptureExtender;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 
 import android.util.Log;
+import android.view.OrientationEventListener;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -60,7 +65,6 @@ import static android.widget.Toast.LENGTH_SHORT;
 public class CameraActivity extends AppCompatActivity {
 
     public static final int TAKE_IMAGE = 205;
-
     /**
      * Bundle key used for the {@link String} setting custom Image Name
      * for the file generated
@@ -81,6 +85,11 @@ public class CameraActivity extends AppCompatActivity {
     PreviewView mPreviewView;
     ImageView captureImage;
     private Handler mBackgroundHandler;
+    private OrientationEventListener orientationEventListener;
+    public CameraInfo cInfo;
+    public CameraControl cControl;
+    private SeekBar zoomBar;
+
 
 
     private Executor executor = Executors.newSingleThreadExecutor();
@@ -94,6 +103,12 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        mPreviewView = findViewById(R.id.camera);
+        captureImage = findViewById(R.id.take_picture);
+
+        zoomBar = findViewById(R.id.zoomBar);
+        zoomBar.setMax(100);
+        zoomBar.setProgress(0);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -103,8 +118,6 @@ public class CameraActivity extends AppCompatActivity {
                 mFilePath = extras.getString(SET_IMAGE_PATH);
         }
 
-        mPreviewView = findViewById(R.id.camera);
-        captureImage = findViewById(R.id.take_picture);
 
         if (allPermissionsGranted()) {
             startCamera(); //start camera if permission has been granted by user
@@ -116,6 +129,10 @@ public class CameraActivity extends AppCompatActivity {
     @NeedsPermission(Manifest.permission.CAMERA)
     void startCamera() {
         final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        try {
+            orientationEventListener.enable();
+        }catch (Exception e){
+        }
         cameraProviderFuture.addListener(new Runnable() {
             @Override
             public void run() {
@@ -160,6 +177,8 @@ public class CameraActivity extends AppCompatActivity {
                 .build();
         preview.setSurfaceProvider(mPreviewView.createSurfaceProvider());
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, imageAnalysis, imageCapture);
+        pinchToZoom();
+        //setUpZoomSlider();
 
 
         captureImage.setOnClickListener(new View.OnClickListener() {
@@ -182,6 +201,48 @@ public class CameraActivity extends AppCompatActivity {
 
             }
 
+        });
+
+    }
+
+    private void pinchToZoom() {
+        //Pinch Zoom Camera
+        ScaleGestureDetector.SimpleOnScaleGestureListener listener = new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                LiveData<ZoomState> ZoomRatio = cInfo.getZoomState();
+                float currentZoomRatio = 0;
+                try {
+                    currentZoomRatio = ZoomRatio.getValue().getZoomRatio();
+                } catch (NullPointerException e) {
+
+                }
+                float linearValue = ZoomRatio.getValue().getLinearZoom();
+                float delta = detector.getScaleFactor();
+                cControl.setZoomRatio(currentZoomRatio * delta);
+                float mat = (linearValue) * (100);
+                zoomBar.setProgress((int) mat);
+                return true;
+            }
+        };
+
+        ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(getBaseContext(), listener);
+    }
+    private void setUpZoomSlider(){
+        zoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                float mat = (float) (progress) / (100);
+                cControl.setLinearZoom(mat);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
         });
     }
 
