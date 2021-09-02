@@ -41,6 +41,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <View
+        android:id="@+id/focus"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@drawable/ic_focus"
+        app:layout_constraintBottom_toTopOf="@+id/zoomBar"
+        app:layout_constraintEnd_toEndOf="@+id/camera"
+        app:layout_constraintStart_toStartOf="@+id/camera"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible" />
     <SeekBar
         android:id="@+id/zoomBar"
         android:layout_width="match_parent"

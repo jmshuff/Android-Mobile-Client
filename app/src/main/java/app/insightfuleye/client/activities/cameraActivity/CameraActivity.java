@@ -15,17 +15,22 @@ import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraControl;
 import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.FocusMeteringAction;
+import androidx.camera.core.FocusMeteringResult;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.ImageProxy;
+import androidx.camera.core.MeteringPoint;
+import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
 import androidx.camera.core.ZoomState;
-import androidx.camera.extensions.HdrImageCaptureExtender;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
@@ -34,6 +39,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -50,9 +56,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.IllegalFormatWidthException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.app.AppConstants;
@@ -89,6 +97,16 @@ public class CameraActivity extends AppCompatActivity {
     public CameraInfo cInfo;
     public CameraControl cControl;
     private SeekBar zoomBar;
+    private CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
+    private Handler handler = new Handler();
+    private View focusView;
+    //private ImageCapture imageCapture = null;
+    private Runnable focusingTOInvisible = new Runnable() {
+        @Override
+        public void run() {
+            focusView.setVisibility(View.INVISIBLE);
+        }
+    };
 
 
 
@@ -105,6 +123,7 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         mPreviewView = findViewById(R.id.camera);
         captureImage = findViewById(R.id.take_picture);
+        focusView = findViewById(R.id.focus);
 
         zoomBar = findViewById(R.id.zoomBar);
         zoomBar.setMax(100);
@@ -124,10 +143,14 @@ public class CameraActivity extends AppCompatActivity {
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
+
+
     }
 
+
     @NeedsPermission(Manifest.permission.CAMERA)
-    void startCamera() {
+
+    /*void startCamera() {
         final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         try {
             orientationEventListener.enable();
@@ -148,8 +171,112 @@ public class CameraActivity extends AppCompatActivity {
             }
         }, ContextCompat.getMainExecutor(this));
     }
+*/
+    void startCamera() {
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        try {
+            orientationEventListener.enable();
+        }catch (Exception e){
 
-    void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
+        }
+        cameraProviderFuture.addListener(()->{
+            try{
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                //bind Camera Preview to Surface provider ie:viewFinder in my case
+                Preview preview = new Preview.Builder().build();
+
+                ImageCapture imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).setTargetAspectRatio(AspectRatio.RATIO_4_3).build();
+                Preview.SurfaceProvider surfaceProvider = mPreviewView.createSurfaceProvider();
+                preview.setSurfaceProvider(surfaceProvider);
+
+                try {
+                    cameraProvider.unbindAll();
+                    Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+                    cControl = camera.getCameraControl();
+                    cInfo = camera.getCameraInfo();
+                    //AutoFocus Every X Seconds
+                    MeteringPointFactory AFfactory = new SurfaceOrientedMeteringPointFactory((float)mPreviewView.getWidth(),(float)mPreviewView.getHeight());
+                    float centerWidth = (float)mPreviewView.getWidth()/2;
+                    float centerHeight = (float)mPreviewView.getHeight()/2;
+                    MeteringPoint AFautoFocusPoint = AFfactory.createPoint(centerWidth, centerHeight);
+                    try {
+                        FocusMeteringAction action = new FocusMeteringAction.Builder(AFautoFocusPoint,FocusMeteringAction.FLAG_AF).setAutoCancelDuration(1, TimeUnit.SECONDS).build();
+                        cControl.startFocusAndMetering(action);
+                    }catch (Exception e){
+
+                    }
+                    captureImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            imageCapture.takePicture(executor, new ImageCapture.OnImageCapturedCallback() {
+                                @Override
+                                public void onCaptureSuccess(ImageProxy image) {
+                                    final byte[] data;
+                                    data = toBitmap(image);
+                                    compressImageAndSave(data);
+                                }
+
+                                @Override
+                                public void onError(@NonNull ImageCaptureException error) {
+                                    error.printStackTrace();
+                                }
+
+                            });
+
+                        }
+
+                    });
+
+                    //AutoFocus CameraX
+                    mPreviewView.setOnTouchListener((v, event) -> {
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            handler.removeCallbacks(focusingTOInvisible);
+                            mPreviewView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus));
+                            mPreviewView.setVisibility(View.VISIBLE);
+                            return true;
+                        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                            MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory((float) mPreviewView.getWidth(), (float)mPreviewView.getHeight());
+                            MeteringPoint autoFocusPoint = factory.createPoint(event.getX(), event.getY());
+                            FocusMeteringAction action = new FocusMeteringAction.Builder(autoFocusPoint,FocusMeteringAction.FLAG_AF).setAutoCancelDuration(5,TimeUnit.SECONDS).build();
+                            ListenableFuture future = cControl.startFocusAndMetering(action);
+
+                            future.addListener(()->{
+                                handler.postDelayed(focusingTOInvisible,3000);
+                                try{
+                                    FocusMeteringResult result = (FocusMeteringResult) future.get();
+                                    if(result.isFocusSuccessful()){
+                                        focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus_green));
+
+                                    }
+                                }catch (Exception e){
+
+                                }
+                            },executor);
+
+
+
+                            return true;
+                        } else {
+
+                            return false;
+                        }
+                    });
+
+
+                }catch (Exception e){
+                    Toast.makeText(this,"Failed", LENGTH_SHORT).show();
+                }
+                pinchToZoom();
+                setUpZoomSlider();
+            }catch (ExecutionException | InterruptedException e){
+
+            }
+        },ContextCompat.getMainExecutor(this));
+
+
+    }
+
+    /*void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
 
         Preview preview = new Preview.Builder()
                 .build();
@@ -177,8 +304,7 @@ public class CameraActivity extends AppCompatActivity {
                 .build();
         preview.setSurfaceProvider(mPreviewView.createSurfaceProvider());
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, imageAnalysis, imageCapture);
-        pinchToZoom();
-        //setUpZoomSlider();
+
 
 
         captureImage.setOnClickListener(new View.OnClickListener() {
@@ -203,7 +329,7 @@ public class CameraActivity extends AppCompatActivity {
 
         });
 
-    }
+    }*/
 
     private void pinchToZoom() {
         //Pinch Zoom Camera
