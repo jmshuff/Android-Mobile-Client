@@ -1,0 +1,92 @@
+{
+    "id":"ID_1851599251",
+    "text":"Patient Experiencing Symptoms",
+    "perform-physical-exam":"Eyes:Glasses;Eyes:Distance;Eyes:VA left;Eyes:VA right;Eyes:Pinhole left;Eyes:Pinhole right;Eyes:Images;Eyes:Image upload right;Eyes:Image upload left;Eyes:Referral;",
+    "options": [{
+        "id":"ID_1957174010",
+        "text":"Complaints:",
+    "display":"Do you have any of these symptoms?",
+        "options": [{
+            "id":"ID_161621329",
+            "text":"Vision Loss"
+        }, {
+            "id":"ID_1866234525",
+            "text":"Reading Difficulty"
+        }, {
+            "id":"ID_615473083",
+            "text":"Redness or Iritation"
+        }, {
+            "id":"ID_1029517096",
+            "text":"Eye Pain"
+        }, {
+            "id":"ID_229686471",
+            "text":"Headache"
+        }]
+    }, {
+        "id":"ID_449982048",
+        "text":"Symptoms located in",
+    "display":"In which eye are you experiencing symptoms?",
+        "options": [{
+            "id":"ID_94458896",
+            "text":"Left Eye"
+        }, {
+            "id":"ID_1215037043",
+            "text":"Right Eye"
+        }, {
+            "id":"ID_1206537765",
+            "text":"Both Eyes"
+        }]
+    }, {
+        "id":"ID_712863452",
+        "text":"Persistence",
+    "display":"How constant are your systems?",
+    "language":"%",
+        "options": [{
+            "id":"ID_47424289",
+            "text":"Constant: they do not get better or worse",
+    "language":"Constant symptoms"
+        }, {
+            "id":"ID_1033799844",
+            "text":"Intermittent: they sometimes get better or worse",
+    "language":"Intermittent Symptoms"
+        }]
+    }, {
+        "id":"ID_1695512600",
+        "text":"Symptom duration:",
+    "display":"When did your symptoms start?",
+        "options": [{
+            "id":"ID_1262970632",
+            "text":"A few days"
+        }, {
+            "id":"ID_462273844",
+            "text":"A few weeks"
+        }, {
+            "id":"ID_1218245972",
+            "text":"1-6 months"
+        }, {
+            "id":"ID_942202219",
+            "text":"6-12 months"
+        }, {
+            "id":"ID_393243330",
+            "text":"12+ months"
+        }]
+    }, {
+        "id":"ID_1843208568",
+        "text":"Trauma",
+    "language":"%",
+    "display":"Have you suffered any recent eye trauma?",
+        "options": [{
+            "id":"ID_208640262",
+            "text":"Yes",
+    "language":"Patient has recent eye trauma"
+        }, {
+            "id":"ID_232992630",
+            "text":"No",
+    "language":"%"
+        }, {
+            "id":"ID_1409663703",
+            "text":"Patient Unsure",
+    "language":"%"
+        }]
+    }]
+}
