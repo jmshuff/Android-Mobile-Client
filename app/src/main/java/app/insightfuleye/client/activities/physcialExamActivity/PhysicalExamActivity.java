@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import org.json.JSONException;
@@ -368,6 +369,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
     }
 
+
+
     @Override
     public void onChildListClickEvent(int groupPosition, int childPos, int physExamPos) {
         Node question = physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getOption(childPos);
@@ -399,6 +402,27 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         if (!question.isTerminal() && question.isSelected()) {
             Node.subLevelQuestion(question, this, adapter, filePath.toString(), imageName);
+        }
+
+        //JS, get values for physical exam questions
+        Node category= physicalExamMap.getExamNode(physExamPos);
+        //category equals the first branch in free mind
+        if (category.getText().equals("VA right")){
+            String VAright=category.formConceptLanguage();
+            physicalExamMap.setVARight(VAright);
+        }
+        if (category.getText().equals("VA left")){
+            String Valeft=category.formConceptLanguage();
+            physicalExamMap.setVALeft(Valeft);
+        }
+
+        if (category.getText().equals("Pinhole right")){
+            String Pinholeright=category.formConceptLanguage();
+            physicalExamMap.setPinholeRight(Pinholeright);
+        }
+        if (category.getText().equals("Pinhole left")){
+            String Pinholeleft=category.formConceptLanguage();
+            physicalExamMap.setPinholeLeft(Pinholeleft);
         }
     }
 
@@ -552,7 +576,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             String nodeText = parent_name + " : " + viewNode.findDisplay();
 
             textView.setText(nodeText);
-
             Node displayNode = viewNode.getOption(0);
 
             if (displayNode.isAidAvailable()) {

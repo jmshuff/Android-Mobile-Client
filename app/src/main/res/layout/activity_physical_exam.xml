@@ -64,10 +64,10 @@
             android:id="@+id/physExam_recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:visibility="visible"
             android:fadeScrollbars="false"
-            android:scrollbarThumbVertical="@color/colorAccent" />
+            android:scrollbarThumbVertical="@color/colorAccent"
+            android:scrollbars="vertical"
+            android:visibility="visible" />
 
     </LinearLayout>
 

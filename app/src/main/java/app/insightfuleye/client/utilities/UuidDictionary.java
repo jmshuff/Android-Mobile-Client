@@ -23,7 +23,8 @@ public class UuidDictionary {
     public static final String FOLLOW_UP_VISIT = "e8caffd6-5d22-41c4-8d6a-bc31a44d0c86";
     //m added
     public static final String EMERGENCY = "ca5f5dc3-4f0b-4097-9cae-5cf2eb44a09c";
-//physical exam JS
+
+    //physical exam JS
     public static final String VARight = "4765816f-dffe-42d4-bef2-7eaba8e191b6";
     public static final String VALeft = "bc4744da-8e42-48f2-a061-de0ea13c02ad";
     public static final String PinholeRight = "50492e1a-db2c-438f-bd9b-f8b7c68920f8";
