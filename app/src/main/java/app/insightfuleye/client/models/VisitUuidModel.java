@@ -19,22 +19,26 @@ public class VisitUuidModel implements Parcelable {
     private String encounterVitals;
     private String encounterAdultIntials;
     private String visitUuidString;
+    private String encounterPhysicalExam;
 
     public VisitUuidModel(Parcel in) {
         encounterVitals = in.readString();
         encounterAdultIntials = in.readString();
         visitUuidString = in.readString();
+        encounterPhysicalExam= in.readString();
     }
 
-    public VisitUuidModel(String vitals, String encounterVitals, String encounterAdultIntials) {
+    public VisitUuidModel(String vitals, String encounterVitals, String encounterAdultIntials, String encounterPhysicalExam) {
         this.encounterVitals = encounterVitals;
         this.encounterAdultIntials = encounterAdultIntials;
         this.visitUuidString = vitals;
+        this.encounterPhysicalExam= encounterPhysicalExam;
     }
 
-    public VisitUuidModel(String encounterVitals, String encounterAdultIntials) {
+    public VisitUuidModel(String encounterVitals, String encounterAdultIntials, String encounterPhysicalExam) {
         this.encounterVitals = encounterVitals;
         this.encounterAdultIntials = encounterAdultIntials;
+        this.encounterPhysicalExam=encounterPhysicalExam;
     }
 
     public String getEncounterVitals() {
@@ -53,6 +57,14 @@ public class VisitUuidModel implements Parcelable {
         this.encounterAdultIntials = encounterAdultIntials;
     }
 
+    public String getEncounterPhysicalExam() {
+        return encounterPhysicalExam;
+    }
+
+    public void setPhysicalExam(String encounterPhysical) {
+        this.encounterPhysicalExam = encounterPhysical;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -63,5 +75,6 @@ public class VisitUuidModel implements Parcelable {
         dest.writeString(encounterVitals);
         dest.writeString(encounterAdultIntials);
         dest.writeString(visitUuidString);
+        dest.writeString(encounterPhysicalExam);
     }
 }
