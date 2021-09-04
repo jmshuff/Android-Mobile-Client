@@ -107,7 +107,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     Boolean complaintConfirmed = false;
     String encounterVitals;
     String encounterAdultIntials, EncounterAdultInitial_LatestVisit;
-    String encounterPhysicalExam;
     SessionManager sessionManager;
     RecyclerView physExam_recyclerView;
     QuestionsAdapter adapter;
@@ -159,22 +158,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         pb.setTextColor(getResources().getColor((R.color.colorPrimary)));
         //pb.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
 
-        //Create physical exam encounter
-        EncounterDAO encounterDAO = new EncounterDAO();
-        EncounterDTO encounterDTO = new EncounterDTO();
-        encounterDTO.setUuid(encounterPhysicalExam);
-        encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_PHYSICAL_EXAM"));
-        encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
-        encounterDTO.setVisituuid(visitUuid);
-        encounterDTO.setSyncd(false);
-        encounterDTO.setProvideruuid(sessionManager.getProviderID());
-        Log.d("DTO", "DTOcomp: " + encounterDTO.getProvideruuid());
-        encounterDTO.setVoided(0);
-        try {
-            encounterDAO.createEncountersToDB(encounterDTO);
-        } catch (DAOException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-        }
 
         //select exams
         selectedExamsList = new ArrayList<>();
@@ -185,7 +168,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             encounterVitals = intent.getStringExtra("encounterUuidVitals");
             encounterAdultIntials = intent.getStringExtra("encounterUuidAdultIntial");
             EncounterAdultInitial_LatestVisit = intent.getStringExtra("EncounterAdultInitial_LatestVisit");
-            encounterPhysicalExam=intent.getStringExtra("encounterUuidPhysicalExam");
             state = intent.getStringExtra("state");
             patientName = intent.getStringExtra("name");
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
@@ -408,7 +390,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 intent.putExtra("visitUuid", visitUuid);
                 intent.putExtra("encounterUuidVitals", encounterVitals);
                 intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
-                intent.putExtra("encounterUuidPhysicalExam", encounterPhysicalExam);
                 intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
                 intent.putExtra("state", state);
                 intent.putExtra("name", patientName);
@@ -429,7 +410,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 intent1.putExtra("visitUuid", visitUuid);
                 intent1.putExtra("encounterUuidVitals", encounterVitals);
                 intent1.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
-                intent1.putExtra("encounterUuidPhysicalExam", encounterPhysicalExam);
                 intent1.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
                 intent1.putExtra("state", state);
                 intent1.putExtra("name", patientName);
@@ -761,7 +741,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         intent.putExtra("visitUuid", visitUuid);
         intent.putExtra("encounterUuidVitals", encounterVitals);
         intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
-        intent.putExtra("encounterUuidPhysicalExam", encounterPhysicalExam);
         intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
         intent.putExtra("state", state);
         intent.putExtra("name", patientName);
