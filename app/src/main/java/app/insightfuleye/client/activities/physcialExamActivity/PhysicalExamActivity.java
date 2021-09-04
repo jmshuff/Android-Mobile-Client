@@ -63,6 +63,7 @@ import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
+import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
@@ -158,6 +159,24 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         pb.setTextColor(getResources().getColor((R.color.colorPrimary)));
         //pb.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
 
+        //Create physical exam encounter
+        EncounterDAO encounterDAO = new EncounterDAO();
+        EncounterDTO encounterDTO = new EncounterDTO();
+        encounterDTO.setUuid(encounterPhysicalExam);
+        encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_PHYSICAL_EXAM"));
+        encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
+        encounterDTO.setVisituuid(visitUuid);
+        encounterDTO.setSyncd(false);
+        encounterDTO.setProvideruuid(sessionManager.getProviderID());
+        Log.d("DTO", "DTOcomp: " + encounterDTO.getProvideruuid());
+        encounterDTO.setVoided(0);
+        try {
+            encounterDAO.createEncountersToDB(encounterDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        //select exams
         selectedExamsList = new ArrayList<>();
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
@@ -166,6 +185,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             encounterVitals = intent.getStringExtra("encounterUuidVitals");
             encounterAdultIntials = intent.getStringExtra("encounterUuidAdultIntial");
             EncounterAdultInitial_LatestVisit = intent.getStringExtra("EncounterAdultInitial_LatestVisit");
+            encounterPhysicalExam=intent.getStringExtra("encounterUuidPhysicalExam");
             state = intent.getStringExtra("state");
             patientName = intent.getStringExtra("name");
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
@@ -309,9 +329,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             FirebaseCrashlytics.getInstance().recordException(e);
         }
 
+
+
         obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.VARight);
-        obsDTO.setEncounteruuid(encounterPhysicalExam);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
         obsDTO.setValue(physicalExamMap.getVARight());
 
@@ -323,7 +345,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.VALeft);
-        obsDTO.setEncounteruuid(encounterPhysicalExam);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
         obsDTO.setValue(physicalExamMap.getVALeft());
 
@@ -335,7 +357,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.PinholeRight);
-        obsDTO.setEncounteruuid(encounterPhysicalExam);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
         obsDTO.setValue(physicalExamMap.getPinholeRight());
 
@@ -347,7 +369,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.PinholeLeft);
-        obsDTO.setEncounteruuid(encounterPhysicalExam);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
         obsDTO.setValue(physicalExamMap.getPinholeLeft());
 
@@ -386,6 +408,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 intent.putExtra("visitUuid", visitUuid);
                 intent.putExtra("encounterUuidVitals", encounterVitals);
                 intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+                intent.putExtra("encounterUuidPhysicalExam", encounterPhysicalExam);
                 intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
                 intent.putExtra("state", state);
                 intent.putExtra("name", patientName);
@@ -406,6 +429,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 intent1.putExtra("visitUuid", visitUuid);
                 intent1.putExtra("encounterUuidVitals", encounterVitals);
                 intent1.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+                intent1.putExtra("encounterUuidPhysicalExam", encounterPhysicalExam);
                 intent1.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
                 intent1.putExtra("state", state);
                 intent1.putExtra("name", patientName);
@@ -526,35 +550,35 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
             obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.VARight);
-            obsDTO.setEncounteruuid(encounterPhysicalExam);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
             obsDTO.setValue(physicalExamMap.getVARight());
-            obsDTO.setUuid(obsDAO.getObsuuid(encounterPhysicalExam, UuidDictionary.VARight));
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VARight));
             obsDAO.updateObs(obsDTO);
 
             obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.VALeft);
-            obsDTO.setEncounteruuid(encounterPhysicalExam);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
             obsDTO.setValue(physicalExamMap.getVALeft());
-            obsDTO.setUuid(obsDAO.getObsuuid(encounterPhysicalExam, UuidDictionary.VALeft));
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VALeft));
             obsDAO.updateObs(obsDTO);
 
 
             obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.PinholeRight);
-            obsDTO.setEncounteruuid(encounterPhysicalExam);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
             obsDTO.setValue(physicalExamMap.getPinholeRight());
-            obsDTO.setUuid(obsDAO.getObsuuid(encounterPhysicalExam, UuidDictionary.PinholeRight));
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.PinholeRight));
             obsDAO.updateObs(obsDTO);
 
             obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.PinholeLeft);
-            obsDTO.setEncounteruuid(encounterPhysicalExam);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
             obsDTO.setValue(physicalExamMap.getPinholeLeft());
-            obsDTO.setUuid(obsDAO.getObsuuid(encounterPhysicalExam, UuidDictionary.PinholeLeft));
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.PinholeLeft));
             obsDAO.updateObs(obsDTO);
 
         } catch (DAOException dao) {
@@ -563,8 +587,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         EncounterDAO encounterDAO = new EncounterDAO();
         try {
-            encounterDAO.updateEncounterSync("false", encounterPhysicalExam);
-            encounterDAO.updateEncounterModifiedDate(encounterPhysicalExam);
+            encounterDAO.updateEncounterSync("false", encounterAdultIntials);
+            encounterDAO.updateEncounterModifiedDate(encounterAdultIntials);
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
@@ -737,6 +761,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         intent.putExtra("visitUuid", visitUuid);
         intent.putExtra("encounterUuidVitals", encounterVitals);
         intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+        intent.putExtra("encounterUuidPhysicalExam", encounterPhysicalExam);
         intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
         intent.putExtra("state", state);
         intent.putExtra("name", patientName);
