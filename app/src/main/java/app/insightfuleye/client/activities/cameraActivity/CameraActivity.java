@@ -258,6 +258,7 @@ public class CameraActivity extends AppCompatActivity {
                     });
 
                     //AutoFocus CameraX
+                    /*
                     mPreviewView.setOnTouchListener((v, event) -> {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             handler.removeCallbacks(focusingTOInvisible);
@@ -292,7 +293,7 @@ public class CameraActivity extends AppCompatActivity {
                         }
                     });
 
-
+*/
                 }catch (Exception e){
                     Toast.makeText(this,"Failed", LENGTH_SHORT).show();
                 }
