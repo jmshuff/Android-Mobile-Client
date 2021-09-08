@@ -1,6 +1,8 @@
 package app.insightfuleye.client.activities.cameraActivity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -8,7 +10,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.hardware.SensorManager;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -39,10 +43,14 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.ScaleGestureDetector;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -93,13 +101,13 @@ public class CameraActivity extends AppCompatActivity {
     PreviewView mPreviewView;
     ImageView captureImage;
     private Handler mBackgroundHandler;
-    private OrientationEventListener orientationEventListener;
     public CameraInfo cInfo;
     public CameraControl cControl;
     private SeekBar zoomBar;
     private CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
     private Handler handler = new Handler();
     private View focusView;
+    private TextureView txView;
     //private ImageCapture imageCapture = null;
     private Runnable focusingTOInvisible = new Runnable() {
         @Override
@@ -124,7 +132,7 @@ public class CameraActivity extends AppCompatActivity {
         mPreviewView = findViewById(R.id.camera);
         captureImage = findViewById(R.id.take_picture);
         focusView = findViewById(R.id.focus);
-
+        txView=findViewById(R.id.view_finder);
         zoomBar = findViewById(R.id.zoomBar);
         zoomBar.setMax(100);
         zoomBar.setProgress(0);
@@ -174,18 +182,17 @@ public class CameraActivity extends AppCompatActivity {
 */
     void startCamera() {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
-        try {
-            orientationEventListener.enable();
-        }catch (Exception e){
 
-        }
         cameraProviderFuture.addListener(()->{
             try{
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
                 //bind Camera Preview to Surface provider ie:viewFinder in my case
                 Preview preview = new Preview.Builder().build();
 
-                ImageCapture imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).setTargetAspectRatio(AspectRatio.RATIO_4_3).build();
+                ImageCapture imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                                //.setTargetRotation(this.getWindowManager().getDefaultDisplay().getRotation())
+                                .build();
+
                 Preview.SurfaceProvider surfaceProvider = mPreviewView.createSurfaceProvider();
                 preview.setSurfaceProvider(surfaceProvider);
 
@@ -194,6 +201,7 @@ public class CameraActivity extends AppCompatActivity {
                     Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
                     cControl = camera.getCameraControl();
                     cInfo = camera.getCameraInfo();
+
                     //AutoFocus Every X Seconds
                     MeteringPointFactory AFfactory = new SurfaceOrientedMeteringPointFactory((float)mPreviewView.getWidth(),(float)mPreviewView.getHeight());
                     float centerWidth = (float)mPreviewView.getWidth()/2;
@@ -205,6 +213,26 @@ public class CameraActivity extends AppCompatActivity {
                     }catch (Exception e){
 
                     }
+
+                    OrientationEventListener orientationEventListener = new OrientationEventListener(this) {
+                        @Override
+                        public void onOrientationChanged(int orientation) {
+                                int rotation;
+                                // Monitors orientation values to determine the target rotation value
+                                if (orientation >= 45 && orientation < 135) {
+                                    rotation = Surface.ROTATION_270;
+                                } else if (orientation >= 135 && orientation < 225) {
+                                    rotation = Surface.ROTATION_180;
+                                } else if (orientation >= 225 && orientation < 315) {
+                                    rotation = Surface.ROTATION_90;
+                                } else {
+                                    rotation = Surface.ROTATION_0;
+                                }
+                                imageCapture.setTargetRotation(rotation);
+                            }
+
+                        };
+                    orientationEventListener.enable();
                     captureImage.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -213,12 +241,14 @@ public class CameraActivity extends AppCompatActivity {
                                 public void onCaptureSuccess(ImageProxy image) {
                                     final byte[] data;
                                     data = toBitmap(image);
-                                    compressImageAndSave(data);
+                                    compressImageAndSave(data, imageCapture);
+                                    orientationEventListener.disable();
                                 }
 
                                 @Override
                                 public void onError(@NonNull ImageCaptureException error) {
                                     error.printStackTrace();
+                                    orientationEventListener.disable();
                                 }
 
                             });
@@ -272,6 +302,7 @@ public class CameraActivity extends AppCompatActivity {
 
             }
         },ContextCompat.getMainExecutor(this));
+
 
 
     }
@@ -372,6 +403,7 @@ public class CameraActivity extends AppCompatActivity {
         });
     }
 
+
     private byte[] toBitmap(ImageProxy image) {
         ImageProxy.PlaneProxy planeProxy = image.getPlanes()[0];
         ByteBuffer buffer = planeProxy.getBuffer();
@@ -381,7 +413,7 @@ public class CameraActivity extends AppCompatActivity {
         //return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
-    void compressImageAndSave(final byte[] data) {
+    void compressImageAndSave(final byte[] data, ImageCapture imageCapture) {
         getBackgroundHandler().post(new Runnable() {
             @Override
             public void run() {
@@ -468,28 +500,24 @@ public class CameraActivity extends AppCompatActivity {
                     canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2, middleY - bmp.getHeight() / 2, new Paint(
                             Paint.FILTER_BITMAP_FLAG));
 
-                    ExifInterface exif;
-                    try {
-                        exif = new ExifInterface(filePath);
+                    int orientation=imageCapture.getTargetRotation();
 
-                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+                    Log.e("EXIF", "Exif: " + orientation);
+                    Matrix matrix = new Matrix();
+                    if (orientation == 0) {
+                        matrix.postRotate(90);
                         Log.e("EXIF", "Exif: " + orientation);
-                        Matrix matrix = new Matrix();
-                        if (orientation == 6) {
-                            matrix.postRotate(90);
-                            Log.e("EXIF", "Exif: " + orientation);
-                        } else if (orientation == 3) {
-                            matrix.postRotate(180);
-                            Log.e("EXIF", "Exif: " + orientation);
-                        } else if (orientation == 8) {
-                            matrix.postRotate(270);
-                            Log.e("EXIF", "Exif: " + orientation);
-                        }
-                        scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(),
-                                matrix, true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } else if (orientation == 2) {
+                        matrix.postRotate(270);
+                        Log.e("EXIF", "Exif: " + orientation);
+                    } else if (orientation == 3) {
+                        matrix.postRotate(180);
+                        Log.e("EXIF", "Exif: " + orientation);
                     }
+                    scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(),
+                            matrix, true);
+
+
                     FileOutputStream out = null;
                     String filename = filePath;
                     try {
@@ -562,6 +590,8 @@ public class CameraActivity extends AppCompatActivity {
         }
         return true;
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

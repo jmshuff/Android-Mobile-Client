@@ -31,6 +31,7 @@ public class PhysicalExam extends Node {
     private String VALeft;
     private String PinholeRight;
     private String PinholeLeft;
+    private String volunteerReferral;
 
     public PhysicalExam(JSONObject jsonObject, ArrayList<String> selection) {
         super(jsonObject);
@@ -322,10 +323,13 @@ public class PhysicalExam extends Node {
     public void setVALeft(String VALeft){this.VALeft=VALeft; }
     public void setPinholeRight(String PinholeRight){this.PinholeRight=PinholeRight; }
     public void setPinholeLeft(String PinholeLeft){this.PinholeLeft=PinholeLeft; }
+    public void setVolunteerReferral(String volunteerReferral){this.volunteerReferral=volunteerReferral; }
     public String getVARight(){return VARight;}
     public String getVALeft(){return VALeft;}
     public String getPinholeRight(){return  PinholeRight;}
     public String getPinholeLeft(){return PinholeLeft;}
+    public String getVolunteerReferral(){return volunteerReferral;}
+
 
 
 }

@@ -361,6 +361,18 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             FirebaseCrashlytics.getInstance().recordException(e);
         }
 
+        obsDTO = new ObsDTO();
+        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
+        obsDTO.setCreator(sessionManager.getCreatorID());
+        obsDTO.setValue(physicalExamMap.getVolunteerReferral());
+
+        try {
+            obsDAO.insertObs(obsDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
         return isInserted;
     }
 
@@ -481,6 +493,12 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             String Pinholeleft=category.formConceptLanguage();
             physicalExamMap.setPinholeLeft(Pinholeleft);
         }
+
+        if (category.getText().equals("Referral")){
+            String volunteerReferral=category.formConceptLanguage();
+            physicalExamMap.setVolunteerReferral(volunteerReferral);
+        }
+
     }
 
 
@@ -559,6 +577,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setCreator(sessionManager.getCreatorID());
             obsDTO.setValue(physicalExamMap.getPinholeLeft());
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.PinholeLeft));
+            obsDAO.updateObs(obsDTO);
+
+            obsDTO = new ObsDTO();
+            obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
+            obsDTO.setCreator(sessionManager.getCreatorID());
+            obsDTO.setValue(physicalExamMap.getVolunteerReferral());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferral));
             obsDAO.updateObs(obsDTO);
 
         } catch (DAOException dao) {
