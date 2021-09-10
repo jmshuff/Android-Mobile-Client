@@ -1,6 +1,7 @@
 package app.insightfuleye.client.activities.cameraActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.hardware.SensorManager;
 import android.media.ExifInterface;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +25,7 @@ import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraControl;
 import androidx.camera.core.CameraInfo;
+import androidx.camera.core.CameraInfoUnavailableException;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.FocusMeteringAction;
 import androidx.camera.core.FocusMeteringResult;
@@ -37,11 +40,13 @@ import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
 import androidx.camera.core.ZoomState;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
+import androidx.camera.view.TextureViewMeteringPointFactory;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 
+import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -52,6 +57,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -115,6 +121,8 @@ public class CameraActivity extends AppCompatActivity {
             focusView.setVisibility(View.INVISIBLE);
         }
     };
+
+
 
 
 
@@ -259,31 +267,30 @@ public class CameraActivity extends AppCompatActivity {
 
                     //AutoFocus CameraX
                     /*
-                    mPreviewView.setOnTouchListener((v, event) -> {
+                    txView.setOnTouchListener((v, event) -> {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             handler.removeCallbacks(focusingTOInvisible);
-                            mPreviewView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus));
-                            mPreviewView.setVisibility(View.VISIBLE);
+                            focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus));
+                            focusView.setVisibility(View.VISIBLE);
                             return true;
                         } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                            MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory((float) mPreviewView.getWidth(), (float)mPreviewView.getHeight());
+                            MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory((float) txView.getWidth(), (float) txView.getHeight());
                             MeteringPoint autoFocusPoint = factory.createPoint(event.getX(), event.getY());
-                            FocusMeteringAction action = new FocusMeteringAction.Builder(autoFocusPoint,FocusMeteringAction.FLAG_AF).setAutoCancelDuration(5,TimeUnit.SECONDS).build();
+                            FocusMeteringAction action = new FocusMeteringAction.Builder(autoFocusPoint, FocusMeteringAction.FLAG_AF).setAutoCancelDuration(5, TimeUnit.SECONDS).build();
                             ListenableFuture future = cControl.startFocusAndMetering(action);
 
-                            future.addListener(()->{
-                                handler.postDelayed(focusingTOInvisible,3000);
-                                try{
+                            future.addListener(() -> {
+                                handler.postDelayed(focusingTOInvisible, 3000);
+                                try {
                                     FocusMeteringResult result = (FocusMeteringResult) future.get();
-                                    if(result.isFocusSuccessful()){
+                                    if (result.isFocusSuccessful()) {
                                         focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus_green));
 
                                     }
-                                }catch (Exception e){
+                                } catch (Exception e) {
 
                                 }
-                            },executor);
-
+                            }, executor);
 
 
                             return true;
@@ -292,13 +299,15 @@ public class CameraActivity extends AppCompatActivity {
                             return false;
                         }
                     });
-
 */
+
                 }catch (Exception e){
                     Toast.makeText(this,"Failed", LENGTH_SHORT).show();
                 }
                 pinchToZoom();
                 setUpZoomSlider();
+                autofocusOnStart();
+                setUpTapToFocus();
             }catch (ExecutionException | InterruptedException e){
 
             }
@@ -402,6 +411,38 @@ public class CameraActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void setUpTapToFocus() {
+        txView.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() != MotionEvent.ACTION_UP) {
+                /* Original post returns false here, but in my experience this makes
+                onTouch not being triggered for ACTION_UP event */
+                    return true;
+                }
+                TextureViewMeteringPointFactory factory = new TextureViewMeteringPointFactory(txView);
+                MeteringPoint point = factory.createPoint(event.getX(), event.getY());
+                FocusMeteringAction action = new FocusMeteringAction.Builder(point).build();
+                cControl.startFocusAndMetering(action);
+                handler.removeCallbacks(focusingTOInvisible);
+                focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus));
+                focusView.setX(event.getX());
+                focusView.setY(event.getY());
+                focusView.setVisibility(View.VISIBLE);
+                handler.postDelayed(focusingTOInvisible,1000);
+                return true;
+            }
+        });
+    }
+
+    private void autofocusOnStart(){
+        TextureViewMeteringPointFactory factory = new TextureViewMeteringPointFactory(txView);
+        MeteringPoint point = factory.createPoint(0.5f, 0.5f);
+        FocusMeteringAction action = new FocusMeteringAction.Builder(point).build();
+        cControl.startFocusAndMetering(action);
     }
 
 
