@@ -1,5 +1,7 @@
 package app.insightfuleye.client.models;
 
+import android.util.Log;
+
 public class Patient {
     private String uuid;
     private String openmrs_id;
@@ -166,6 +168,7 @@ public class Patient {
 
     public void setEconomic_status(String economic_status) {
         this.economic_status = economic_status;
+        Log.i("GPS", "GPS Status set");
     }
 
     public String getEducation_level() {

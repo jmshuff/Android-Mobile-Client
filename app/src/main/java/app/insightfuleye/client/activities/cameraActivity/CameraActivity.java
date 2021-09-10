@@ -306,7 +306,7 @@ public class CameraActivity extends AppCompatActivity {
                 }
                 pinchToZoom();
                 setUpZoomSlider();
-                autofocusOnStart();
+                //autofocusOnStart();
                 setUpTapToFocus();
             }catch (ExecutionException | InterruptedException e){
 
@@ -440,7 +440,9 @@ public class CameraActivity extends AppCompatActivity {
 
     private void autofocusOnStart(){
         TextureViewMeteringPointFactory factory = new TextureViewMeteringPointFactory(txView);
-        MeteringPoint point = factory.createPoint(0.5f, 0.5f);
+        float centerWidth=(float)mPreviewView.getWidth()/2;
+        float centerHeight= (float)mPreviewView.getHeight()/2;
+        MeteringPoint point = factory.createPoint(centerWidth,centerHeight);
         FocusMeteringAction action = new FocusMeteringAction.Builder(point).build();
         cControl.startFocusAndMetering(action);
     }
