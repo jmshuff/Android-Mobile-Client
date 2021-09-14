@@ -1,0 +1,71 @@
+{
+    "id":"ID_133044878",
+    "text":"Patient History",
+    "options": [{
+        "id":"ID_1414929347",
+        "text":"Do you have prolonged use of corticosteroids (including steroid cream or inhaled steroids)?",
+    "display":"Do you have prolonged use of corticosteroids (including steroid cream or inhaled steroids)?",
+    "language":"%",
+        "options": [{
+            "id":"ID_1854741392",
+            "text":"Yes",
+    "language":"Prolonged use of corticosteroids"
+        }, {
+            "id":"ID_1094800320",
+            "text":"No",
+    "language":"%"
+        }, {
+            "id":"ID_141751878",
+            "text":"Patient unsure",
+    "language":"%"
+        }]
+    }, {
+        "id":"ID_82509300",
+        "text":"Do you have any of the following conditions?",
+    "display":"Do you have any of the following conditions?",
+    "language":"%",
+        "options": [{
+            "id":"ID_1080427077",
+            "text":"Asthma",
+    "language":"Asthma"
+        }, {
+            "id":"ID_408004823",
+            "text":"Cardiac Problems",
+    "language":"Cardiac Problems"
+        }, {
+            "id":"ID_395443507",
+            "text":"Diabetes",
+    "language":"%",
+            "options": [{
+                "id":"ID_1601127469",
+                "text":"Less than 5 years",
+    "language":"Diabetes for less than 5 years",
+    "display":"To your knowledge, how long have you had diabetes?"
+            }, {
+                "id":"ID_540529455",
+                "text":"5-10 years",
+    "language":"Diabetes for 5-10 years"
+            }, {
+                "id":"ID_968496081",
+                "text":"More than 10 years",
+    "language":"Diabetes 5-10 years"
+            }]
+        }, {
+            "id":"ID_1234756610",
+            "text":"Hypertension",
+    "language":"Hypertension"
+        }, {
+            "id":"ID_1159370656",
+            "text":"High Cholesterol",
+    "language":"High Cholesterol"
+        }, {
+            "id":"ID_1872077483",
+            "text":"Patient Unaware",
+    "language":"%"
+        }, {
+            "id":"ID_646580571",
+            "text":"Other Medical Conditions",
+    "input-type":"text"
+        }]
+    }]
+}

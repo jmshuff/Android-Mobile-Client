@@ -1,0 +1,63 @@
+{
+  "mFirstName": true,
+  "mMiddleName": false,
+  "mLastName": true,
+  "mGenderM": true,
+  "mGenderF": true,
+  "mDOB": false,
+  "mAge": true,
+  "mPhoneNum": true,
+  "mCountry": "India",
+  "countryText": false,
+  "mState": "Tamil Nadu",
+  "stateText": false,
+  "mCity": true,
+  "mAddress1": true,
+  "mAddress2": true,
+  "mOccupation": true,
+  "casteLayout": false,
+  "educationLayout": false,
+  "economicLayout": false,
+  "mPostal": false,
+  "countryStateLayout": true,
+  "mRelationship": true,
+  "mHeight": false,
+  "mWeight": false,
+  "mPulse": false,
+  "mBpSys": false,
+  "mBpDia": false,
+  "mTemperature": false,
+  "mCelsius": false,
+  "mFahrenheit": false,
+  "mSpo2": false,
+  "mBMI": false,
+  "mResp": false,
+  "health_scheme_card": false,
+  "video_library": "https://www.youtube.com/playlist?list=PLY7f0i-HnvJ3XTsH3NvetrOw5ml7NNdHT",
+  "privacyNotice": true,
+  "privacyNoticeText": "•Personal Information
+  
+Aravind will collect personal information and health information from you for your medical records.
+
+•Use
+Your information is 
+- used for diagnosing and treating you. 
+- used to send you reminders, prescription information, and other related communication. 
+
+Your personal information will be anonymized for use in research, disease monitoring, and analysis to help us improve our products and services.
+
+•Protection Measures
+We provide physical, electronic, and procedural safeguards to protect information we process and maintain. 
+
+•Access and Correction
+You have the right to ask for a copy of any personal information we hold about you, as well as to ask for it to be corrected if you think it is wrong.
+
+On clicking “Accept”, I consent to the collection and use of my personal data, including health information, and to give access to the above-mentioned entities.
+",
+
+  "privacyNoticeText_Cebuano" : "",
+  "privacyNoticeText_Hindi" : "•व्यक्तिगत जानकारी\n  \nसेविका आपके मेडिकल रिकॉर्ड के लिए आपसे व्यक्तिगत जानकारी और स्वास्थ्य जानकारी एकत्र करेगी।\n\n•उपयोग\nआपकी जानकारी का उपयोग। \n- आपके निदान और उपचार के लिए उपयोग किया जाता है। \n- आपको याद दिलाने, दवाई के पर्चे की जानकारी और अन्य संबंधित संचार भेजने के लिए उपयोग किया जाता है। \n\nआपकी व्यक्तिगत जानकारी को खोज और सेवाओं को बेहतर बनाने में मदद करने के लिए अनुसंधान, रोग की जानकारी और विश्लेषण में उपयोग के लिए आपका नाम हटा कर उपयोग किया जाएगा| यहाँ हम दी गई कुछ विशेष परिस्थितियों में आपकी व्यक्तिगत जानकारी का खुलासा कर सकते हैं https://www.intelehealth.org/privacy-policy।\n\n• सुरक्षा के उपाय\nहम भौतिक, इलेक्ट्रॉनिक और प्रक्रियात्मक सुरक्षा उपायों की जानकारी देते हैं, जिनकी हम प्रक्रिया और रखरखाव करते हैं। \n\n• पहुँच और सुधार\nआपके पास हमारे बारे में रखने वाली किसी भी व्यक्तिगत जानकारी की एक प्रति के लिए पूछने का अधिकार है, साथ ही अगर आपको लगता है कि यह गलत है तो इसे ठीक करने के लिए कहें।\n\nयदि आप हमारे द्वारा प्रदान किए गए अपने व्यक्तिगत डेटा को हटाना या संशोधित करना चाहते हैं, तो कृपया support@intelehealth.io पर डेटा गोपनीयता अधिकारी से संपर्क करें और हम उचित समय में जवाब देंगे। \n\nस्वीकार करें पर क्लिक करने पर, मैं अपने व्यक्तिगत डेटा के संग्रह और उपयोग के लिए सहमति देता हूं, जिसमें स्वास्थ्य जानकारी शामिल है, और उपर्युक्त संस्थाओं तक पहुंच प्रदान करना है।",
+  "privacyNoticeText_Odiya" : "",
+  "presciptionHeader1": "Ekal Telemedicine Project",
+  "presciptionHeader2": "e-prescription"
+}
