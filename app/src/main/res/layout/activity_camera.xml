@@ -6,10 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context="app.insightfultest.client.activities.cameraActivity.CameraActivity">
+    tools:context="app.insightfuleye.client.activities.cameraActivity.CameraActivity">
 
-    <com.google.android.cameraview.CameraView
-        android:id="@+id/camera_surface_CameraView"
+    <androidx.camera.view.PreviewView
+        android:id="@+id/camera"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:adjustViewBounds="true"
@@ -19,6 +19,14 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <TextureView
+        android:id="@+id/view_finder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/alignCircle"
@@ -28,8 +36,8 @@
         android:src="@drawable/circle_intelehealth"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/camera_surface_CameraView"
-        app:layout_constraintBottom_toBottomOf="@id/camera_surface_CameraView"
+        app:layout_constraintTop_toTopOf="@id/camera"
+        app:layout_constraintBottom_toBottomOf="@id/camera"
         />
 
 
@@ -41,6 +49,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+
+    <SeekBar
+        android:id="@+id/zoomBar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="0dp"
+        android:layout_marginBottom="545dp"
+        android:max="100"
+        android:padding="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/camera"
+        android:elevation="2dp"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/take_picture"
         android:layout_width="wrap_content"
@@ -50,5 +71,18 @@
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_camera"
         app:useCompatPadding="true" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relativeLayout">
+
+        <ImageView
+            android:id="@+id/focus"
+            android:background="@drawable/ic_focus"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,8 +1,10 @@
 package app.insightfultest.client.activities.cameraActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,13 +23,42 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.camera.core.AspectRatio;
+import androidx.camera.core.Camera;
+import androidx.camera.core.CameraControl;
+import androidx.camera.core.CameraInfo;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.FocusMeteringAction;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
+import androidx.camera.core.MeteringPoint;
+import androidx.camera.core.MeteringPointFactory;
+import androidx.camera.core.Preview;
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
+import androidx.camera.core.ZoomState;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.camera.view.TextureViewMeteringPointFactory;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.OrientationEventListener;
+import android.view.ScaleGestureDetector;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.File;
@@ -35,6 +66,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import app.insightfultest.client.R;
 import app.insightfultest.client.app.AppConstants;
@@ -45,6 +81,8 @@ import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.OnShowRationale;
 import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 @RuntimePermissions
 public class CameraActivity extends AppCompatActivity {
@@ -64,70 +102,347 @@ public class CameraActivity extends AppCompatActivity {
      * Bundle key used for the {@link String} showing custom dialog
      * message before starting the camera.
      */
-    public static final String SHOW_DIALOG_MESSAGE = "DEFAULT_DLG";
-    private static final int[] FLASH_OPTIONS = {
-            CameraView.FLASH_AUTO,
-            CameraView.FLASH_OFF,
-            CameraView.FLASH_ON,
-    };
-    private static final int[] FLASH_ICONS = {
-            R.drawable.ic_flash_auto,
-            R.drawable.ic_flash_off,
-            R.drawable.ic_flash_on,
-    };
-    private static final int[] FLASH_TITLES = {
-            R.string.flash_auto,
-            R.string.flash_off,
-            R.string.flash_on,
-    };
-    private final String TAG = CameraActivity.class.getSimpleName();
-    private CameraView mCameraView;
-    private FloatingActionButton mFab;
-    private int mCurrentFlash;
-
-    private Handler mBackgroundHandler;
-
-    //Pass Custom File Name Using intent.putExtra(CameraActivity.SET_IMAGE_NAME, "Image Name");
     private String mImageName = null;
-    //Pass Dialog Message Using intent.putExtra(CameraActivity.SET_IMAGE_NAME, "Dialog Message");
-    private String mDialogMessage = null;
-    //Pass Custom File Path Using intent.putExtra(CameraActivity.SET_IMAGE_PATH, "Image Path");
     private String mFilePath = null;
-    private CameraView.Callback mCallback
-            = new CameraView.Callback() {
-
+    private final String TAG = CameraActivity.class.getSimpleName();
+    PreviewView mPreviewView;
+    ImageView captureImage;
+    private Handler mBackgroundHandler;
+    public CameraInfo cInfo;
+    public CameraControl cControl;
+    private SeekBar zoomBar;
+    private CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
+    private Handler handler = new Handler();
+    private View focusView;
+    private TextureView txView;
+    //private ImageCapture imageCapture = null;
+    private Runnable focusingTOInvisible = new Runnable() {
         @Override
-        public void onCameraOpened(CameraView cameraView) {
-            Log.d(TAG, "onCameraOpened");
+        public void run() {
+            focusView.setVisibility(View.INVISIBLE);
         }
-
-        @Override
-        public void onCameraClosed(CameraView cameraView) {
-            Log.d(TAG, "onCameraClosed");
-        }
-
-        @Override
-        public void onPictureTaken(CameraView cameraView, final byte[] data) {
-            Log.d(TAG, "onPictureTaken " + data.length);
-            Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
-                    .show();
-            compressImageAndSave(data);
-
-        }
-
     };
 
 
-    void compressImageAndSave(final byte[] data){
+
+
+
+    private Executor executor = Executors.newSingleThreadExecutor();
+    private int REQUEST_CODE_PERMISSIONS = 1001;
+    private final String[] REQUIRED_PERMISSIONS = new String[]{
+            "android.permission.CAMERA",
+            "android.permission.WRITE_EXTERNAL_STORAGE"};
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_camera);
+        mPreviewView = findViewById(R.id.camera);
+        captureImage = findViewById(R.id.take_picture);
+        focusView = findViewById(R.id.focus);
+        txView=findViewById(R.id.view_finder);
+        zoomBar = findViewById(R.id.zoomBar);
+        zoomBar.setMax(100);
+        zoomBar.setProgress(0);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            if (extras.containsKey(SET_IMAGE_NAME))
+                mImageName = extras.getString(SET_IMAGE_NAME);
+            if (extras.containsKey(SET_IMAGE_PATH))
+                mFilePath = extras.getString(SET_IMAGE_PATH);
+        }
+
+
+        if (allPermissionsGranted()) {
+            startCamera(); //start camera if permission has been granted by user
+        } else {
+            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
+        }
+
+
+    }
+
+
+    @NeedsPermission(Manifest.permission.CAMERA)
+
+    /*void startCamera() {
+        final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        try {
+            orientationEventListener.enable();
+        }catch (Exception e){
+        }
+        cameraProviderFuture.addListener(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                    bindPreview(cameraProvider);
+                } catch (ExecutionException | InterruptedException e) {
+                    // No errors need to be handled for this Future.
+                    // This should never be reached.
+                }
+            }
+        }, ContextCompat.getMainExecutor(this));
+    }
+*/
+    void startCamera() {
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+
+        cameraProviderFuture.addListener(()->{
+            try{
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                //bind Camera Preview to Surface provider ie:viewFinder in my case
+                Preview preview = new Preview.Builder().build();
+
+                ImageCapture imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                        //.setTargetRotation(this.getWindowManager().getDefaultDisplay().getRotation())
+                        .build();
+
+                Preview.SurfaceProvider surfaceProvider = mPreviewView.createSurfaceProvider();
+                preview.setSurfaceProvider(surfaceProvider);
+
+                try {
+                    cameraProvider.unbindAll();
+                    Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+                    cControl = camera.getCameraControl();
+                    cInfo = camera.getCameraInfo();
+
+                    //AutoFocus Every X Seconds
+                    MeteringPointFactory AFfactory = new SurfaceOrientedMeteringPointFactory((float)mPreviewView.getWidth(),(float)mPreviewView.getHeight());
+                    float centerWidth = (float)mPreviewView.getWidth()/2;
+                    float centerHeight = (float)mPreviewView.getHeight()/2;
+                    MeteringPoint AFautoFocusPoint = AFfactory.createPoint(centerWidth, centerHeight);
+                    try {
+                        FocusMeteringAction action = new FocusMeteringAction.Builder(AFautoFocusPoint,FocusMeteringAction.FLAG_AF).setAutoCancelDuration(1, TimeUnit.SECONDS).build();
+                        cControl.startFocusAndMetering(action);
+                    }catch (Exception e){
+
+                    }
+
+                    OrientationEventListener orientationEventListener = new OrientationEventListener(this) {
+                        @Override
+                        public void onOrientationChanged(int orientation) {
+                            int rotation;
+                            // Monitors orientation values to determine the target rotation value
+                            if (orientation >= 45 && orientation < 135) {
+                                rotation = Surface.ROTATION_270;
+                            } else if (orientation >= 135 && orientation < 225) {
+                                rotation = Surface.ROTATION_180;
+                            } else if (orientation >= 225 && orientation < 315) {
+                                rotation = Surface.ROTATION_90;
+                            } else {
+                                rotation = Surface.ROTATION_0;
+                            }
+                            imageCapture.setTargetRotation(rotation);
+                        }
+
+                    };
+                    orientationEventListener.enable();
+                    captureImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            imageCapture.takePicture(executor, new ImageCapture.OnImageCapturedCallback() {
+                                @Override
+                                public void onCaptureSuccess(ImageProxy image) {
+                                    final byte[] data;
+                                    data = toBitmap(image);
+                                    compressImageAndSave(data, imageCapture);
+                                    orientationEventListener.disable();
+                                }
+
+                                @Override
+                                public void onError(@NonNull ImageCaptureException error) {
+                                    error.printStackTrace();
+                                    orientationEventListener.disable();
+                                }
+
+                            });
+
+                        }
+
+                    });
+
+                    //AutoFocus CameraX
+                    /*
+                    txView.setOnTouchListener((v, event) -> {
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            handler.removeCallbacks(focusingTOInvisible);
+                            focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus));
+                            focusView.setVisibility(View.VISIBLE);
+                            return true;
+                        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                            MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory((float) txView.getWidth(), (float) txView.getHeight());
+                            MeteringPoint autoFocusPoint = factory.createPoint(event.getX(), event.getY());
+                            FocusMeteringAction action = new FocusMeteringAction.Builder(autoFocusPoint, FocusMeteringAction.FLAG_AF).setAutoCancelDuration(5, TimeUnit.SECONDS).build();
+                            ListenableFuture future = cControl.startFocusAndMetering(action);
+                            future.addListener(() -> {
+                                handler.postDelayed(focusingTOInvisible, 3000);
+                                try {
+                                    FocusMeteringResult result = (FocusMeteringResult) future.get();
+                                    if (result.isFocusSuccessful()) {
+                                        focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus_green));
+                                    }
+                                } catch (Exception e) {
+                                }
+                            }, executor);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+*/
+
+                }catch (Exception e){
+                    Toast.makeText(this,"Failed", LENGTH_SHORT).show();
+                }
+                pinchToZoom();
+                setUpZoomSlider();
+                //autofocusOnStart();
+                setUpTapToFocus();
+            }catch (ExecutionException | InterruptedException e){
+
+            }
+        },ContextCompat.getMainExecutor(this));
+
+
+
+    }
+
+    /*void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
+        Preview preview = new Preview.Builder()
+                .build();
+        CameraSelector cameraSelector = new CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .build();
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                .build();
+        ImageCapture.Builder builder = new ImageCapture.Builder();
+        //Vendor-Extensions (The CameraX extensions dependency in build.gradle)
+        HdrImageCaptureExtender hdrImageCaptureExtender = HdrImageCaptureExtender.create(builder);
+        // Query if extension is available (optional).
+        if (hdrImageCaptureExtender.isExtensionAvailable(cameraSelector)) {
+            // Enable the extension if available.
+            hdrImageCaptureExtender.enableExtension(cameraSelector);
+        }
+        final ImageCapture imageCapture = builder
+                .setTargetRotation(this.getWindowManager().getDefaultDisplay().getRotation())
+                .build();
+        preview.setSurfaceProvider(mPreviewView.createSurfaceProvider());
+        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, imageAnalysis, imageCapture);
+        captureImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageCapture.takePicture(executor, new ImageCapture.OnImageCapturedCallback() {
+                    @Override
+                    public void onCaptureSuccess(ImageProxy image) {
+                        final byte[] data;
+                        data = toBitmap(image);
+                        compressImageAndSave(data);
+                    }
+                    @Override
+                    public void onError(@NonNull ImageCaptureException error) {
+                        error.printStackTrace();
+                    }
+                });
+            }
+        });
+    }*/
+
+    private void pinchToZoom() {
+        //Pinch Zoom Camera
+        ScaleGestureDetector.SimpleOnScaleGestureListener listener = new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                LiveData<ZoomState> ZoomRatio = cInfo.getZoomState();
+                float currentZoomRatio = 0;
+                try {
+                    currentZoomRatio = ZoomRatio.getValue().getZoomRatio();
+                } catch (NullPointerException e) {
+
+                }
+                float linearValue = ZoomRatio.getValue().getLinearZoom();
+                float delta = detector.getScaleFactor();
+                cControl.setZoomRatio(currentZoomRatio * delta);
+                float mat = (linearValue) * (100);
+                zoomBar.setProgress((int) mat);
+                return true;
+            }
+        };
+
+        ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(getBaseContext(), listener);
+    }
+    private void setUpZoomSlider(){
+        zoomBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                float mat = (float) (progress) / (100);
+                cControl.setLinearZoom(mat);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
+    private void setUpTapToFocus() {
+        txView.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() != MotionEvent.ACTION_UP) {
+                /* Original post returns false here, but in my experience this makes
+                onTouch not being triggered for ACTION_UP event */
+                    return true;
+                }
+                TextureViewMeteringPointFactory factory = new TextureViewMeteringPointFactory(txView);
+                MeteringPoint point = factory.createPoint(event.getX(), event.getY());
+                FocusMeteringAction action = new FocusMeteringAction.Builder(point).build();
+                cControl.startFocusAndMetering(action);
+                handler.removeCallbacks(focusingTOInvisible);
+                focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus));
+                focusView.setX(event.getX());
+                focusView.setY(event.getY());
+                focusView.setVisibility(View.VISIBLE);
+                handler.postDelayed(focusingTOInvisible,1000);
+                return true;
+            }
+        });
+    }
+
+    private void autofocusOnStart(){
+        TextureViewMeteringPointFactory factory = new TextureViewMeteringPointFactory(txView);
+        float centerWidth=(float)mPreviewView.getWidth()/2;
+        float centerHeight= (float)mPreviewView.getHeight()/2;
+        MeteringPoint point = factory.createPoint(centerWidth,centerHeight);
+        FocusMeteringAction action = new FocusMeteringAction.Builder(point).build();
+        cControl.startFocusAndMetering(action);
+    }
+
+
+    private byte[] toBitmap(ImageProxy image) {
+        ImageProxy.PlaneProxy planeProxy = image.getPlanes()[0];
+        ByteBuffer buffer = planeProxy.getBuffer();
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        return bytes;
+        //return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
+    void compressImageAndSave(final byte[] data, ImageCapture imageCapture) {
         getBackgroundHandler().post(new Runnable() {
             @Override
             public void run() {
                 if (mImageName == null) {
                     mImageName = "IMG";
                 }
-
-
-                String filePath=AppConstants.IMAGE_PATH + mImageName + ".jpg";
+                String filePath = AppConstants.IMAGE_PATH + mImageName + ".jpg";
 
                 File file;
                 if (mFilePath == null) {
@@ -145,9 +460,6 @@ public class CameraActivity extends AppCompatActivity {
                     os.flush();
                     os.close();
                     bitmap.recycle();
-
-
-
 
 
                     Bitmap scaledBitmap = null;
@@ -210,28 +522,24 @@ public class CameraActivity extends AppCompatActivity {
                     canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2, middleY - bmp.getHeight() / 2, new Paint(
                             Paint.FILTER_BITMAP_FLAG));
 
-                    ExifInterface exif;
-                    try {
-                        exif = new ExifInterface(filePath);
+                    int orientation=imageCapture.getTargetRotation();
 
-                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+                    Log.e("EXIF", "Exif: " + orientation);
+                    Matrix matrix = new Matrix();
+                    if (orientation == 0) {
+                        matrix.postRotate(90);
                         Log.e("EXIF", "Exif: " + orientation);
-                        Matrix matrix = new Matrix();
-                        if (orientation == 6) {
-                            matrix.postRotate(90);
-                            Log.e("EXIF", "Exif: " + orientation);
-                        } else if (orientation == 3) {
-                            matrix.postRotate(180);
-                            Log.e("EXIF", "Exif: " + orientation);
-                        } else if (orientation == 8) {
-                            matrix.postRotate(270);
-                            Log.e("EXIF", "Exif: " + orientation);
-                        }
-                        scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(),
-                                matrix, true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } else if (orientation == 2) {
+                        matrix.postRotate(270);
+                        Log.e("EXIF", "Exif: " + orientation);
+                    } else if (orientation == 3) {
+                        matrix.postRotate(180);
+                        Log.e("EXIF", "Exif: " + orientation);
                     }
+                    scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(),
+                            matrix, true);
+
+
                     FileOutputStream out = null;
                     String filename = filePath;
                     try {
@@ -253,7 +561,7 @@ public class CameraActivity extends AppCompatActivity {
                     setResult(RESULT_OK, intent);
                     Log.i(TAG, file.getAbsolutePath());
                     finish();
-                }catch (IOException e) {
+                } catch (IOException e) {
                     Log.w(TAG, "Cannot write to " + file, e);
                     setResult(RESULT_CANCELED, new Intent());
                     finish();
@@ -286,134 +594,6 @@ public class CameraActivity extends AppCompatActivity {
         return inSampleSize;
     }
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            if (extras.containsKey(SET_IMAGE_NAME))
-                mImageName = extras.getString(SET_IMAGE_NAME);
-            if (extras.containsKey(SHOW_DIALOG_MESSAGE))
-                mDialogMessage = extras.getString(SHOW_DIALOG_MESSAGE);
-            if (extras.containsKey(SET_IMAGE_PATH))
-                mFilePath = extras.getString(SET_IMAGE_PATH);
-        }
-
-        setContentView(R.layout.activity_camera);
-        mCameraView = findViewById(R.id.camera_surface_CameraView);
-        mFab = findViewById(R.id.take_picture);
-
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
-
-        }
-
-        if (mCameraView != null) mCameraView.addCallback(mCallback);
-        if (mFab != null) {
-            mFab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mCameraView != null)
-                    {
-                        mCameraView.takePicture();
-                    }
-                }
-            });
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        CameraActivityPermissionsDispatcher.startCameraWithCheck(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mCameraView != null) mCameraView.stop();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.camera, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.switch_flash:
-                if (mCameraView != null) {
-                    mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
-                    item.setTitle(FLASH_TITLES[mCurrentFlash]);
-                    item.setIcon(FLASH_ICONS[mCurrentFlash]);
-                    mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
-                }
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        CameraActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
-    }
-
-    @NeedsPermission(Manifest.permission.CAMERA)
-    void startCamera() {
-        if (mDialogMessage != null) {
-            MaterialAlertDialogBuilder builder =  new MaterialAlertDialogBuilder(this)
-                    .setMessage(mDialogMessage)
-                    .setNeutralButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            AlertDialog dialog = builder.show();
-            IntelehealthApplication.setAlertDialogCustomTheme(this,dialog);
-        }
-        mCameraView.start();
-    }
-
-    @OnShowRationale(Manifest.permission.CAMERA)
-    void showRationaleForCamera(final PermissionRequest request) {
-        MaterialAlertDialogBuilder builder =  new MaterialAlertDialogBuilder(this)
-                .setMessage(getString(R.string.permission_camera_rationale))
-                .setPositiveButton(getString(R.string.button_allow), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        request.proceed();
-                    }
-                })
-                .setNegativeButton(getString(R.string.button_deny), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        request.cancel();
-                    }
-                });
-        AlertDialog dialog = builder.show();
-        IntelehealthApplication.setAlertDialogCustomTheme(this,dialog);
-    }
-
-    @OnPermissionDenied(Manifest.permission.CAMERA)
-    void showDeniedForCamera() {
-        Toast.makeText(this, getString(R.string.permission_camera_denied), Toast.LENGTH_SHORT).show();
-    }
-
-    @OnNeverAskAgain(Manifest.permission.CAMERA)
-    void showNeverAskForCamera() {
-        Toast.makeText(this, getString(R.string.permission_camera_never_askagain), Toast.LENGTH_SHORT).show();
-    }
-
     private Handler getBackgroundHandler() {
         if (mBackgroundHandler == null) {
             HandlerThread thread = new HandlerThread("background");
@@ -423,10 +603,28 @@ public class CameraActivity extends AppCompatActivity {
         return mBackgroundHandler;
     }
 
-    @Override
-    public void onBackPressed() {
-        //do nothing
-        finish();
 
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionsGranted()) {
+                startCamera();
+            } else {
+                Toast.makeText(this, "Permissions not granted by the user.", LENGTH_SHORT).show();
+                this.finish();
+            }
+        }
     }
 }
