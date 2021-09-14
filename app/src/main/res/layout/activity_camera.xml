@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context="app.insightfuleye.client.activities.cameraActivity.CameraActivity">
+    tools:context="app.insightfultest.client.activities.cameraActivity.CameraActivity">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/camera"
@@ -70,7 +70,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_camera"
-        app:useCompatPadding="true" />
+        app:useCompatPadding="true"
+        tools:ignore="VectorDrawableCompat" />
 
     <RelativeLayout
         android:layout_width="match_parent"
