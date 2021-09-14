@@ -27,6 +27,13 @@ public class PhysicalExam extends Node {
     private List<Node> selectedNodes;
     private int totalExams;
     private List<String> pageTitles;
+    private String VARight;
+    private String VALeft;
+    private String PinholeRight;
+    private String PinholeLeft;
+    private String volunteerReferral;
+    private String volunteerReferralLocation;
+    private String volunteerReferralReason;
 
     public PhysicalExam(JSONObject jsonObject, ArrayList<String> selection) {
         super(jsonObject);
@@ -174,8 +181,7 @@ public class PhysicalExam extends Node {
         return pageTitles;
     }
 
-    public String getTitle(int index) {
-        return pageTitles.get(index);
+    public String getTitle(int index) {return pageTitles.get(index);
     }
 
     /**
@@ -192,7 +198,9 @@ public class PhysicalExam extends Node {
         String[] split = title.split(" : ");
         String levelOne = split[0];
         String levelTwo = split[1];
-
+        Log.i(TAG, "title" + title);
+        Log.i(TAG, "lvl1: "+ levelOne);
+        Log.i(TAG, "lvl2: "+ levelTwo);
         for (Node selectedNode : selectedNodes) {
             if (selectedNode.getText().equals(levelOne)) {
                 for (Node node : selectedNode.getOptionsList()) {
@@ -219,6 +227,7 @@ public class PhysicalExam extends Node {
                 parent_node = selectedNode.findDisplay();
             }
         }
+        Log.i(TAG, "parent name"+parent_node);
         return parent_node;
 
     }
@@ -301,6 +310,7 @@ public class PhysicalExam extends Node {
     }
 
 
+
     private String removeCharsFindings(String raw) {
         String formatted;
         if (Character.toString(raw.charAt(0)).equals(",")) {
@@ -310,6 +320,23 @@ public class PhysicalExam extends Node {
         }
         return formatted;
     }
+
+    public void setVARight(String VARight){this.VARight=VARight; }
+    public void setVALeft(String VALeft){this.VALeft=VALeft; }
+    public void setPinholeRight(String PinholeRight){this.PinholeRight=PinholeRight; }
+    public void setPinholeLeft(String PinholeLeft){this.PinholeLeft=PinholeLeft; }
+    public void setVolunteerReferral(String volunteerReferral){this.volunteerReferral=volunteerReferral; }
+    public void setVolunteerReferralLocation(String volunteerReferralLocation){this.volunteerReferralLocation=volunteerReferralLocation; }
+    public void setVolunteerReferralReason(String volunteerReferralReason){this.volunteerReferralReason=volunteerReferralReason; }
+
+    public String getVARight(){return VARight;}
+    public String getVALeft(){return VALeft;}
+    public String getPinholeRight(){return  PinholeRight;}
+    public String getPinholeLeft(){return PinholeLeft;}
+    public String getVolunteerReferral(){return volunteerReferral;}
+    public String getVolunteerReferralLocation(){return volunteerReferralLocation;}
+    public String getVolunteerReferralReason(){return volunteerReferralReason;}
+
 
 
 }

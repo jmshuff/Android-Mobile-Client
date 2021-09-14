@@ -58,6 +58,14 @@ public class UuidDictionary {
     public static final String ATTRIBUTE_OCCUPATION = "ecdaadb6-14a0-4ed9-b5b7-cfed87b44b87";
     public static final String ATTRIBUTE_HEALTH_CENTER = "8d87236c-c2cc-11de-8d13-0010c6dffd0f";
 
+    //physical exam JS
+    public static final String VARight = "4765816f-dffe-42d4-bef2-7eaba8e191b6";
+    public static final String VALeft = "bc4744da-8e42-48f2-a061-de0ea13c02ad";
+    public static final String PinholeRight = "50492e1a-db2c-438f-bd9b-f8b7c68920f8";
+    public static final String PinholeLeft = "e7f1a349-8bb3-44a2-9d6a-260fffd01e7b";
+    public static final String VolunteerReferral = "f83b9e96-8247-4354-9ba6-1196e3b56500";
+    public static final String VolunteerReferralReason = "d33cecbf-03b8-47ca-8ef7-771343c31d40";
+    public static final String VolunteerReferralLocation= "413a81ab-35a7-4660-8a66-9f29dd33e2bf";
 
     //Visit Types
     public static final String VISIT_TELEMEDICINE = "a86ac96e-2e07-47a7-8e72-8216a1a75bfd";
