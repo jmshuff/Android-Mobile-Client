@@ -362,10 +362,10 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
 
         obsDTO = new ObsDTO();
-        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
+        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralReason);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
-        obsDTO.setValue(physicalExamMap.getVolunteerReferral());
+        obsDTO.setValue(physicalExamMap.getVolunteerReferralReason());
 
         try {
             obsDAO.insertObs(obsDTO);
@@ -386,16 +386,17 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
 
         obsDTO = new ObsDTO();
-        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralReason);
+        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
-        obsDTO.setValue(physicalExamMap.getVolunteerReferralReason());
+        obsDTO.setValue(physicalExamMap.getVolunteerReferral());
 
         try {
             obsDAO.insertObs(obsDTO);
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
+
 
         return isInserted;
     }
@@ -517,11 +518,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             physicalExamMap.setPinholeLeft(Pinholeleft);
         }
 
-        if (category.getText().equals("Referral")){
-            String volunteerReferral=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferral(volunteerReferral);
-        }
-
         if (category.getText().equals("Referral Reason")){
             String volunteerReferralReason=category.formConceptLanguage();
             physicalExamMap.setVolunteerReferralReason(volunteerReferralReason);
@@ -529,7 +525,12 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         if (category.getText().equals("Referral Location")){
             String volunteerReferralLocation=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferralReason(volunteerReferralLocation);
+            physicalExamMap.setVolunteerReferralLocation(volunteerReferralLocation);
+        }
+
+        if (category.getText().equals("Referral")){
+            String volunteerReferral=category.formConceptLanguage();
+            physicalExamMap.setVolunteerReferral(volunteerReferral);
         }
 
     }
@@ -613,14 +614,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDAO.updateObs(obsDTO);
 
             obsDTO = new ObsDTO();
-            obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
-            obsDTO.setEncounteruuid(encounterAdultIntials);
-            obsDTO.setCreator(sessionManager.getCreatorID());
-            obsDTO.setValue(physicalExamMap.getVolunteerReferral());
-            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferral));
-            obsDAO.updateObs(obsDTO);
-
-            obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralReason);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
@@ -628,13 +621,23 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferralReason));
             obsDAO.updateObs(obsDTO);
 
-            obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralLocation);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
             obsDTO.setValue(physicalExamMap.getVolunteerReferralLocation());
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferralLocation));
             obsDAO.updateObs(obsDTO);
+
+            obsDTO = new ObsDTO();
+            obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
+            obsDTO.setCreator(sessionManager.getCreatorID());
+            obsDTO.setValue(physicalExamMap.getVolunteerReferral());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferral));
+            Log.i("volunteerReferral", physicalExamMap.getVolunteerReferral());
+            obsDAO.updateObs(obsDTO);
+
+
 
         } catch (DAOException dao) {
             FirebaseCrashlytics.getInstance().recordException(dao);
