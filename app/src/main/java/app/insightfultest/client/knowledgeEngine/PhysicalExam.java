@@ -2,10 +2,12 @@ package app.insightfultest.client.knowledgeEngine;
 
 import android.util.Log;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -309,6 +311,154 @@ public class PhysicalExam extends Node {
         return mLanguage;
     }
 
+    public String generateTable(){
+        Set<String> rootStrings = new HashSet<>();
+        List<String> stringsList = new ArrayList<>();
+        List<String> rightVAList= new ArrayList<>();
+        List<String> leftVAList= new ArrayList<>();
+        List<String> rightPinList= new ArrayList<>();
+        List<String> leftPinList= new ArrayList<>();
+        List<String> rightPhysExamList= new ArrayList<>();
+        List<String> leftPhysExamList= new ArrayList<>();
+        String mRVA = "";
+        String mLVA = "";
+        String mRPin= "";
+        String mLPin="";
+        String mRPhys = "";
+        String mLPhys= "";
+        String mOther="";
+
+        int total = this.totalExams;
+        for (int i = 0; i < total; i++) {
+            Node node = getExamNode(i);
+            if ((node.isSelected() | node.anySubSelected())) {
+                //stringsList.add(bullet + " " + node.getLanguage());
+                //Currently not getting any language for
+                if (!node.isTerminal()) {
+                    String lang = node.formLanguage();
+                    Log.i(TAG, "generateFindings: "+ lang);
+
+                    //IF BOTH, it is physical exam, add to both physical exams
+                    if (lang.toLowerCase().contains("right")&& lang.toLowerCase().contains("left")){
+                        lang=lang.split("-")[0]; //get everything before -
+                        rightPhysExamList.add(bullet + " " + lang);
+                        leftPhysExamList.add(bullet + " "+ lang);
+                    }
+                    //If it's not both, check for left, right or neither
+                    else {
+                        //if right, check for visual acuity, pinhole, or other. All others go in physical exam
+                        if (lang.toLowerCase().contains("right")) {
+                            if (lang.toLowerCase().contains("visual acuity")) {
+                                lang = lang.toLowerCase().replace("right eye", "");
+                                lang = lang.toLowerCase().replace("visual acuity:", "");
+                                rightVAList.add(bullet + " " + lang); //consider adding node.getLanguage()
+                            } else if (lang.toLowerCase().contains("pinhole")) {
+                                lang = lang.toLowerCase().replace("right eye", "");
+                                lang = lang.toLowerCase().replace("pinhole acuity:", "");
+                                rightPinList.add(bullet + " " + lang);
+                            } else {
+                                lang=lang.split("-")[0]; //get everything before -
+                                rightPhysExamList.add(bullet + " " + lang);
+                            }
+                        }
+                        else {
+                            if (lang.toLowerCase().contains("left")) {
+                                if (lang.toLowerCase().contains("visual acuity")) {
+                                    lang = lang.toLowerCase().replace("left eye", "");
+                                    lang = lang.toLowerCase().replace("visual acuity:", "");
+                                    leftVAList.add(bullet + " " + lang); //consider adding node.getLanguage()
+                                } else if (lang.toLowerCase().contains("pinhole")) {
+                                    lang = lang.toLowerCase().replace("left eye", "");
+                                    lang = lang.toLowerCase().replace("pinhole acuity:", "");
+                                    leftPinList.add(bullet + " " + lang);
+                                } else {
+                                    lang = lang.split("-")[0]; //get everything before -
+                                    leftPhysExamList.add(bullet + " " + lang);
+                                }
+
+                            } else {
+                                if (lang==""){//remove empty lines
+                                }
+                                else {
+                                    stringsList.add(bullet + " " + lang);
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        String languageSeparator = next_line;
+
+        for (int i = 0; i < stringsList.size(); i++) {
+            mOther = mOther.concat(stringsList.get(i) + languageSeparator);}
+
+        for (int i=0; i< rightVAList.size(); i++){
+            mRVA=mRVA.concat(rightVAList.get(i) + languageSeparator);}
+
+        for (int i=0; i< leftVAList.size(); i++){
+            mLVA=mLVA.concat(leftVAList.get(i) + languageSeparator);}
+
+        for (int i=0; i< rightPinList.size(); i++){
+            mRPin=mRPin.concat(rightPinList.get(i) + languageSeparator);}
+
+        for (int i=0; i< leftPinList.size(); i++){
+            mLPin=mLPin.concat(leftPinList.get(i) + languageSeparator);}
+
+        for (int i=0; i< rightPhysExamList.size(); i++){
+            mRPhys = mRPhys.concat(rightPhysExamList.get(i) + languageSeparator);}
+
+        for (int i=0; i< leftPhysExamList.size(); i++){
+            mLPhys=mLPhys.concat(leftPhysExamList.get(i) + languageSeparator);}
+
+
+        mRVA=mRVA.replace(" - ", " ");
+        mLVA=mLVA.replace(" - ", " ");
+        mRPin=mRPin.replace(" - ", " ");
+        mLPin=mLPin.replace(" - ", " ");
+        mRPhys=mRPhys.replace(" - ", " ");
+        mLPhys=mLPhys.replace(" - ", " ");
+        mOther=mOther.replace(" - ", " ");
+
+
+        Log.i("rightVA", String.valueOf(mRVA));
+        Log.i("leftVA", String.valueOf(mLVA));
+        Log.i("rightPin", String.valueOf(mRPin));
+        Log.i("leftPin", String.valueOf(mLPin));
+        Log.i("rightPhys", String.valueOf(mRPhys));
+        Log.i("leftPhys", String.valueOf(mLPhys));
+        Log.i("stringList", String.valueOf(mOther));
+
+        String mTable;
+        mTable="<table>" +
+                "<tr>"+
+                    "<th></th>"+
+                    "<th>Right Eye</th>"+
+                    "<th>Left Eye</th>"+
+                "</tr>"+
+                "<tr>"+
+                    "<th>Visual Acuity</th>"+
+                    "<td>"+mRVA+"</td>"+
+                    "<td>"+mLVA+"</td>"+
+                "</tr>"+
+                "<tr>"+
+                    "<th>Pinhole Acuity</th>"+
+                    "<td>"+mRPin+"</td>"+
+                    "<td>"+mLPin+"</td>"+
+                "</tr>"+
+                "<tr>"+
+                    "<th>Physical Exam</th>"+
+                    "<td>"+mRPhys+"</td>"+
+                    "<td>"+mLPhys+"</td>"+
+                "<tr>"+
+             "</table>"+
+             mOther;
+        return mTable;
+
+    }
 
 
     private String removeCharsFindings(String raw) {

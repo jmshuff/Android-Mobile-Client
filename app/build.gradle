@@ -6,7 +6,7 @@ android {
     compileSdkVersion 30
     defaultConfig {
         applicationId "app.insightfultest.client"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 3
 

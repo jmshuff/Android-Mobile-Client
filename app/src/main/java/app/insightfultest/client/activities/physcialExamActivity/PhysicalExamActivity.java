@@ -405,7 +405,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         if (complaintConfirmed) {
 
-            physicalString = physicalExamMap.generateFindings();
+            physicalString = physicalExamMap.generateTable();
+
 
             List<String> imagePathList = physicalExamMap.getImagePathList();
 
