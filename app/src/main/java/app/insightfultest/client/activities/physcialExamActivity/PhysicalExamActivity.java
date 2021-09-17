@@ -528,7 +528,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         if (category.getText().equals("Referral Location")){
             String volunteerReferralLocation=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferralReason(volunteerReferralLocation);
+            physicalExamMap.setVolunteerReferralLocation(volunteerReferralLocation);
         }
 
     }

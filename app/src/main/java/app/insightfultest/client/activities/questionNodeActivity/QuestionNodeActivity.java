@@ -429,6 +429,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         return isInserted;
     }
 
+
     private void updateImageDatabase(String imagePath) {
 
 
