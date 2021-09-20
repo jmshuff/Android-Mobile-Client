@@ -103,6 +103,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     PhysicalExam physicalExamMap;
 
     String physicalString;
+    String physicalDisplay;
     Boolean complaintConfirmed = false;
     String encounterVitals;
     String encounterAdultIntials, EncounterAdultInitial_LatestVisit;
@@ -406,7 +407,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         complaintConfirmed = physicalExamMap.areRequiredAnswered();
 
         if (complaintConfirmed) {
-
+            physicalDisplay=physicalExamMap.generateFindings();
             physicalString = physicalExamMap.generateTable();
 
 
@@ -432,6 +433,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 intent.putExtra("float_ageYear_Month", float_ageYear_Month);
                 intent.putExtra("tag", intentTag);
                 intent.putExtra("hasPrescription", "false");
+                intent.putExtra("physicalDisplay", physicalDisplay);
 
                 for (String exams : selectedExamsList) {
                     Log.i(TAG, "onClick:++ " + exams);
@@ -452,6 +454,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 intent1.putExtra("tag", intentTag);
                 intent1.putExtra("float_ageYear_Month", float_ageYear_Month);
                 intent1.putExtra("hasPrescription", "false");
+                intent1.putExtra("physicalDisplay", physicalDisplay);
                 // intent1.putStringArrayListExtra("exams", selectedExamsList);
                 startActivity(intent1);
             }
