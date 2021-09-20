@@ -1,5 +1,6 @@
 package app.insightfuleye.client.activities.physcialExamActivity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -104,6 +105,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     PhysicalExam physicalExamMap;
 
     String physicalString;
+    String physicalDisplay;
     Boolean complaintConfirmed = false;
     String encounterVitals;
     String encounterAdultIntials, EncounterAdultInitial_LatestVisit;
@@ -216,7 +218,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         setContentView(R.layout.activity_physical_exam);
         setTitle(getString(R.string.title_activity_physical_exam));
 
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         recyclerViewIndicator = findViewById(R.id.recyclerViewIndicator);
         setSupportActionBar(toolbar);
@@ -237,7 +238,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
        /* mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), physicalExamMap);
-
         // Set up the ViewPager with the sections adapter.
         mViewPager = findViewById(R.id.container);
         if (mViewPager != null) {
@@ -246,7 +246,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         /*TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setSelectedTabIndicatorHeight(15);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             tabLayout.setSelectedTabIndicatorColor(getColor(R.color.amber));
             tabLayout.setTabTextColors(getColor(R.color.white), getColor(R.color.amber));
@@ -258,17 +257,13 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
             tabLayout.setupWithViewPager(mViewPager);
         }
-
         FloatingActionButton fab = findViewById(R.id.fab);
         assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
             }
         });
-
          */
 
       /*
@@ -362,10 +357,10 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
 
         obsDTO = new ObsDTO();
-        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralReason);
+        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
-        obsDTO.setValue(physicalExamMap.getVolunteerReferralReason());
+        obsDTO.setValue(physicalExamMap.getVolunteerReferral());
 
         try {
             obsDAO.insertObs(obsDTO);
@@ -386,10 +381,10 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
 
         obsDTO = new ObsDTO();
-        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
+        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralReason);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
-        obsDTO.setValue(physicalExamMap.getVolunteerReferral());
+        obsDTO.setValue(physicalExamMap.getVolunteerReferralReason());
 
         try {
             obsDAO.insertObs(obsDTO);
@@ -397,18 +392,20 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             FirebaseCrashlytics.getInstance().recordException(e);
         }
 
-
         return isInserted;
     }
 
+
+    @SuppressLint("LongLogTag")
     @Override
     public void fabClickedAtEnd() {
 
         complaintConfirmed = physicalExamMap.areRequiredAnswered();
 
         if (complaintConfirmed) {
+            physicalDisplay=physicalExamMap.generateFindings();
+            physicalString = physicalExamMap.generateTable();
 
-            physicalString = physicalExamMap.generateFindings();
 
             List<String> imagePathList = physicalExamMap.getImagePathList();
 
@@ -432,6 +429,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 intent.putExtra("float_ageYear_Month", float_ageYear_Month);
                 intent.putExtra("tag", intentTag);
                 intent.putExtra("hasPrescription", "false");
+                intent.putExtra("physicalDisplay", physicalDisplay);
 
                 for (String exams : selectedExamsList) {
                     Log.i(TAG, "onClick:++ " + exams);
@@ -452,6 +450,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 intent1.putExtra("tag", intentTag);
                 intent1.putExtra("float_ageYear_Month", float_ageYear_Month);
                 intent1.putExtra("hasPrescription", "false");
+                intent1.putExtra("physicalDisplay", physicalDisplay);
                 // intent1.putStringArrayListExtra("exams", selectedExamsList);
                 startActivity(intent1);
             }
@@ -518,6 +517,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             physicalExamMap.setPinholeLeft(Pinholeleft);
         }
 
+        if (category.getText().equals("Referral")){
+            String volunteerReferral=category.formConceptLanguage();
+            physicalExamMap.setVolunteerReferral(volunteerReferral);
+        }
+
         if (category.getText().equals("Referral Reason")){
             String volunteerReferralReason=category.formConceptLanguage();
             physicalExamMap.setVolunteerReferralReason(volunteerReferralReason);
@@ -526,11 +530,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         if (category.getText().equals("Referral Location")){
             String volunteerReferralLocation=category.formConceptLanguage();
             physicalExamMap.setVolunteerReferralLocation(volunteerReferralLocation);
-        }
-
-        if (category.getText().equals("Referral")){
-            String volunteerReferral=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferral(volunteerReferral);
         }
 
     }
@@ -614,6 +613,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDAO.updateObs(obsDTO);
 
             obsDTO = new ObsDTO();
+            obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
+            obsDTO.setCreator(sessionManager.getCreatorID());
+            obsDTO.setValue(physicalExamMap.getVolunteerReferral());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferral));
+            obsDAO.updateObs(obsDTO);
+
+            obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralReason);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
@@ -621,23 +628,13 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferralReason));
             obsDAO.updateObs(obsDTO);
 
+            obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralLocation);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
             obsDTO.setValue(physicalExamMap.getVolunteerReferralLocation());
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferralLocation));
             obsDAO.updateObs(obsDTO);
-
-            obsDTO = new ObsDTO();
-            obsDTO.setConceptuuid(UuidDictionary.VolunteerReferral);
-            obsDTO.setEncounteruuid(encounterAdultIntials);
-            obsDTO.setCreator(sessionManager.getCreatorID());
-            obsDTO.setValue(physicalExamMap.getVolunteerReferral());
-            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferral));
-            Log.i("volunteerReferral", physicalExamMap.getVolunteerReferral());
-            obsDAO.updateObs(obsDTO);
-
-
 
         } catch (DAOException dao) {
             FirebaseCrashlytics.getInstance().recordException(dao);
@@ -870,5 +867,3 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     }
 
 }
-
-
