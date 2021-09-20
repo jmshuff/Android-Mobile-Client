@@ -189,20 +189,15 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
  /*       questionListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
                 onListClicked(v, groupPosition, childPosition);
-
                 return false;
-
             }
         });
-
         //Not a perfect method, but closes all other questions when a new one is clicked.
         //Expandable Lists in Android are broken, so this is a band-aid fix.
         questionListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
-
                 if (lastExpandedPosition != -1
                         && groupPosition != lastExpandedPosition) {
                     questionListView.collapseGroup(lastExpandedPosition);
@@ -309,6 +304,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             }
 
             String complaintString = currentNode.generateLanguage();
+            currentNode.generateTableResults();
 
             if (complaintString != null && !complaintString.isEmpty()) {
                 //     String complaintFormatted = complaintString.replace("?,", "?:");
@@ -373,7 +369,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
 
                     startActivity(intent);
                 } else {
-                    Log.i(TAG, "fabClick: " + insertion);
+                    Log.i(TAG, "fabClickInsertion: " + insertion);
                     insertDb(insertion);
                     Intent intent = new Intent
                             (QuestionNodeActivity.this, PastMedicalHistoryActivity.class);
@@ -391,7 +387,11 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
 
                     startActivity(intent);
                 }
+
+
             }
+
+
         }
 
         // question_recyclerView.setAdapter(adapter);
@@ -418,6 +418,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
         obsDTO.setValue(StringUtils.getValue1(value));
+
         boolean isInserted = false;
         try {
             isInserted = obsDAO.insertObs(obsDTO);
@@ -428,6 +429,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
 
         return isInserted;
     }
+
+
 
     private void updateImageDatabase(String imagePath) {
 

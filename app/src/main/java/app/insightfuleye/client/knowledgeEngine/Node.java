@@ -84,6 +84,9 @@ public class Node implements Serializable {
     private String gender;
     private String min_age;
     private String max_age;
+    static String leftSympt;
+    static String rightSympt;
+    static String footer;
 
 
     //for Associated Complaints and medical history only
@@ -714,6 +717,84 @@ public class Node implements Serializable {
         }
         return null;
     }
+
+
+    public void generateTableResults() {
+        Log.i("generateTableResults", "called");
+
+        String raw = "";
+        String leftSympt= "None";
+        String rightSympt="None";
+        String footer = "";
+        List<Node> mOptions = optionsList;
+
+        if (optionsList != null && !optionsList.isEmpty()) {
+            for (Node node_opt : mOptions) {
+                if (node_opt.isSelected()) {
+                    if (node_opt.getLanguage().toLowerCase().contains("glasses")){
+                        footer = footer + bullet + " " + node_opt.formLanguage() + next_line;
+                    }
+                    else if (node_opt.getLanguage().equals("%")) {
+                        raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
+                    } else if (node_opt.getLanguage().substring(0, 1).equals("%")) {
+                        raw = raw + (bullet + " " + node_opt.formLanguage()) + next_line;
+                    } else {
+                        raw = raw + (bullet + " " + node_opt.formLanguage()) + next_line;
+                    }
+
+                    //raw = raw + ("\n"+"\n" + bullet +" "+ node_opt.formLanguage());
+                } else {
+                    String associatedTest = node_opt.getText();
+                    if (associatedTest != null && (associatedTest.trim().equals("Associated symptoms")
+                            || associatedTest.trim().equals("जुड़े लक्षण") || (associatedTest.trim().equals("ସମ୍ପର୍କିତ ଲକ୍ଷଣଗୁଡ଼ିକ")))) {
+                        if (!generateAssociatedSymptomsOrHistory(node_opt).isEmpty()) {
+                            raw = raw + (generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
+                            raw = raw.substring(6);
+                            Log.e("FinalText= ", raw);
+                        } else {
+                            Log.e("FinalText= ", raw);
+                        }
+                    }
+                }
+            }
+        }
+
+        String formatted;
+        if (!raw.isEmpty()) {
+            Log.i("GenerateTableResults", "raw loop");
+            if (Character.toString(raw.charAt(0)).equals(",")) {
+                formatted = raw.substring(2);
+            } else {
+                formatted = raw;
+            }
+            formatted = formatted.replaceAll("\\. -", ".");
+            formatted = formatted.replaceAll("\\.,", ", ");
+            Log.i(TAG, "generateLanguage: " + formatted);
+
+            //splint into left and right
+            if(formatted.toLowerCase().contains("left")){
+                leftSympt=formatted;
+                leftSympt=leftSympt.replace("Left Eye.<br/>"+bullet, "");
+            }
+            if (formatted.toLowerCase().contains("right")){
+                rightSympt=formatted;
+                rightSympt=rightSympt.replace("Right Eye.<br/>"+bullet, "");
+            }
+            if (!formatted.toLowerCase().contains("right") && !formatted.toLowerCase().contains("left")){
+                footer=formatted;
+            }
+
+        }
+        Log.i("leftSympt", leftSympt);
+        Log.i("rightSympt", rightSympt);
+        Log.i("footer", footer);
+        setLeftSympt(leftSympt);
+        setRightSympt(rightSympt);
+        setFooter(footer);
+
+    }
+
+
 
     //TODO: Check this, as associated complaints are not being triggered.
     public ArrayList<String> getSelectedAssociations() {
@@ -1524,8 +1605,6 @@ public class Node implements Serializable {
             }
         }
 
-
-
         String languageSeparator;
         if (isTerminal) {
             languageSeparator = ", ";
@@ -1848,6 +1927,16 @@ public class Node implements Serializable {
     public void setImagePathList(List<String> imagePathList) {
         this.imagePathList = imagePathList;
     }
+    public void setLeftSympt(String leftSympt){this.leftSympt=leftSympt; }
+    public void setRightSympt(String rightSympt){this.rightSympt=rightSympt; }
+    public void setFooter(String footer){this.footer=footer;}
+
+    public static String getLeftSympt(){ return leftSympt;}
+    public static String getRightSympt(){return rightSympt;}
+    public static String getFooter(){return footer;}
+
+
+
 
     public void addImageToList() {
         if (imagePathList == null) {
@@ -2361,4 +2450,3 @@ public class Node implements Serializable {
 
 
 }
-

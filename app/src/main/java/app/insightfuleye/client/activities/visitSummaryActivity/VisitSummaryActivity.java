@@ -267,6 +267,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     String encounterUuidAdultIntial;
     // Boolean isreturningWhatsapp = true;
     String EncounterAdultInitial_LatestVisit;
+    String physicalDisplay;
 
     ProgressBar mProgressBar;
     TextView mProgressText;
@@ -431,6 +432,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             intentTag = intent.getStringExtra("tag");
             isPastVisit = intent.getBooleanExtra("pastVisit", false);
 //            hasPrescription = intent.getStringExtra("hasPrescription");
+            physicalDisplay=intent.getStringExtra("physicalDisplay");
 
             Set<String> selectedExams = sessionManager.getVisitSummary(patientUuid);
             if (physicalExams == null) physicalExams = new ArrayList<>();
@@ -1034,8 +1036,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         if (patHistory.getValue() != null)
             patHistView.setText(Html.fromHtml(patHistory.getValue()));
         if (phyExam.getValue() != null)
-            physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
-
+            //physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
+            physFindingsView.setText(Html.fromHtml(physicalDisplay));
 
 /*
         editVitals.setOnClickListener(new View.OnClickListener() {
@@ -1276,7 +1278,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
                 final TextView physicalText = convertView.findViewById(R.id.textView_entry);
                 if (phyExam.getValue() != null)
-                    physicalText.setText(Html.fromHtml(phyExam.getValue()));
+                    physicalText.setText(Html.fromHtml(physicalDisplay));
                 physicalText.setEnabled(false);
 
                 physicalDialog.setPositiveButton(getString(R.string.generic_manual_entry), new DialogInterface.OnClickListener() {
@@ -1296,8 +1298,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
                                 phyExam.setValue(dialogEditText.getText().toString().replace("\n", "<br>"));
                                 if (phyExam.getValue() != null) {
-                                    physicalText.setText(Html.fromHtml(phyExam.getValue()));
-                                    physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
+                                    physicalText.setText(Html.fromHtml(physicalDisplay));
+                                    physFindingsView.setText(Html.fromHtml(physicalDisplay));
                                 }
                                 updateDatabase(phyExam.getValue(), UuidDictionary.PHYSICAL_EXAMINATION);
                                 dialog.dismiss();
