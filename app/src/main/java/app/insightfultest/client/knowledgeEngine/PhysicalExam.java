@@ -1,13 +1,13 @@
 package app.insightfultest.client.knowledgeEngine;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.util.Log;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +36,7 @@ public class PhysicalExam extends Node {
     private String volunteerReferral;
     private String volunteerReferralLocation;
     private String volunteerReferralReason;
+
 
     public PhysicalExam(JSONObject jsonObject, ArrayList<String> selection) {
         super(jsonObject);
@@ -250,6 +251,7 @@ public class PhysicalExam extends Node {
         return allAnswered;
     }
 
+
     //TODO: Physical exam map needs to modified to make language generation easier.
     public String generateFindings() {
         String mLanguage = "";
@@ -311,7 +313,9 @@ public class PhysicalExam extends Node {
         return mLanguage;
     }
 
+
     public String generateTable(){
+
         Set<String> rootStrings = new HashSet<>();
         List<String> stringsList = new ArrayList<>();
         List<String> rightVAList= new ArrayList<>();
@@ -327,6 +331,10 @@ public class PhysicalExam extends Node {
         String mRPhys = "";
         String mLPhys= "";
         String mOther="";
+        String leftSymptom=getLeftSympt();
+        String rightSymptom=getRightSympt();
+        String footer=getFooter();
+
 
         int total = this.totalExams;
         for (int i = 0; i < total; i++) {
@@ -440,6 +448,11 @@ public class PhysicalExam extends Node {
                     "<th>Left Eye</th>"+
                 "</tr>"+
                 "<tr>"+
+                    "<th>Chief Complaint </th>"+
+                    "<td>"+leftSymptom+"</td>"+
+                    "<td>"+rightSymptom+"</td>"+
+                "</tr>"+
+                "<tr>"+
                     "<th>Visual Acuity</th>"+
                     "<td>"+mRVA+"</td>"+
                     "<td>"+mLVA+"</td>"+
@@ -455,6 +468,7 @@ public class PhysicalExam extends Node {
                     "<td>"+mLPhys+"</td>"+
                 "<tr>"+
              "</table>"+
+                footer+
              mOther;
         return mTable;
 

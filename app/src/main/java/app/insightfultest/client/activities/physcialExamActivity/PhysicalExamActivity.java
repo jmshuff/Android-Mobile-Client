@@ -1,5 +1,6 @@
 package app.insightfultest.client.activities.physcialExamActivity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -214,7 +215,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         setContentView(R.layout.activity_physical_exam);
         setTitle(getString(R.string.title_activity_physical_exam));
 
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         recyclerViewIndicator = findViewById(R.id.recyclerViewIndicator);
         setSupportActionBar(toolbar);
@@ -398,6 +398,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         return isInserted;
     }
 
+
+    @SuppressLint("LongLogTag")
     @Override
     public void fabClickedAtEnd() {
 
