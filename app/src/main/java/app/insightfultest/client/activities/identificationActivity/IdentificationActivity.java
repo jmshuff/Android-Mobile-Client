@@ -18,6 +18,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -54,27 +55,36 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
 import app.insightfultest.client.R;
+import app.insightfultest.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfultest.client.activities.patientDetailActivity.PatientDetailActivity;
+import app.insightfultest.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfultest.client.app.AppConstants;
 import app.insightfultest.client.app.IntelehealthApplication;
+import app.insightfultest.client.database.InteleHealthDatabaseHelper;
+import app.insightfultest.client.database.dao.EncounterDAO;
 import app.insightfultest.client.database.dao.ImagesDAO;
 import app.insightfultest.client.database.dao.ImagesPushDAO;
 import app.insightfultest.client.database.dao.PatientsDAO;
 import app.insightfultest.client.database.dao.SyncDAO;
+import app.insightfultest.client.database.dao.VisitsDAO;
 import app.insightfultest.client.models.Patient;
+import app.insightfultest.client.models.dto.EncounterDTO;
 import app.insightfultest.client.models.dto.PatientAttributesDTO;
 import app.insightfultest.client.models.dto.PatientDTO;
+import app.insightfultest.client.models.dto.VisitDTO;
 import app.insightfultest.client.utilities.DateAndTimeUtils;
 import app.insightfultest.client.utilities.EditTextUtils;
 import app.insightfultest.client.utilities.FileUtils;
 import app.insightfultest.client.utilities.Logger;
 import app.insightfultest.client.utilities.SessionManager;
+import app.insightfultest.client.utilities.UuidDictionary;
 import app.insightfultest.client.utilities.UuidGenerator;
 
 import app.insightfultest.client.activities.cameraActivity.CameraActivity;
@@ -144,6 +154,11 @@ public class IdentificationActivity extends AppCompatActivity {
     Context context;
     private String BlockCharacterSet_Others = "0123456789\\@$!=><&^*+€¥£`~";
     private String BlockCharacterSet_Name = "\\@$!=><&^*+\"\'€¥£`~";
+    String phistory = "";
+    String fhistory = "";
+    float float_ageYear_Month1;
+    float float_ageYear_Month;
+
 
     Intent i_privacy;
     String privacy_value;
@@ -151,9 +166,24 @@ public class IdentificationActivity extends AppCompatActivity {
     private int retainPickerMonth;
     private int retainPickerDate;
 
+    EncounterDTO encounterDTO = new EncounterDTO();
+    private String encounterVitals = "";
+    private String encounterAdultIntials = "";
+    private boolean returning;
+    String visitUuid1;
+    String EncounterAdultInitial_LatestVisit1="";
+    String fullName1;
+    private String encounterVitals1 = "";
+    private String encounterAdultIntials1 = "";
+
+
     //Health_Scheme_Fields
     MaterialCheckBox ma_checkbox, ab_checkbox, none_checkbox;
     FrameLayout frameLayout;
+    LinearLayout addressLayout;
+    LinearLayout othersLayout;
+    CardView addressCard;
+    CardView othersCard;
     TextView health_textview, address_details_textview, personal_info_textview;
     String html_health, result_selection;
 
@@ -170,6 +200,7 @@ public class IdentificationActivity extends AppCompatActivity {
         i_privacy = getIntent();
         context = IdentificationActivity.this;
         privacy_value = i_privacy.getStringExtra("privacy"); //privacy_accept value retrieved from previous act.
+
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,6 +278,11 @@ public class IdentificationActivity extends AppCompatActivity {
         none_checkbox = findViewById(R.id.none_checkbox);
         frameLayout = findViewById(R.id.health_framelayout);
         health_textview = findViewById(R.id.health_textview);
+        addressLayout=findViewById(R.id.address_card);
+        othersLayout=findViewById(R.id.others_card);
+        addressCard=findViewById(R.id.cardview2);
+        othersCard=findViewById(R.id.cardview3);
+
 
 //Initialize the local database to store patient information
 
@@ -257,7 +293,14 @@ public class IdentificationActivity extends AppCompatActivity {
                 patientID_edit = intent.getStringExtra("patientUuid");
                 patient1.setUuid(patientID_edit);
                 setscreen(patientID_edit);
+                visitUuid1=intent.getStringExtra("visitUuid");
+                encounterVitals1=intent.getStringExtra("encounterVitals");
+                encounterAdultIntials1=intent.getStringExtra("encounterUuidAdultIntial");
+                EncounterAdultInitial_LatestVisit1=intent.getStringExtra("EncounterAdultInitial_LatestVisit");
+                fullName1=intent.getStringExtra("name");
+                float_ageYear_Month1=intent.getFloatExtra("float_ageYear_Month", 0);
             }
+
         }
 //        if (sessionManager.valueContains("licensekey"))
         if (!sessionManager.getLicenseKey().isEmpty())
@@ -334,6 +377,11 @@ public class IdentificationActivity extends AppCompatActivity {
             } else {
                 mPostal.setVisibility(View.GONE);
             }
+            if(!obj.getBoolean("mAddress1")&& !obj.getBoolean("mAddress2") && !obj.getBoolean("mCity") && !obj.getBoolean("countryStateLayout") && !obj.getBoolean("mPostal")){
+                addressLayout.setVisibility(View.GONE);
+                addressCard.setVisibility(View.GONE);
+            }
+
 
             if (obj.getBoolean("mGenderM")) {
                 mGenderM.setVisibility(View.VISIBLE);
@@ -369,6 +417,10 @@ public class IdentificationActivity extends AppCompatActivity {
                 economicLayout.setVisibility(View.VISIBLE);
             } else {
                 economicLayout.setVisibility(View.GONE);
+            }
+            if(!obj.getBoolean("mRelationship")&& !obj.getBoolean("mOccupation") && !obj.getBoolean("casteLayout") && !obj.getBoolean("educationLayout") && !obj.getBoolean("economicLayout")){
+                othersLayout.setVisibility(View.GONE);
+                othersCard.setVisibility(View.GONE);
             }
             country1 = obj.getString("mCountry");
             state = obj.getString("mState");
@@ -1185,7 +1237,7 @@ public class IdentificationActivity extends AppCompatActivity {
 
 
         // New Validation
-        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && !mGenderF.isChecked() && !mGenderM.isChecked() && mDOB.getText().toString().equals("") && mDOB.getText().toString().isEmpty() && mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty() && mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty())
+        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty())
         {
             personal_info_textview.requestFocus();
 
@@ -1195,20 +1247,6 @@ public class IdentificationActivity extends AppCompatActivity {
             mLastName.setError(getString(R.string.error_field_required));
 //            mLastName.requestFocus();
 
-            mGenderF.setError(getString(R.string.error_field_required));
-//            mGenderF.requestFocus();
-
-            mDOB.setError(getString(R.string.error_field_required));
-//            mDOB.requestFocus();
-
-            mAge.setError(getString(R.string.error_field_required));
-//            mAge.requestFocus();
-
-//            countryText.setError(getString(R.string.error_field_required));
-//            countryText.requestFocus();
-
-//            stateText.setError(getString(R.string.error_field_required));
-//            stateText.requestFocus();
 
             mPhoneNum.setError(getString(R.string.error_field_required));
 //            mCity.requestFocus();
@@ -1255,90 +1293,6 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         }
 
-        if (!mGenderF.isChecked() && !mGenderM.isChecked()) {
-            mGenderF.setError(getString(R.string.error_field_required));
-            personal_info_textview.requestFocus();
-            MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
-            alertDialogBuilder.setTitle(R.string.error);
-            alertDialogBuilder.setMessage(R.string.identification_screen_dialog_error_gender);
-            alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-
-            Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-            //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
-            personal_info_textview.clearFocus();
-            return;
-        }
-
-        if (mDOB.getText().toString().equals("") && mDOB.getText().toString().isEmpty()) {
-            mDOB.setError(getString(R.string.error_field_required));
-            personal_info_textview.requestFocus();
-            Toast.makeText(this, R.string.please_enter_DOB, Toast.LENGTH_SHORT).show();
-            personal_info_textview.clearFocus();
-            return;
-        }
-
-        if (dob.equals("") || dob.toString().equals("")) {
-            if (dob.after(today)) {
-                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
-                alertDialogBuilder.setTitle(R.string.error);
-                alertDialogBuilder.setMessage(R.string.identification_screen_dialog_error_dob);
-                //alertDialogBuilder.setMessage(getString(R.string.identification_dialog_date_error));
-                alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-
-                mDOBPicker.show();
-                alertDialog.show();
-
-                Button postiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                postiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-                // postiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-                IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
-                return;
-            }
-        }
-
-        if (mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty()) {
-            mAge.setError(getString(R.string.error_field_required));
-            mAge.requestFocus();
-            return;
-        }
-
-        if (mCountry.getSelectedItemPosition() == 0) {
-            countryText.setError(getString(R.string.error_field_required));
-//            mCountry.requestFocus();
-            address_details_textview.requestFocus();
-            Toast.makeText(this, R.string.please_select_country, Toast.LENGTH_SHORT).show();
-            address_details_textview.clearFocus();
-            return;
-        } else {
-            countryText.setError(null);
-        }
-
-        if (mState.getSelectedItemPosition() == 0) {
-            stateText.setError(getString(R.string.error_field_required));
-//            mState.requestFocus();
-            address_details_textview.requestFocus();
-            Toast.makeText(this, R.string.please_select_state, Toast.LENGTH_SHORT).show();
-            address_details_textview.clearFocus();
-            return;
-        }
-        else {
-            stateText.setError(null);
-        }
 
         //if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
         //    mCity.setError(getString(R.string.error_field_required));
@@ -1373,13 +1327,15 @@ public class IdentificationActivity extends AppCompatActivity {
         }
 
 
-        if(mPhoneNum.getText().toString().trim().length() > 0) {
+        /*if(mPhoneNum.getText().toString().trim().length() > 0) {
             if(mPhoneNum.getText().toString().trim().length() < 10) {
                 mPhoneNum.requestFocus();
                 mPhoneNum.setError("Enter 10 digits");
                 return;
             }
         }
+
+         */
 
         //Next of Kin Phone, JS
         if(mOccupation.getText().toString().trim().length() > 0) {
@@ -1719,16 +1675,7 @@ public class IdentificationActivity extends AppCompatActivity {
 //                AppConstants.notificationUtils.showNotifications(getString(R.string.patient_data_failed), getString(R.string.check_your_connectivity), 2, IdentificationActivity.this);
 //            }
             if (isPatientInserted && isPatientImageInserted) {
-                Logger.logD(TAG, "inserted");
-                Intent i = new Intent(getApplication(), PatientDetailActivity.class);
-                i.putExtra("patientUuid", uuid);
-                i.putExtra("patientName", patientdto.getFirstname() + " " + patientdto.getLastname());
-                i.putExtra("tag", "newPatient");
-                i.putExtra("privacy", privacy_value);
-                i.putExtra("hasPrescription", "false");
-                Log.d(TAG, "Privacy Value on (Identification): " + privacy_value); //privacy value transferred to PatientDetail activity.
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                getApplication().startActivity(i);
+                createVisit();
             } else {
                 Toast.makeText(IdentificationActivity.this, "Error of adding the data", Toast.LENGTH_SHORT).show();
             }
@@ -1776,7 +1723,7 @@ public class IdentificationActivity extends AppCompatActivity {
 //        }
 
         // New Validation
-        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && !mGenderF.isChecked() && !mGenderM.isChecked() && mDOB.getText().toString().equals("") && mDOB.getText().toString().isEmpty() && mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty())
+        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty())
         {
             personal_info_textview.requestFocus();
 
@@ -1786,15 +1733,6 @@ public class IdentificationActivity extends AppCompatActivity {
             mLastName.setError(getString(R.string.error_field_required));
 //            mLastName.requestFocus();
 
-            //gender..
-//            mGenderM.setError(getString(R.string.error_field_required));
-            mGenderF.setError(getString(R.string.error_field_required));
-
-            mDOB.setError(getString(R.string.error_field_required));
-//            mDOB.requestFocus();
-
-            mAge.setError(getString(R.string.error_field_required));
-//            mAge.requestFocus();
 
 //            countryText.setError(getString(R.string.error_field_required));
 //            countryText.requestFocus();
@@ -1846,89 +1784,6 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         }
 
-        if (!mGenderF.isChecked() && !mGenderM.isChecked()) {
-            mGenderF.setError(getString(R.string.error_field_required));
-            personal_info_textview.requestFocus();
-            MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
-            alertDialogBuilder.setTitle(R.string.error);
-            alertDialogBuilder.setMessage(R.string.identification_screen_dialog_error_gender);
-            alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-
-            Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-            //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
-            personal_info_textview.clearFocus();
-            return;
-        }
-
-        if (mDOB.getText().toString().equals("") && mDOB.getText().toString().isEmpty()) {
-            mDOB.setError(getString(R.string.error_field_required));
-            personal_info_textview.requestFocus();
-            Toast.makeText(this, "Please enter Date Of Birth", Toast.LENGTH_SHORT).show();
-            personal_info_textview.clearFocus();
-            return;
-        }
-
-        if (dob.equals("") || dob.toString().equals("")) {
-            if (dob.after(today)) {
-                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
-                alertDialogBuilder.setTitle(R.string.error);
-                alertDialogBuilder.setMessage(R.string.identification_screen_dialog_error_dob);
-                //alertDialogBuilder.setMessage(getString(R.string.identification_dialog_date_error));
-                alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-
-                mDOBPicker.show();
-                alertDialog.show();
-
-                Button postiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                postiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-                // postiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-                IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
-                return;
-            }
-        }
-
-        if (mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty()) {
-            mAge.setError(getString(R.string.error_field_required));
-            mAge.requestFocus();
-            return;
-        }
-
-        if (mCountry.getSelectedItemPosition() == 0) {
-            countryText.setError(getString(R.string.error_field_required));
-//            mCountry.requestFocus();
-            address_details_textview.requestFocus();
-            Toast.makeText(this, "Please select Country", Toast.LENGTH_SHORT).show();
-            address_details_textview.clearFocus();
-            return;
-        } else {
-            countryText.setError(null);
-        }
-
-        if (mState.getSelectedItemPosition() == 0) {
-            stateText.setError(getString(R.string.error_field_required));
-//            mState.requestFocus();
-            address_details_textview.requestFocus();
-            Toast.makeText(this, "Please select State", Toast.LENGTH_SHORT).show();
-            address_details_textview.clearFocus();
-            return;
-        } else {
-            stateText.setError(null);
-        }
 
        /* if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
             mCity.setError(getString(R.string.error_field_required));
@@ -1963,13 +1818,15 @@ public class IdentificationActivity extends AppCompatActivity {
         }
 
 
-        if(mPhoneNum.getText().toString().trim().length() > 0) {
+        /*if(mPhoneNum.getText().toString().trim().length() > 0) {
             if(mPhoneNum.getText().toString().trim().length() < 10) {
                 mPhoneNum.requestFocus();
                 mPhoneNum.setError("Enter 10 digits");
                 return;
             }
         }
+
+         */
 
         //Next of kin phone
         if(mOccupation.getText().toString().trim().length() > 0) {
@@ -2179,7 +2036,8 @@ public class IdentificationActivity extends AppCompatActivity {
         patientdto.setAddress2(StringUtils.getValue(mAddress2.getText().toString()));
         patientdto.setCity_village(StringUtils.getValue(mCity.getText().toString()));
         patientdto.setPostal_code(StringUtils.getValue(mPostal.getText().toString()));
-        patientdto.setCountry(StringUtils.getValue(mCountry.getSelectedItem().toString()));
+        //patientdto.setCountry(StringUtils.getValue(mCountry.getSelectedItem().toString()));
+        patientdto.setCountry("India");
         patientdto.setPatient_photo(mCurrentPhotoPath);
 //                patientdto.setEconomic(StringUtils.getValue(m));
         patientdto.setState_province(StringUtils.getValue(patientdto.getState_province()));
@@ -2278,11 +2136,18 @@ public class IdentificationActivity extends AppCompatActivity {
             }
             if (isPatientUpdated && isPatientImageUpdated) {
                 Logger.logD(TAG, "updated");
-                Intent i = new Intent(getApplication(), PatientDetailActivity.class);
+                Intent i = new Intent(getApplication(), VisitSummaryActivity.class);
                 i.putExtra("patientUuid", uuid);
-                i.putExtra("patientName", patientdto.getFirst_name() + " " + patientdto.getLast_name());
+                i.putExtra("name", patientdto.getFirst_name() + " " + patientdto.getLast_name());
                 i.putExtra("tag", "newPatient");
                 i.putExtra("hasPrescription", "false");
+                i.putExtra("visitUuid", visitUuid1);
+
+                i.putExtra("encounterUuidVitals", encounterVitals1);
+                i.putExtra("encounterUuidAdultIntial", encounterAdultIntials1);
+                i.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit1);
+                i.putExtra("float_ageYear_Month", float_ageYear_Month1);
+
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 getApplication().startActivity(i);
             }
@@ -2291,6 +2156,134 @@ public class IdentificationActivity extends AppCompatActivity {
         }
 
     }
+    public void createVisit(){
+        SimpleDateFormat currentDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault());
+        Date todayDate = new Date();
+        String thisDate = currentDate.format(todayDate);
+
+
+        if (encounterVitals.equalsIgnoreCase("") || encounterVitals == null) {
+            encounterVitals = UUID.randomUUID().toString();
+
+        }
+        String uuid = UUID.randomUUID().toString();
+        EncounterDAO encounterDAO = new EncounterDAO();
+        encounterDTO = new EncounterDTO();
+        encounterDTO.setUuid(encounterVitals);
+        encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_VITALS"));
+        encounterDTO.setEncounterTime(thisDate);
+        encounterDTO.setVisituuid(uuid);
+        encounterDTO.setSyncd(false);
+        encounterDTO.setProvideruuid(sessionManager.getProviderID());
+        Log.d("DTO", "DTO:detail " + encounterDTO.getProvideruuid());
+        encounterDTO.setVoided(0);
+        encounterDTO.setPrivacynotice_value(privacy_value);//privacy value added.
+
+
+
+        try {
+            encounterDAO.createEncountersToDB(encounterDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        InteleHealthDatabaseHelper mDatabaseHelper = new InteleHealthDatabaseHelper(IdentificationActivity.this);
+        SQLiteDatabase sqLiteDatabase = mDatabaseHelper.getReadableDatabase();
+
+        String CREATOR_ID = sessionManager.getCreatorID();
+        returning = false;
+        sessionManager.setReturning(returning);
+
+        String[] cols = {"value"};
+        Cursor cursor = sqLiteDatabase.query("tbl_obs", cols, "encounteruuid=? and conceptuuid=?",// querying for PMH (Past Medical History)
+                new String[]{encounterAdultIntials, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            // rows present
+            do {
+                // so that null data is not appended
+                phistory = phistory + cursor.getString(0);
+
+            }
+            while (cursor.moveToNext());
+            returning = true;
+            sessionManager.setReturning(returning);
+        }
+        cursor.close();
+
+        Cursor cursor1 = sqLiteDatabase.query("tbl_obs", cols, "encounteruuid=? and conceptuuid=?",// querying for FH (Family History)
+                new String[]{encounterAdultIntials, UuidDictionary.RHK_FAMILY_HISTORY_BLURB},
+                null, null, null);
+        if (cursor1.moveToFirst()) {
+            // rows present
+            do {
+                fhistory = fhistory + cursor1.getString(0);
+            }
+            while (cursor1.moveToNext());
+            returning = true;
+            sessionManager.setReturning(returning);
+        }
+        cursor1.close();
+
+        // Will display data for patient as it is present in database
+        // Toast.makeText(PatientDetailActivity.this,"PMH: "+phistory,Toast.LENGTH_SHORT).sƒhow();
+        // Toast.makeText(PatientDetailActivity.this,"FH: "+fhistory,Toast.LENGTH_SHORT).show();
+
+        Intent intent2 = new Intent(IdentificationActivity.this, AdditionalDocumentsActivity.class);
+        String fullName = patientdto.getFirstname() + " " + patientdto.getLastname();
+
+        VisitDTO visitDTO = new VisitDTO();
+
+        visitDTO.setUuid(uuid);
+        visitDTO.setPatientuuid(patientdto.getUuid());
+        visitDTO.setStartdate(thisDate);
+        visitDTO.setVisitTypeUuid(UuidDictionary.VISIT_TELEMEDICINE);
+        visitDTO.setLocationuuid(sessionManager.getLocationUuid());
+        visitDTO.setSyncd(false);
+        visitDTO.setCreatoruuid(sessionManager.getCreatorID());//static
+        VisitsDAO visitsDAO = new VisitsDAO();
+
+        try {
+            visitsDAO.insertPatientToDB(visitDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        if (encounterAdultIntials.equalsIgnoreCase("") || encounterAdultIntials == null) {
+            encounterAdultIntials = UUID.randomUUID().toString();
+
+        }
+
+
+        encounterDTO.setUuid(encounterAdultIntials);
+        encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_ADULTINITIAL"));
+        encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
+        encounterDTO.setVisituuid(uuid);
+        encounterDTO.setSyncd(false);
+        encounterDTO.setProvideruuid(sessionManager.getProviderID());
+        Log.d("DTO", "DTOcomp: " + encounterDTO.getProvideruuid());
+        encounterDTO.setVoided(0);
+        try {
+            encounterDAO.createEncountersToDB(encounterDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        // visitUuid = String.valueOf(visitLong);
+//                localdb.close();
+        intent2.putExtra("patientUuid", patientdto.getUuid());
+        intent2.putExtra("visitUuid", uuid);
+        intent2.putExtra("encounterUuidVitals", encounterVitals);
+        intent2.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+        intent2.putExtra("EncounterAdultInitial_LatestVisit", encounterAdultIntials);
+        intent2.putExtra("name", fullName);
+        intent2.putExtra("tag", "new");
+        intent2.putExtra("float_ageYear_Month", float_ageYear_Month);
+        startActivity(intent2);
+    }
+
+
 
     public String health_condition() {
         if (ma_checkbox.isChecked() && !ab_checkbox.isChecked()) {

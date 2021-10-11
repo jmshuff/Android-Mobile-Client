@@ -93,7 +93,9 @@ import app.insightfultest.client.R;
 import app.insightfultest.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfultest.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.insightfultest.client.activities.familyHistoryActivity.FamilyHistoryActivity;
+import app.insightfultest.client.activities.identificationActivity.IdentificationActivity;
 import app.insightfultest.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
+import app.insightfultest.client.activities.patientDetailActivity.PatientDetailActivity;
 import app.insightfultest.client.activities.patientSurveyActivity.PatientSurveyActivity;
 import app.insightfultest.client.app.AppConstants;
 import app.insightfultest.client.app.IntelehealthApplication;
@@ -183,6 +185,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     ImageButton editFamHist;
     ImageButton editMedHist;
     ImageButton editAddDocs;
+    ImageButton editPatient;
 
     FrameLayout frameLayout_doctor;
     TextView nameView;
@@ -516,7 +519,6 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 }
             }
         });
-
         card_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -710,6 +712,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         editAddDocs = findViewById(R.id.imagebutton_edit_additional_document);
         uploadButton = findViewById(R.id.button_upload);
         downloadButton = findViewById(R.id.button_download);
+        editPatient= findViewById(R.id.imagebutton_edit_patient);
+
 
         //additionalDocumentsDownlaod = findViewById(R.id.imagebutton_download_additional_document);
         onExaminationDownload = findViewById(R.id.imagebutton_download_physexam);
@@ -1267,6 +1271,24 @@ public class VisitSummaryActivity extends AppCompatActivity {
             }
         });
 
+        editPatient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent2 = new Intent(VisitSummaryActivity.this, IdentificationActivity.class);
+                intent2.putExtra("patientUuid", patientUuid);
+                intent2.putExtra("patientUuid", patientUuid);
+                intent2.putExtra("visitUuid", visitUuid);
+                intent2.putExtra("encounterUuidVitals", encounterVitals);
+                intent2.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                intent2.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+                intent2.putExtra("state", state);
+                intent2.putExtra("name", patientName);
+                intent2.putExtra("float_ageYear_Month", float_ageYear_Month);
+                startActivity(intent2);
+
+            }
+        });
+
         editPhysical.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1484,6 +1506,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 addDocs.putExtra("visitUuid", visitUuid);
                 addDocs.putExtra("encounterUuidVitals", encounterVitals);
                 addDocs.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                addDocs.putExtra("name", patientName);
+                addDocs.putExtra("float_ageYear_Month",float_ageYear_Month);
                 startActivity(addDocs);
             }
         });

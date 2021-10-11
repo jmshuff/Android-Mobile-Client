@@ -57,6 +57,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import app.insightfultest.client.R;
+import app.insightfultest.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfultest.client.app.AppConstants;
 import app.insightfultest.client.app.IntelehealthApplication;
 import app.insightfultest.client.database.InteleHealthDatabaseHelper;
@@ -101,6 +102,7 @@ public class PatientDetailActivity extends AppCompatActivity {
     Patient patient_new = new Patient();
 
     EncounterDTO encounterDTO = new EncounterDTO();
+
     PatientsDAO patientsDAO = new PatientsDAO();
     private boolean hasLicense = false;
     private boolean returning;
@@ -185,6 +187,7 @@ public class PatientDetailActivity extends AppCompatActivity {
             //newVisit.setTextColor(getResources().getColor(R.color.white));
         }
 
+
         newVisit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -195,10 +198,14 @@ public class PatientDetailActivity extends AppCompatActivity {
                 String thisDate = currentDate.format(todayDate);
 
 
+                if (encounterVitals.equalsIgnoreCase("") || encounterVitals == null) {
+                    encounterVitals = UUID.randomUUID().toString();
+
+                }
                 String uuid = UUID.randomUUID().toString();
                 EncounterDAO encounterDAO = new EncounterDAO();
                 encounterDTO = new EncounterDTO();
-                encounterDTO.setUuid(UUID.randomUUID().toString());
+                encounterDTO.setUuid(encounterVitals);
                 encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_VITALS"));
                 encounterDTO.setEncounterTime(thisDate);
                 encounterDTO.setVisituuid(uuid);
@@ -207,6 +214,8 @@ public class PatientDetailActivity extends AppCompatActivity {
                 Log.d("DTO", "DTO:detail " + encounterDTO.getProvideruuid());
                 encounterDTO.setVoided(0);
                 encounterDTO.setPrivacynotice_value(privacy_value_selected);//privacy value added.
+
+
 
                 try {
                     encounterDAO.createEncountersToDB(encounterDTO);
@@ -257,7 +266,7 @@ public class PatientDetailActivity extends AppCompatActivity {
                 // Toast.makeText(PatientDetailActivity.this,"PMH: "+phistory,Toast.LENGTH_SHORT).sƒhow();
                 // Toast.makeText(PatientDetailActivity.this,"FH: "+fhistory,Toast.LENGTH_SHORT).show();
 
-                Intent intent2 = new Intent(PatientDetailActivity.this, ComplaintNodeActivity.class);
+                Intent intent2 = new Intent(PatientDetailActivity.this, AdditionalDocumentsActivity.class);
                 String fullName = patient_new.getFirst_name() + " " + patient_new.getLast_name();
                 intent2.putExtra("patientUuid", patientUuid);
 
@@ -278,12 +287,29 @@ public class PatientDetailActivity extends AppCompatActivity {
                     FirebaseCrashlytics.getInstance().recordException(e);
                 }
 
+                encounterAdultIntials = UUID.randomUUID().toString();
+
+
+                encounterDTO.setUuid(encounterAdultIntials);
+                encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_ADULTINITIAL"));
+                encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
+                encounterDTO.setVisituuid(uuid);
+                encounterDTO.setSyncd(false);
+                encounterDTO.setProvideruuid(sessionManager.getProviderID());
+                Log.d("DTO", "DTOcomp: " + encounterDTO.getProvideruuid());
+                encounterDTO.setVoided(0);
+                try {
+                    encounterDAO.createEncountersToDB(encounterDTO);
+                } catch (DAOException e) {
+                    FirebaseCrashlytics.getInstance().recordException(e);
+                }
+
                 // visitUuid = String.valueOf(visitLong);
 //                localdb.close();
                 intent2.putExtra("patientUuid", patientUuid);
                 intent2.putExtra("visitUuid", uuid);
-                intent2.putExtra("encounterUuidVitals", encounterDTO.getUuid());
-                intent2.putExtra("encounterUuidAdultIntial", "");
+                intent2.putExtra("encounterUuidVitals", encounterVitals);
+                intent2.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
                 intent2.putExtra("EncounterAdultInitial_LatestVisit", encounterAdultIntials);
                 intent2.putExtra("name", fullName);
                 intent2.putExtra("tag", "new");

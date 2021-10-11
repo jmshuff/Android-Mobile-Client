@@ -6,6 +6,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -15,7 +16,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-
+import android.widget.ImageView;
+import android.widget.TextView;
 
 
 import java.io.File;
@@ -24,9 +26,16 @@ import java.util.List;
 import java.util.UUID;
 
 import app.insightfultest.client.R;
+import app.insightfultest.client.activities.complaintNodeActivity.ComplaintNodeActivity;
+import app.insightfultest.client.activities.complaintNodeActivity.ComplaintNodeListAdapter;
+import app.insightfultest.client.activities.questionNodeActivity.QuestionNodeActivity;
+import app.insightfultest.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfultest.client.app.AppConstants;
 import app.insightfultest.client.database.dao.ImagesDAO;
+import app.insightfultest.client.knowledgeEngine.Node;
 import app.insightfultest.client.models.DocumentObject;
+import app.insightfultest.client.models.dto.EncounterDTO;
+import app.insightfultest.client.utilities.SessionManager;
 import app.insightfultest.client.utilities.UuidDictionary;
 
 import app.insightfultest.client.activities.cameraActivity.CameraActivity;
@@ -42,6 +51,16 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
     private String encounterAdultIntials;
     private List<DocumentObject> rowListItem;
     private AdditionalDocumentAdapter recyclerViewAdapter;
+
+    String state;
+    String patientName;
+    String intentTag;
+    SearchView searchView;
+    List<Node> complaints;
+    // CustomArrayAdapter listAdapter;
+    ComplaintNodeListAdapter listAdapter;
+    String EncounterAdultInitial_LatestVisit;
+    private float float_ageYear_Month;
 
 
     @Override
@@ -59,7 +78,20 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                Intent intent = new Intent(
+                        AdditionalDocumentsActivity.this, VisitSummaryActivity.class);
+                intent.putExtra("patientUuid", patientUuid);
+                intent.putExtra("visitUuid", visitUuid);
+                intent.putExtra("encounterUuidVitals", encounterVitals);
+                intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+                intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+                intent.putExtra("state", state);
+                intent.putExtra("name", patientName);
+                intent.putExtra("float_ageYear_Month", float_ageYear_Month);
+                if (intentTag != null) {
+                    intent.putExtra("tag", intentTag);
+                }
+                startActivity(intent);
             }
         });
         Intent intent = this.getIntent(); // The intent was passed to the activity
@@ -68,6 +100,11 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
             visitUuid = intent.getStringExtra("visitUuid");
             encounterVitals = intent.getStringExtra("encounterUuidVitals");
             encounterAdultIntials = intent.getStringExtra("encounterUuidAdultIntial");
+            EncounterAdultInitial_LatestVisit = intent.getStringExtra("EncounterAdultInitial_LatestVisit");
+            state = intent.getStringExtra("state");
+            patientName = intent.getStringExtra("name");
+            float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
+            intentTag = intent.getStringExtra("tag");
 
             ImagesDAO imagesDAO = new ImagesDAO();
             ArrayList<String> fileuuidList = new ArrayList<String>();

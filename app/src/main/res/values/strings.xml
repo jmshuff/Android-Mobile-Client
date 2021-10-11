@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">InSightful Test</string>
+    <string name="app_name">InSightful</string>
 
     //Gene
     <string name="generic_the_flipping_word_next">Next</string>
@@ -39,7 +39,7 @@
     <string name="db_patient_id3">patient_identifier3</string>
 
     //Login Screen
-    <string name="title_activity_login">Intelehealth</string>
+    <string name="title_activity_login">InSightful</string>
     <string name="prompt_email">Username</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_admin_password">Admin Password</string>
@@ -82,7 +82,7 @@
     <string name="identification_screen_prompt_last_name">Last name *</string>
     <string name="identification_screen_prompt_address">Village</string>
     <string name="identification_screen_prompt_address2">Taluk</string>
-    <string name="identification_screen_prompt_phone_number">Phone number *</string>
+    <string name="identification_screen_prompt_phone_number">Patient ID</string>
     <string name="admin_password_dialog_heading">Enter Admin Password</string>
     <string name="identification_screen_prompt_gender">Gender *</string>
     <string name="identification_screen_checkbox_male">Male</string>
@@ -220,7 +220,7 @@
     <string name="row_dob">DOB</string>
     <string name="row_age">Age</string>
     <string name="row_address">Address</string>
-    <string name="row_phone_number">Phone number</string>
+    <string name="row_phone_number">Patient ID</string>
     <string name="row_open_visit">Click to open visit</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -328,7 +328,7 @@
     <string name="prescription">Prescription</string>
 
     <string name="error_no_data">Please download first before attempting to end the visit.</string>
-    <string name="error_phone_number">Phone number can\'t be empty</string>
+    <string name="error_phone_number">Patient ID can\'t be empty</string>
     <string name="action_end_visit">End Visit</string>
 
     <string name="error_sms">SMS failed, please try again later!</string>

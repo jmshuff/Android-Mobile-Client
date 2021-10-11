@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.UUID;
 
 import app.insightfultest.client.R;
+import app.insightfultest.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfultest.client.activities.homeActivity.HomeActivity;
 import app.insightfultest.client.activities.questionNodeActivity.QuestionNodeActivity;
 import app.insightfultest.client.app.AppConstants;
@@ -317,7 +318,7 @@ public class ComplaintNodeActivity extends AppCompatActivity {
                     displaySelection.add(node.findDisplay());
                 }
             }
-
+/*
             if (selection.isEmpty()) {
                 MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
 //                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
@@ -335,7 +336,11 @@ public class ComplaintNodeActivity extends AppCompatActivity {
                 pb.setTextColor(getResources().getColor((R.color.colorPrimary)));
                 //pb.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
                 IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
-            } else {
+            }
+             else {
+
+ */
+
                 //MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
 //              //  AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
                 //alertDialogBuilder.setTitle(R.string.complaint_dialog_title);
@@ -351,7 +356,7 @@ public class ComplaintNodeActivity extends AppCompatActivity {
                 //    public void onClick(DialogInterface dialog, int which) {
                 //    dialog.dismiss();
                 Intent intent = new Intent(
-                        ComplaintNodeActivity.this, QuestionNodeActivity.class);
+                        ComplaintNodeActivity.this, AdditionalDocumentsActivity.class);
                 intent.putExtra("patientUuid", patientUuid);
                 intent.putExtra("visitUuid", visitUuid);
                 intent.putExtra("encounterUuidVitals", encounterVitals);
@@ -363,7 +368,7 @@ public class ComplaintNodeActivity extends AppCompatActivity {
                 if (intentTag != null) {
                     intent.putExtra("tag", intentTag);
                 }
-                intent.putStringArrayListExtra("complaints", selection);
+                //intent.putStringArrayListExtra("complaints", selection);
 
                 startActivity(intent);
             }
@@ -383,7 +388,7 @@ public class ComplaintNodeActivity extends AppCompatActivity {
                 ////nb.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
                 //IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
             //}
-        }
+        //}
     }
 
     @Override
@@ -444,3 +449,4 @@ public class ComplaintNodeActivity extends AppCompatActivity {
 
     }
 }
+
