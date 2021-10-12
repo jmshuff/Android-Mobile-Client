@@ -89,6 +89,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import app.insightfultest.client.R;
 import app.insightfultest.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
@@ -139,7 +140,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     String speciality_selected = "General Physician";
 
     boolean uploaded = false;
-    boolean downloaded = false;
+    boolean downloaded = true;
 
     Context context;
 
@@ -153,6 +154,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     String medicalAdvice_HyperLink = "";
     String isSynedFlag = "";
     private float float_ageYear_Month;
+    String openmrs_id;
 
     Spinner speciality_spinner;
 
@@ -447,6 +449,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             isPastVisit = intent.getBooleanExtra("pastVisit", false);
 //            hasPrescription = intent.getStringExtra("hasPrescription");
             physicalDisplay=intent.getStringExtra("physicalDisplay");
+            openmrs_id=intent.getStringExtra("openmrs_id");
 
             Set<String> selectedExams = sessionManager.getVisitSummary(patientUuid);
             if (physicalExams == null) physicalExams = new ArrayList<>();
@@ -979,7 +982,6 @@ public class VisitSummaryActivity extends AppCompatActivity {
             uploadButton.setEnabled(false);
         }
 
-
         queryData(String.valueOf(patientUuid));
         nameView = findViewById(R.id.textView_name_value);
 
@@ -988,7 +990,11 @@ public class VisitSummaryActivity extends AppCompatActivity {
         visitView = findViewById(R.id.textView_visit_value);
         if (patient.getOpenmrs_id() != null && !patient.getOpenmrs_id().isEmpty()) {
             idView.setText(patient.getOpenmrs_id());
-        } else {
+        }
+        else if(openmrs_id!=null && openmrs_id!=""){
+            idView.setText(openmrs_id);
+        }
+        else {
             idView.setText(getString(R.string.patient_not_registered));
         }
 
@@ -1334,6 +1340,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 intent2.putExtra("state", state);
                 intent2.putExtra("name", patientName);
                 intent2.putExtra("float_ageYear_Month", float_ageYear_Month);
+                intent2.putExtra("openmrs_id", idView.getText());
                 startActivity(intent2);
 
             }
@@ -3027,35 +3034,25 @@ public class VisitSummaryActivity extends AppCompatActivity {
             if (visitIDCursor != null) visitIDCursor.close();
         }
         if (visitUUID != null && !visitUUID.isEmpty()) {
-            if (followUpDate != null && !followUpDate.isEmpty()) {
-                MaterialAlertDialogBuilder followUpAlert = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
-                followUpAlert.setMessage(getString(R.string.visit_summary_follow_up_reminder) + followUpDate);
-                followUpAlert.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(VisitSummaryActivity.this, PatientSurveyActivity.class);
-                        intent.putExtra("patientUuid", patientUuid);
-                        intent.putExtra("visitUuid", visitUuid);
-                        intent.putExtra("encounterUuidVitals", encounterVitals);
-                        intent.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
-                        intent.putExtra("state", state);
-                        intent.putExtra("name", patientName);
-                        intent.putExtra("tag", intentTag);
-                        startActivity(intent);
-                    }
-                });
-                followUpAlert.show();
-            } else {
-                Intent intent = new Intent(VisitSummaryActivity.this, PatientSurveyActivity.class);
-                intent.putExtra("patientUuid", patientUuid);
-                intent.putExtra("visitUuid", visitUuid);
-                intent.putExtra("encounterUuidVitals", encounterVitals);
-                intent.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
-                intent.putExtra("state", state);
-                intent.putExtra("name", patientName);
-                intent.putExtra("tag", intentTag);
-                startActivity(intent);
+            VisitsDAO visitsDAO = new VisitsDAO();
+            try {
+                visitsDAO.updateVisitEnddate(visitUuid, AppConstants.dateAndTimeUtils.currentDateTime());
+            } catch (DAOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
+
+            //SyncDAO syncDAO = new SyncDAO();
+            //syncDAO.pushDataApi();
+            //syncUtils.syncForeground("survey"); //Sync function will work in foreground of app and
+            // the Time will be changed for last sync.
+
+//        AppConstants.notificationUtils.DownloadDone(getString(R.string.end_visit_notif), getString(R.string.visit_ended_notif), 3, PatientSurveyActivity.this);
+
+            sessionManager.removeVisitSummary(patientUuid, visitUuid);
+
+            Intent i = new Intent(this, HomeActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
         } else {
 
             Log.d(TAG, "endVisit: null");
