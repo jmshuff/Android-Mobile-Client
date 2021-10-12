@@ -1237,7 +1237,7 @@ public class IdentificationActivity extends AppCompatActivity {
 
 
         // New Validation
-        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty())
+        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty() && !mGenderF.isChecked() && !mGenderM.isChecked()  && mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty())
         {
             personal_info_textview.requestFocus();
 
@@ -1250,6 +1250,9 @@ public class IdentificationActivity extends AppCompatActivity {
 
             mPhoneNum.setError(getString(R.string.error_field_required));
 //            mCity.requestFocus();
+            mAge.setError(getString(R.string.error_field_required));
+
+            mGenderF.setError(getString(R.string.error_field_required));
 
             if (frameLayout.getVisibility() == View.VISIBLE) {
                 if (!ma_checkbox.isChecked() && !ab_checkbox.isChecked() && !none_checkbox.isChecked()) {
@@ -1290,6 +1293,41 @@ public class IdentificationActivity extends AppCompatActivity {
         if (mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty()) {
             mLastName.setError(getString(R.string.error_field_required));
             mLastName.requestFocus();
+            return;
+        }
+
+        if (mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty()) {
+            mPhoneNum.setError(getString(R.string.error_field_required));
+            mPhoneNum.requestFocus();
+            return;
+        }
+        if (!mGenderF.isChecked() && !mGenderM.isChecked()) {
+            mGenderF.setError(getString(R.string.error_field_required));
+            personal_info_textview.requestFocus();
+            MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
+            alertDialogBuilder.setTitle(R.string.error);
+            alertDialogBuilder.setMessage(R.string.identification_screen_dialog_error_gender);
+            alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
+            Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+            //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
+            personal_info_textview.clearFocus();
+            return;
+        }
+
+
+        if (mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty()) {
+            mAge.setError(getString(R.string.error_field_required));
+            mAge.requestFocus();
             return;
         }
 
@@ -1723,7 +1761,7 @@ public class IdentificationActivity extends AppCompatActivity {
 //        }
 
         // New Validation
-        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty())
+        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty()  && mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty() && !mGenderF.isChecked() && !mGenderM.isChecked())
         {
             personal_info_textview.requestFocus();
 
@@ -1733,6 +1771,11 @@ public class IdentificationActivity extends AppCompatActivity {
             mLastName.setError(getString(R.string.error_field_required));
 //            mLastName.requestFocus();
 
+            mPhoneNum.setError(getString(R.string.error_field_required));
+
+            mGenderF.setError(getString(R.string.error_field_required));
+
+            mAge.setError(getString(R.string.error_field_required));
 
 //            countryText.setError(getString(R.string.error_field_required));
 //            countryText.requestFocus();
@@ -1781,6 +1824,12 @@ public class IdentificationActivity extends AppCompatActivity {
         if (mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty()) {
             mLastName.setError(getString(R.string.error_field_required));
             mLastName.requestFocus();
+            return;
+        }
+
+        if (mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty()) {
+            mPhoneNum.setError(getString(R.string.error_field_required));
+            mPhoneNum.requestFocus();
             return;
         }
 

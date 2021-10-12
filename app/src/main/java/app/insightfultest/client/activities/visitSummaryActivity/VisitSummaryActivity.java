@@ -77,6 +77,7 @@ import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -239,6 +240,16 @@ public class VisitSummaryActivity extends AppCompatActivity {
     TextView followUpDateTextView;
     //added checkbox flag .m
     CheckBox flag;
+    TextView complaintsHeading;
+    TextView physExamHeading;
+    TextView medHistHeading;
+    TextView famHistHeading;
+    TextView healthWorkerHeading;
+    CardView complaintCard;
+    CardView physExamCard;
+    CardView medHistCard;
+    CardView famHistCard;
+    CardView healthWorkerCard;
 
     Boolean isPastVisit = false, isVisitSpecialityExists = false;
     Boolean isReceiverRegistered = false;
@@ -508,6 +519,31 @@ public class VisitSummaryActivity extends AppCompatActivity {
         card_print = findViewById(R.id.card_print);
         card_share = findViewById(R.id.card_share);
 
+        complaintsHeading=findViewById(R.id.textView_heading_complaint);
+        physExamHeading=findViewById(R.id.textView_heading_physexam);
+        medHistHeading=findViewById(R.id.textView_heading_pathist);
+        famHistHeading=findViewById(R.id.textView_heading_famhist);
+        healthWorkerHeading=findViewById(R.id.title_health_worker);
+        complaintCard=findViewById(R.id.cardView_complaint);
+        physExamCard=findViewById(R.id.cardView_physexam);
+        medHistCard=findViewById(R.id.cardView_pathist);
+        famHistCard=findViewById(R.id.cardView_famhist);
+        healthWorkerCard=findViewById(R.id.chw_and_doctor_details);
+
+        boolean Shroff=true;
+        if(Shroff){
+            complaintsHeading.setVisibility(View.GONE);
+            physExamHeading.setVisibility(View.GONE);
+            medHistHeading.setVisibility(View.GONE);
+            famHistHeading.setVisibility(View.GONE);
+            healthWorkerHeading.setVisibility(View.GONE);
+            complaintCard.setVisibility(View.GONE);
+            physExamCard.setVisibility(View.GONE);
+            medHistCard.setVisibility(View.GONE);
+            famHistCard.setVisibility(View.GONE);
+            healthWorkerCard.setVisibility(View.GONE);
+        }
+
         card_print.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -522,6 +558,10 @@ public class VisitSummaryActivity extends AppCompatActivity {
         card_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                shareImage();
+
+
+                /*
 
                 if (hasPrescription.equalsIgnoreCase("true")) {
 //                    try {
@@ -605,9 +645,19 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
                 }
 
+                 */
 
             }
+
+
+
+
+
+
         });
+
+
+
 
 
 //        mDoctorTitle.setVisibility(View.GONE);
@@ -3934,6 +3984,49 @@ public class VisitSummaryActivity extends AppCompatActivity {
         }
         visitCursor.close();
     }
+    public void shareImage(){
+        ImagesDAO imagesDAO = new ImagesDAO();
+        ArrayList<String> fileuuidList = new ArrayList<String>();
+        ArrayList<File> fileList = new ArrayList<File>();
+        try {
+            fileuuidList = imagesDAO.getImageUuid(encounterUuidAdultIntial, UuidDictionary.COMPLEX_IMAGE_AD);
+            for (String fileuuid : fileuuidList) {
+                String filename = AppConstants.IMAGE_PATH + fileuuid + ".jpg";
+                if (new File(filename).exists()) {
+                    fileList.add(new File(filename));
+                }
+            }
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        } catch (Exception file) {
+            Logger.logD(TAG, file.getMessage());
+        }
 
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        //Target whatsapp:
+        shareIntent.setPackage("com.whatsapp");
+        //String picture_text="Images for " + patientName;
+        //shareIntent.putExtra(Intent.EXTRA_TEXT, picture_text);
+
+        ArrayList<Uri> uriArrayList = new ArrayList<>();
+        for (File file : fileList){
+            Uri imageUri= Uri.parse(file.getAbsolutePath());
+            Log.d("share image", imageUri.toString());
+            uriArrayList.add(imageUri);
+        }
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriArrayList);
+        shareIntent.setType("image/*");
+
+        //Add text and then Image URI
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(shareIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(context, "Whatsapp is not installed.",Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
 }
