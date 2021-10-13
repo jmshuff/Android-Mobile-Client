@@ -2199,6 +2199,8 @@ public class IdentificationActivity extends AppCompatActivity {
                 i.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit1);
                 i.putExtra("float_ageYear_Month", float_ageYear_Month1);
                 i.putExtra("openmrs_id", openmrs_id);
+                i.putExtra("sceh_id", mPhoneNum.getText().toString());
+
 
 
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -2333,6 +2335,7 @@ public class IdentificationActivity extends AppCompatActivity {
         intent2.putExtra("name", fullName);
         intent2.putExtra("tag", "new");
         intent2.putExtra("float_ageYear_Month", float_ageYear_Month);
+        intent2.putExtra("sceh_id", mPhoneNum.getText().toString());
         startActivity(intent2);
     }
 

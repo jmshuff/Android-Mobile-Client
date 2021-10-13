@@ -28,6 +28,8 @@ import android.print.PrintJob;
 import android.print.PrintManager;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.ShareCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
@@ -91,6 +93,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import app.insightfultest.client.BuildConfig;
 import app.insightfultest.client.R;
 import app.insightfultest.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfultest.client.activities.complaintNodeActivity.ComplaintNodeActivity;
@@ -252,6 +255,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     CardView medHistCard;
     CardView famHistCard;
     CardView healthWorkerCard;
+    String sceh_id;
 
     Boolean isPastVisit = false, isVisitSpecialityExists = false;
     Boolean isReceiverRegistered = false;
@@ -450,6 +454,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
 //            hasPrescription = intent.getStringExtra("hasPrescription");
             physicalDisplay=intent.getStringExtra("physicalDisplay");
             openmrs_id=intent.getStringExtra("openmrs_id");
+            sceh_id=intent.getStringExtra("sceh_id");
 
             Set<String> selectedExams = sessionManager.getVisitSummary(patientUuid);
             if (physicalExams == null) physicalExams = new ArrayList<>();
@@ -3981,25 +3986,50 @@ public class VisitSummaryActivity extends AppCompatActivity {
         }
         visitCursor.close();
     }
-    public void shareImage(){
+    public void shareImage() {
         ImagesDAO imagesDAO = new ImagesDAO();
         ArrayList<String> fileuuidList = new ArrayList<String>();
         ArrayList<File> fileList = new ArrayList<File>();
+        ArrayList<Uri> uriArrayList=new ArrayList<>();
         try {
             fileuuidList = imagesDAO.getImageUuid(encounterUuidAdultIntial, UuidDictionary.COMPLEX_IMAGE_AD);
             for (String fileuuid : fileuuidList) {
                 String filename = AppConstants.IMAGE_PATH + fileuuid + ".jpg";
+                Log.d("WhatsApp",filename);
                 if (new File(filename).exists()) {
                     fileList.add(new File(filename));
                 }
             }
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
-        } catch (Exception file) {
-            Logger.logD(TAG, file.getMessage());
         }
 
-        Intent shareIntent = new Intent();
+        try{
+            for (File file : fileList){
+                Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID+".provider", file);
+                uriArrayList.add(uri);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String text="Images for "+patientName + ", ID: "+ sceh_id;
+        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        //shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setPackage("com.whatsapp");
+        //shareIntent.putExtra(Intent.EXTRA_STREAM, uriArrayList.get(0));
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriArrayList);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        shareIntent.setType("image/*");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(shareIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(context, "Whatsapp is not installed.",Toast.LENGTH_SHORT).show();
+        }
+
+        /*Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         //Target whatsapp:
         shareIntent.setPackage("com.whatsapp");
@@ -4023,6 +4053,12 @@ public class VisitSummaryActivity extends AppCompatActivity {
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(context, "Whatsapp is not installed.",Toast.LENGTH_SHORT).show();
         }
+
+         */
+
+
+
+
 
     }
 
