@@ -22,22 +22,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.print.PdfPrint;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintJob;
 import android.print.PrintManager;
-
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.core.view.MenuItemCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.telephony.SmsManager;
 import android.text.Html;
 import android.text.InputFilter;
@@ -69,7 +58,27 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
@@ -79,6 +88,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -93,8 +103,10 @@ import app.insightfultest.client.R;
 import app.insightfultest.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfultest.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.insightfultest.client.activities.familyHistoryActivity.FamilyHistoryActivity;
+import app.insightfultest.client.activities.homeActivity.HomeActivity;
 import app.insightfultest.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
 import app.insightfultest.client.activities.patientSurveyActivity.PatientSurveyActivity;
+import app.insightfultest.client.activities.physcialExamActivity.PhysicalExamActivity;
 import app.insightfultest.client.app.AppConstants;
 import app.insightfultest.client.app.IntelehealthApplication;
 import app.insightfultest.client.database.dao.EncounterDAO;
@@ -114,16 +126,10 @@ import app.insightfultest.client.syncModule.SyncUtils;
 import app.insightfultest.client.utilities.DateAndTimeUtils;
 import app.insightfultest.client.utilities.FileUtils;
 import app.insightfultest.client.utilities.Logger;
-
-import android.print.PdfPrint;
-
+import app.insightfultest.client.utilities.NetworkConnection;
 import app.insightfultest.client.utilities.SessionManager;
 import app.insightfultest.client.utilities.UrlModifiers;
 import app.insightfultest.client.utilities.UuidDictionary;
-
-import app.insightfultest.client.activities.homeActivity.HomeActivity;
-import app.insightfultest.client.activities.physcialExamActivity.PhysicalExamActivity;
-import app.insightfultest.client.utilities.NetworkConnection;
 import app.insightfultest.client.utilities.exception.DAOException;
 
 public class VisitSummaryActivity extends AppCompatActivity {
@@ -3909,6 +3915,77 @@ public class VisitSummaryActivity extends AppCompatActivity {
             } while (visitCursor.moveToNext());
         }
         visitCursor.close();
+    }
+
+    public void azureImage_push(final Context context) {
+        String base = "https://" + R.string.base_server_url + "/server/api/v1/image";
+
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(context);
+            //String URL = "http://...";
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("visitId", visitUuid);
+            jsonBody.put("patientId", patientUuid);
+            jsonBody.put("creatorId", sessionManager.getChwname());
+
+            ImagesDAO imagesDAO = new ImagesDAO();
+            List<String> imageList = imagesDAO.getImages(encounterUuidAdultIntial, UuidDictionary.COMPLEX_IMAGE_PE);
+            for (String obsImageUuid : imageList) {
+                String imageName = obsImageUuid + ".jpg";
+                jsonBody.put("file", imageName);
+                new File(obsImgdir, imageName).deleteOnExit();
+            }
+
+            List<String> imageList_AD = imagesDAO.getImages(encounterUuidAdultIntial, UuidDictionary.COMPLEX_IMAGE_AD);
+            for (String obsImageUuid : imageList_AD) {
+                String imageName = obsImageUuid + ".jpg";
+                jsonBody.put("file", imageName);
+                new File(obsImgdir, imageName).deleteOnExit();
+            }
+
+            final String requestBody = jsonBody.toString();
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, base, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.i("VOLLEY", response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("VOLLEY", error.toString());
+                }
+            }) {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    try {
+                        return requestBody == null ? null : requestBody.getBytes("utf-8");
+                    } catch (UnsupportedEncodingException uee) {
+                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                        return null;
+                    }
+                }
+
+                @Override
+                protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                    String responseString = "";
+                    if (response != null) {
+                        responseString = String.valueOf(response.statusCode);
+                        // can get more details such as response.headers
+                    }
+                    return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+                }
+            };
+
+            requestQueue.add(stringRequest);
+        } catch (JSONException | DAOException e) {
+            e.printStackTrace();
+        }
     }
 
 

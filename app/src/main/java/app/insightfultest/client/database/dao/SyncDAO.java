@@ -7,9 +7,22 @@ import android.util.Log;
 import android.widget.Toast;
 
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +30,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import app.insightfultest.client.models.dto.EncounterDTO;
+import app.insightfultest.client.models.dto.VisitAttributeDTO;
+import app.insightfultest.client.models.pushRequestApiCall.Encounter;
 import app.insightfultest.client.utilities.Logger;
 import app.insightfultest.client.utilities.NotificationID;
 import app.insightfultest.client.utilities.PatientsFrameJson;
@@ -440,4 +456,8 @@ public class SyncDAO {
 
         sessionManager.setLastTimeAgo(finalTime);
     }
+
+
+
+
 }
