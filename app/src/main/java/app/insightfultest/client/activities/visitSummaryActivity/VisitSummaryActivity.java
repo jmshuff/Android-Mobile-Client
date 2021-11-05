@@ -923,8 +923,10 @@ public class VisitSummaryActivity extends AppCompatActivity {
                     positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
 
                 }
+                azureImage_push(VisitSummaryActivity.this);
 
             }
+
         });
 
         if (intentTag != null && intentTag.equals("prior")) {
@@ -3918,7 +3920,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     }
 
     public void azureImage_push(final Context context) {
-        String base = "https://" + R.string.base_server_url + "/server/api/v1/image";
+        String base = "https://testing.visilant.org/api/v1/image/";
 
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(context);
@@ -3948,7 +3950,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, base, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Log.i("VOLLEY", response);
+                    Log.d("VOLLEY", response);
                 }
             }, new Response.ErrorListener() {
                 @Override
