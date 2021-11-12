@@ -25,6 +25,7 @@ public class Patient {
     private String caste;
     private String emergency;
     private String health_scheme;
+    private String eyecampid;
 
     public String getUuid() {
         return uuid;
@@ -185,6 +186,14 @@ public class Patient {
 
     public void setCaste(String caste) {
         this.caste = caste;
+    }
+
+    public String getEyecampid() {
+        return eyecampid;
+    }
+
+    public void setEyecampid(String eyecampid) {
+        this.eyecampid = eyecampid;
     }
 
     public String getEmergency() {

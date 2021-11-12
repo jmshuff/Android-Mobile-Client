@@ -198,6 +198,13 @@ public class SmoothUpgrade {
                     patientAttributesDTO = new PatientAttributesDTO();
                     patientAttributesDTO.setUuid(UUID.randomUUID().toString());
                     patientAttributesDTO.setPatientuuid(uuid);
+                    patientAttributesDTO.setPersonAttributeTypeUuid("00784346-7f86-43ea-a40b-608d6deacfab");
+                    patientAttributesDTO.setValue(StringUtils.getValue(cursor.getString(cursor.getColumnIndexOrThrow("eyecampid"))));
+                    patientAttributesDTOList.add(patientAttributesDTO);
+
+                    patientAttributesDTO = new PatientAttributesDTO();
+                    patientAttributesDTO.setUuid(UUID.randomUUID().toString());
+                    patientAttributesDTO.setPatientuuid(uuid);
                     patientAttributesDTO.setPersonAttributeTypeUuid("1c718819-345c-4368-aad6-d69b4c267db7");
                     patientAttributesDTO.setValue(StringUtils.getValue(cursor.getString(cursor.getColumnIndexOrThrow("education_status"))));
                     patientAttributesDTOList.add(patientAttributesDTO);

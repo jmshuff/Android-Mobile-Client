@@ -93,6 +93,7 @@
     <string name="identification_screen_prompt_state">State *</string>
     <string name="identification_screen_prompt_caste">Caste</string>
     <string name="identification_screen_prompt_economic_status">Economic status</string>
+    <string name="identification_screen_prompt_eyecampid">Eye Camp ID</string>
     <string name="identification_screen_prompt_education">Education level</string>
     <string name="identification_screen_prompt_country">Country *</string>
     <string name="identification_screen_prompt_postal_code">Postal code</string>

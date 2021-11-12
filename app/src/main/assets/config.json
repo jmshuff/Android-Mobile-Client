@@ -32,6 +32,7 @@
   "mSpo2": false,
   "mBMI": false,
   "mResp": false,
+  "eyeCampID": true,
   "health_scheme_card": false,
   "video_library": "https://www.youtube.com/playlist?list=PLY7f0i-HnvJ3XTsH3NvetrOw5ml7NNdHT",
   "privacyNotice": true,

@@ -56,6 +56,10 @@ public class PatientDTO {
     @SerializedName("gender")
     @Expose
     private String gender;
+    @SerializedName("eyecampid")
+    @Expose
+    private String eyecampid;
+
 
 
     private String patientPhoto;
@@ -211,6 +215,15 @@ public class PatientDTO {
     public void setEconomic(String economic) {
         this.economic = economic;
     }
+
+    public String getEyecampid() {
+        return eyecampid;
+    }
+
+    public void setEyecampid(String eyecampid) {
+        this.eyecampid = eyecampid;
+    }
+
 
     public List<PatientAttributesDTO> getPatientAttributesDTOList() {
         return patientAttributesDTOList;

@@ -3068,6 +3068,10 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 if (name.equalsIgnoreCase("occupation")) {
                     patient.setOccupation(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
+
+                if (name.equalsIgnoreCase("eyecampid")){
+                    patient.setEyecampid(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
+                }
                 if (name.equalsIgnoreCase("Son/wife/daughter")) {
                     patient.setSdw(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }

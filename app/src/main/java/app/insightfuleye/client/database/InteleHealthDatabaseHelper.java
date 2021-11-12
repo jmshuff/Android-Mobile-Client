@@ -80,6 +80,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "caste TEXT," +
             "health_scheme TEXT," +
             "dead Text," +
+            "eyecampid TEXT," +
             "modified_date TEXT," +
             "voided TEXT DEFAULT '0'," +
             "sync TEXT DEFAULT 'false' " +
@@ -208,6 +209,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('1b2f34f7-2bf8-4ef7-9736-f5b858afc160','ATTRIBUTE_SON_WIFE_DAUGHTER ')");
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('ecdaadb6-14a0-4ed9-b5b7-cfed87b44b87','ATTRIBUTE_OCCUPATION')");
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('8d87236c-c2cc-11de-8d13-0010c6dffd0f','ATTRIBUTE_HEALTH_CENTER')");
+            db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('00784346-7f86-43ea-a40b-608d6deacfab','ATTRIBUTE_EYE_CAMP_ID')");
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('a86ac96e-2e07-47a7-8e72-8216a1a75bfd','VISIT_TELEMEDICINE')");
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('78284507-fb71-4354-9b34-046ab205e18f','RATING')");
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('36d207d6-bee7-4b3e-9196-7d053c6eddce','COMMENTS')");

@@ -68,7 +68,7 @@ public class UuidDictionary {
     public static final String ATTRIBUTE_SON_WIFE_DAUGHTER = "1b2f34f7-2bf8-4ef7-9736-f5b858afc160";
     public static final String ATTRIBUTE_OCCUPATION = "ecdaadb6-14a0-4ed9-b5b7-cfed87b44b87";
     public static final String ATTRIBUTE_HEALTH_CENTER = "8d87236c-c2cc-11de-8d13-0010c6dffd0f";
-
+    public static final String ATTRIBUTE_EYE_CAMP_ID = "00784346-7f86-43ea-a40b-608d6deacfab";
 
     //Visit Types
     public static final String VISIT_TELEMEDICINE = "a86ac96e-2e07-47a7-8e72-8216a1a75bfd";
