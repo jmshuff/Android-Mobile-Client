@@ -139,6 +139,7 @@ public class IdentificationActivity extends AppCompatActivity {
     Spinner mState;
     EditText economicText;
     EditText educationText;
+    EditText eyeCampID;
     TextInputLayout casteLayout;
     TextInputLayout economicLayout;
     TextInputLayout educationLayout;
@@ -248,6 +249,7 @@ public class IdentificationActivity extends AppCompatActivity {
 
         mOccupation = findViewById(R.id.identification_occupation);
         //mOccupation.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25), inputFilter_Others}); //maxlength 25
+        eyeCampID = findViewById(R.id.identification_eyecampid);
 
         mCaste = findViewById(R.id.spinner_caste);
         mEducation = findViewById(R.id.spinner_education);
@@ -434,6 +436,11 @@ public class IdentificationActivity extends AppCompatActivity {
             } else {
                 mOccupation.setVisibility(View.GONE);
             }
+            if (obj.getBoolean("eyeCampID")) {
+                eyeCampID.setVisibility(View.VISIBLE);
+            } else {
+                eyeCampID.setVisibility(View.GONE);
+            }
             if (obj.getBoolean("casteLayout")) {
                 casteLayout.setVisibility(View.VISIBLE);
             } else {
@@ -491,6 +498,7 @@ public class IdentificationActivity extends AppCompatActivity {
         mPostal.setText(patient1.getPostal_code());
         mRelationship.setText(patient1.getSdw());
         mOccupation.setText(patient1.getOccupation());
+        eyeCampID.setText(patient1.getEyecampid());
         //helath_scheme...
         Log.d("Health_scheme", "Scheme: " + patient1.getHealth_scheme());
         if (patient1.getHealth_scheme() != null && !patient1.getHealth_scheme().isEmpty()) {
@@ -1139,6 +1147,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 patient1.setPatient_photo(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_photo")));
                 patient1.setHealth_scheme(idCursor.getString(idCursor.getColumnIndexOrThrow("health_scheme")));
                 patient1.setEconomic_status(idCursor.getString(idCursor.getColumnIndexOrThrow("economic_status")));
+                patient1.setEyecampid(idCursor.getString(idCursor.getColumnIndexOrThrow("eyecampid")));
 
             } while (idCursor.moveToNext());
             idCursor.close();
@@ -1170,6 +1179,9 @@ public class IdentificationActivity extends AppCompatActivity {
                 }
                 if (name.equalsIgnoreCase("occupation")) {
                     patient1.setOccupation(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
+                }
+                if (name.equalsIgnoreCase("eyecampid")) {
+                    patient1.setEyecampid(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
                 if (name.equalsIgnoreCase("Son/wife/daughter")) {
                     patient1.setSdw(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
@@ -1714,6 +1726,14 @@ public class IdentificationActivity extends AppCompatActivity {
         patientAttributesDTO.setPersonAttributeTypeUuid(patientsDAO.getUuidForAttribute("occupation"));
         patientAttributesDTO.setValue(StringUtils.getValue(mOccupation.getText().toString()));
         patientAttributesDTOList.add(patientAttributesDTO);
+
+        patientAttributesDTO = new PatientAttributesDTO();
+        patientAttributesDTO.setUuid(UUID.randomUUID().toString());
+        patientAttributesDTO.setPatientuuid(uuid);
+        patientAttributesDTO.setPersonAttributeTypeUuid(patientsDAO.getUuidForAttribute("eyecampid"));
+        patientAttributesDTO.setValue(StringUtils.getValue(eyeCampID.getText().toString()));
+        patientAttributesDTOList.add(patientAttributesDTO);
+
 
 
         if(frameLayout.getVisibility() == View.VISIBLE)
@@ -2295,6 +2315,13 @@ public class IdentificationActivity extends AppCompatActivity {
         patientAttributesDTO.setPatientuuid(uuid);
         patientAttributesDTO.setPersonAttributeTypeUuid(patientsDAO.getUuidForAttribute("occupation"));
         patientAttributesDTO.setValue(StringUtils.getValue(mOccupation.getText().toString()));
+        patientAttributesDTOList.add(patientAttributesDTO);
+
+        patientAttributesDTO = new PatientAttributesDTO();
+        patientAttributesDTO.setUuid(UUID.randomUUID().toString());
+        patientAttributesDTO.setPatientuuid(uuid);
+        patientAttributesDTO.setPersonAttributeTypeUuid(patientsDAO.getUuidForAttribute("eyecampid"));
+        patientAttributesDTO.setValue(StringUtils.getValue(eyeCampID.getText().toString()));
         patientAttributesDTOList.add(patientAttributesDTO);
 
 
