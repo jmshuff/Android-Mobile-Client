@@ -24,7 +24,7 @@
         android:src="@mipmap/ic_launcher_round" />
 
         <TextView
-            android:layout_width="162dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center"

@@ -87,6 +87,7 @@ public class Node implements Serializable {
     static String leftSympt;
     static String rightSympt;
     static String footer;
+    private String bilateralQuestion;
 
 
     //for Associated Complaints and medical history only
@@ -211,6 +212,8 @@ public class Node implements Serializable {
                 this.language = this.text;
             }
 
+            this.bilateralQuestion= jsonNode.optString("bilateral");
+
 
             //Only for physical exams
             if (!this.language.isEmpty()) {
@@ -289,6 +292,7 @@ public class Node implements Serializable {
         this.required = source.required;
         this.positiveCondition = source.positiveCondition;
         this.negativeCondition = source.negativeCondition;
+        this.bilateralQuestion= source.bilateralQuestion;
     }
 
     public static void subLevelQuestion(final Node node, final Activity context, final QuestionsAdapter callingAdapter,

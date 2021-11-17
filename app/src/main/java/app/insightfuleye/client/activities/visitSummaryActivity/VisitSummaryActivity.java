@@ -218,6 +218,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     RelativeLayout uploadButton;
     RelativeLayout downloadButton;
     ArrayList<String> physicalExams;
+    RelativeLayout endVisitButton;
 
     CardView diagnosisCard;
     CardView prescriptionCard;
@@ -710,6 +711,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         editAddDocs = findViewById(R.id.imagebutton_edit_additional_document);
         uploadButton = findViewById(R.id.button_upload);
         downloadButton = findViewById(R.id.button_download);
+        endVisitButton= findViewById(R.id.button_endvisit);
+
 
         //additionalDocumentsDownlaod = findViewById(R.id.imagebutton_download_additional_document);
         onExaminationDownload = findViewById(R.id.imagebutton_download_physexam);
@@ -1521,6 +1524,12 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 startDownload(UuidDictionary.COMPLEX_IMAGE_AD);
             }
         }); */
+        endVisitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                endVisit();
+            }
+        });
         onExaminationDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1530,6 +1539,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
         doQuery();
     }
+
 
     /**
      * @param uuid the visit uuid of the patient visit records is passed to the function.
@@ -3841,8 +3851,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
     private void addDownloadButton() {
         if (!downloadButton.isEnabled()) {
-            downloadButton.setEnabled(true);
-            downloadButton.setVisibility(View.VISIBLE);
+            downloadButton.setEnabled(false); //JS changed to hide download button
+            downloadButton.setVisibility(View.GONE);
         }
     }
 
