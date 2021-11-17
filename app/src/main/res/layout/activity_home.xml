@@ -240,6 +240,8 @@
                             android:gravity="center_vertical"
                             android:padding="16dp">
 
+
+
                             <ImageView
                                 android:id="@+id/iv_whatsapp_helpline"
                                 android:layout_width="30dp"
@@ -264,9 +266,160 @@
 
                         </RelativeLayout>
 
-
-
                 </androidx.cardview.widget.CardView>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="0dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_weight="1">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/settings_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:cardCornerRadius="5dp"
+                        app:cardElevation="5dp"
+                        app:cardUseCompatPadding="true">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="14dp">
+
+
+                                <ImageView
+                                    android:id="@+id/settings_imageView"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_centerHorizontal="true"
+                                    android:contentDescription="TODO"
+                                    app:srcCompat="@drawable/ic_baseline_settings_24" />
+
+                                <TextView
+                                    android:id="@+id/settings_textview"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerHorizontal="true"
+                                    android:layout_below="@+id/settings_imageView"
+                                    android:text="@string/action_settings"
+                                    android:includeFontPadding="false"
+                                    android:fontFamily="@font/lato_medium"
+                                    android:textSize="14sp"/>
+                            </RelativeLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        </LinearLayout>
+
+                        <!-- Icon Credits:- <a target="_blank" href="https://icons8.com/icons/set/whatsapp">WhatsApp icon</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>-->
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:layout_toRightOf="@+id/settings"
+                            android:layout_marginHorizontal="8dp"
+                            android:layout_weight="1">
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/updateProtocols_card"
+
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/white"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                app:cardCornerRadius="5dp"
+                                app:cardElevation="5dp"
+                                app:cardUseCompatPadding="true">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/updateProtocols"
+                                android:padding="14dp"
+                                >
+
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:id="@+id/update_imageView"
+                                android:contentDescription="TODO"
+                                android:layout_centerHorizontal="true"
+                                app:srcCompat="@drawable/ic_baseline_repeat_24" />
+
+                            <TextView
+                                android:id="@+id/update_textview"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_below="@+id/update_imageView"
+                                android:fontFamily="@font/lato_medium"
+                                android:includeFontPadding="false"
+                                android:text="@string/update_protocols"
+                                android:textSize="14sp" />
+                            </RelativeLayout>
+                            </androidx.cardview.widget.CardView>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@+id/updateProtocols"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical">
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/logout_card"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/white"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                app:cardCornerRadius="5dp"
+                                app:cardElevation="5dp"
+                                app:cardUseCompatPadding="true">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/logout"
+                                android:padding="14dp"
+                                >
+
+                            <ImageView
+                                android:id="@+id/logout_imageView"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_centerHorizontal="true"
+                                android:contentDescription="TODO"
+                                app:srcCompat="@drawable/ic_person_black_18dp" />
+
+                            <TextView
+                                android:id="@+id/logout_textview"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/logout_imageView"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginStart="10dp"
+                                android:fontFamily="@font/lato_medium"
+                                android:includeFontPadding="false"
+                                android:text="@string/menu_option_logout"
+                                android:textSize="14sp" />
+
+                            </RelativeLayout>
+                            </androidx.cardview.widget.CardView>
+
+                        </LinearLayout>
+                    </LinearLayout>
+
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardview_home"

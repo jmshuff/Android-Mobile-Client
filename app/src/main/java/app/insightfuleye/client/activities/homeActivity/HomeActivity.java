@@ -113,6 +113,7 @@ public class HomeActivity extends AppCompatActivity {
     Myreceiver reMyreceive;
     SyncUtils syncUtils = new SyncUtils();
     CardView c1, c2, c3, c4, c5, c6;
+    CardView settings_card, updateProtocols_card, logout_card;
     private String key = null;
     private String licenseUrl = null;
 
@@ -171,6 +172,11 @@ public class HomeActivity extends AppCompatActivity {
         c4 = findViewById(R.id.cardview_active_patients);
         c5 = findViewById(R.id.cardview_video_libraby);
         c6 = findViewById(R.id.cardview_help_whatsapp);
+        settings_card=findViewById(R.id.settings_card);
+        updateProtocols_card=findViewById(R.id.updateProtocols_card);
+        logout_card=findViewById(R.id.logout_card);
+
+        c6.setVisibility(View.GONE); //JS remove help button
 
         //card textview referrenced to fix bug of localization not working in some cases...
         newPatient_textview = findViewById(R.id.newPatient_textview);
@@ -334,6 +340,104 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         showProgressbar();
+
+        settings_card.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View V){
+                settings();
+            }
+        });
+
+        updateProtocols_card.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View V){
+                if (NetworkConnection.isOnline(HomeActivity.this)) {
+
+                    if (!sessionManager.getLicenseKey().isEmpty()) {
+
+                        String licenseUrl = sessionManager.getMindMapServerUrl();
+                        String licenseKey = sessionManager.getLicenseKey();
+                        getMindmapDownloadURL("https://" + licenseUrl + ":3004/", licenseKey);
+
+                    } else {
+                        MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(HomeActivity.this);
+                        // AlertDialog.Builder dialog = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
+                        LayoutInflater li = LayoutInflater.from(HomeActivity.this);
+                        View promptsView = li.inflate(R.layout.dialog_mindmap_cred, null);
+                        dialog.setTitle(getString(R.string.enter_license_key))
+                                .setView(promptsView)
+                                .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                        Dialog d = (Dialog) dialog;
+
+                                        EditText etURL = d.findViewById(R.id.licenseurl);
+                                        EditText etKey = d.findViewById(R.id.licensekey);
+                                        String url = etURL.getText().toString().trim();
+                                        String key = etKey.getText().toString().trim();
+
+                                        if (url.isEmpty()) {
+                                            etURL.setError(getResources().getString(R.string.enter_server_url));
+                                            etURL.requestFocus();
+                                            return;
+                                        }
+                                        if (url.contains(":")) {
+                                            etURL.setError(getResources().getString(R.string.invalid_url));
+                                            etURL.requestFocus();
+                                            return;
+                                        }
+                                        if (key.isEmpty()) {
+                                            etKey.setError(getResources().getString(R.string.enter_license_key));
+                                            etKey.requestFocus();
+                                            return;
+                                        }
+
+                                        sessionManager.setMindMapServerUrl(url);
+                                        getMindmapDownloadURL("http://" + url + ":3004/", key);
+
+                                    }
+                                })
+                                .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        Dialog builderDialog = dialog.show();
+                        IntelehealthApplication.setAlertDialogCustomTheme(HomeActivity.this, builderDialog);
+
+                    }
+
+                } else {
+                    Toast.makeText(context, getString(R.string.mindmap_internect_connection), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+        logout_card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialAlertDialogBuilder alertdialogBuilder = new MaterialAlertDialogBuilder(HomeActivity.this);
+                alertdialogBuilder.setMessage(R.string.sure_to_logout);
+                alertdialogBuilder.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        logout();
+                    }
+                });
+                alertdialogBuilder.setNegativeButton(R.string.generic_no, null);
+                AlertDialog alertDialog = alertdialogBuilder.create();
+                alertDialog.show();
+                Button positiveButton = alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE);
+                Button negativeButton = alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE);
+                positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+                negativeButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+                IntelehealthApplication.setAlertDialogCustomTheme(HomeActivity.this, alertDialog);
+
+            }
+        });
     }
 
     InstallStateUpdatedListener installStateUpdatedListener = new
@@ -474,6 +578,7 @@ public class HomeActivity extends AppCompatActivity {
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -482,6 +587,9 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+ */
+
+/*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -579,7 +687,7 @@ public class HomeActivity extends AppCompatActivity {
 //            case R.id.restoreOption:
 //                manageBackup(false, false); // to restore app data if db is empty
 //                return true;
-
+/*
             case R.id.logoutOption:
 //                manageBackup(true, false);
 
@@ -605,6 +713,7 @@ public class HomeActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    */
 
     /**
      * This method starts intent to another activity to change settings
