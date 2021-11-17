@@ -477,7 +477,7 @@
     <string name="health_worker">Health worker</string>
     <string name="priority">Priority</string>
     <string name="server_url">Server url</string>
-    <string name="sync">Refresh</string>
+    <string name="sync">Upload</string>
     <string name="update_protocols">Update Protocols</string>
     <string name="end_all_visit">End All Visit</string>
     <string name="filter_by_creator">Filter by creator</string>
@@ -532,7 +532,7 @@
     <string name="protocols_downloaded_successfully">Protocols Downloaded Successfully!</string>
     <string name="no_protocols_found">No protocols found</string>
     <string name="unable_to_get_proper_response">There was a problem downloading protocols, Please contact system administrator</string>
-    <string name="last_synced">Last Refreshed - </string>
+    <string name="last_synced">Last Uploaded - </string>
     <string name="today_visits">Today\'s Visits</string>
     <string name="active_visits">Active Visits</string>
     <string name="day">day</string>
@@ -645,7 +645,7 @@
     <string name="download_presc_before_sharing">Download prescription first before sharing</string>
     <string name="please_select_specialization">Please select specialization</string>
     <string name="setup">Setup</string>
-    <string name="refresh">Refresh</string>
+    <string name="refresh">Upload</string>
     <string name="gujarati_hello_thankyou_for_using_myteledoc_">"હેલ્લો, માયટેલીડોકનો ઉપયોગ કરવા બદલ આભાર. તમારૂં દવાનું પ્રિસ્ક્રીપ્શન મેળવવા અહીં પર ક્લિક કરો, "</string>
     <string name="gujarati_and_enter_your_patient_id">" અને તમારો પેશન્ટ ઓળખનંબર "</string>
     <string name="gujarati_end_statement">" દાખલ કરો."</string>
