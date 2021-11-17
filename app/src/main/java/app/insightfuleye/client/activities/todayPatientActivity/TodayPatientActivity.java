@@ -7,7 +7,10 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +30,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -110,6 +114,7 @@ public class TodayPatientActivity extends AppCompatActivity {
             }
         }
 
+
         //Get patientUUID from visitList
         for (int i = 0; i < encounterVisitUUID.size(); i++) {
 
@@ -135,8 +140,8 @@ public class TodayPatientActivity extends AppCompatActivity {
         List<TodayPatientModel> todayPatientList = new ArrayList<>();
         Date cDate = new Date();
         String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
-        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.openmrs_id " +
-                "FROM tbl_visit a, tbl_patient b  " +
+        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, a.creator,  b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.openmrs_id " +
+                "FROM tbl_visit a, tbl_patient b " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND a.startdate LIKE '" + currentDate + "T%'   " +
                 "GROUP BY a.uuid ORDER BY a.patientuuid ASC";
@@ -158,7 +163,8 @@ public class TodayPatientActivity extends AppCompatActivity {
                                 cursor.getString(cursor.getColumnIndexOrThrow("last_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("date_of_birth")),
                                 StringUtils.mobileNumberEmpty(phoneNumber(cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")))),
-                                cursor.getString(cursor.getColumnIndexOrThrow("sync")))
+                                cursor.getString(cursor.getColumnIndexOrThrow("sync")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("creator")))
                         );
                     } catch (DAOException e) {
                         e.printStackTrace();
@@ -172,7 +178,7 @@ public class TodayPatientActivity extends AppCompatActivity {
 
         if (!todayPatientList.isEmpty()) {
             for (TodayPatientModel todayPatientModel : todayPatientList)
-                Log.i(TAG, todayPatientModel.getFirst_name() + " " + todayPatientModel.getLast_name());
+                Log.i(TAG, todayPatientModel.getFirst_name() + " " + todayPatientModel.getLast_name() + todayPatientModel.getCreator());
 
             TodayPatientAdapter mTodayPatientAdapter = new TodayPatientAdapter(todayPatientList, TodayPatientActivity.this, listPatientUUID);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(TodayPatientActivity.this);
@@ -182,6 +188,52 @@ public class TodayPatientActivity extends AppCompatActivity {
                     DividerItemDecoration.VERTICAL));*/
             mTodayPatientList.setAdapter(mTodayPatientAdapter);
         }
+
+        int totalVisits=todayPatientList.size();
+        Log.d("Number of visits: ", String.valueOf(totalVisits));
+
+        //get Volunteer list
+        List<String> todayVolunteerList = new ArrayList<>();
+
+        Log.d(TAG, String.valueOf(todayVolunteerList));
+        for (TodayPatientModel todayPatientModel : todayPatientList){
+            //todayVolunteerList.add(todayPatientModel.getCreator()); //create list of all volunteers for each visit
+            String volunteerQuery = "SELECT given_name, family_name, uuid " +
+                    "FROM tbl_provider " +
+                    "WHERE uuid = \"" + todayPatientModel.getCreator() +"\"";
+            final Cursor cursor1 = db.rawQuery(volunteerQuery, null);
+            if (cursor1 != null) {
+                if (cursor1.moveToFirst()) {
+                    do {
+                        todayVolunteerList.add(cursor1.getString(cursor1.getColumnIndexOrThrow("given_name")) + " " + cursor1.getString(cursor1.getColumnIndexOrThrow("family_name")));
+                    } while (cursor1.moveToNext());
+                }
+            }
+            if (cursor1 != null) {
+                cursor1.close();
+            }
+        }
+        Log.i("testall", String.valueOf(todayVolunteerList));
+
+
+
+        //get unique volunteer counts
+        List<String> uniqueVolunteers = new ArrayList<>();
+        List<Integer> volunteerCounts = new ArrayList<>();
+        Collections.sort(todayVolunteerList);
+        for (String volunteer : todayVolunteerList){
+            if (!uniqueVolunteers.contains(volunteer)) {
+                uniqueVolunteers.add(volunteer);
+                volunteerCounts.add(1);
+            }
+            else{
+                volunteerCounts.set(volunteerCounts.size() - 1, volunteerCounts.get(volunteerCounts.size() - 1) + 1);
+            }
+        }
+        Log.i(TAG, String.valueOf(uniqueVolunteers));
+        Log.i(TAG, String.valueOf(volunteerCounts));
+
+
 
     }
 
@@ -301,7 +353,8 @@ public class TodayPatientActivity extends AppCompatActivity {
                                 cursor.getString(cursor.getColumnIndexOrThrow("last_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("date_of_birth")),
                                 StringUtils.mobileNumberEmpty(phoneNumber(cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")))),
-                                cursor.getString(cursor.getColumnIndexOrThrow("sync")))
+                                cursor.getString(cursor.getColumnIndexOrThrow("sync")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("creator")))
                         );
                     } catch (DAOException e) {
                         e.printStackTrace();
