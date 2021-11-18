@@ -26,10 +26,12 @@ import android.widget.Button;
 
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.common.collect.Lists;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -140,10 +142,11 @@ public class TodayPatientActivity extends AppCompatActivity {
         List<TodayPatientModel> todayPatientList = new ArrayList<>();
         Date cDate = new Date();
         String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
-        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, a.creator,  b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.openmrs_id " +
-                "FROM tbl_visit a, tbl_patient b " +
+        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, c.provider_uuid,  b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.openmrs_id " +
+                "FROM tbl_visit a, tbl_patient b, tbl_encounter c " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND a.startdate LIKE '" + currentDate + "T%'   " +
+                "AND c.visituuid=a.uuid " +
                 "GROUP BY a.uuid ORDER BY a.patientuuid ASC";
         Logger.logD(TAG, query);
         final Cursor cursor = db.rawQuery(query, null);
@@ -164,7 +167,7 @@ public class TodayPatientActivity extends AppCompatActivity {
                                 cursor.getString(cursor.getColumnIndexOrThrow("date_of_birth")),
                                 StringUtils.mobileNumberEmpty(phoneNumber(cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")))),
                                 cursor.getString(cursor.getColumnIndexOrThrow("sync")),
-                                cursor.getString(cursor.getColumnIndexOrThrow("creator")))
+                                cursor.getString(cursor.getColumnIndexOrThrow("provider_uuid")))
                         );
                     } catch (DAOException e) {
                         e.printStackTrace();
@@ -178,7 +181,7 @@ public class TodayPatientActivity extends AppCompatActivity {
 
         if (!todayPatientList.isEmpty()) {
             for (TodayPatientModel todayPatientModel : todayPatientList)
-                Log.i(TAG, todayPatientModel.getFirst_name() + " " + todayPatientModel.getLast_name() + todayPatientModel.getCreator());
+                Log.i(TAG, todayPatientModel.getFirst_name() + " " + todayPatientModel.getLast_name() + todayPatientModel.getProvider_uuid());
 
             TodayPatientAdapter mTodayPatientAdapter = new TodayPatientAdapter(todayPatientList, TodayPatientActivity.this, listPatientUUID);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(TodayPatientActivity.this);
@@ -192,49 +195,106 @@ public class TodayPatientActivity extends AppCompatActivity {
         int totalVisits=todayPatientList.size();
         Log.d("Number of visits: ", String.valueOf(totalVisits));
 
+        ProviderDAO providerDAO = new ProviderDAO();
+        ArrayList selectedItems = new ArrayList<>();
+        String[] creator_names = null;
+        String[] creator_uuid = null;
+        try {
+            creator_names = providerDAO.getProvidersList().toArray(new String[0]);
+            creator_uuid = providerDAO.getProvidersUuidList().toArray(new String[0]);
+        } catch (DAOException e) {
+            e.printStackTrace();
+        }
+        Log.d("creator names", Arrays.toString(creator_uuid));
         //get Volunteer list
-        List<String> todayVolunteerList = new ArrayList<>();
-
-        Log.d(TAG, String.valueOf(todayVolunteerList));
-        for (TodayPatientModel todayPatientModel : todayPatientList){
-            //todayVolunteerList.add(todayPatientModel.getCreator()); //create list of all volunteers for each visit
-            String volunteerQuery = "SELECT given_name, family_name, uuid " +
-                    "FROM tbl_provider " +
-                    "WHERE uuid = \"" + todayPatientModel.getCreator() +"\"";
-            final Cursor cursor1 = db.rawQuery(volunteerQuery, null);
-            if (cursor1 != null) {
-                if (cursor1.moveToFirst()) {
-                    do {
-                        todayVolunteerList.add(cursor1.getString(cursor1.getColumnIndexOrThrow("given_name")) + " " + cursor1.getString(cursor1.getColumnIndexOrThrow("family_name")));
-                    } while (cursor1.moveToNext());
-                }
-            }
-            if (cursor1 != null) {
-                cursor1.close();
+        /*List<List<String>> allVolunteerList = new ArrayList<>();
+        String volunteerQuery = "SELECT chwname, creator_uuid_cred " +
+                "FROM tbl_user_credentials";
+        final Cursor cursor1 = db.rawQuery(volunteerQuery, null);
+        if (cursor1 != null) {
+            if (cursor1.moveToFirst()) {
+                do {
+                        //Log.d("uuid", cursor1.getColumnIndexOrThrow("uuid") + " " + cursor1.getColumnIndexOrThrow("given_name"));
+                        //if (String.valueOf(cursor1.getString(cursor1.getColumnIndexOrThrow("uuid")))==volunteerUuid) {
+                    allVolunteerList.add(Lists.newArrayList(cursor1.getString(cursor1.getColumnIndexOrThrow("chwname")), cursor1.getString(cursor1.getColumnIndexOrThrow("creator_uuid_cred"))));
+                        //}
+                } while (cursor1.moveToNext());
             }
         }
-        Log.i("testall", String.valueOf(todayVolunteerList));
-
-
-
+        if (cursor1 != null) {
+            cursor1.close();
+        }
+        Log.i("testall", String.valueOf(allVolunteerList));
+        List<String> todayVolunteerList= new ArrayList<>();
+        for (TodayPatientModel todayPatientModel : todayPatientList){
+            String volunteerUuid= todayPatientModel.getCreator();
+            Log.d(TAG, volunteerUuid);
+            for (List<String> volunteer: allVolunteerList){
+                if(volunteer.get(1)==volunteerUuid){
+                    todayVolunteerList.add(volunteer.get(0));
+                }
+            }
+        }
+        Log.d("Today volunteer", String.valueOf(todayVolunteerList));
         //get unique volunteer counts
+
+         */
         List<String> uniqueVolunteers = new ArrayList<>();
         List<Integer> volunteerCounts = new ArrayList<>();
-        Collections.sort(todayVolunteerList);
-        for (String volunteer : todayVolunteerList){
-            if (!uniqueVolunteers.contains(volunteer)) {
-                uniqueVolunteers.add(volunteer);
+        for (TodayPatientModel todayPatientModel : todayPatientList){
+            if (!uniqueVolunteers.contains(todayPatientModel.getProvider_uuid())) {
+                uniqueVolunteers.add(todayPatientModel.getProvider_uuid());
                 volunteerCounts.add(1);
             }
             else{
-                volunteerCounts.set(volunteerCounts.size() - 1, volunteerCounts.get(volunteerCounts.size() - 1) + 1);
+                int i= findIndex(uniqueVolunteers, String.valueOf(todayPatientModel.getProvider_uuid()));
+                volunteerCounts.set(i, volunteerCounts.get(i) + 1);
             }
+        }
+        Log.i(TAG, String.valueOf(uniqueVolunteers));
+        Log.i(TAG, String.valueOf(volunteerCounts));
+        int k=0;
+        for (String volunteer : uniqueVolunteers){
+
+            int i= 0;
+            while (!creator_uuid[i].equals(volunteer)){
+                i++;
+            }
+            uniqueVolunteers.set(k, creator_names[i]);
+            k++;
         }
         Log.i(TAG, String.valueOf(uniqueVolunteers));
         Log.i(TAG, String.valueOf(volunteerCounts));
 
 
 
+
+    }
+    public static int findIndex(List<String> arr, String t)
+    {
+        // if array is Null
+        if (arr == null) {
+            return 0;
+        }
+
+        // find length of array
+        int len = arr.size();
+        int i = 0;
+
+        // traverse in the array
+        while (i < len) {
+            Log.d("match", arr.get(i) + " " + t);
+            // if the i-th element is t
+            // then return the index
+            if (arr.get(i).equals(t)) {
+                Log.d("matched", "yes");
+                return i;
+            }
+            else {
+                i = i + 1;
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -354,7 +414,7 @@ public class TodayPatientActivity extends AppCompatActivity {
                                 cursor.getString(cursor.getColumnIndexOrThrow("date_of_birth")),
                                 StringUtils.mobileNumberEmpty(phoneNumber(cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")))),
                                 cursor.getString(cursor.getColumnIndexOrThrow("sync")),
-                                cursor.getString(cursor.getColumnIndexOrThrow("creator")))
+                                cursor.getString(cursor.getColumnIndexOrThrow("provider_uuid")))
                         );
                     } catch (DAOException e) {
                         e.printStackTrace();

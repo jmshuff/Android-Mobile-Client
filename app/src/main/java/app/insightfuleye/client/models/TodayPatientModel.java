@@ -12,10 +12,10 @@ public class TodayPatientModel {
     String date_of_birth;
     String phone_number;
     String sync;
-    String creator;
+    String provider_uuid;
 
 
-    public TodayPatientModel(String uuid, String patientuuid, String startdate, String enddate, String openmrs_id, String first_name, String middle_name, String last_name, String date_of_birth, String phone_number, String sync, String creator) {
+    public TodayPatientModel(String uuid, String patientuuid, String startdate, String enddate, String openmrs_id, String first_name, String middle_name, String last_name, String date_of_birth, String phone_number, String sync, String provider_uuid) {
         this.uuid = uuid;
         this.patientuuid = patientuuid;
         this.startdate = startdate;
@@ -27,7 +27,7 @@ public class TodayPatientModel {
         this.date_of_birth = date_of_birth;
         this.phone_number = phone_number;
         this.sync = sync;
-        this.creator=creator;
+        this.provider_uuid=provider_uuid;
     }
 
 
@@ -119,8 +119,8 @@ public class TodayPatientModel {
         this.sync = sync;
     }
 
-    public String getCreator() {return creator;}
+    public String getProvider_uuid() {return provider_uuid;}
 
-    public void setCreator(String creator) {this.creator=creator;}
+    public void setProvider_uuid(String provider_uuid) {this.provider_uuid=provider_uuid;}
 
 }
