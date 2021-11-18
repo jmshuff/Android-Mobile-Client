@@ -651,5 +651,6 @@
     <string name="gujarati_and_enter_your_patient_id">" અને તમારો પેશન્ટ ઓળખનંબર "</string>
     <string name="gujarati_end_statement">" દાખલ કરો."</string>
     <string name="powered_by_intelehealth">Powered by Intelehealth</string>
+    <string name="total_visits_today">Total Visits Today:</string>
 
 </resources>

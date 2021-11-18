@@ -11,9 +11,11 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,7 +24,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -47,6 +51,7 @@ import app.insightfuleye.client.database.dao.VisitsDAO;
 import app.insightfuleye.client.models.TodayPatientModel;
 import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.models.dto.VisitDTO;
+import app.insightfuleye.client.models.volunteerTotalModel;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.activities.homeActivity.HomeActivity;
@@ -60,8 +65,12 @@ public class TodayPatientActivity extends AppCompatActivity {
     SessionManager sessionManager = null;
     RecyclerView mTodayPatientList;
    MaterialAlertDialogBuilder dialogBuilder;
+   TextView totalPatients;
+   CardView totalPatientCard;
+   private RecyclerView volunteerRecyclerView;
 
     private ArrayList<String> listPatientUUID = new ArrayList<String>();
+    private ArrayList<volunteerTotalModel> volunteerList=new ArrayList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,14 +93,30 @@ public class TodayPatientActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         mTodayPatientList = findViewById(R.id.today_patient_recycler_view);
+        volunteerRecyclerView=findViewById(R.id.volunteer_total_recycler_view);
+        volunteerRecyclerView.setVisibility(View.GONE);
         sessionManager = new SessionManager(this);
+        totalPatients=findViewById(R.id.totalPatientsNum_textView);
+        totalPatientCard=findViewById(R.id.totalPatients);
         db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         if (sessionManager.isPullSyncFinished()) {
             doQuery();
         }
 
         getVisits();
+        setVolunteerAdapter();
 
+        totalPatientCard.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if(volunteerRecyclerView.getVisibility()==View.VISIBLE){
+                    volunteerRecyclerView.setVisibility(View.GONE);
+                }
+                else{
+                    volunteerRecyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     private void getVisits() {
@@ -194,6 +219,8 @@ public class TodayPatientActivity extends AppCompatActivity {
 
         int totalVisits=todayPatientList.size();
         Log.d("Number of visits: ", String.valueOf(totalVisits));
+        totalPatients.setText(String.valueOf(totalVisits));
+
 
         ProviderDAO providerDAO = new ProviderDAO();
         ArrayList selectedItems = new ArrayList<>();
@@ -206,39 +233,8 @@ public class TodayPatientActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         Log.d("creator names", Arrays.toString(creator_uuid));
-        //get Volunteer list
-        /*List<List<String>> allVolunteerList = new ArrayList<>();
-        String volunteerQuery = "SELECT chwname, creator_uuid_cred " +
-                "FROM tbl_user_credentials";
-        final Cursor cursor1 = db.rawQuery(volunteerQuery, null);
-        if (cursor1 != null) {
-            if (cursor1.moveToFirst()) {
-                do {
-                        //Log.d("uuid", cursor1.getColumnIndexOrThrow("uuid") + " " + cursor1.getColumnIndexOrThrow("given_name"));
-                        //if (String.valueOf(cursor1.getString(cursor1.getColumnIndexOrThrow("uuid")))==volunteerUuid) {
-                    allVolunteerList.add(Lists.newArrayList(cursor1.getString(cursor1.getColumnIndexOrThrow("chwname")), cursor1.getString(cursor1.getColumnIndexOrThrow("creator_uuid_cred"))));
-                        //}
-                } while (cursor1.moveToNext());
-            }
-        }
-        if (cursor1 != null) {
-            cursor1.close();
-        }
-        Log.i("testall", String.valueOf(allVolunteerList));
-        List<String> todayVolunteerList= new ArrayList<>();
-        for (TodayPatientModel todayPatientModel : todayPatientList){
-            String volunteerUuid= todayPatientModel.getCreator();
-            Log.d(TAG, volunteerUuid);
-            for (List<String> volunteer: allVolunteerList){
-                if(volunteer.get(1)==volunteerUuid){
-                    todayVolunteerList.add(volunteer.get(0));
-                }
-            }
-        }
-        Log.d("Today volunteer", String.valueOf(todayVolunteerList));
-        //get unique volunteer counts
 
-         */
+
         List<String> uniqueVolunteers = new ArrayList<>();
         List<Integer> volunteerCounts = new ArrayList<>();
         for (TodayPatientModel todayPatientModel : todayPatientList){
@@ -266,8 +262,21 @@ public class TodayPatientActivity extends AppCompatActivity {
         Log.i(TAG, String.valueOf(uniqueVolunteers));
         Log.i(TAG, String.valueOf(volunteerCounts));
 
+        //add to model
+        int j=0;
+        while (j < uniqueVolunteers.size()){
+            volunteerList.add(new volunteerTotalModel(uniqueVolunteers.get(j), volunteerCounts.get(j)));
+            j++;
+        }
+        Log.d("length", String.valueOf(volunteerList.size()));
+    }
 
-
+    private void setVolunteerAdapter(){
+        recyclerVolunteerAdapter adapter= new recyclerVolunteerAdapter(volunteerList);
+        RecyclerView.LayoutManager layoutManager= new LinearLayoutManager(getApplicationContext());
+        volunteerRecyclerView.setLayoutManager(layoutManager);
+        volunteerRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        volunteerRecyclerView.setAdapter(adapter);
 
     }
     public static int findIndex(List<String> arr, String t)
