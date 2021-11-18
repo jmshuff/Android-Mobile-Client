@@ -1125,7 +1125,7 @@ public class IdentificationActivity extends AppCompatActivity {
         String[] patientColumns = {"uuid", "first_name", "middle_name", "last_name",
                 "date_of_birth", "address1", "address2", "city_village", "state_province",
                 "postal_code", "country", "phone_number", "gender", "sdw", "occupation", "patient_photo",
-                "economic_status", "education_status", "caste", "health_scheme", "eyecampid"};
+                "economic_status", "education_status", "caste", "health_scheme"};
         Cursor idCursor = db.query("tbl_patient", patientColumns, patientSelection, patientArgs, null, null, null);
         if (idCursor.moveToFirst()) {
             do {
@@ -1147,7 +1147,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 patient1.setPatient_photo(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_photo")));
                 patient1.setHealth_scheme(idCursor.getString(idCursor.getColumnIndexOrThrow("health_scheme")));
                 patient1.setEconomic_status(idCursor.getString(idCursor.getColumnIndexOrThrow("economic_status")));
-                patient1.setEyecampid(idCursor.getString(idCursor.getColumnIndexOrThrow("eyecampid")));
+                //imagpatient1.setEyecampid(idCursor.getString(idCursor.getColumnIndexOrThrow("eyecampid")));
 
             } while (idCursor.moveToNext());
             idCursor.close();

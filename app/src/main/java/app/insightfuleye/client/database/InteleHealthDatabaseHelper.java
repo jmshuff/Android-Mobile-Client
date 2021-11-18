@@ -79,11 +79,11 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "education_status TEXT," +
             "caste TEXT," +
             "health_scheme TEXT," +
-            "eyecampid TEXT," +
             "dead Text," +
             "modified_date TEXT," +
             "voided TEXT DEFAULT '0'," +
-            "sync TEXT DEFAULT 'false' " +
+            "sync TEXT DEFAULT 'false' ," +
+            "eyecampid TEXT" +
             ")";
 
     public static final String CREATE_ATTRIB_MAIN = "CREATE TABLE IF NOT EXISTS tbl_patient_attribute (" +
