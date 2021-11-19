@@ -285,7 +285,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     private boolean isRespiratory = false;
 
 
-    @Override
+   /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_visit_summary, menu);
@@ -308,6 +308,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    */
+
     private BroadcastReceiver broadcastReceiverForIamgeDownlaod = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -317,6 +319,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
         }
     };
+
+
 
     public void registerBroadcastReceiverDynamically() {
         IntentFilter filter = new IntentFilter();
@@ -346,7 +350,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
         super.onDestroy();
 
     }
-
+/*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -414,6 +418,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+ */
 
 
     @Override
@@ -1040,7 +1046,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             patHistView.setText(Html.fromHtml(patHistory.getValue()));
         if (phyExam.getValue() != null)
             //physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
-            physFindingsView.setText(Html.fromHtml(physicalDisplay));
+            physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
 
 /*
         editVitals.setOnClickListener(new View.OnClickListener() {
@@ -1281,7 +1287,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
                 final TextView physicalText = convertView.findViewById(R.id.textView_entry);
                 if (phyExam.getValue() != null)
-                    physicalText.setText(Html.fromHtml(physicalDisplay));
+                    physicalText.setText(Html.fromHtml(phyExam.getValue()));
                 physicalText.setEnabled(false);
 
                 physicalDialog.setPositiveButton(getString(R.string.generic_manual_entry), new DialogInterface.OnClickListener() {
@@ -1527,7 +1533,9 @@ public class VisitSummaryActivity extends AppCompatActivity {
         endVisitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                endVisit();
+                Intent i = new Intent(VisitSummaryActivity.this, HomeActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
             }
         });
         onExaminationDownload.setOnClickListener(new View.OnClickListener() {
