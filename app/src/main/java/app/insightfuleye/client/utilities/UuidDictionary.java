@@ -30,7 +30,8 @@ public class UuidDictionary {
     public static final String PinholeRight = "50492e1a-db2c-438f-bd9b-f8b7c68920f8";
     public static final String PinholeLeft = "e7f1a349-8bb3-44a2-9d6a-260fffd01e7b";
     public static final String VolunteerReferral = "f83b9e96-8247-4354-9ba6-1196e3b56500";
-    public static final String VolunteerReferralReason = "d33cecbf-03b8-47ca-8ef7-771343c31d40";
+    public static final String VolunteerDiagnosisRight = "d33cecbf-03b8-47ca-8ef7-771343c31d40";
+    public static final String VolunteerDiagnosisLeft = "44535c45-d3b4-4190-b423-b21e28633c02";
     public static final String VolunteerReferralLocation= "413a81ab-35a7-4660-8a66-9f29dd33e2bf";
 
     public static final String TELEMEDICINE_DIAGNOSIS = "537bb20d-d09d-4f88-930b-cc45c7d662df";

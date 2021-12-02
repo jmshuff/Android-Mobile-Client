@@ -381,10 +381,22 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
 
         obsDTO = new ObsDTO();
-        obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralReason);
+        obsDTO.setConceptuuid(UuidDictionary.VolunteerDiagnosisRight);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
-        obsDTO.setValue(physicalExamMap.getVolunteerReferralReason());
+        obsDTO.setValue(physicalExamMap.getVolunteerDiagnosisRight());
+
+        try {
+            obsDAO.insertObs(obsDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        obsDTO = new ObsDTO();
+        obsDTO.setConceptuuid(UuidDictionary.VolunteerDiagnosisLeft);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
+        obsDTO.setCreator(sessionManager.getCreatorID());
+        obsDTO.setValue(physicalExamMap.getVolunteerDiagnosisLeft());
 
         try {
             obsDAO.insertObs(obsDTO);
@@ -519,18 +531,34 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         if (category.getText().equals("Referral")){
             String volunteerReferral=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferral(volunteerReferral);
+            physicalExamMap.setVolunteerReferral(volunteerReferral.split(" ")[0]);
+            if (volunteerReferral.split(" ").length > 1){
+                physicalExamMap.setVolunteerReferralLocation(volunteerReferral.split(" ")[1]);
+            }
         }
 
         if (category.getText().equals("Referral Reason")){
             String volunteerReferralReason=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferralReason(volunteerReferralReason);
+            String diagnosisRight= "";
+            String diagnosisLeft="";
+            Log.d("Referral Reason", volunteerReferralReason);
+            String[] reasons=volunteerReferralReason.split(".");
+            for (String reason : reasons){
+                if (reason.contains("Right Eye")){
+                    diagnosisRight.concat(reason.split(" - Right Eye")[0]);
+                }
+                if (reason.contains("Left Eye")){
+                    diagnosisLeft.concat(reason.split(" - Left Eye")[0]);
+                }
+            }
+
+            physicalExamMap.setVolunteerDiagnosisRight(diagnosisRight);
+            physicalExamMap.setVolunteerDiagnosisLeft(diagnosisLeft);
+
+            Log.d("DiagnosisRight", physicalExamMap.getVolunteerDiagnosisRight());
+            Log.d("DiagnosisLeft", physicalExamMap.getVolunteerDiagnosisLeft());
         }
 
-        if (category.getText().equals("Referral Location")){
-            String volunteerReferralLocation=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferralLocation(volunteerReferralLocation);
-        }
 
     }
 
@@ -621,11 +649,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDAO.updateObs(obsDTO);
 
             obsDTO = new ObsDTO();
-            obsDTO.setConceptuuid(UuidDictionary.VolunteerReferralReason);
+            obsDTO.setConceptuuid(UuidDictionary.VolunteerDiagnosisRight);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
-            obsDTO.setValue(physicalExamMap.getVolunteerReferralReason());
-            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferralReason));
+            obsDTO.setValue(physicalExamMap.getVolunteerDiagnosisRight());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerDiagnosisRight));
             obsDAO.updateObs(obsDTO);
 
             obsDTO = new ObsDTO();

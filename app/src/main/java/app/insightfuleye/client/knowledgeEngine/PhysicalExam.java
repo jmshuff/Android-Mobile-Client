@@ -33,7 +33,8 @@ public class PhysicalExam extends Node {
     private String PinholeLeft;
     private String volunteerReferral;
     private String volunteerReferralLocation;
-    private String volunteerReferralReason;
+    private String volunteerDiagnosisRight;
+    private String volunteerDiagnosisLeft;
 
 
     public PhysicalExam(JSONObject jsonObject, ArrayList<String> selection) {
@@ -489,7 +490,22 @@ public class PhysicalExam extends Node {
     public void setPinholeLeft(String PinholeLeft){this.PinholeLeft=PinholeLeft; }
     public void setVolunteerReferral(String volunteerReferral){this.volunteerReferral=volunteerReferral; }
     public void setVolunteerReferralLocation(String volunteerReferralLocation){this.volunteerReferralLocation=volunteerReferralLocation; }
-    public void setVolunteerReferralReason(String volunteerReferralReason){this.volunteerReferralReason=volunteerReferralReason; }
+
+    public String getVolunteerDiagnosisRight() {
+        return volunteerDiagnosisRight;
+    }
+
+    public void setVolunteerDiagnosisRight(String volunteerDiagnosisRight) {
+        this.volunteerDiagnosisRight = volunteerDiagnosisRight;
+    }
+
+    public String getVolunteerDiagnosisLeft() {
+        return volunteerDiagnosisLeft;
+    }
+
+    public void setVolunteerDiagnosisLeft(String volunteerDiagnosisLeft) {
+        this.volunteerDiagnosisLeft = volunteerDiagnosisLeft;
+    }
 
     public String getVARight(){return VARight;}
     public String getVALeft(){return VALeft;}
@@ -497,7 +513,7 @@ public class PhysicalExam extends Node {
     public String getPinholeLeft(){return PinholeLeft;}
     public String getVolunteerReferral(){return volunteerReferral;}
     public String getVolunteerReferralLocation(){return volunteerReferralLocation;}
-    public String getVolunteerReferralReason(){return volunteerReferralReason;}
+
 
 
 
