@@ -79,6 +79,7 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
@@ -923,7 +924,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
                     positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
 
                 }
-                azureImage_push(VisitSummaryActivity.this);
+                //azureImage_push(VisitSummaryActivity.this);
+
 
             }
 
@@ -3919,8 +3921,9 @@ public class VisitSummaryActivity extends AppCompatActivity {
         visitCursor.close();
     }
 
-    public void azureImage_push(final Context context) {
-        String base = "https://testing.visilant.org/api/v1/image/";
+
+    /*public void azureImage_push(final Context context) {
+        String base = "20.85.243.31:3006/api/v1/image/";
 
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(context);
@@ -3989,6 +3992,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+     */
 
 
 }

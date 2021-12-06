@@ -489,6 +489,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 }
                 imageName = UUID.randomUUID().toString();
                 Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
+
+
             } else {
                 Node.handleQuestion(question, this, adapter, null, null);
             }
