@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -66,6 +67,8 @@ import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
 import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.models.dto.ObsDTO;
+import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
+import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.UuidDictionary;
@@ -75,6 +78,14 @@ import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.utilities.pageindicator.ScrollingPagerIndicator;
 
 import app.insightfuleye.client.database.dao.PatientsDAO;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class PhysicalExamActivity extends AppCompatActivity implements QuestionsAdapter.FabClickListener {
     final static String TAG = PhysicalExamActivity.class.getSimpleName();
@@ -97,6 +108,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     static String imageName;
     static String baseDir;
     static File filePath;
+    String azureType=null;
+
 
 
     String mFileName = "physExam.json";
@@ -496,7 +509,16 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     Log.i("RES>", "" + filePath + " -> " + res);
                 }
                 imageName = UUID.randomUUID().toString();
-                Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
+                if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("right")){
+                    azureType="right";
+                }
+                if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")){
+                    azureType="left";
+                }
+
+                    Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
+
+
             } else {
                 Node.handleQuestion(question, this, adapter, null, null);
             }
@@ -715,6 +737,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 Log.i(TAG, mCurrentPhotoPath);
                 physicalExamMap.displayImage(this, filePath.getAbsolutePath(), imageName);
                 updateImageDatabase();
+                uploadImage(filePath.getAbsolutePath(), imageName);
 
             }
 
@@ -892,6 +915,35 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             v.startAnimation(bottomUp);
         }
 
+    }
+
+    private void uploadImage(String filePath,String imageName) {
+        File file = new File(filePath+"/"+imageName+".jpg");
+        Log.d("Azure file", file.getName());
+        Retrofit retrofit = AzureNetworkClient.getRetrofit();
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part parts = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+        RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"), sessionManager.getChwname());
+        RequestBody visitId= RequestBody.create(MediaType.parse("text/plain"), visitUuid);
+        RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), patientUuid);
+        RequestBody type = RequestBody.create(MediaType.parse("text/plain"), azureType);
+
+        AzureUploadAPI uploadApis = retrofit.create(AzureUploadAPI.class);
+        Call call = uploadApis.uploadImage(parts, creatorId, visitId, patientId, type);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                Log.d("Azure", response.toString());
+
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Log.d("Azure", t.toString());
+
+            }
+        });
     }
 
 }
