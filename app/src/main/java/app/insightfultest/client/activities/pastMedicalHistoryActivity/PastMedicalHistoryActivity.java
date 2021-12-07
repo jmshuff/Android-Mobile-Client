@@ -328,7 +328,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         if (clickedNode.getInputType() != null) {
             if (!clickedNode.getInputType().equals("camera")) {
                 imageName = UUID.randomUUID().toString();
-                Node.handleQuestion(clickedNode, PastMedicalHistoryActivity.this, adapter, null, null);
+                Node.handleQuestion(clickedNode, PastMedicalHistoryActivity.this, adapter, null, null, null);
             }
         }
 

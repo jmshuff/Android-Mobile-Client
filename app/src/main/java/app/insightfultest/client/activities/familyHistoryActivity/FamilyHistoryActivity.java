@@ -304,7 +304,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
 
         if (clickedNode.getInputType() != null) {
             if (!clickedNode.getInputType().equals("camera")) {
-                Node.handleQuestion(clickedNode, FamilyHistoryActivity.this, adapter, null, null);
+                Node.handleQuestion(clickedNode, FamilyHistoryActivity.this, adapter, null, null, null);
             }
         }
         if (!filePath.exists()) {

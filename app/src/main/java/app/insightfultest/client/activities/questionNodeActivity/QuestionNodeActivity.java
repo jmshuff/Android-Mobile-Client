@@ -52,6 +52,8 @@ import app.insightfultest.client.database.dao.ImagesDAO;
 import app.insightfultest.client.database.dao.ObsDAO;
 import app.insightfultest.client.knowledgeEngine.PhysicalExam;
 import app.insightfultest.client.models.dto.ObsDTO;
+import app.insightfultest.client.networkApiCalls.AzureNetworkClient;
+import app.insightfultest.client.networkApiCalls.AzureUploadAPI;
 import app.insightfultest.client.utilities.FileUtils;
 import app.insightfultest.client.utilities.SessionManager;
 import app.insightfultest.client.utilities.UuidDictionary;
@@ -64,6 +66,13 @@ import app.insightfultest.client.utilities.exception.DAOException;
 import app.insightfultest.client.utilities.pageindicator.ScrollingPagerIndicator;
 
 import app.insightfultest.client.database.dao.PatientsDAO;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 
 public class QuestionNodeActivity extends AppCompatActivity implements QuestionsAdapter.FabClickListener {
@@ -80,6 +89,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     Boolean complaintConfirmed = false;
     SessionManager sessionManager = null;
     private float float_ageYear_Month;
+    String azureType=null;
 
 
     //    Knowledge mKnowledge; //Knowledge engine
@@ -225,7 +235,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             } else {
                 currentNode.getOption(groupPosition).setUnselected();
             }
-
+            //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
 
             if (!question.getInputType().isEmpty() && question.isSelected()) {
                 if (question.getInputType().equals("camera")) {
@@ -233,9 +243,19 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                         filePath.mkdirs();
                     }
                     imageName = UUID.randomUUID().toString();
-                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, filePath.toString(), imageName);
+
+                    if (currentNode.getOption(childPosition).getText().toLowerCase().contains("right")){
+                        azureType="right";
+                    }
+                    if (currentNode.getOption(childPosition).getText().toLowerCase().contains("left")){
+                        azureType="left";
+                    }
+
+
+
+                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, filePath.toString(), imageName,azureType);
                 } else {
-                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, null, null);
+                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, null, null, null);
                 }
             }
 
@@ -266,15 +286,24 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             } else {
                 currentNode.getOption(groupPosition).setUnselected();
             }
+            //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
 
             if (!question.getInputType().isEmpty() && question.isSelected()) {
                 if (question.getInputType().equals("camera")) {
                     if (!filePath.exists()) {
                         filePath.mkdirs();
                     }
-                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, filePath.toString(), imageName);
+                    String azureType=null;
+                    if (currentNode.getOption(childPosition).getText().toLowerCase().contains("right")){
+                        azureType="right";
+                    }
+                    if (currentNode.getOption(childPosition).getText().toLowerCase().contains("left")){
+                        azureType="left";
+                    }
+
+                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, filePath.toString(), imageName, azureType);
                 } else {
-                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, null, null);
+                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, null, null, null);
                 }
                 //If there is an input type, then the question has a special method of data entry.
             }
@@ -448,6 +477,35 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
+    }
+
+    private void uploadImage(String filePath,String imageName) {
+        File file = new File(filePath+"/"+imageName+".jpg");
+        Log.d("Azure file", file.getName());
+        Retrofit retrofit = AzureNetworkClient.getRetrofit();
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part parts = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+        RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"), sessionManager.getChwname());
+        RequestBody visitId= RequestBody.create(MediaType.parse("text/plain"), visitUuid);
+        RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), patientUuid);
+        RequestBody type = RequestBody.create(MediaType.parse("text/plain"), azureType);
+
+        AzureUploadAPI uploadApis = retrofit.create(AzureUploadAPI.class);
+        Call call = uploadApis.uploadImage(parts, creatorId, visitId, patientId, type);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                Log.d("Azure", response.toString());
+
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Log.d("Azure", t.toString());
+
+            }
+        });
     }
 
     private void updateDatabase(String string) {
@@ -656,6 +714,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 String mCurrentPhotoPath = data.getStringExtra("RESULT");
                 currentNode.setImagePath(mCurrentPhotoPath);
                 currentNode.displayImage(this, filePath.getAbsolutePath(), imageName);
+                uploadImage(filePath.getAbsolutePath(), imageName);
+
             }
         }
     }

@@ -584,42 +584,11 @@ public class CameraActivity extends AppCompatActivity {
                         }
                     }
                 }
-                uploadImage(file.getPath());
 
             }
         });
     }
 
-    private void uploadImage(String filePath) {
-        File file = new File(filePath);
-
-        Retrofit retrofit = AzureNetworkClient.getRetrofit();
-
-        RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
-        MultipartBody.Part parts = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
-
-        RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"),"test1");
-
-        RequestBody visitId= RequestBody.create(MediaType.parse("text/plain"), "test1");
-        RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), "test1");
-        RequestBody type = RequestBody.create(MediaType.parse("text/plain"), "right");
-
-        AzureUploadAPI uploadApis = retrofit.create(AzureUploadAPI.class);
-        Call call = uploadApis.uploadImage(parts, creatorId, visitId, patientId, type);
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) {
-                Log.d("Azure", response.toString());
-
-            }
-
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                Log.d("Azure", t.toString());
-
-            }
-        });
-    }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         final int height = options.outHeight;

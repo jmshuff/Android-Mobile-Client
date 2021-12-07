@@ -900,7 +900,7 @@ public class Node implements Serializable {
     }
 
     public static void handleQuestion(Node questionNode, final Activity context, final QuestionsAdapter adapter,
-                                      final String imagePath, final String imageName) {
+                                      final String imagePath, final String imageName, final String azureType) {
         String type = questionNode.getInputType();
         switch (type) {
             case "text":
