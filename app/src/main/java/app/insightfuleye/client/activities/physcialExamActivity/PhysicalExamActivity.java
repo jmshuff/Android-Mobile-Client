@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -428,6 +429,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         complaintConfirmed = physicalExamMap.areRequiredAnswered();
 
         if (complaintConfirmed) {
+            physicalExamMap.getPhysicalConcepts();
             physicalDisplay=physicalExamMap.generateFindings();
             physicalString = physicalExamMap.generateTable();
 
@@ -531,7 +533,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
 
         //JS, get values for physical exam questions
-        Node category= physicalExamMap.getExamNode(physExamPos);
+        /*Node category= physicalExamMap.getExamNode(physExamPos);
         //category equals the first branch in free mind
         if (category.getText().equals("VA right")){
             String VAright=category.formConceptLanguage();
@@ -553,10 +555,13 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         if (category.getText().equals("Referral")){
             String volunteerReferral=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferral(volunteerReferral.split(" ")[0]);
+            physicalExamMap.setVolunteerReferral(volunteerReferral);
+            //physicalExamMap.setVolunteerReferral(volunteerReferral.split(" ")[0]);
             if (volunteerReferral.split(" ").length > 1){
                 physicalExamMap.setVolunteerReferralLocation(volunteerReferral.split(" ")[1]);
             }
+
+
         }
 
         if (category.getText().equals("Referral Reason")){
@@ -564,22 +569,33 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             String diagnosisRight= "";
             String diagnosisLeft="";
             Log.d("Referral Reason", volunteerReferralReason);
-            String[] reasons=volunteerReferralReason.split(".");
+            String[] reasons=volunteerReferralReason.split("\\. - ");
+            Log.d("Reasons", Arrays.toString(reasons));
             for (String reason : reasons){
-                if (reason.contains("Right Eye")){
-                    diagnosisRight.concat(reason.split(" - Right Eye")[0]);
+                Log.d("Diagnosis", reason);
+                if (reason.toLowerCase().contains("right")){
+                    diagnosisRight=diagnosisRight.concat(reason.split("-")[0]);
+                    diagnosisRight=diagnosisRight.concat(",");
                 }
-                if (reason.contains("Left Eye")){
-                    diagnosisLeft.concat(reason.split(" - Left Eye")[0]);
+                if (reason.toLowerCase().contains("left")){
+                    diagnosisLeft=diagnosisLeft.concat(reason.split("-")[0]);
+                    diagnosisLeft=diagnosisLeft.concat(",");
                 }
             }
-
+            //remove last comma character
+            if (diagnosisRight.length()>1){
+                diagnosisRight=diagnosisRight.substring(0, diagnosisRight.length()-1);
+            }
+            if (diagnosisLeft.length()>1){
+                diagnosisLeft=diagnosisLeft.substring(0,diagnosisLeft.length()-1);
+            }
             physicalExamMap.setVolunteerDiagnosisRight(diagnosisRight);
             physicalExamMap.setVolunteerDiagnosisLeft(diagnosisLeft);
 
-            Log.d("DiagnosisRight", physicalExamMap.getVolunteerDiagnosisRight());
-            Log.d("DiagnosisLeft", physicalExamMap.getVolunteerDiagnosisLeft());
+            Log.d("DiagnosisRight",diagnosisRight);
+            Log.d("DiagnosisLeft", diagnosisLeft);
         }
+        */
 
 
     }

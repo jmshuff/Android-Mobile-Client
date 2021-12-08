@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -251,6 +252,82 @@ public class PhysicalExam extends Node {
     }
 
 
+    public void getPhysicalConcepts(){
+        int total= this.totalExams;
+        for (int i=0; i<total;i++){
+            Node node=getExamNode(i);
+            String title=getTitle(i);
+            String[] split=title.split(": ");
+            String category=split[1];
+
+            if ((node.isSelected() | node.anySubSelected())){
+                Log.d("Category", category);
+                if (category.equals("VA right")){
+                    String VAright=node.formConceptLanguage();
+                    Log.d("VAright lang", VAright);
+                    setVARight(VAright);
+                }
+                if (category.equals("VA left")){
+                    String Valeft=node.formConceptLanguage();
+                    setVALeft(Valeft);
+                }
+
+                if (category.equals("Pinhole right")){
+                    String Pinholeright=node.formConceptLanguage();
+                    setPinholeRight(Pinholeright);
+                }
+                if (category.equals("Pinhole left")){
+                    String Pinholeleft=node.formConceptLanguage();
+                    setPinholeLeft(Pinholeleft);
+                }
+
+                if (category.equals("Referral")){
+                    String volunteerReferral=node.formConceptLanguage();
+                    setVolunteerReferral(volunteerReferral);
+                    //physicalExamMap.setVolunteerReferral(volunteerReferral.split(" ")[0]);
+            /*if (volunteerReferral.split(" ").length > 1){
+                physicalExamMap.setVolunteerReferralLocation(volunteerReferral.split(" ")[1]);
+            }
+
+             */
+                }
+
+                if (category.equals("Referral Reason")){
+                    String volunteerReferralReason=node.formConceptLanguage();
+                    String diagnosisRight= "";
+                    String diagnosisLeft="";
+                    Log.d("Referral Reason", volunteerReferralReason);
+                    String[] reasons=volunteerReferralReason.split("\\. - ");
+                    Log.d("Reasons", Arrays.toString(reasons));
+                    for (String reason : reasons){
+                        Log.d("Diagnosis", reason);
+                        if (reason.toLowerCase().contains("right")){
+                            diagnosisRight=diagnosisRight.concat(reason.split(" -")[0]);
+                            diagnosisRight=diagnosisRight.concat(", ");
+                        }
+                        if (reason.toLowerCase().contains("left")){
+                            diagnosisLeft=diagnosisLeft.concat(reason.split(" -")[0]);
+                            diagnosisLeft=diagnosisLeft.concat(", ");
+                        }
+                    }
+                    //remove last comma character
+                    if (diagnosisRight.length()>1){
+                        diagnosisRight=diagnosisRight.substring(0, diagnosisRight.length()-2);
+                    }
+                    if (diagnosisLeft.length()>1){
+                        diagnosisLeft=diagnosisLeft.substring(0,diagnosisLeft.length()-2);
+                    }
+                    setVolunteerDiagnosisRight(diagnosisRight);
+                    setVolunteerDiagnosisLeft(diagnosisLeft);
+
+                    Log.d("DiagnosisRight",diagnosisRight);
+                    Log.d("DiagnosisLeft", diagnosisLeft);
+                }
+
+            }
+
+        }
+    }
     //TODO: Physical exam map needs to modified to make language generation easier.
     public String generateFindings() {
         String mLanguage = "";
@@ -264,6 +341,7 @@ public class PhysicalExam extends Node {
             String title = getTitle(i);
             String[] split = title.split(" : ");
             String levelOne = split[0];
+
             if ((node.isSelected() | node.anySubSelected())) {
                 boolean checkSet = rootStrings.add(levelOne);
 
