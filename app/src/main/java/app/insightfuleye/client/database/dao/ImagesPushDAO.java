@@ -134,6 +134,63 @@ public class ImagesPushDAO {
         return true;
     }
 
+    public boolean azureImagePush(){
+        sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
+        String encoded = sessionManager.getEncoded();
+        Gson gson = new Gson();
+        UrlModifiers urlModifiers = new UrlModifiers();
+        ImagesDAO imagesDAO = new ImagesDAO();
+        String url = urlModifiers.setObsImageUrl();
+        List<ObsPushDTO> obsImageJsons = new ArrayList<>();
+        try {
+            obsImageJsons = imagesDAO.getObsUnsyncedImages();
+            Log.e(TAG, "image request model" + gson.toJson(obsImageJsons));
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        int i = 0;
+        for (ObsPushDTO p : obsImageJsons) {
+            //pass it like this
+            File file = null;
+            file = new File(AppConstants.IMAGE_PATH + p.getUuid() + ".jpg");
+            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+            // MultipartBody.Part is used to send also the actual file name
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+
+            Observable<ObsJsonResponse> obsJsonResponseObservable = AppConstants.apiInterface.OBS_JSON_RESPONSE_OBSERVABLE(url, "Basic " + encoded, body, p);
+            obsJsonResponseObservable.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DisposableObserver<ObsJsonResponse>() {
+                        @Override
+                        public void onNext(ObsJsonResponse obsJsonResponse) {
+                            Logger.logD(TAG, "success" + obsJsonResponse);
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Logger.logD(TAG, "Onerror " + e.getMessage());
+//                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", IntelehealthApplication.getAppContext());
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Logger.logD(TAG, "success");
+                            try {
+                                imagesDAO.updateUnsyncedObsImages(p.getUuid());
+                            } catch (DAOException e) {
+                                FirebaseCrashlytics.getInstance().recordException(e);
+                            }
+                        }
+                    });
+        }
+        sessionManager.setPushSyncFinished(true);
+//        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
+        return true;
+
+    }
+
     public boolean deleteObsImage() {
         sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
         String encoded = sessionManager.getEncoded();

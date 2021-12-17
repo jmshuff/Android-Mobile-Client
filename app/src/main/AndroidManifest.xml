@@ -248,6 +248,7 @@
             </intent-filter>
         </receiver>
 
+
         <provider
             android:name="app.insightfuleye.client.activities.searchPatientActivity.SearchSuggestionProvider"
             android:authorities="app.insightfuleye.client.activities.searchPatientActivity.SearchSuggestionProvider"

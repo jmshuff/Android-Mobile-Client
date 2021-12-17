@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
@@ -715,7 +716,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     }
 
     @Override
-    public void onBackPressed() {
+    public void
+    onBackPressed() {
     }
 
 

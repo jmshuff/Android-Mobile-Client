@@ -265,41 +265,6 @@ public class CameraActivity extends AppCompatActivity {
 
                     });
 
-                    //AutoFocus CameraX
-                    /*
-                    txView.setOnTouchListener((v, event) -> {
-                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                            handler.removeCallbacks(focusingTOInvisible);
-                            focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus));
-                            focusView.setVisibility(View.VISIBLE);
-                            return true;
-                        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                            MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory((float) txView.getWidth(), (float) txView.getHeight());
-                            MeteringPoint autoFocusPoint = factory.createPoint(event.getX(), event.getY());
-                            FocusMeteringAction action = new FocusMeteringAction.Builder(autoFocusPoint, FocusMeteringAction.FLAG_AF).setAutoCancelDuration(5, TimeUnit.SECONDS).build();
-                            ListenableFuture future = cControl.startFocusAndMetering(action);
-
-                            future.addListener(() -> {
-                                handler.postDelayed(focusingTOInvisible, 3000);
-                                try {
-                                    FocusMeteringResult result = (FocusMeteringResult) future.get();
-                                    if (result.isFocusSuccessful()) {
-                                        focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus_green));
-
-                                    }
-                                } catch (Exception e) {
-
-                                }
-                            }, executor);
-
-
-                            return true;
-                        } else {
-
-                            return false;
-                        }
-                    });
-*/
 
                 }catch (Exception e){
                     Toast.makeText(this,"Failed", LENGTH_SHORT).show();

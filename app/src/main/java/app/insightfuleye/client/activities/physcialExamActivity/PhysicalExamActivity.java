@@ -1,12 +1,16 @@
 package app.insightfuleye.client.activities.physcialExamActivity;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,6 +39,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -66,6 +71,8 @@ import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
+import app.insightfuleye.client.models.Results;
+import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
@@ -961,5 +968,26 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             }
         });
     }
+
+    private List<azureResults> getAzureImage(){
+        Retrofit retrofit = AzureNetworkClient.getRetrofit();
+        AzureUploadAPI getAzureImage = retrofit.create(AzureUploadAPI.class);
+        Call<List<azureResults>> call = getAzureImage.getAzureImage();
+        List<azureResults> resultsList= new ArrayList<>();
+        call.enqueue(new Callback<List<azureResults>>() {
+            @Override
+            public void onResponse(Call<List<azureResults>> call, Response<List<azureResults>> response) {
+                List<azureResults> resultsList = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<List<azureResults>> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_LONG).show();
+            }
+
+        });
+        return resultsList;
+    }
+
 
 }
