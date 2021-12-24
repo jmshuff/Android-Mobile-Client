@@ -11,6 +11,7 @@ import app.insightfuleye.client.database.dao.ImagesPushDAO;
 import app.insightfuleye.client.database.dao.SyncDAO;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.NotificationUtils;
+import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class SyncUtils {
 
@@ -39,6 +40,11 @@ public class SyncUtils {
             public void run() {
                 Logger.logD(TAG, "Background Image Push Started");
                 imagesPushDAO.obsImagesPush();
+                try {
+                    imagesPushDAO.azureImagePush();
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
                 Logger.logD(TAG, "Background Image Pull ended");
             }
         }, 3000);
@@ -92,6 +98,11 @@ public class SyncUtils {
             public void run() {
                 Logger.logD(TAG, "Image Push Started");
                 imagesPushDAO.obsImagesPush();
+                try {
+                    imagesPushDAO.azureImagePush();
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
                 Logger.logD(TAG, "Image Pull ended");
             }
         }, 3000);

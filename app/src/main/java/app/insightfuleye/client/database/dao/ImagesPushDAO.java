@@ -1,5 +1,6 @@
 package app.insightfuleye.client.database.dao;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 
@@ -10,6 +11,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import app.insightfuleye.client.models.azureResultsPush;
+import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
+import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.UrlModifiers;
@@ -18,17 +24,21 @@ import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.models.ObsImageModel.ObsJsonResponse;
 import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
 import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
+import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
+import retrofit2.Retrofit;
 
 public class ImagesPushDAO {
     String TAG = ImagesPushDAO.class.getSimpleName();
@@ -134,38 +144,55 @@ public class ImagesPushDAO {
         return true;
     }
 
-    public boolean azureImagePush(){
+
+    public boolean azureImagePush() throws DAOException {
         sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
+
+//        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+//        localdb.execSQL("delete from tbl_azure_uploads");
         String encoded = sessionManager.getEncoded();
-        Gson gson = new Gson();
-        UrlModifiers urlModifiers = new UrlModifiers();
+        Retrofit retrofit = AzureNetworkClient.getRetrofit();
         ImagesDAO imagesDAO = new ImagesDAO();
-        String url = urlModifiers.setObsImageUrl();
-        List<ObsPushDTO> obsImageJsons = new ArrayList<>();
+        List<azureResults> imageQueue = new ArrayList<>();
         try {
-            obsImageJsons = imagesDAO.getObsUnsyncedImages();
-            Log.e(TAG, "image request model" + gson.toJson(obsImageJsons));
+            imageQueue = imagesDAO.getAzureImageQueue();
+            Log.e(TAG, imageQueue.toString());
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
 
         int i = 0;
-        for (ObsPushDTO p : obsImageJsons) {
+        for (azureResults p : imageQueue) {
             //pass it like this
             File file = null;
-            file = new File(AppConstants.IMAGE_PATH + p.getUuid() + ".jpg");
+            file = new File(AppConstants.IMAGE_PATH + p.getImagePath());
             RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
             // MultipartBody.Part is used to send also the actual file name
-            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+            MultipartBody.Part parts = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+            RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"), p.getChwName());
+            RequestBody visitId= RequestBody.create(MediaType.parse("text/plain"), p.getVisitId());
+            RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), p.getPatientId());
+            RequestBody type = RequestBody.create(MediaType.parse("text/plain"), p.getLeftRight());
 
-            Observable<ObsJsonResponse> obsJsonResponseObservable = AppConstants.apiInterface.OBS_JSON_RESPONSE_OBSERVABLE(url, "Basic " + encoded, body, p);
-            obsJsonResponseObservable.subscribeOn(Schedulers.io())
+            Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
+            AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
+            Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(parts, creatorId, visitId, patientId, type);
+            Log.d("AzureUpload", p.getImagePath());
+            //is this the right type for the observable...
+            azureObservable.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableObserver<ObsJsonResponse>() {
-                        @Override
-                        public void onNext(ObsJsonResponse obsJsonResponse) {
-                            Logger.logD(TAG, "success" + obsJsonResponse);
+                    .subscribe(new DisposableObserver<ResponseBody>() {
 
+
+                        @Override
+                        public void onNext(@NonNull ResponseBody responseBody) {
+                            Log.d(TAG, "azure success");
+                            //Remove request from database and delete file
+                            try {
+                                imagesDAO.removeAzureSynced(p.getImagePath());
+                            } catch (DAOException e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         @Override
@@ -178,9 +205,12 @@ public class ImagesPushDAO {
                         public void onComplete() {
                             Logger.logD(TAG, "success");
                             try {
-                                imagesDAO.updateUnsyncedObsImages(p.getUuid());
-                            } catch (DAOException e) {
-                                FirebaseCrashlytics.getInstance().recordException(e);
+                                List<azureResults> azureQueue;
+                                azureQueue=imagesDAO.getAzureImageQueue();
+                                Log.d("AzureQueue", azureQueue.toString());
+                                Log.d(TAG, "complete");
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         }
                     });

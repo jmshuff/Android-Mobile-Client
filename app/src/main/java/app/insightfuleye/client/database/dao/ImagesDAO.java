@@ -5,7 +5,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.media.Image;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -14,6 +16,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.insightfuleye.client.models.azureResults;
+import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
+import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
 import app.insightfuleye.client.utilities.Base64Utils;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.UuidDictionary;
@@ -21,6 +26,10 @@ import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
 import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
 import app.insightfuleye.client.utilities.exception.DAOException;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class ImagesDAO {
     public String TAG = ImagesDAO.class.getSimpleName();
@@ -328,6 +337,43 @@ public class ImagesDAO {
         return isUpdated;
     }
 
+    public void removeAzureSynced(String imageName) throws DAOException {
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        File file= new File(AppConstants.IMAGE_PATH + imageName);
+        try {
+            String query = "Select * from tbl_azure_uploads where imageName = \'" + imageName + "\'";
+            Cursor cursor = localdb.rawQuery(query, null);
+            if (cursor.getCount() > 0) {
+                //while (cursor.moveToNext()) {
+                    //String dbImageName = cursor.getString(cursor.getColumnIndexOrThrow("imageName"));
+                    //Log.d("FileErase", dbImageName);
+                    //Log.d("File erase", imageName);
+                    localdb.execSQL("DELETE from tbl_azure_uploads where imageName = \'" + imageName + "\'");
+                    localdb.setTransactionSuccessful();
+//                    List<azureResults> imageQueue = new ArrayList<>();
+//                    try {
+//                        imageQueue = getAzureImageQueue();
+//                        Log.e(TAG, imageQueue.toString());
+//                    } catch (DAOException e) {
+//                        FirebaseCrashlytics.getInstance().recordException(e);
+//                    }
+
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                //}
+            }
+        }
+        catch (SQLException e){
+            throw new DAOException(e);
+        }
+        finally {
+            localdb.endTransaction();
+        }
+    }
+
 
     public ArrayList getImageUuid(String encounterUuid, String conceptuuid) throws DAOException {
         Logger.logD(TAG, "encounter uuid for image " + encounterUuid);
@@ -407,6 +453,55 @@ public class ImagesDAO {
     }
 
 
+
+    public List<azureResults> getAzureImages(){
+        //get data from Azure server
+        Retrofit retrofit = AzureNetworkClient.getRetrofit();
+        AzureUploadAPI getAzureImage = retrofit.create(AzureUploadAPI.class);
+        Call<List<azureResults>> call = getAzureImage.getAzureImage();
+        List<azureResults> resultsList= new ArrayList<>();
+        call.enqueue(new Callback<List<azureResults>>() {
+            @Override
+            public void onResponse(Call<List<azureResults>> call, Response<List<azureResults>> response) {
+                List<azureResults> resultsList = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<List<azureResults>> call, Throwable t) {
+                Log.d("getAzureImage", t.toString());
+            }
+
+        });
+        return resultsList;
+    }
+
+    public List<azureResults> getAzureImageQueue() throws DAOException {
+        //get unsynced images from local storage
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        List<azureResults> azureResultList = new ArrayList<>();
+        try {
+            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_azure_uploads", null);
+            if (idCursor.getCount() != 0) {
+                while (idCursor.moveToNext()) {
+                    azureResults ImageQueue= new azureResults();
+                    ImageQueue.setChwName(idCursor.getString(idCursor.getColumnIndexOrThrow("creatorId")));
+                    ImageQueue.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName")));
+                    ImageQueue.setLeftRight(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
+                    ImageQueue.setVisitId(idCursor.getString(idCursor.getColumnIndexOrThrow("visitId")));
+                    ImageQueue.setPatientId(idCursor.getString(idCursor.getColumnIndexOrThrow("patientId")));
+                    azureResultList.add(ImageQueue);
+                }
+            }
+            idCursor.close();
+        } catch (SQLiteException e) {
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return azureResultList;
+    }
 
 }
 

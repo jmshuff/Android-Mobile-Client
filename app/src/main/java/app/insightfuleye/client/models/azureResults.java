@@ -84,4 +84,8 @@ public class azureResults {
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
+
+    public String toString(){
+        return "PatientID: " + patientId + ", CreatorId: " + chwName + ", Type: " + leftRight + ", VisitID: " + visitId + ", Image Path: " + imagePath;
+    }
 }

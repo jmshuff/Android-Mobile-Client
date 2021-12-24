@@ -1,9 +1,12 @@
 package app.insightfuleye.client.activities.questionNodeActivity;
 
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -474,7 +477,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         }
     }
 
-    private void uploadImage(String filePath,String imageName) {
+    private void uploadAzureImage(String filePath,String imageName) {
         File file = new File(filePath+"/"+imageName+".jpg");
         Log.d("Azure file", file.getName());
         Retrofit retrofit = AzureNetworkClient.getRetrofit();
@@ -486,21 +489,61 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), patientUuid);
         RequestBody type = RequestBody.create(MediaType.parse("text/plain"), azureType);
 
+
         AzureUploadAPI uploadApis = retrofit.create(AzureUploadAPI.class);
         Call call = uploadApis.uploadImage(parts, creatorId, visitId, patientId, type);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
                 Log.d("Azure", response.toString());
+                if (response.message()=="OK"){
+                    Log.d("Azure", "success");
+                }
+                else{
+                    try {
+                        boolean isInserted=insertAzureImageDatabase(azureType, file.getName());
+                    } catch (DAOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
                 Log.d("Azure", t.toString());
-
+                try {
+                    boolean isInserted=insertAzureImageDatabase(azureType, file.getName());
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
             }
         });
+    }
+
+    public boolean insertAzureImageDatabase(String type, String imageName) throws DAOException {
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("imageName", imageName);
+            contentValues.put("patientId", patientUuid);
+            contentValues.put("visitId", visitUuid);
+            contentValues.put("creatorId", sessionManager.getChwname());
+            contentValues.put("type", type);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_azure_uploads", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return isInserted;
     }
 
     private void updateDatabase(String string) {
@@ -709,7 +752,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 String mCurrentPhotoPath = data.getStringExtra("RESULT");
                 currentNode.setImagePath(mCurrentPhotoPath);
                 currentNode.displayImage(this, filePath.getAbsolutePath(), imageName);
-                uploadImage(filePath.getAbsolutePath(), imageName);
+                uploadAzureImage(filePath.getAbsolutePath(), imageName);
 
             }
         }

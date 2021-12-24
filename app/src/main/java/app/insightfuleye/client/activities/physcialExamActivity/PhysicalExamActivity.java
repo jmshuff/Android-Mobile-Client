@@ -2,10 +2,12 @@ package app.insightfuleye.client.activities.physcialExamActivity;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
@@ -89,6 +91,7 @@ import app.insightfuleye.client.database.dao.PatientsDAO;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -760,7 +763,17 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 Log.i(TAG, mCurrentPhotoPath);
                 physicalExamMap.displayImage(this, filePath.getAbsolutePath(), imageName);
                 updateImageDatabase();
-                uploadImage(filePath.getAbsolutePath(), imageName);
+                uploadAzureImage(filePath.getAbsolutePath(), imageName);
+
+                //Test, code to print list of queded images for testing
+                ImagesDAO imagesDAO = new ImagesDAO();
+                List<azureResults> azureQueue= new ArrayList<>();
+                try {
+                    azureQueue=imagesDAO.getAzureImageQueue();
+                    Log.d("AzureQueue", azureQueue.toString());
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
 
             }
 
@@ -940,7 +953,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
     }
 
-    private void uploadImage(String filePath,String imageName) {
+    private void uploadAzureImage(String filePath,String imageName) {
         File file = new File(filePath+"/"+imageName+".jpg");
         Log.d("Azure file", file.getName());
         Retrofit retrofit = AzureNetworkClient.getRetrofit();
@@ -953,40 +966,63 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         RequestBody type = RequestBody.create(MediaType.parse("text/plain"), azureType);
 
         AzureUploadAPI uploadApis = retrofit.create(AzureUploadAPI.class);
+
+
         Call call = uploadApis.uploadImage(parts, creatorId, visitId, patientId, type);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
                 Log.d("Azure", response.toString());
+                if (response.message()=="OK"){
+                    Log.d("Azure", "success");
+                }
+                else{
+                    //add to queue
+                    Log.d("Azure", "add to queue");
+                    try {
+                        boolean isInserted=insertAzureImageDatabase(azureType, file.getName());
+                    } catch (DAOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
                 Log.d("Azure", t.toString());
-
+                try {
+                    boolean isInserted=insertAzureImageDatabase(azureType, file.getName());
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    private List<azureResults> getAzureImage(){
-        Retrofit retrofit = AzureNetworkClient.getRetrofit();
-        AzureUploadAPI getAzureImage = retrofit.create(AzureUploadAPI.class);
-        Call<List<azureResults>> call = getAzureImage.getAzureImage();
-        List<azureResults> resultsList= new ArrayList<>();
-        call.enqueue(new Callback<List<azureResults>>() {
-            @Override
-            public void onResponse(Call<List<azureResults>> call, Response<List<azureResults>> response) {
-                List<azureResults> resultsList = response.body();
-            }
+    public boolean insertAzureImageDatabase(String type, String imageName) throws DAOException {
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("imageName", imageName);
+            contentValues.put("patientId", patientUuid);
+            contentValues.put("visitId", visitUuid);
+            contentValues.put("creatorId", sessionManager.getChwname());
+            contentValues.put("type", type);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_azure_uploads", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
 
-            @Override
-            public void onFailure(Call<List<azureResults>> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_LONG).show();
-            }
-
-        });
-        return resultsList;
+        }
+        return isInserted;
     }
 
 

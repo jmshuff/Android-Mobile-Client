@@ -166,6 +166,13 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "voided TEXT DEFAULT '0'," +
             "sync TEXT DEFAULT 'false' " +
             ")";
+    public static final String AZURE_UPLOADS= "CREATE TABLE IF NOT EXISTS tbL_azure_uploads(" +
+            "imageName TEXT PRIMARY KEY," +
+            "patientId TEXT," +
+            "visitId TEXT," +
+            "creatorId TEXT," +
+            "type TEXT" +
+            ")";
 
 
     public InteleHealthDatabaseHelper(@Nullable Context context) {
@@ -232,6 +239,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_USER_CREDENTIALS);
         db.execSQL(CREATE_DR_SPECIALITY);
         db.execSQL(CREATE_VISIT_ATTRIBUTES);
+        db.execSQL(AZURE_UPLOADS);
         uuidInsert(db);
         database = db;
 
