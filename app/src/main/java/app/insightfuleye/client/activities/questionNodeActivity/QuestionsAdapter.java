@@ -307,7 +307,12 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
         @Override
         public ComplaintNodeListAdapter.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View row = inflater.inflate(R.layout.layout_chip, parent, false);
+            View row;
+            if (currentNode.isBilateral()){
+                row=inflater.inflate(R.layout.layout_chip_bilateral,parent, false);
+            }else{
+            row = inflater.inflate(R.layout.layout_chip, parent, false);
+            }
             return new ComplaintNodeListAdapter.ItemViewHolder(row);
         }
 

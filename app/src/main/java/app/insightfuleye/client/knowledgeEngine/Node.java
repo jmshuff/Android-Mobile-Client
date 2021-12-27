@@ -108,6 +108,7 @@ public class Node implements Serializable {
     private boolean hasPopUp;
     private boolean subPopUp;
     private int associated_symptoms = 0;
+    private boolean bilateral;
 
     private boolean isNoSelected;
 
@@ -213,6 +214,11 @@ public class Node implements Serializable {
             }
 
             this.bilateralQuestion= jsonNode.optString("bilateral");
+            if (!bilateralQuestion.isEmpty()){
+                this.bilateral=true;
+            }else{
+                bilateral=false;
+            }
 
 
             //Only for physical exams
@@ -529,6 +535,8 @@ public class Node implements Serializable {
     public boolean isAidAvailable() {
         return aidAvailable;
     }
+
+    public boolean isBilateral(){return bilateral;}
 
 
     public List<Node> getOptionsList() {
@@ -2208,6 +2216,7 @@ public class Node implements Serializable {
                 ", imagePathList=" + imagePathList +
                 ", space='" + space + '\'' +
                 ", imagePath='" + imagePath + '\'' +
+                ", bilateral'" + bilateralQuestion + '\'' +
                 '}';
     }
 
