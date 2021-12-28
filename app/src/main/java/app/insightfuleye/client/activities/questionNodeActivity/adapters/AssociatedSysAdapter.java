@@ -74,6 +74,7 @@ public class AssociatedSysAdapter extends RecyclerView.Adapter<AssociatedSysAdap
 
             Node groupNode = mGroupNode.getOption(mGroupPos);
             itemViewHolder.chip_No.setTextColor(ContextCompat.getColor(mContext, R.color.red));
+            String type="both";
 
            // itemViewHolder.chip_yes.setBackground(ContextCompat.getDrawable(mContext, R.drawable.rounded_rectangle_blue));
             //itemViewHolder.chip_No.setBackground(ContextCompat.getDrawable(mContext, R.drawable.rounded_rectangle_blue));
@@ -112,7 +113,7 @@ public class AssociatedSysAdapter extends RecyclerView.Adapter<AssociatedSysAdap
 
                             List<Node> childNode = mGroupNode.getOptionsList().get(mGroupPos).getOptionsList();
                             int indexOfCheckedNode = childNode.indexOf(thisNode);
-                            _mListener.onChildListClickEvent(mGroupPos, indexOfCheckedNode, physExamNodePos);
+                            _mListener.onChildListClickEvent(mGroupPos, indexOfCheckedNode, physExamNodePos, type);
                             notifyDataSetChanged();
                         });
 

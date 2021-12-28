@@ -35,6 +35,7 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -147,7 +148,6 @@ public class ImagesPushDAO {
 
     public boolean azureImagePush() throws DAOException {
         sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
-
 //        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
 //        localdb.execSQL("delete from tbl_azure_uploads");
         String encoded = sessionManager.getEncoded();
@@ -173,10 +173,18 @@ public class ImagesPushDAO {
             RequestBody visitId= RequestBody.create(MediaType.parse("text/plain"), p.getVisitId());
             RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), p.getPatientId());
             RequestBody type = RequestBody.create(MediaType.parse("text/plain"), p.getLeftRight());
-
+            RequestBody sex = RequestBody.create(MediaType.parse("text/plain"), p.getSex());
+            RequestBody age= RequestBody.create(MediaType.parse("text/plain"), p.getAge());
+            RequestBody visual_acuity = RequestBody.create(MediaType.parse("text/plain"), p.getVARight());
+            RequestBody pinhole_acuity = RequestBody.create(MediaType.parse("text/plain"),p.getPinholeRight());
+            RequestBody complaints =RequestBody.create(MediaType.parse("text/plain"), p.getComplaints());
+            if(p.getLeftRight()=="left"){
+                visual_acuity = RequestBody.create(MediaType.parse("text/plain"), p.getVALeft());
+                pinhole_acuity = RequestBody.create(MediaType.parse("text/plain"), p.getPinholeLeft());
+            }
             Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
             AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
-            Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(parts, creatorId, visitId, patientId, type);
+            Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(parts, creatorId, visitId, patientId, type, visual_acuity, pinhole_acuity, sex, age, complaints);
             Log.d("AzureUpload", p.getImagePath());
             //is this the right type for the observable...
             azureObservable.subscribeOn(Schedulers.io())
@@ -217,6 +225,7 @@ public class ImagesPushDAO {
         }
         sessionManager.setPushSyncFinished(true);
 //        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
+
         return true;
 
     }

@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
@@ -70,6 +71,7 @@ import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
 import app.insightfuleye.client.database.dao.ImagesDAO;
+import app.insightfuleye.client.database.dao.ImagesPushDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
@@ -137,6 +139,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     RecyclerView physExam_recyclerView;
     QuestionsAdapter adapter;
     String mgender;
+    String mAge;
     ScrollingPagerIndicator recyclerViewIndicator;
 
 
@@ -295,7 +298,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         Log.e(TAG, "PhyExam: " + physicalExamMap.getTotalNumberOfExams());*/
 
         mgender = PatientsDAO.fetch_gender(patientUuid);
-
+        mAge= PatientsDAO.fetch_age(patientUuid);
         if (mgender.equalsIgnoreCase("M")) {
             physicalExamMap.fetchItem("0");
         } else if (mgender.equalsIgnoreCase("F")) {
@@ -451,6 +454,29 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     updateImageDatabase();
                 }
             }
+            //update azure database
+            try {
+                updateAzureImageDatabase();
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+            //Print Queue
+            ImagesDAO imagesDAO = new ImagesDAO();
+            List<azureResults> azureQueue= new ArrayList<>();
+            try {
+                azureQueue=imagesDAO.getAzureImageQueue();
+                Log.d("AzureQueue", azureQueue.toString());
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+            //upload all images to Azure
+            ImagesPushDAO imagesPushDAO = new ImagesPushDAO();
+            try {
+                imagesPushDAO.azureImagePush();
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+
 
             if (intentTag != null && intentTag.equals("edit")) {
                 updateDatabase(physicalString);
@@ -501,7 +527,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
 
     @Override
-    public void onChildListClickEvent(int groupPosition, int childPos, int physExamPos) {
+    public void onChildListClickEvent(int groupPosition, int childPos, int physExamPos, String type) {
         Node question = physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getOption(childPos);
         //Log.d("Clicked", question.language());
         question.toggleSelected();
@@ -763,8 +789,13 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 Log.i(TAG, mCurrentPhotoPath);
                 physicalExamMap.displayImage(this, filePath.getAbsolutePath(), imageName);
                 updateImageDatabase();
-                uploadAzureImage(filePath.getAbsolutePath(), imageName);
-
+                //uploadAzureImage(filePath.getAbsolutePath(), imageName);
+                //instead of uploading it now, let's queue it now and upload everything later
+                try {
+                    insertAzureImageDatabase(azureType, imageName+".jpg");
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
                 //Test, code to print list of queded images for testing
                 ImagesDAO imagesDAO = new ImagesDAO();
                 List<azureResults> azureQueue= new ArrayList<>();
@@ -953,7 +984,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
     }
 
-    private void uploadAzureImage(String filePath,String imageName) {
+    /*private void uploadAzureImage(String filePath,String imageName) {
         File file = new File(filePath+"/"+imageName+".jpg");
         Log.d("Azure file", file.getName());
         Retrofit retrofit = AzureNetworkClient.getRetrofit();
@@ -1000,6 +1031,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         });
     }
 
+     */
+
     public boolean insertAzureImageDatabase(String type, String imageName) throws DAOException {
         boolean isInserted = false;
         SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
@@ -1011,6 +1044,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             contentValues.put("visitId", visitUuid);
             contentValues.put("creatorId", sessionManager.getChwname());
             contentValues.put("type", type);
+            contentValues.put("VARight", "");
+            contentValues.put("VALeft", "");
+            contentValues.put("PinholeRight", "");
+            contentValues.put("PinholeLeft", "");
+            contentValues.put("age", "");
+            contentValues.put("sex", "");
+            contentValues.put("complaints", "");
+
             //contentValues.put("sync", "false");
             localdb.insertWithOnConflict("tbl_azure_uploads", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
             isInserted = true;
@@ -1023,6 +1064,32 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         }
         return isInserted;
+    }
+    public boolean updateAzureImageDatabase() throws DAOException{
+        boolean isUpdated =false;
+        SQLiteDatabase localdb=AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues=new ContentValues();
+        PatientsDAO patientsDAO= new PatientsDAO();
+        String mAge=patientsDAO.fetch_age(patientUuid);
+        String mGender=patientsDAO.fetch_gender(patientUuid);
+        try{
+            contentValues.put("VARight", physicalExamMap.getVARight());
+            contentValues.put("VALeft", physicalExamMap.getVALeft());
+            contentValues.put("PinholeRight", physicalExamMap.getPinholeRight());
+            contentValues.put("PinholeLeft", physicalExamMap.getPinholeLeft());
+            contentValues.put("age", mAge);
+            contentValues.put("sex", mGender);
+            localdb.updateWithOnConflict("tbl_azure_uploads", contentValues, "visitId = ?", new String[]{visitUuid}, SQLiteDatabase.CONFLICT_REPLACE);
+            localdb.setTransactionSuccessful();
+            isUpdated=true;
+        }catch (SQLException e) {
+            isUpdated = false;
+            throw new DAOException(e);
+        } finally{
+            localdb.endTransaction();
+        }
+        return isUpdated;
     }
 
 

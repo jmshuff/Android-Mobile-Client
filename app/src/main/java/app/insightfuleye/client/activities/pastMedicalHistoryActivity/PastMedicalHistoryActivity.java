@@ -313,7 +313,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
     }
 
 
-    private void onListClick(View v, int groupPosition, int childPosition) {
+    private void onListClick(View v, int groupPosition, int childPosition, String type) {
         Node clickedNode = patientHistoryMap.getOption(groupPosition).getOption(childPosition);
         clickedNode.toggleSelected();
 
@@ -521,8 +521,8 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
     }
 
     @Override
-    public void onChildListClickEvent(int groupPos, int childPos, int physExamPos) {
-        onListClick(null, groupPos, childPos);
+    public void onChildListClickEvent(int groupPos, int childPos, int physExamPos, String type) {
+        onListClick(null, groupPos, childPos, type);
     }
 
 

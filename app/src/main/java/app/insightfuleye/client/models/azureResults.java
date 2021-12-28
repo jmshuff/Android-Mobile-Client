@@ -20,6 +20,14 @@ public class azureResults {
     @SerializedName("created_at")
     private String creationDate;
 
+    private String VARight;
+    private String VALeft;
+    private String PinholeRight;
+    private String PinholeLeft;
+    private String age;
+    private String sex;
+    private String complaints;
+
     public String getImageId() {
         return ImageId;
     }
@@ -85,7 +93,63 @@ public class azureResults {
         this.creationDate = creationDate;
     }
 
+    public String getVARight() {
+        return VARight;
+    }
+
+    public void setVARight(String VARight) {
+        this.VARight = VARight;
+    }
+
+    public String getVALeft() {
+        return VALeft;
+    }
+
+    public void setVALeft(String VALeft) {
+        this.VALeft = VALeft;
+    }
+
+    public String getPinholeRight() {
+        return PinholeRight;
+    }
+
+    public void setPinholeRight(String pinholeRight) {
+        PinholeRight = pinholeRight;
+    }
+
+    public String getPinholeLeft() {
+        return PinholeLeft;
+    }
+
+    public void setPinholeLeft(String pinholeLeft) {
+        PinholeLeft = pinholeLeft;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getComplaints() {
+        return complaints;
+    }
+
+    public void setComplaints(String complaints) {
+        this.complaints = complaints;
+    }
+
     public String toString(){
-        return "PatientID: " + patientId + ", CreatorId: " + chwName + ", Type: " + leftRight + ", VisitID: " + visitId + ", Image Path: " + imagePath;
+        return "PatientID: " + patientId + ", CreatorId: " + chwName + ", Type: " + leftRight + ", VisitID: " + visitId + ", Image Path: " + imagePath + "VARight " + VARight + "VALeft: " + VALeft + "Age: " + age + "Sex: " + sex;
     }
 }

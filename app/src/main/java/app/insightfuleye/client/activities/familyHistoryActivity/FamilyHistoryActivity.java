@@ -291,7 +291,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
         return result;
     }
 
-    private void onListClick(View v, int groupPosition, int childPosition) {
+    private void onListClick(View v, int groupPosition, int childPosition, String type) {
         Node clickedNode = familyHistoryMap.getOption(groupPosition).getOption(childPosition);
         Log.i(TAG, "onChildClick: ");
         clickedNode.toggleSelected();
@@ -486,8 +486,8 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
     }
 
     @Override
-    public void onChildListClickEvent(int groupPos, int childPos, int physExamPos) {
-        onListClick(null, groupPos, childPos);
+    public void onChildListClickEvent(int groupPos, int childPos, int physExamPos, String type) {
+        onListClick(null, groupPos, childPos, type);
     }
 
 

@@ -166,12 +166,19 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "voided TEXT DEFAULT '0'," +
             "sync TEXT DEFAULT 'false' " +
             ")";
-    public static final String AZURE_UPLOADS= "CREATE TABLE IF NOT EXISTS tbL_azure_uploads(" +
+    public static final String AZURE_UPLOADS= "CREATE TABLE IF NOT EXISTS tbl_azure_uploads(" +
             "imageName TEXT PRIMARY KEY," +
             "patientId TEXT," +
             "visitId TEXT," +
             "creatorId TEXT," +
-            "type TEXT" +
+            "type TEXT," +
+            "VARight TEXT," +
+            "VALeft TEXT," +
+            "PinholeRight TEXT," +
+            "PinholeLeft TEXT," +
+            "age TEXT," +
+            "sex TEXT," +
+            "complaints TEXT" +
             ")";
 
 

@@ -455,6 +455,24 @@ public class PatientsDAO {
         return gender;
     }
 
+    public static String fetch_age(String patientUuid) {
+        String age = "";
+
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        Cursor cursor = db.query("tbl_patient", new String[]{"date_of_birth"}, "uuid=?",
+                new String[]{patientUuid}, null, null, null);
+
+        if(cursor.moveToFirst()) {
+            do {
+                age = cursor.getString(cursor.getColumnIndexOrThrow("date_of_birth"));
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return age;
+    }
+
 
 
 }

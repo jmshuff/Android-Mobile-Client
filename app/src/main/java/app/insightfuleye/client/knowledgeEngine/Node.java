@@ -109,6 +109,8 @@ public class Node implements Serializable {
     private boolean subPopUp;
     private int associated_symptoms = 0;
     private boolean bilateral;
+    private boolean rightSelected;
+    private boolean leftSelected;
 
     private boolean isNoSelected;
 
@@ -299,6 +301,8 @@ public class Node implements Serializable {
         this.positiveCondition = source.positiveCondition;
         this.negativeCondition = source.negativeCondition;
         this.bilateralQuestion= source.bilateralQuestion;
+        this.rightSelected=false;
+        this.leftSelected=false;
     }
 
     public static void subLevelQuestion(final Node node, final Activity context, final QuestionsAdapter callingAdapter,
@@ -536,7 +540,14 @@ public class Node implements Serializable {
         return aidAvailable;
     }
 
-    public boolean isBilateral(){return bilateral;}
+    public boolean isBilateral(){
+        //return bilateral;}
+        //returning true for testing 12-28-21 JS
+        return true;
+    }
+
+    public boolean isRightSelected(){return rightSelected;}
+    public boolean isLeftSelected(){return leftSelected;}
 
 
     public List<Node> getOptionsList() {
@@ -591,19 +602,74 @@ public class Node implements Serializable {
     public void setUnselected() {
         selected = false;
     }
+    public void setRightUnselected(){
+        rightSelected=false;
+    }
+
+    public void setLeftUnselected(){
+        leftSelected=false;
+    }
 
     public void toggleSelected() {
         selected = !selected;
+    }
+
+    public void toggleRightSelected(){
+        rightSelected=!rightSelected;
+    }
+
+    public void toggleLeftSelected(){
+        leftSelected=!leftSelected;
     }
 
     public void setSelected(boolean isSelectedStatus) {
         selected = isSelectedStatus;
     }
 
+    public void setRightSelected(boolean isRightSelectedStatus){
+        rightSelected=isRightSelectedStatus;
+    }
+
+    public void setLeftSelected(boolean isLeftSelectedStatus){
+        leftSelected=isLeftSelectedStatus;
+    }
+
     public boolean anySubSelected() {
         if (!terminal) {
             for (int i = 0; i < optionsList.size(); i++) {
                 if (optionsList.get(i).isSelected()) {
+                    subSelected = true;
+                    break;
+                } else {
+                    subSelected = false;
+                }
+            }
+            return subSelected;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean anySubRightSelected() {
+        if (!terminal) {
+            for (int i = 0; i < optionsList.size(); i++) {
+                if (optionsList.get(i).isRightSelected()) {
+                    subSelected = true;
+                    break;
+                } else {
+                    subSelected = false;
+                }
+            }
+            return subSelected;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean anySubLeftSelected() {
+        if (!terminal) {
+            for (int i = 0; i < optionsList.size(); i++) {
+                if (optionsList.get(i).isLeftSelected()) {
                     subSelected = true;
                     break;
                 } else {

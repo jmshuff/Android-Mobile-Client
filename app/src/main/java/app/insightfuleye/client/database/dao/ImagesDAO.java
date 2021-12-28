@@ -490,6 +490,13 @@ public class ImagesDAO {
                     ImageQueue.setLeftRight(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
                     ImageQueue.setVisitId(idCursor.getString(idCursor.getColumnIndexOrThrow("visitId")));
                     ImageQueue.setPatientId(idCursor.getString(idCursor.getColumnIndexOrThrow("patientId")));
+                    ImageQueue.setVARight(idCursor.getString(idCursor.getColumnIndexOrThrow("VARight")));
+                    ImageQueue.setVALeft(idCursor.getString(idCursor.getColumnIndexOrThrow("VALeft")));
+                    ImageQueue.setPinholeRight(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeRight")));
+                    ImageQueue.setPinholeLeft(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeLeft")));
+                    ImageQueue.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
+                    ImageQueue.setSex(idCursor.getString(idCursor.getColumnIndexOrThrow("sex")));
+                    ImageQueue.setComplaints(idCursor.getString(idCursor.getColumnIndexOrThrow("complaints")));
                     azureResultList.add(ImageQueue);
                 }
             }

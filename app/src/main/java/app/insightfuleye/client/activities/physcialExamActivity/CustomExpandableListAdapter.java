@@ -126,7 +126,8 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 @Override
                 public void onClick(View view) {
                     node.setNoSelected(false);
-                    ((QuestionNodeActivity) mContext).onListClicked(finalConvertView, groupPosition, childPosition);
+                    String type="both";
+                    ((QuestionNodeActivity) mContext).onListClicked(finalConvertView, groupPosition, childPosition, type);
                 }
             });
 

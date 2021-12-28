@@ -223,8 +223,9 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     }
 
 
-    public void onListClicked(View v, int groupPosition, int childPosition) {
+    public void onListClicked(View v, int groupPosition, int childPosition, String type) {
         Log.e(TAG, "CLICKED: " + currentNode.getOption(groupPosition).toString());
+
         if ((currentNode.getOption(groupPosition).getChoiceType().equals("single")) && !currentNode.getOption(groupPosition).anySubSelected()) {
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
             question.toggleSelected();
@@ -234,6 +235,26 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 currentNode.getOption(groupPosition).setUnselected();
             }
             //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
+
+            if(currentNode.isBilateral()){
+                if(type=="right" || type=="both"){
+                    question.toggleRightSelected();
+                    if (currentNode.getOption(groupPosition).anySubRightSelected()) {
+                        currentNode.getOption(groupPosition).setRightSelected(true);
+                    } else {
+                        currentNode.getOption(groupPosition).setRightUnselected();
+                    }
+                }
+                if(type=="left" || type=="both"){
+                    question.toggleLeftSelected();
+                    if (currentNode.getOption(groupPosition).anySubLeftSelected()) {
+                        currentNode.getOption(groupPosition).setLeftSelected(true);
+                    } else {
+                        currentNode.getOption(groupPosition).setLeftUnselected();
+                    }
+                }
+
+            }
 
             if (!question.getInputType().isEmpty() && question.isSelected()) {
                 if (question.getInputType().equals("camera")) {
@@ -276,16 +297,34 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             alertDialog.show();
             IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
         } else {
-
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
-            question.toggleSelected();
-            if (currentNode.getOption(groupPosition).anySubSelected()) {
-                currentNode.getOption(groupPosition).setSelected(true);
-            } else {
-                currentNode.getOption(groupPosition).setUnselected();
-            }
-            //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
+                question.toggleSelected();
+                if (currentNode.getOption(groupPosition).anySubSelected()) {
+                    currentNode.getOption(groupPosition).setSelected(true);
+                } else {
+                    currentNode.getOption(groupPosition).setUnselected();
+                }
+                //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
 
+            if(currentNode.isBilateral()){
+                if(type=="right" || type=="both"){
+                    question.toggleRightSelected();
+                    if (currentNode.getOption(groupPosition).anySubRightSelected()) {
+                        currentNode.getOption(groupPosition).setRightSelected(true);
+                    } else {
+                        currentNode.getOption(groupPosition).setRightUnselected();
+                    }
+                }
+                if(type=="left" || type=="both"){
+                    question.toggleLeftSelected();
+                    if (currentNode.getOption(groupPosition).anySubLeftSelected()) {
+                        currentNode.getOption(groupPosition).setLeftSelected(true);
+                    } else {
+                        currentNode.getOption(groupPosition).setLeftUnselected();
+                    }
+                }
+
+            }
             if (!question.getInputType().isEmpty() && question.isSelected()) {
                 if (question.getInputType().equals("camera")) {
                     if (!filePath.exists()) {
@@ -476,7 +515,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
-
+/*
     private void uploadAzureImage(String filePath,String imageName) {
         File file = new File(filePath+"/"+imageName+".jpg");
         Log.d("Azure file", file.getName());
@@ -520,6 +559,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             }
         });
     }
+
+ */
 
     public boolean insertAzureImageDatabase(String type, String imageName) throws DAOException {
         boolean isInserted = false;
@@ -752,7 +793,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 String mCurrentPhotoPath = data.getStringExtra("RESULT");
                 currentNode.setImagePath(mCurrentPhotoPath);
                 currentNode.displayImage(this, filePath.getAbsolutePath(), imageName);
-                uploadAzureImage(filePath.getAbsolutePath(), imageName);
+                //uploadAzureImage(filePath.getAbsolutePath(), imageName);
 
             }
         }
@@ -807,8 +848,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     }
 
     @Override
-    public void onChildListClickEvent(int groupPos, int childPos, int physExamPos) {
-        onListClicked(null, groupPos, childPos);
+    public void onChildListClickEvent(int groupPos, int childPos, int physExamPos, String type) {
+        onListClicked(null, groupPos, childPos, type);
     }
 
 
