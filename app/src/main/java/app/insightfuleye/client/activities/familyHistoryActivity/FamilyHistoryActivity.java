@@ -300,6 +300,25 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
         } else {
             familyHistoryMap.getOption(groupPosition).setUnselected();
         }
+
+        if (clickedNode.isBilateral()) {
+            if (type == "right" || type == "both") {
+                clickedNode.toggleRightSelected();
+                if (familyHistoryMap.getOption(groupPosition).anySubRightSelected()) {
+                    familyHistoryMap.getOption(groupPosition).setRightSelected(true);
+                } else {
+                    familyHistoryMap.getOption(groupPosition).setRightUnselected();
+                }
+            }
+            if (type == "left" || type == "both") {
+                clickedNode.toggleLeftSelected();
+                if (familyHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
+                    familyHistoryMap.getOption(groupPosition).setLeftSelected(true);
+                } else {
+                    familyHistoryMap.getOption(groupPosition).setLeftUnselected();
+                }
+            }
+        }
         adapter.notifyDataSetChanged();
 
         if (clickedNode.getInputType() != null) {

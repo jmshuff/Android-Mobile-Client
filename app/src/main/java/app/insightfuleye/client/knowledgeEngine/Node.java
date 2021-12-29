@@ -729,6 +729,7 @@ public class Node implements Serializable {
     }
 
     public String generateLanguage() {
+        //Makes the output result string
 
         String raw = "";
         List<Node> mOptions = optionsList;
@@ -756,10 +757,12 @@ public class Node implements Serializable {
                     } else {
                         if (!node_opt.getLanguage().isEmpty()) {
                             if (node_opt.getLanguage().equals("%")) {
-                                raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
+                                //raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
+                                //I think removing this will remove empty lines. JS confirm 12-28-21
                             } else if (node_opt.getLanguage().substring(0, 1).equals("%")) {
                                 raw = raw + (bullet + " " + node_opt.getLanguage().substring(1) + " - " + node_opt.formLanguage()) + next_line;
                             } else {
+                                //getLanguge= language from json file
                                 raw = raw + (bullet + " " + node_opt.getLanguage() + " - " + node_opt.formLanguage()) + next_line;
                             }
                         }
@@ -1671,6 +1674,12 @@ public class Node implements Serializable {
                         } else {
                             stringsList.add(test);
                         }
+                    }
+                    if (mOptions.get(i).isRightSelected()){
+                        stringsList.add("- Right Eye ");
+                    }
+                    if (mOptions.get(i).isLeftSelected()){
+                        stringsList.add(" - Left Eye ");
                     }
 
                     if (!mOptions.get(i).isTerminal()) {

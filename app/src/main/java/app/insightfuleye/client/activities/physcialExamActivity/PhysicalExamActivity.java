@@ -536,7 +536,28 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         } else {
             physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
         }
+
+        if (question.isBilateral()){
+            if(type=="right" || type=="both"){
+                question.toggleRightSelected();
+                if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
+                } else {
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
+                }
+            }
+            if(type=="left" || type=="both"){
+                question.toggleLeftSelected();
+                if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
+                } else {
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
+                }
+            }
+        }
         adapter.notifyDataSetChanged();
+
+
 
 
         if (question.getInputType() != null && question.isSelected()) {

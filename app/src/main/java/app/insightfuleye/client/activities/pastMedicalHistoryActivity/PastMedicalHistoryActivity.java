@@ -323,6 +323,25 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         } else {
             patientHistoryMap.getOption(groupPosition).setUnselected();
         }
+
+        if (clickedNode.isBilateral()) {
+            if (type == "right" || type == "both") {
+                clickedNode.toggleRightSelected();
+                if (patientHistoryMap.getOption(groupPosition).anySubRightSelected()) {
+                    patientHistoryMap.getOption(groupPosition).setRightSelected(true);
+                } else {
+                    patientHistoryMap.getOption(groupPosition).setRightUnselected();
+                }
+            }
+            if (type == "left" || type == "both") {
+                clickedNode.toggleLeftSelected();
+                if (patientHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
+                    patientHistoryMap.getOption(groupPosition).setLeftSelected(true);
+                } else {
+                    patientHistoryMap.getOption(groupPosition).setLeftUnselected();
+                }
+            }
+        }
         adapter.notifyDataSetChanged();
 
         if (clickedNode.getInputType() != null) {
