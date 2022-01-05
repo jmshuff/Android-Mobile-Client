@@ -537,7 +537,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
         }
 
-        if (question.isBilateral()){
+        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()){
+            Log.d("QuestionisBilateral", "true");
             if(type=="right" || type=="both"){
                 question.toggleRightSelected();
                 if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {

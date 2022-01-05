@@ -216,7 +216,7 @@ public class Node implements Serializable {
             }
 
             this.bilateralQuestion= jsonNode.optString("bilateral");
-            if (!bilateralQuestion.isEmpty()){
+            if (!this.bilateralQuestion.isEmpty()){
                 this.bilateral=true;
             }else{
                 bilateral=false;
@@ -242,7 +242,6 @@ public class Node implements Serializable {
             } else {
                 this.aidAvailable = false;
             }
-
             this.associatedComplaint = jsonNode.optString("associated-complaint");
             this.hasAssociations = !associatedComplaint.isEmpty();
 
@@ -541,10 +540,8 @@ public class Node implements Serializable {
     }
 
     public boolean isBilateral(){
-        //return bilateral;}
+        return bilateral;}
         //returning true for testing 12-28-21 JS
-        return true;
-    }
 
     public boolean isRightSelected(){return rightSelected;}
     public boolean isLeftSelected(){return leftSelected;}
@@ -804,8 +801,8 @@ public class Node implements Serializable {
         Log.i("generateTableResults", "called");
 
         String raw = "";
-        String leftSympt= "None";
-        String rightSympt="None";
+        String leftSympt= "";
+        String rightSympt="";
         String footer = "";
         List<Node> mOptions = optionsList;
 
@@ -814,6 +811,14 @@ public class Node implements Serializable {
                 if (node_opt.isSelected()) {
                     if (node_opt.getLanguage().toLowerCase().contains("glasses")){
                         footer = footer + bullet + " " + node_opt.formLanguage() + next_line;
+                    }
+                    else if (node_opt.getLanguage().toLowerCase().contains("complaints")){
+                        if(node_opt.isRightSelected()){
+                            rightSympt= rightSympt+ bullet + " " + node_opt.formLanguageBilateral() +next_line;
+                        }
+                        if(node_opt.isLeftSelected()){
+                            leftSympt= leftSympt+ bullet + " " + node_opt.formLanguageBilateral() +next_line;
+                        }
                     }
                     else if (node_opt.getLanguage().equals("%")) {
                         raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
@@ -852,18 +857,18 @@ public class Node implements Serializable {
             formatted = formatted.replaceAll("\\.,", ", ");
             Log.i(TAG, "generateLanguage: " + formatted);
 
-            //splint into left and right
-            if(formatted.toLowerCase().contains("left")){
-                leftSympt=formatted;
-                leftSympt=leftSympt.replace("Left Eye.<br/>"+bullet, "");
-            }
-            if (formatted.toLowerCase().contains("right")){
-                rightSympt=formatted;
-                rightSympt=rightSympt.replace("Right Eye.<br/>"+bullet, "");
-            }
-            if (!formatted.toLowerCase().contains("right") && !formatted.toLowerCase().contains("left")){
-                footer=formatted;
-            }
+//            //splint into left and right
+//            if(formatted.toLowerCase().contains("left")){
+//                leftSympt=formatted;
+//                leftSympt=leftSympt.replace("Left Eye.<br/>"+bullet, "");
+//            }
+//            if (formatted.toLowerCase().contains("right")){
+//                rightSympt=formatted;
+//                rightSympt=rightSympt.replace("Right Eye.<br/>"+bullet, "");
+//            }
+//            if (!formatted.toLowerCase().contains("right") && !formatted.toLowerCase().contains("left")){
+//                footer=formatted;
+//            }
 
         }
         Log.i("leftSympt", leftSympt);
@@ -1676,10 +1681,10 @@ public class Node implements Serializable {
                         }
                     }
                     if (mOptions.get(i).isRightSelected()){
-                        stringsList.add("- Right Eye ");
+                        stringsList.add(" Right Eye");
                     }
                     if (mOptions.get(i).isLeftSelected()){
-                        stringsList.add(" - Left Eye ");
+                        stringsList.add(" Left Eye");
                     }
 
                     if (!mOptions.get(i).isTerminal()) {
@@ -1722,7 +1727,7 @@ public class Node implements Serializable {
         return mLanguage;
     }
 
-    public String formConceptLanguage() {
+    public String formLanguageBilateral() {
         List<String> stringsList = new ArrayList<>();
         List<Node> mOptions = optionsList;
         boolean isTerminal = false;
@@ -1738,12 +1743,119 @@ public class Node implements Serializable {
                             stringsList.add(test);
                         }
                     }
+//                    if (mOptions.get(i).isRightSelected()){
+//                        stringsList.add("- Right Eye ");
+//                    }
+//                    if (mOptions.get(i).isLeftSelected()){
+//                        stringsList.add(" - Left Eye ");
+//                    }
 
                     if (!mOptions.get(i).isTerminal()) {
-                        stringsList.add(mOptions.get(i).formLanguage());
+                        stringsList.add(mOptions.get(i).formLanguageBilateral());
                         isTerminal = false;
                     } else {
                         isTerminal = true;
+                    }
+                }
+            }
+        }
+
+        String languageSeparator;
+        if (isTerminal) {
+            languageSeparator = ", ";
+        } else {
+            languageSeparator = " - ";
+        }
+        String mLanguage = "";
+        for (int i = 0; i < stringsList.size(); i++) {
+            if (i == 0) {
+
+                if (!stringsList.get(i).isEmpty()) {
+                    if (i == stringsList.size() - 1 && isTerminal) {
+                        mLanguage = mLanguage.concat(stringsList.get(i) + ".");
+                    } else {
+                        mLanguage = mLanguage.concat(stringsList.get(i));
+                    }
+                }
+            } else {
+                if (!stringsList.get(i).isEmpty()) {
+                    if (i == stringsList.size() - 1 && isTerminal) {
+                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i) + ".");
+                    } else {
+                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
+                    }
+                }
+            }
+        }
+        return mLanguage;
+    }
+
+    public String formConceptLanguage(String type) {
+        List<String> stringsList = new ArrayList<>();
+        List<Node> mOptions = optionsList;
+        boolean isTerminal = false;
+        if (mOptions != null && !mOptions.isEmpty()) {
+            for (int i = 0; i < mOptions.size(); i++) {
+                if (type=="right") {
+                    if (mOptions.get(i).isRightSelected()) {
+                        String test = mOptions.get(i).getLanguage();
+                        if (!test.isEmpty()) {
+                            if (test.equals("%")) {
+                            } else if (test.substring(0, 1).equals("%")) {
+                                stringsList.add(test.substring(1));
+                            } else {
+                                stringsList.add(test);
+                            }
+                        }
+
+                        if (!mOptions.get(i).isTerminal()) {
+                            stringsList.add(mOptions.get(i).formLanguageBilateral());
+                            isTerminal = false;
+                        } else {
+                            isTerminal = true;
+                        }
+                    }
+                }
+
+                if (type=="left"){
+                    if (mOptions.get(i).isLeftSelected()) {
+                        String test = mOptions.get(i).getLanguage();
+                        if (!test.isEmpty()) {
+                            if (test.equals("%")) {
+                            } else if (test.substring(0, 1).equals("%")) {
+                                stringsList.add(test.substring(1));
+                            } else {
+                                stringsList.add(test);
+                            }
+                        }
+
+                        if (!mOptions.get(i).isTerminal()) {
+                            stringsList.add(mOptions.get(i).formLanguageBilateral());
+                            isTerminal = false;
+                        } else {
+                            isTerminal = true;
+                        }
+                    }
+                }
+
+                else{
+                    if (mOptions.get(i).isSelected()) {
+                        String test = mOptions.get(i).getLanguage();
+                        if (!test.isEmpty()) {
+                            if (test.equals("%")) {
+                            } else if (test.substring(0, 1).equals("%")) {
+                                stringsList.add(test.substring(1));
+                            } else {
+                                stringsList.add(test);
+                            }
+                        }
+
+                        if (!mOptions.get(i).isTerminal()) {
+                            stringsList.add(mOptions.get(i).formLanguageBilateral());
+                            isTerminal = false;
+                        } else {
+                            isTerminal = true;
+                        }
                     }
                 }
             }
@@ -1779,6 +1891,8 @@ public class Node implements Serializable {
         }
         return mLanguage;
     }
+
+
 
     public AlertDialog displayImage(final Activity context, final String path, final String name) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
@@ -2291,7 +2405,7 @@ public class Node implements Serializable {
                 ", imagePathList=" + imagePathList +
                 ", space='" + space + '\'' +
                 ", imagePath='" + imagePath + '\'' +
-                ", bilateral'" + bilateralQuestion + '\'' +
+                ", bilateral='" + bilateral + '\'' +
                 '}';
     }
 

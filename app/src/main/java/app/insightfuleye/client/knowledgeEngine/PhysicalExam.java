@@ -262,27 +262,23 @@ public class PhysicalExam extends Node {
 
             if ((node.isSelected() | node.anySubSelected())){
                 Log.d("Category", category);
-                if (category.equals("VA right")){
-                    String VAright=node.formConceptLanguage();
+                if (category.equals("Visual Acuity")){
+                    String VAright=node.formConceptLanguage("right");
+                    String VAleft=node.formConceptLanguage("left");
                     Log.d("VAright lang", VAright);
                     setVARight(VAright);
-                }
-                if (category.equals("VA left")){
-                    String Valeft=node.formConceptLanguage();
-                    setVALeft(Valeft);
+                    setVALeft(VAleft);
                 }
 
-                if (category.equals("Pinhole right")){
-                    String Pinholeright=node.formConceptLanguage();
+                if (category.equals("Pinhole")){
+                    String Pinholeright=node.formConceptLanguage("right");
                     setPinholeRight(Pinholeright);
-                }
-                if (category.equals("Pinhole left")){
-                    String Pinholeleft=node.formConceptLanguage();
+                    String Pinholeleft=node.formConceptLanguage("left");
                     setPinholeLeft(Pinholeleft);
                 }
 
                 if (category.equals("Referral")){
-                    String volunteerReferral=node.formConceptLanguage();
+                    String volunteerReferral=node.formConceptLanguage("normal");
                     setVolunteerReferral(volunteerReferral);
                     //physicalExamMap.setVolunteerReferral(volunteerReferral.split(" ")[0]);
             /*if (volunteerReferral.split(" ").length > 1){
@@ -293,35 +289,39 @@ public class PhysicalExam extends Node {
                 }
 
                 if (category.equals("Referral Reason")){
-                    String volunteerReferralReason=node.formConceptLanguage();
-                    String diagnosisRight= "";
-                    String diagnosisLeft="";
-                    Log.d("Referral Reason", volunteerReferralReason);
-                    String[] reasons=volunteerReferralReason.split("\\. - ");
-                    Log.d("Reasons", Arrays.toString(reasons));
-                    for (String reason : reasons){
-                        Log.d("Diagnosis", reason);
-                        if (reason.toLowerCase().contains("right")){
-                            diagnosisRight=diagnosisRight.concat(reason.split(" -")[0]);
-                            diagnosisRight=diagnosisRight.concat(", ");
-                        }
-                        if (reason.toLowerCase().contains("left")){
-                            diagnosisLeft=diagnosisLeft.concat(reason.split(" -")[0]);
-                            diagnosisLeft=diagnosisLeft.concat(", ");
-                        }
-                    }
-                    //remove last comma character
-                    if (diagnosisRight.length()>1){
-                        diagnosisRight=diagnosisRight.substring(0, diagnosisRight.length()-2);
-                    }
-                    if (diagnosisLeft.length()>1){
-                        diagnosisLeft=diagnosisLeft.substring(0,diagnosisLeft.length()-2);
-                    }
-                    setVolunteerDiagnosisRight(diagnosisRight);
-                    setVolunteerDiagnosisLeft(diagnosisLeft);
-
-                    Log.d("DiagnosisRight",diagnosisRight);
-                    Log.d("DiagnosisLeft", diagnosisLeft);
+                    String volunteerDiagnosisRight=node.formConceptLanguage("right");
+                    String volunteerDiagnosisLeft=node.formConceptLanguage("left");
+                    setVolunteerDiagnosisRight(volunteerDiagnosisRight);
+                    setVolunteerDiagnosisLeft(volunteerDiagnosisLeft);
+//                    String volunteerReferralReason=node.formConceptLanguage("normal");
+//                    String diagnosisRight= "";
+//                    String diagnosisLeft="";
+//                    Log.d("Referral Reason", volunteerReferralReason);
+//                    String[] reasons=volunteerReferralReason.split("\\. - ");
+//                    Log.d("Reasons", Arrays.toString(reasons));
+//                    for (String reason : reasons){
+//                        Log.d("Diagnosis", reason);
+//                        if (reason.toLowerCase().contains("right")){
+//                            diagnosisRight=diagnosisRight.concat(reason.split(" -")[0]);
+//                            diagnosisRight=diagnosisRight.concat(", ");
+//                        }
+//                        if (reason.toLowerCase().contains("left")){
+//                            diagnosisLeft=diagnosisLeft.concat(reason.split(" -")[0]);
+//                            diagnosisLeft=diagnosisLeft.concat(", ");
+//                        }
+//                    }
+//                    //remove last comma character
+//                    if (diagnosisRight.length()>1){
+//                        diagnosisRight=diagnosisRight.substring(0, diagnosisRight.length()-2);
+//                    }
+//                    if (diagnosisLeft.length()>1){
+//                        diagnosisLeft=diagnosisLeft.substring(0,diagnosisLeft.length()-2);
+//                    }
+//                    setVolunteerDiagnosisRight(diagnosisRight);
+//                    setVolunteerDiagnosisLeft(diagnosisLeft);
+//
+//                    Log.d("DiagnosisRight",diagnosisRight);
+//                    Log.d("DiagnosisLeft", diagnosisLeft);
                 }
 
             }
@@ -392,6 +392,49 @@ public class PhysicalExam extends Node {
 
 
     public String generateTable(){
+        String mTable;
+        String mRVA=getVARight();
+        String mLVA=getVALeft();
+        String mRPin= getPinholeRight();
+        String mLPin = getPinholeLeft();
+        String leftSymptom=getLeftSympt();
+        String rightSymptom=getRightSympt();
+        String footer=getFooter();
+
+        mTable="<table>" +
+                "<tr>"+
+                "<th></th>"+
+                "<th>Right Eye</th>"+
+                "<th>Left Eye</th>"+
+                "</tr>"+
+                "<tr>"+
+                "<th>Chief Complaint </th>"+
+                "<td>"+leftSymptom+"</td>"+
+                "<td>"+rightSymptom+"</td>"+
+                "</tr>"+
+                "<tr>"+
+                "<th>Visual Acuity</th>"+
+                "<td>"+mRVA+"</td>"+
+                "<td>"+mLVA+"</td>"+
+                "</tr>"+
+                "<tr>"+
+                "<th>Pinhole Acuity</th>"+
+                "<td>"+mRPin+"</td>"+
+                "<td>"+mLPin+"</td>"+
+                "</tr>"+
+                "<tr>"+
+                "<th>Physical Exam</th>"+
+                //"<td>"+mRPhys+"</td>"+
+                //"<td>"+mLPhys+"</td>"+
+                "<tr>"+
+                "</table>"+
+                footer;
+                //mOther;
+        return mTable;
+
+
+    }
+/*    public String generateTable(){
 
         Set<String> rootStrings = new HashSet<>();
         List<String> stringsList = new ArrayList<>();
@@ -550,6 +593,8 @@ public class PhysicalExam extends Node {
         return mTable;
 
     }
+
+ */
 
 
     private String removeCharsFindings(String raw) {

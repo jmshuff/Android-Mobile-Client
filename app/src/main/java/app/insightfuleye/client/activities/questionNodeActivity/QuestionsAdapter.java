@@ -3,6 +3,7 @@ package app.insightfuleye.client.activities.questionNodeActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,9 +121,11 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             _mNode = physicalExam.getExamNode(position).getOption(0);
             final String parent_name = physicalExam.getExamParentNodeName(position);
             String nodeText = parent_name + " : " + _mNode.findDisplay();
-
+            Log.d("NodeText",nodeText);
             holder.physical_exam_text_view.setText(nodeText);
             holder.physical_exam_text_view.setVisibility(View.GONE);
+            Log.d("isAidAvailab;e", String.valueOf(_mNode.isAidAvailable()));
+            Log.d("isBilateral", String.valueOf(_mNode.isBilateral()));
             if (_mNode.isAidAvailable()) {
                 String type = _mNode.getJobAidType();
                 if (type.equals("video")) {
@@ -307,11 +310,14 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
 
         @NonNull
         @Override
-        public ComplaintNodeListAdapter.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View row;
             //row = inflater.inflate(R.layout.layout_chip, parent, false);
+            //Log.d("ChooseLayout", String.valueOf(physicalExam.getExamNode(mGroupPos).getOption(0).isBilateral()));
+            //Log.d("mGroupNode", mGroupNode.getOption(mGroupPos).toString());
             if (mGroupNode.isBilateral()){
+            //if (mGroupNode.getOption(mGroupPos).isBilateral()){
                 row=inflater.inflate(R.layout.layout_chip_bilateral,parent, false);
 
             }else{
@@ -319,7 +325,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             }
 
 
-            return new ComplaintNodeListAdapter.ItemViewHolder(row);
+            return new ItemViewHolder(row);
         }
 
         @Override
@@ -330,6 +336,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             Node groupNode = mGroupNode.getOption(mGroupPos);
             //Change color of the node if it is selected
             if(mGroupNode.isBilateral()){
+                //Log.d("Colorchange", "working");
                 if (thisNode.isRightSelected()){
                     itemViewHolder.mChipRight.setTextColor(ContextCompat.getColor(mContext, R.color.white));
                     itemViewHolder.mChipRight.setBackground(ContextCompat.getDrawable(mContext, R.drawable.rounded_rectangle_blue));
@@ -452,38 +459,39 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
 
                 }
             });
-
-            itemViewHolder.mChipRight.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int indexOfCheckedNode;
-                    String type="right";
-                    if (_mCallingClass.equalsIgnoreCase(PhysicalExamActivity.class.getSimpleName())) {
-                        indexOfCheckedNode = position;
-                    } else {
-                        List<Node> childNode = mGroupNode.getOptionsList().get(mGroupPos).getOptionsList();
-                        indexOfCheckedNode = childNode.indexOf(thisNode);
+            if (mGroupNode.isBilateral()) {
+                itemViewHolder.mChipRight.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int indexOfCheckedNode;
+                        String type = "right";
+                        if (_mCallingClass.equalsIgnoreCase(PhysicalExamActivity.class.getSimpleName())) {
+                            indexOfCheckedNode = position;
+                        } else {
+                            List<Node> childNode = mGroupNode.getOptionsList().get(mGroupPos).getOptionsList();
+                            indexOfCheckedNode = childNode.indexOf(thisNode);
+                        }
+                        _mListener.onChildListClickEvent(mGroupPos, indexOfCheckedNode, physExamNodePos, type);
+                        notifyDataSetChanged();
                     }
-                    _mListener.onChildListClickEvent(mGroupPos, indexOfCheckedNode, physExamNodePos, type);
-                    notifyDataSetChanged();
-                }
-            });
+                });
 
-            itemViewHolder.mChipLeft.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int indexOfCheckedNode;
-                    String type="left";
-                    if (_mCallingClass.equalsIgnoreCase(PhysicalExamActivity.class.getSimpleName())) {
-                        indexOfCheckedNode = position;
-                    } else {
-                        List<Node> childNode = mGroupNode.getOptionsList().get(mGroupPos).getOptionsList();
-                        indexOfCheckedNode = childNode.indexOf(thisNode);
+                itemViewHolder.mChipLeft.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int indexOfCheckedNode;
+                        String type = "left";
+                        if (_mCallingClass.equalsIgnoreCase(PhysicalExamActivity.class.getSimpleName())) {
+                            indexOfCheckedNode = position;
+                        } else {
+                            List<Node> childNode = mGroupNode.getOptionsList().get(mGroupPos).getOptionsList();
+                            indexOfCheckedNode = childNode.indexOf(thisNode);
+                        }
+                        _mListener.onChildListClickEvent(mGroupPos, indexOfCheckedNode, physExamNodePos, type);
+                        notifyDataSetChanged();
                     }
-                    _mListener.onChildListClickEvent(mGroupPos, indexOfCheckedNode, physExamNodePos, type);
-                    notifyDataSetChanged();
-                }
-            });
+                });
+            }
 
 
         /*   itemViewHolder.mChip.setOnClickListener(new View.OnClickListener() {

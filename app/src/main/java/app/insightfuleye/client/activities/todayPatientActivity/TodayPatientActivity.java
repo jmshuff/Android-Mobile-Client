@@ -250,25 +250,28 @@ public class TodayPatientActivity extends AppCompatActivity {
         Log.i(TAG, String.valueOf(uniqueVolunteers));
         Log.i(TAG, String.valueOf(volunteerCounts));
         int k=0;
-        for (String volunteer : uniqueVolunteers){
+        if(creator_uuid.length>0) {
+            for (String volunteer : uniqueVolunteers) {
 
-            int i= 0;
-            while (!creator_uuid[i].equals(volunteer)){
-                i++;
+
+                int i = 0;
+                while (!creator_uuid[i].equals(volunteer)) {
+                    i++;
+                }
+                uniqueVolunteers.set(k, creator_names[i]);
+                k++;
             }
-            uniqueVolunteers.set(k, creator_names[i]);
-            k++;
-        }
-        Log.i(TAG, String.valueOf(uniqueVolunteers));
-        Log.i(TAG, String.valueOf(volunteerCounts));
+            Log.i(TAG, String.valueOf(uniqueVolunteers));
+            Log.i(TAG, String.valueOf(volunteerCounts));
 
-        //add to model
-        int j=0;
-        while (j < uniqueVolunteers.size()){
-            volunteerList.add(new volunteerTotalModel(uniqueVolunteers.get(j), volunteerCounts.get(j)));
-            j++;
+            //add to model
+            int j = 0;
+            while (j < uniqueVolunteers.size()) {
+                volunteerList.add(new volunteerTotalModel(uniqueVolunteers.get(j), volunteerCounts.get(j)));
+                j++;
+            }
+            Log.d("length", String.valueOf(volunteerList.size()));
         }
-        Log.d("length", String.valueOf(volunteerList.size()));
     }
 
     private void setVolunteerAdapter(){
