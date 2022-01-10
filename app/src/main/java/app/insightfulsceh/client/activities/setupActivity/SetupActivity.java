@@ -88,7 +88,7 @@ public class SetupActivity extends AppCompatActivity {
     Base64Utils base64Utils = new Base64Utils();
     String encoded = null;
     AlertDialog.Builder dialog;
-    String key = "cbid-sceh"; //JS
+    String key = "image-test"; //JS
     String licenseUrl = "testing.intelehealth.org"; //JS
     SessionManager sessionManager = null;
     public File base_dir;

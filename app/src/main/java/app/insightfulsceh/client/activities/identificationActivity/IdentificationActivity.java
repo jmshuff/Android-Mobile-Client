@@ -1238,152 +1238,152 @@ public class IdentificationActivity extends AppCompatActivity {
 
 
         // New Validation
-        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty() && !mGenderF.isChecked() && !mGenderM.isChecked()  && mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty())
-        {
-            personal_info_textview.requestFocus();
-
-            mFirstName.setError(getString(R.string.error_field_required));
+//        if(mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty() && mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty() && mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty() && !mGenderF.isChecked() && !mGenderM.isChecked()  && mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty())
+//        {
+//            personal_info_textview.requestFocus();
+//
+//            mFirstName.setError(getString(R.string.error_field_required));
+////            mFirstName.requestFocus();
+//
+//            mLastName.setError(getString(R.string.error_field_required));
+////            mLastName.requestFocus();
+//
+//
+//            mPhoneNum.setError(getString(R.string.error_field_required));
+////            mCity.requestFocus();
+//            mAge.setError(getString(R.string.error_field_required));
+//
+//            mGenderF.setError(getString(R.string.error_field_required));
+//
+//            if (frameLayout.getVisibility() == View.VISIBLE) {
+//                if (!ma_checkbox.isChecked() && !ab_checkbox.isChecked() && !none_checkbox.isChecked()) {
+//                    health_textview.setError(getString(R.string.error_field_required));
+//                    /*ma_checkbox.setError(getString(R.string.error_field_required));
+//                    ab_checkbox.setError(getString(R.string.error_field_required));
+//                    none_checkbox.setError(getString(R.string.error_field_required));*/
+//                }
+//            }
+//
+//            MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
+//            alertDialogBuilder.setTitle(R.string.error);
+//            alertDialogBuilder.setMessage(R.string.identification_screen_required_fields);
+//            alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    dialog.dismiss();
+//                }
+//            });
+//            AlertDialog alertDialog = alertDialogBuilder.create();
+//            alertDialog.show();
+//
+//            Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+//            positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+//            //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+//            IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
+//            personal_info_textview.clearFocus();
+//            return;
+//        }
+//
+//
+//        if (mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty()) {
+//            mFirstName.setError(getString(R.string.error_field_required));
 //            mFirstName.requestFocus();
-
-            mLastName.setError(getString(R.string.error_field_required));
+//            return;
+//        }
+//
+//        if (mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty()) {
+//            mLastName.setError(getString(R.string.error_field_required));
 //            mLastName.requestFocus();
-
-
-            mPhoneNum.setError(getString(R.string.error_field_required));
-//            mCity.requestFocus();
-            mAge.setError(getString(R.string.error_field_required));
-
-            mGenderF.setError(getString(R.string.error_field_required));
-
-            if (frameLayout.getVisibility() == View.VISIBLE) {
-                if (!ma_checkbox.isChecked() && !ab_checkbox.isChecked() && !none_checkbox.isChecked()) {
-                    health_textview.setError(getString(R.string.error_field_required));
-                    /*ma_checkbox.setError(getString(R.string.error_field_required));
-                    ab_checkbox.setError(getString(R.string.error_field_required));
-                    none_checkbox.setError(getString(R.string.error_field_required));*/
-                }
-            }
-
-            MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
-            alertDialogBuilder.setTitle(R.string.error);
-            alertDialogBuilder.setMessage(R.string.identification_screen_required_fields);
-            alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-
-            Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-            //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
-            personal_info_textview.clearFocus();
-            return;
-        }
-
-
-        if (mFirstName.getText().toString().equals("") && mFirstName.getText().toString().isEmpty()) {
-            mFirstName.setError(getString(R.string.error_field_required));
-            mFirstName.requestFocus();
-            return;
-        }
-
-        if (mLastName.getText().toString().equals("") && mLastName.getText().toString().isEmpty()) {
-            mLastName.setError(getString(R.string.error_field_required));
-            mLastName.requestFocus();
-            return;
-        }
-
-        if (mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty()) {
-            mPhoneNum.setError(getString(R.string.error_field_required));
-            mPhoneNum.requestFocus();
-            return;
-        }
-        if (!mGenderF.isChecked() && !mGenderM.isChecked()) {
-            mGenderF.setError(getString(R.string.error_field_required));
-            personal_info_textview.requestFocus();
-            MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
-            alertDialogBuilder.setTitle(R.string.error);
-            alertDialogBuilder.setMessage(R.string.identification_screen_dialog_error_gender);
-            alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-
-            Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-            //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-            IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
-            personal_info_textview.clearFocus();
-            return;
-        }
-
-
-        if (mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty()) {
-            mAge.setError(getString(R.string.error_field_required));
-            mAge.requestFocus();
-            return;
-        }
-
-
-        //if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
-        //    mCity.setError(getString(R.string.error_field_required));
-        //    address_details_textview.requestFocus();
-        //    Toast.makeText(this, R.string.please_enter_village, Toast.LENGTH_SHORT).show();
-        //    address_details_textview.clearFocus();
-        //    return;
-        //}
-
-        if (frameLayout.getVisibility() == View.VISIBLE) {
-            if (!ma_checkbox.isChecked() && !ab_checkbox.isChecked() && !none_checkbox.isChecked()) {
-                health_textview.setError(getString(R.string.error_field_required));
-                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
-                alertDialogBuilder.setTitle("Health Scheme Card");
-                alertDialogBuilder.setMessage(R.string.please_select_option_hsc);
-                alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-
-                Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-                //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-                IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
-
-                return;
-            }
-        }
-
-
-        /*if(mPhoneNum.getText().toString().trim().length() > 0) {
-            if(mPhoneNum.getText().toString().trim().length() < 10) {
-                mPhoneNum.requestFocus();
-                mPhoneNum.setError("Enter 10 digits");
-                return;
-            }
-        }
-
-         */
-
-        //Next of Kin Phone, JS
-        if(mOccupation.getText().toString().trim().length() > 0) {
-            if(mOccupation.getText().toString().trim().length() < 10) {
-                mOccupation.requestFocus();
-                mOccupation.setError("Enter 10 digits");
-                return;
-            }
-        }
+//            return;
+//        }
+//
+//        if (mPhoneNum.getText().toString().equals("") && mPhoneNum.getText().toString().isEmpty()) {
+//            mPhoneNum.setError(getString(R.string.error_field_required));
+//            mPhoneNum.requestFocus();
+//            return;
+//        }
+//        if (!mGenderF.isChecked() && !mGenderM.isChecked()) {
+//            mGenderF.setError(getString(R.string.error_field_required));
+//            personal_info_textview.requestFocus();
+//            MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
+//            alertDialogBuilder.setTitle(R.string.error);
+//            alertDialogBuilder.setMessage(R.string.identification_screen_dialog_error_gender);
+//            alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    dialog.dismiss();
+//                }
+//            });
+//            AlertDialog alertDialog = alertDialogBuilder.create();
+//            alertDialog.show();
+//
+//            Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+//            positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+//            //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+//            IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
+//            personal_info_textview.clearFocus();
+//            return;
+//        }
+//
+//
+//        if (mAge.getText().toString().equals("") && mAge.getText().toString().isEmpty()) {
+//            mAge.setError(getString(R.string.error_field_required));
+//            mAge.requestFocus();
+//            return;
+//        }
+//
+//
+//        //if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
+//        //    mCity.setError(getString(R.string.error_field_required));
+//        //    address_details_textview.requestFocus();
+//        //    Toast.makeText(this, R.string.please_enter_village, Toast.LENGTH_SHORT).show();
+//        //    address_details_textview.clearFocus();
+//        //    return;
+//        //}
+//
+//        if (frameLayout.getVisibility() == View.VISIBLE) {
+//            if (!ma_checkbox.isChecked() && !ab_checkbox.isChecked() && !none_checkbox.isChecked()) {
+//                health_textview.setError(getString(R.string.error_field_required));
+//                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(IdentificationActivity.this);
+//                alertDialogBuilder.setTitle("Health Scheme Card");
+//                alertDialogBuilder.setMessage(R.string.please_select_option_hsc);
+//                alertDialogBuilder.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//                AlertDialog alertDialog = alertDialogBuilder.create();
+//                alertDialog.show();
+//
+//                Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+//                positiveButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+//                //positiveButton.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+//                IntelehealthApplication.setAlertDialogCustomTheme(IdentificationActivity.this, alertDialog);
+//
+//                return;
+//            }
+//        }
+//
+//
+//        /*if(mPhoneNum.getText().toString().trim().length() > 0) {
+//            if(mPhoneNum.getText().toString().trim().length() < 10) {
+//                mPhoneNum.requestFocus();
+//                mPhoneNum.setError("Enter 10 digits");
+//                return;
+//            }
+//        }
+//
+//         */
+//
+//        //Next of Kin Phone, JS
+//        if(mOccupation.getText().toString().trim().length() > 0) {
+//            if(mOccupation.getText().toString().trim().length() < 10) {
+//                mOccupation.requestFocus();
+//                mOccupation.setError("Enter 10 digits");
+//                return;
+//            }
+//        }
 
    /*     ArrayList<EditText> values = new ArrayList<>();
         values.add(mFirstName);
@@ -1589,7 +1589,7 @@ public class IdentificationActivity extends AppCompatActivity {
         patientdto.setLastname(StringUtils.getValue(mLastName.getText().toString()));
         patientdto.setPhonenumber(StringUtils.getValue(mPhoneNum.getText().toString()));
         patientdto.setGender(StringUtils.getValue(mGender));
-        patientdto.setDateofbirth(DateAndTimeUtils.getFormatedDateOfBirth(StringUtils.getValue(mDOB.getText().toString())));
+        //patientdto.setDateofbirth(DateAndTimeUtils.getFormatedDateOfBirth(StringUtils.getValue(mDOB.getText().toString())));
         patientdto.setAddress1(StringUtils.getValue(mAddress1.getText().toString()));
         patientdto.setAddress2(StringUtils.getValue(mAddress2.getText().toString()));
         patientdto.setCityvillage(StringUtils.getValue(mCity.getText().toString()));

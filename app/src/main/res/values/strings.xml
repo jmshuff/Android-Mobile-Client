@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SCEH: InSightful</string>
+    <string name="app_name">Image Testing</string>
 
     //Gene
     <string name="generic_the_flipping_word_next">Next</string>
@@ -77,16 +77,16 @@
 
     //Identification Screen
     <string name="title_activity_identification">Add New Patient</string>
-    <string name="identification_screen_prompt_first_name">First name *</string>
-    <string name="identification_screen_prompt_middle_name">Middle name</string>
-    <string name="identification_screen_prompt_last_name">Last name *</string>
+    <string name="identification_screen_prompt_first_name">Diagnosis</string>
+    <string name="identification_screen_prompt_middle_name">Prototype Iteration</string>
+    <string name="identification_screen_prompt_last_name">Notes: </string>
     <string name="identification_screen_prompt_address">Village</string>
     <string name="identification_screen_prompt_address2">Taluk</string>
-    <string name="identification_screen_prompt_phone_number">Patient ID</string>
+    <string name="identification_screen_prompt_phone_number">Notes: </string>
     <string name="admin_password_dialog_heading">Enter Admin Password</string>
     <string name="identification_screen_prompt_gender">Gender *</string>
-    <string name="identification_screen_checkbox_male">Male</string>
-    <string name="identification_screen_checkbox_female">Female</string>
+    <string name="identification_screen_checkbox_male">Right</string>
+    <string name="identification_screen_checkbox_female">Left</string>
     <string name="identification_screen_prompt_birthday">Date of birth*</string>
     <string name="identification_screen_prompt_age">Age *</string>
     <string name="identification_screen_prompt_city">District</string>
