@@ -360,9 +360,9 @@ public class ImagesDAO {
 //                        FirebaseCrashlytics.getInstance().recordException(e);
 //                    }
 
-                    if (file.exists()) {
-                        file.delete();
-                    }
+                //if (file.exists()) {
+                //      file.delete();
+                //  }
                 //}
             }
         }

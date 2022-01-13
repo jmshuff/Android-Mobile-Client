@@ -314,6 +314,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
 
     private void onListClick(View v, int groupPosition, int childPosition, String type) {
+        Node parentNode = patientHistoryMap.getOption(groupPosition);
         Node clickedNode = patientHistoryMap.getOption(groupPosition).getOption(childPosition);
         clickedNode.toggleSelected();
 
@@ -324,7 +325,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             patientHistoryMap.getOption(groupPosition).setUnselected();
         }
 
-        if (clickedNode.isBilateral()) {
+        if (parentNode.isBilateral()) {
             if (type == "right" || type == "both") {
                 clickedNode.toggleRightSelected();
                 if (patientHistoryMap.getOption(groupPosition).anySubRightSelected()) {

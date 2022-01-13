@@ -652,5 +652,12 @@
     <string name="gujarati_end_statement">" દાખલ કરો."</string>
     <string name="powered_by_intelehealth">Powered by Intelehealth</string>
     <string name="total_visits_today">Total Visits Today:</string>
+    <string name= "visual_acuity_right">Visual Acuity Right</string>
+    <string name= "visual_acuity_left">Visual Acuity Left</string>
+    <string name= "pinhole_acuity_right">Pinhole Acuity Right</string>
+    <string name= "pinhole_acuity_left">Visual Acuity Left</string>
+
+
+
 
 </resources>

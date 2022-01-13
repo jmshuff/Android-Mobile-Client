@@ -540,6 +540,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()){
             Log.d("QuestionisBilateral", "true");
             if(type=="right" || type=="both"){
+                //Log.d("SetRSelect", "true");
                 question.toggleRightSelected();
                 if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
@@ -549,6 +550,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             }
             if(type=="left" || type=="both"){
                 question.toggleLeftSelected();
+                //Log.d("SetLSelect", "true");
                 if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
                 } else {

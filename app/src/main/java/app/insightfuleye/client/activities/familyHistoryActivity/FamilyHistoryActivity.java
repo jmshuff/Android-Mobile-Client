@@ -292,6 +292,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
     }
 
     private void onListClick(View v, int groupPosition, int childPosition, String type) {
+        Node parentNode= familyHistoryMap.getOption(groupPosition);
         Node clickedNode = familyHistoryMap.getOption(groupPosition).getOption(childPosition);
         Log.i(TAG, "onChildClick: ");
         clickedNode.toggleSelected();
@@ -301,7 +302,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
             familyHistoryMap.getOption(groupPosition).setUnselected();
         }
 
-        if (clickedNode.isBilateral()) {
+        if (parentNode.isBilateral()) {
             if (type == "right" || type == "both") {
                 clickedNode.toggleRightSelected();
                 if (familyHistoryMap.getOption(groupPosition).anySubRightSelected()) {

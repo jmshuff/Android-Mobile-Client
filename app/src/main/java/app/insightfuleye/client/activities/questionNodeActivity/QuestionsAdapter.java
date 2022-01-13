@@ -124,8 +124,8 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             Log.d("NodeText",nodeText);
             holder.physical_exam_text_view.setText(nodeText);
             holder.physical_exam_text_view.setVisibility(View.GONE);
-            Log.d("isAidAvailab;e", String.valueOf(_mNode.isAidAvailable()));
-            Log.d("isBilateral", String.valueOf(_mNode.isBilateral()));
+            //Log.d("isAidAvailab;e", String.valueOf(_mNode.isAidAvailable()));
+            //Log.d("isBilateral", String.valueOf(_mNode.isBilateral()));
             if (_mNode.isAidAvailable()) {
                 String type = _mNode.getJobAidType();
                 if (type.equals("video")) {
@@ -316,8 +316,8 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             //row = inflater.inflate(R.layout.layout_chip, parent, false);
             //Log.d("ChooseLayout", String.valueOf(physicalExam.getExamNode(mGroupPos).getOption(0).isBilateral()));
             //Log.d("mGroupNode", mGroupNode.getOption(mGroupPos).toString());
-            if (mGroupNode.isBilateral()){
-            //if (mGroupNode.getOption(mGroupPos).isBilateral()){
+            if (mGroupNode.isBilateral() || mGroupNode.getOption(mGroupPos).isBilateral()){
+                Log.d("Layout", "Bilateral");
                 row=inflater.inflate(R.layout.layout_chip_bilateral,parent, false);
 
             }else{
@@ -334,8 +334,10 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             itemViewHolder.mChipText.setText(thisNode.findDisplay());
 
             Node groupNode = mGroupNode.getOption(mGroupPos);
+            //Log.d("isBilateral", String.valueOf(groupNode.isBilateral()));
+
             //Change color of the node if it is selected
-            if(mGroupNode.isBilateral()){
+            if(mGroupNode.isBilateral() || mGroupNode.getOption(mGroupPos).isBilateral()){
                 //Log.d("Colorchange", "working");
                 if (thisNode.isRightSelected()){
                     itemViewHolder.mChipRight.setTextColor(ContextCompat.getColor(mContext, R.color.white));
@@ -459,7 +461,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
 
                 }
             });
-            if (mGroupNode.isBilateral()) {
+            if (mGroupNode.isBilateral() || mGroupNode.getOption(mGroupPos).isBilateral()) {
                 itemViewHolder.mChipRight.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -542,7 +544,9 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
 
             public ItemViewHolder(@NonNull View itemView) {
                 super(itemView);
-                if (mGroupNode.isBilateral()){
+                //Log.d("mGroupNode", mGroupNode.toString());
+                //Log.d("mGroupNodeOption", mGroupNode.getOption(mGroupPos).toString());
+                if (mGroupNode.isBilateral() || mGroupNode.getOption(mGroupPos).isBilateral()){
                     mChip = itemView.findViewById(R.id.complaint_chip);
                     mChipText = itemView.findViewById(R.id.tvChipText);
                     mChipLeft= itemView.findViewById(R.id.tvChipLeft);

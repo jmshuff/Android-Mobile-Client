@@ -260,21 +260,26 @@ public class PhysicalExam extends Node {
             String[] split=title.split(": ");
             String category=split[1];
 
+
             if ((node.isSelected() | node.anySubSelected())){
                 Log.d("Category", category);
                 if (category.equals("Visual Acuity")){
-                    String VAright=node.formConceptLanguage("right");
-                    String VAleft=node.formConceptLanguage("left");
+                    String VAright=node.formLanguageBilateral("right");
+                    String VAleft=node.formLanguageBilateral("left");
                     Log.d("VAright lang", VAright);
                     setVARight(VAright);
                     setVALeft(VAleft);
+                    Log.d("VAleft lang", VAleft);
+
                 }
 
                 if (category.equals("Pinhole")){
-                    String Pinholeright=node.formConceptLanguage("right");
+                    String Pinholeright=node.formLanguageBilateral("right");
                     setPinholeRight(Pinholeright);
-                    String Pinholeleft=node.formConceptLanguage("left");
+                    String Pinholeleft=node.formLanguageBilateral("left");
                     setPinholeLeft(Pinholeleft);
+                    Log.d("PinholeRight lang", Pinholeright);
+                    Log.d("PinholeLeft lang", Pinholeleft);
                 }
 
                 if (category.equals("Referral")){
@@ -409,8 +414,8 @@ public class PhysicalExam extends Node {
                 "</tr>"+
                 "<tr>"+
                 "<th>Chief Complaint </th>"+
-                "<td>"+leftSymptom+"</td>"+
                 "<td>"+rightSymptom+"</td>"+
+                "<td>"+leftSymptom+"</td>"+
                 "</tr>"+
                 "<tr>"+
                 "<th>Visual Acuity</th>"+

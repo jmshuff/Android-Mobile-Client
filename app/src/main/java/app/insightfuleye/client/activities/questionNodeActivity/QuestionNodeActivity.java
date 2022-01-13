@@ -236,7 +236,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             }
             //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
 
-            if(currentNode.isBilateral()){
+            if(currentNode.getOption(groupPosition).isBilateral()){
                 if(type=="right" || type=="both"){
                     question.toggleRightSelected();
                     if (currentNode.getOption(groupPosition).anySubRightSelected()) {
@@ -306,7 +306,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 }
                 //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
 
-            if(currentNode.isBilateral()){
+            if(currentNode.getOption(groupPosition).isBilateral()){
                 if(type=="right" || type=="both"){
                     question.toggleRightSelected();
                     if (currentNode.getOption(groupPosition).anySubRightSelected()) {

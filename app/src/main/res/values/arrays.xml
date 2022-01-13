@@ -44,6 +44,20 @@
         <item>Philippines</item>
     </string-array>
 
+    <string-array name="visual_acuity_scores">
+        <item>\u003E6/60</item>
+        <item>6/60</item>
+        <item>6/36</item>
+        <item>6/24</item>
+        <item>6/18</item>
+        <item>6/12</item>
+        <item>6/9</item>
+        <item>6/6</item>
+        <item>HM</item>
+        <item>Light Perception</item>
+        <item>No Light Perception</item>
+    </string-array>
+
     <string-array name="education_or">
         <item>ଶିକ୍ଷା ଚୟନ</item>
         <item>ଅଶିକ୍ଷିତ</item>

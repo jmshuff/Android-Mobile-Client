@@ -814,10 +814,10 @@ public class Node implements Serializable {
                     }
                     else if (node_opt.getLanguage().toLowerCase().contains("complaints")){
                         if(node_opt.isRightSelected()){
-                            rightSympt= rightSympt+ bullet + " " + node_opt.formLanguageBilateral() +next_line;
+                            rightSympt= rightSympt+ bullet + " " + node_opt.formLanguageBilateral("right") +next_line;
                         }
                         if(node_opt.isLeftSelected()){
-                            leftSympt= leftSympt+ bullet + " " + node_opt.formLanguageBilateral() +next_line;
+                            leftSympt= leftSympt+ bullet + " " + node_opt.formLanguageBilateral("left") +next_line;
                         }
                     }
                     else if (node_opt.getLanguage().equals("%")) {
@@ -1727,36 +1727,61 @@ public class Node implements Serializable {
         return mLanguage;
     }
 
-    public String formLanguageBilateral() {
+    public String formLanguageBilateral(String type) {
         List<String> stringsList = new ArrayList<>();
         List<Node> mOptions = optionsList;
         boolean isTerminal = false;
+        Log.d("Enter", "formLangBi");
         if (mOptions != null && !mOptions.isEmpty()) {
             for (int i = 0; i < mOptions.size(); i++) {
-                if (mOptions.get(i).isSelected()) {
-                    String test = mOptions.get(i).getLanguage();
-                    if (!test.isEmpty()) {
-                        if (test.equals("%")) {
-                        } else if (test.substring(0, 1).equals("%")) {
-                            stringsList.add(test.substring(1));
-                        } else {
-                            stringsList.add(test);
+                if (type == "right") {
+                    if (mOptions.get(i).isRightSelected()) {
+                        String test = mOptions.get(i).getLanguage();
+                        Log.d("typeright", test);
+                        if (!test.isEmpty()) {
+                            if (test.equals("%")) {
+                            } else if (test.substring(0, 1).equals("%")) {
+                                stringsList.add(test.substring(1));
+                            } else {
+                                stringsList.add(test);
+                            }
+                        }
+
+                    }
+                } else if (type == "left") {
+                    if (mOptions.get(i).isLeftSelected()) {
+                        String test = mOptions.get(i).getLanguage();
+                        Log.d("typeleft", test);
+                        if (!test.isEmpty()) {
+                            if (test.equals("%")) {
+                            } else if (test.substring(0, 1).equals("%")) {
+                                stringsList.add(test.substring(1));
+                            } else {
+                                stringsList.add(test);
+                            }
                         }
                     }
-//                    if (mOptions.get(i).isRightSelected()){
-//                        stringsList.add("- Right Eye ");
-//                    }
-//                    if (mOptions.get(i).isLeftSelected()){
-//                        stringsList.add(" - Left Eye ");
-//                    }
-
-                    if (!mOptions.get(i).isTerminal()) {
-                        stringsList.add(mOptions.get(i).formLanguageBilateral());
-                        isTerminal = false;
-                    } else {
-                        isTerminal = true;
+                } else {
+                    if (mOptions.get(i).isSelected()) {
+                        String test = mOptions.get(i).getLanguage();
+                        Log.d("typeboth", test);
+                        if (!test.isEmpty()) {
+                            if (test.equals("%")) {
+                            } else if (test.substring(0, 1).equals("%")) {
+                                stringsList.add(test.substring(1));
+                            } else {
+                                stringsList.add(test);
+                            }
+                        }
                     }
                 }
+                if (!mOptions.get(i).isTerminal()) {
+                    stringsList.add(mOptions.get(i).formLanguageBilateral(type));
+                    isTerminal = false;
+                } else {
+                    isTerminal = true;
+                }
+
             }
         }
 
@@ -1771,11 +1796,7 @@ public class Node implements Serializable {
             if (i == 0) {
 
                 if (!stringsList.get(i).isEmpty()) {
-                    if (i == stringsList.size() - 1 && isTerminal) {
-                        mLanguage = mLanguage.concat(stringsList.get(i) + ".");
-                    } else {
-                        mLanguage = mLanguage.concat(stringsList.get(i));
-                    }
+                    mLanguage = mLanguage.concat(stringsList.get(i));
                 }
             } else {
                 if (!stringsList.get(i).isEmpty()) {
@@ -1787,6 +1808,7 @@ public class Node implements Serializable {
                 }
             }
         }
+        Log.d("Concept", mLanguage);
         return mLanguage;
     }
 
@@ -1809,7 +1831,7 @@ public class Node implements Serializable {
                         }
 
                         if (!mOptions.get(i).isTerminal()) {
-                            stringsList.add(mOptions.get(i).formLanguageBilateral());
+                            stringsList.add(mOptions.get(i).formLanguageBilateral("right"));
                             isTerminal = false;
                         } else {
                             isTerminal = true;
@@ -1817,9 +1839,10 @@ public class Node implements Serializable {
                     }
                 }
 
-                if (type=="left"){
+                else if (type=="left"){
                     if (mOptions.get(i).isLeftSelected()) {
                         String test = mOptions.get(i).getLanguage();
+                        Log.d("isLSelected", test);
                         if (!test.isEmpty()) {
                             if (test.equals("%")) {
                             } else if (test.substring(0, 1).equals("%")) {
@@ -1830,7 +1853,7 @@ public class Node implements Serializable {
                         }
 
                         if (!mOptions.get(i).isTerminal()) {
-                            stringsList.add(mOptions.get(i).formLanguageBilateral());
+                            stringsList.add(mOptions.get(i).formLanguageBilateral("left"));
                             isTerminal = false;
                         } else {
                             isTerminal = true;
@@ -1851,7 +1874,7 @@ public class Node implements Serializable {
                         }
 
                         if (!mOptions.get(i).isTerminal()) {
-                            stringsList.add(mOptions.get(i).formLanguageBilateral());
+                            stringsList.add(mOptions.get(i).formLanguageBilateral(""));
                             isTerminal = false;
                         } else {
                             isTerminal = true;
@@ -1873,22 +1896,15 @@ public class Node implements Serializable {
             if (i == 1) {
 
                 if (!stringsList.get(i).isEmpty()) {
-                    if (i == stringsList.size() - 1 && isTerminal) {
-                        mLanguage = mLanguage.concat(stringsList.get(i));
-                    } else {
-                        mLanguage = mLanguage.concat(stringsList.get(i));
-                    }
+                    mLanguage = mLanguage.concat(stringsList.get(i));
                 }
             } else {
                 if (!stringsList.get(i).isEmpty()) {
-                    if (i == stringsList.size() - 1 && isTerminal) {
-                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
-                    } else {
-                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
-                    }
+                    mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
                 }
             }
         }
+        Log.d("formConceptLang", mLanguage);
         return mLanguage;
     }
 
