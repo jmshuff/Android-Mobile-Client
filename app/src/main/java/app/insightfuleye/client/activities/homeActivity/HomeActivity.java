@@ -69,6 +69,7 @@ import app.insightfuleye.client.activities.privacyNoticeActivity.PrivacyNotice_A
 import app.insightfuleye.client.activities.searchPatientActivity.SearchPatientActivity;
 import app.insightfuleye.client.activities.settingsActivity.SettingsActivity;
 import app.insightfuleye.client.activities.todayPatientActivity.TodayPatientActivity;
+import app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.models.CheckAppUpdateRes;
@@ -112,7 +113,7 @@ public class HomeActivity extends AppCompatActivity {
     IntentFilter filter;
     Myreceiver reMyreceive;
     SyncUtils syncUtils = new SyncUtils();
-    CardView c1, c2, c3, c4, c5, c6;
+    CardView c1, c2, c3, c4, c5, c6, c7;
     CardView settings_card, updateProtocols_card, logout_card;
     private String key = null;
     private String licenseUrl = null;
@@ -126,7 +127,7 @@ public class HomeActivity extends AppCompatActivity {
     private int versionCode = 0;
     private CompositeDisposable disposable = new CompositeDisposable();
     TextView newPatient_textview, findPatients_textview, todaysVisits_textview,
-            activeVisits_textview, videoLibrary_textview, help_textview;
+            activeVisits_textview, videoLibrary_textview, help_textview, uploadImage_textView;
     private AppUpdateManager mAppUpdateManager;
     private static final int RC_APP_UPDATE = 11;
 
@@ -172,6 +173,7 @@ public class HomeActivity extends AppCompatActivity {
         c4 = findViewById(R.id.cardview_active_patients);
         c5 = findViewById(R.id.cardview_video_libraby);
         c6 = findViewById(R.id.cardview_help_whatsapp);
+        c7 = findViewById(R.id.cardview_upload_image);
         settings_card=findViewById(R.id.settings_card);
         updateProtocols_card=findViewById(R.id.updateProtocols_card);
         logout_card=findViewById(R.id.logout_card);
@@ -193,6 +195,8 @@ public class HomeActivity extends AppCompatActivity {
 
         videoLibrary_textview = findViewById(R.id.videoLibrary_textview);
         videoLibrary_textview.setText(R.string.video_library);
+
+
 
         help_textview = findViewById(R.id.help_textview);
         help_textview.setText(R.string.Whatsapp_Help_Cardview);
@@ -279,6 +283,14 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 videoLibrary();
+            }
+        });
+
+        c7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, uploadImageInfoActivity.class);
+                startActivity(intent);
             }
         });
 

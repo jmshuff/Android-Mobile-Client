@@ -656,6 +656,7 @@
     <string name= "visual_acuity_left">Visual Acuity Left</string>
     <string name= "pinhole_acuity_right">Pinhole Acuity Right</string>
     <string name= "pinhole_acuity_left">Visual Acuity Left</string>
+    <string name="upload_image">Upload Image</string>
 
 
 

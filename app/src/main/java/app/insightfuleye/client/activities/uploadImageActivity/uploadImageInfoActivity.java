@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -16,8 +17,18 @@ import android.widget.Spinner;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.UUID;
+
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
 import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
+import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.models.dto.PatientDTO;
@@ -30,17 +41,23 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     EditText mAge;
     RadioButton mGenderM;
     RadioButton mGenderF;
-    Spinner mVARight;
-    Spinner mVALeft;
-    Spinner mPinholeRight;
-    Spinner mPinholeLeft;
+    Spinner spinVARight;
+    Spinner spinVALeft;
+    Spinner spinPinholeRight;
+    Spinner spinPinholeLeft;
     ImageView mImageViewRight;
     ImageView mImageViewLeft;
+    EditText vaRightText;
+    EditText vaLeftText;
+    EditText phRightText;
+    EditText phLeftText;
+    private String vaRight, vaLeft, phRight, phLeft;
     private String mGender;
     ImagesDAO imagesDAO = new ImagesDAO();
     private String mCurrentPhotoPath;
     Context context;
     String patientID_edit;
+    String patientId;
     azureResults patient= new azureResults();
 
     @Override
@@ -61,12 +78,16 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         mAge = findViewById(R.id.upload_image_age);
         mGenderM = findViewById(R.id.upload_image_gender_male);
         mGenderF = findViewById(R.id.upload_image_gender_female);
-        mVARight=findViewById(R.id.spinner_varight);
-        mVALeft=findViewById(R.id.spinner_valeft);
-        mPinholeRight=findViewById(R.id.spinner_pinholeright);
-        mPinholeLeft=findViewById(R.id.spinner_pinholeleft);
+        spinVARight=findViewById(R.id.spinner_varight);
+        spinVALeft=findViewById(R.id.spinner_valeft);
+        spinPinholeRight=findViewById(R.id.spinner_pinholeright);
+        spinPinholeLeft=findViewById(R.id.spinner_pinholeleft);
         mImageViewRight=findViewById(R.id.imageview_right_eye_picture);
         mImageViewLeft=findViewById(R.id.imageview_left_eye_picture);
+        vaLeftText=findViewById(R.id.valeft);
+        vaRightText=findViewById(R.id.varight);
+        phLeftText=findViewById(R.id.pinholeleft);
+        phRightText=findViewById(R.id.pinholeright);
 
     //load past details to edit
         Intent intent = this.getIntent(); // The intent was passed to the activity
@@ -88,16 +109,16 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         ArrayAdapter<CharSequence> phLeftAdapter = ArrayAdapter.createFromResource(this,
                 R.array.visual_acuity_scores, R.layout.custom_spinner);
 
-        mVARight.setAdapter(vaRightAdapter);
-        mVALeft.setAdapter(vaLeftAdapter);
-        mPinholeRight.setAdapter(phRightAdapter);
-        mPinholeLeft.setAdapter(phLeftAdapter);
+        spinVARight.setAdapter(vaRightAdapter);
+        spinVALeft.setAdapter(vaLeftAdapter);
+        spinPinholeRight.setAdapter(phRightAdapter);
+        spinPinholeLeft.setAdapter(phLeftAdapter);
 
         if(patientID_edit != null){
-            mVARight.setSelection(vaRightAdapter.getPosition(String.valueOf(patient.getVARight())));
-            mVALeft.setSelection(vaLeftAdapter.getPosition(String.valueOf(patient.getVALeft())));
-            mPinholeRight.setSelection(phRightAdapter.getPosition(String.valueOf(patient.getPinholeRight())));
-            mPinholeLeft.setSelection(phLeftAdapter.getPosition(String.valueOf(patient.getPinholeLeft())));
+            spinVARight.setSelection(vaRightAdapter.getPosition(String.valueOf(patient.getVARight())));
+            spinVALeft.setSelection(vaLeftAdapter.getPosition(String.valueOf(patient.getVALeft())));
+            spinPinholeRight.setSelection(phRightAdapter.getPosition(String.valueOf(patient.getPinholeRight())));
+            spinPinholeLeft.setSelection(phLeftAdapter.getPosition(String.valueOf(patient.getPinholeLeft())));
         }
 
         if (patientID_edit != null) {
@@ -120,12 +141,154 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         } else {
             mGender = "F";
         }
-    }
+        spinVARight.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                vaRight = parent.getItemAtPosition(position).toString();
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        spinVALeft.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                vaLeft = parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        spinPinholeRight.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                phRight=parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        spinPinholeLeft.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                phLeft=parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        mGenderF.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        mGenderM.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        mImageViewRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String imageName = UUID.randomUUID().toString();
+                File filePath = new File(AppConstants.IMAGE_PATH + imageName);
+                if (!filePath.exists()) {
+                    filePath.mkdir();
+                }
+                Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
+                // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
+                cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageName);
+                cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, filePath.toString());
+                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE);
+            }
+        });
+
+        mImageViewLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String imageName = UUID.randomUUID().toString();
+                File filePath = new File(AppConstants.IMAGE_PATH + imageName);
+                if (!filePath.exists()) {
+                    filePath.mkdir();
+                }
+                Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
+                // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
+                cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageName);
+                cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, filePath.toString());
+                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE);
+            }
+        });
+
+
+        mAge.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus) {
+                    if (!mAge.getText().toString().isEmpty()) {
+                        Calendar calendar = Calendar.getInstance();
+                        int curYear = calendar.get(Calendar.YEAR);
+                        int mAgeYear = Integer.parseInt(mAge.getText().toString());
+                        int birthYear = curYear - mAgeYear; //mAge will just be the year JS
+                        int curMonth = calendar.get(Calendar.MONTH);
+                        int birthMonth = curMonth; //There is no birth month JS
+                        int birthDay = calendar.get(Calendar.DAY_OF_MONTH);
+                        //int totalDays = today.getActualMaximum(Calendar.DAY_OF_MONTH);
+                    }
+                }
+            }
+        });
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(v -> {
+            if (patientID_edit != null) {
+                onUploadUpdateClicked(patient);
+            } else {
+                onUploadCreateClicked();
+            }
+        });
+
+    }
 
 
     private void setscreen(String patientId){
 
+    }
+
+    public void onUploadUpdateClicked(azureResults patient){
+
+    }
+    public void onUploadCreateClicked(){
+
+    }
+
+    public void onRadioButtonClicked(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+        switch (view.getId()) {
+            case R.id.upload_image_gender_male:
+                if (checked)
+                    mGender = "M";
+                Log.v(TAG, "gender:" + mGender);
+                break;
+            case R.id.upload_image_gender_female:
+                if (checked)
+                    mGender = "F";
+                Log.v(TAG, "gender:" + mGender);
+                break;
+        }
+        mGenderM.setError(null);
+        mGenderF.setError(null);
     }
 
 

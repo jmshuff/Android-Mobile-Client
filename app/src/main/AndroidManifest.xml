@@ -194,6 +194,18 @@
             android:screenOrientation="portrait"
             android:configChanges="uiMode"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name="app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="uiMode"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name="app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="uiMode"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="app.insightfuleye.client.activities.homeActivity.HomeActivity"
             android:label="@string/title_activity_home"
