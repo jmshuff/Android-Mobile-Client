@@ -90,7 +90,7 @@ public class IntroActivity extends AppCompatActivity {
         context = IntroActivity.this;
         sessionManager = new SessionManager(this);
 
-        BASE_URL = "http://demo.intelehealth.org/openmrs/ws/rest/v1/";
+        BASE_URL = "https://demo.intelehealth.org/openmrs/ws/rest/v1/";
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
