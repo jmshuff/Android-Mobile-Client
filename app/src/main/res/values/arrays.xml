@@ -45,6 +45,7 @@
     </string-array>
 
     <string-array name="visual_acuity_scores">
+        <item></item>
         <item>\u003E6/60</item>
         <item>6/60</item>
         <item>6/36</item>
