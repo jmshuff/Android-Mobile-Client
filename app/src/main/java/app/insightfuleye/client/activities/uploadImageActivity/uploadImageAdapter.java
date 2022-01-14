@@ -34,6 +34,7 @@ import app.insightfuleye.client.activities.additionalDocumentsActivity.Additiona
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.models.DocumentObject;
+import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
@@ -41,13 +42,13 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
     int screen_height;
     int screen_width;
 
-    private List<DocumentObject> documentList = new ArrayList<>();
+    private List<azureResults> documentList = new ArrayList<>();
     private Context context;
     private String filePath;
     ImagesDAO imagesDAO = new ImagesDAO();
     private static final String TAG = uploadImageAdapter.class.getSimpleName();
 
-    public uploadImageAdapter(Context context, List<DocumentObject> documentList, String filePath) {
+    public uploadImageAdapter(Context context, List<azureResults> documentList, String filePath) {
         this.documentList = documentList;
         this.context = context;
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -73,7 +74,7 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
         holder.getDocumentNameTextView().setText
                 ("Document - " + (position + 1));
 
-        final File image = new File(documentList.get(position).getDocumentPhoto());
+        final File image = new File(documentList.get(position).getImagePath());
 
         Glide.with(context)
                 .load(image)
@@ -107,7 +108,7 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
         });
     }
 
-    public void add(DocumentObject doc) {
+    public void add(azureResults doc) {
         boolean bool = documentList.add(doc);
         if (bool) Log.d(TAG, "add: Item added to list");
         notifyDataSetChanged();

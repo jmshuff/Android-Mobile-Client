@@ -2,6 +2,9 @@ package app.insightfuleye.client.activities.uploadImageActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +32,7 @@ import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.models.DocumentObject;
+import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
@@ -37,7 +42,7 @@ public class uploadImageActivity extends AppCompatActivity {
     private String visitUuid;
     private String encounterVitals;
     private String encounterAdultIntials;
-    private List<DocumentObject> rowListItem;
+    private List<azureResults> rowListItem;
     private uploadImageAdapter recyclerViewAdapter;
 
 
@@ -61,29 +66,20 @@ public class uploadImageActivity extends AppCompatActivity {
         });
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
-            patientUuid = intent.getStringExtra("patientUuid");
-            visitUuid = intent.getStringExtra("visitUuid");
-            encounterVitals = intent.getStringExtra("encounterUuidVitals");
-            encounterAdultIntials = intent.getStringExtra("encounterUuidAdultIntial");
-
-            ImagesDAO imagesDAO = new ImagesDAO();
-            ArrayList<String> fileuuidList = new ArrayList<String>();
             ArrayList<File> fileList = new ArrayList<File>();
+            List<azureResults> additionalDocs= new ArrayList<>();
             try {
-                fileuuidList = imagesDAO.getImageUuid(encounterAdultIntials, UuidDictionary.COMPLEX_IMAGE_AD);
-                for (String fileuuid : fileuuidList) {
-                    String filename = AppConstants.IMAGE_PATH + fileuuid + ".jpg";
-                    if (new File(filename).exists()) {
-                        fileList.add(new File(filename));
-                    }
-                }
+                additionalDocs=getAzureImageQueue();
             } catch (DAOException e) {
                 e.printStackTrace();
             }
             rowListItem = new ArrayList<>();
-
-            for (File file : fileList)
-                rowListItem.add(new DocumentObject(file.getName(), file.getAbsolutePath()));
+            for (azureResults doc : additionalDocs) {
+                String filename = AppConstants.IMAGE_PATH + doc.getImagePath() + ".jpg";
+                if (new File(filename).exists()) {
+                    rowListItem.add(doc);
+                }
+            }
 
             RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this);
 
@@ -103,7 +99,7 @@ public class uploadImageActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_additional_docs, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
+/*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -128,6 +124,9 @@ public class uploadImageActivity extends AppCompatActivity {
             }
         }
     }
+
+ */
+
     private void updateImageDatabase(String imageuuid) {
         ImagesDAO imagesDAO = new ImagesDAO();
         try {
@@ -141,14 +140,46 @@ public class uploadImageActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_docs:
-                Intent cameraIntent = new Intent(this, CameraActivity.class);
-                String imageName = UUID.randomUUID().toString();
-                cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageName);
-                cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, AppConstants.IMAGE_PATH);
-                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE);
+                Intent intent = new Intent(this, uploadImageInfoActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public List<azureResults> getAzureImageQueue() throws DAOException {
+        //get unsynced images from local storage
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        List<azureResults> azureResultList = new ArrayList<>();
+        try {
+            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_azure_additional_docs", null);
+            if (idCursor.getCount() != 0) {
+                while (idCursor.moveToNext()) {
+                    azureResults ImageQueue= new azureResults();
+                    ImageQueue.setChwName(idCursor.getString(idCursor.getColumnIndexOrThrow("creatorId")));
+                    ImageQueue.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName")));
+                    ImageQueue.setLeftRight(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
+                    ImageQueue.setVisitId(idCursor.getString(idCursor.getColumnIndexOrThrow("visitId")));
+                    ImageQueue.setPatientId(idCursor.getString(idCursor.getColumnIndexOrThrow("patientId")));
+                    ImageQueue.setVARight(idCursor.getString(idCursor.getColumnIndexOrThrow("VARight")));
+                    ImageQueue.setVALeft(idCursor.getString(idCursor.getColumnIndexOrThrow("VALeft")));
+                    ImageQueue.setPinholeRight(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeRight")));
+                    ImageQueue.setPinholeLeft(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeLeft")));
+                    ImageQueue.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
+                    ImageQueue.setSex(idCursor.getString(idCursor.getColumnIndexOrThrow("sex")));
+                    ImageQueue.setComplaints(idCursor.getString(idCursor.getColumnIndexOrThrow("complaints")));
+                    azureResultList.add(ImageQueue);
+                }
+            }
+            idCursor.close();
+        } catch (SQLiteException e) {
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return azureResultList;
     }
 }

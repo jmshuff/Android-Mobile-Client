@@ -168,6 +168,23 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             ")";
     public static final String AZURE_UPLOADS= "CREATE TABLE IF NOT EXISTS tbl_azure_uploads(" +
             "imageName TEXT PRIMARY KEY," +
+            "imageName2 TEXT," +
+            "patientId TEXT," +
+            "visitId TEXT," +
+            "creatorId TEXT," +
+            "type TEXT," +
+            "VARight TEXT," +
+            "VALeft TEXT," +
+            "PinholeRight TEXT," +
+            "PinholeLeft TEXT," +
+            "age TEXT," +
+            "sex TEXT," +
+            "complaints TEXT" +
+            ")";
+
+    public static final String AZURE_ADDITIONAL_DOCS= "CREATE TABLE IF NOT EXISTS tbl_azure_additional_docs(" +
+            "imageName TEXT PRIMARY KEY," +
+            "imageName2 TEXT," +
             "patientId TEXT," +
             "visitId TEXT," +
             "creatorId TEXT," +
@@ -247,6 +264,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_DR_SPECIALITY);
         db.execSQL(CREATE_VISIT_ATTRIBUTES);
         db.execSQL(AZURE_UPLOADS);
+        db.execSQL(AZURE_ADDITIONAL_DOCS);
         uuidInsert(db);
         database = db;
 
