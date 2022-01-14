@@ -97,12 +97,15 @@ public class CameraActivity extends AppCompatActivity {
      * storing the file generated
      */
     public static final String SET_IMAGE_PATH = "IMG_PATH";
+
+    public static final String SET_EYE_TYPE= "EYE_TYPE";
     /**
      * Bundle key used for the {@link String} showing custom dialog
      * message before starting the camera.
      */
     private String mImageName = null;
     private String mFilePath = null;
+    private String mType= null;
     private final String TAG = CameraActivity.class.getSimpleName();
     PreviewView mPreviewView;
     ImageView captureImage;
@@ -151,6 +154,9 @@ public class CameraActivity extends AppCompatActivity {
                 mImageName = extras.getString(SET_IMAGE_NAME);
             if (extras.containsKey(SET_IMAGE_PATH))
                 mFilePath = extras.getString(SET_IMAGE_PATH);
+            if(extras.containsKey(SET_EYE_TYPE))
+                mType=extras.getString(SET_EYE_TYPE);
+
         }
 
 
@@ -545,6 +551,7 @@ public class CameraActivity extends AppCompatActivity {
                     }
                     Intent intent = new Intent();
                     intent.putExtra("RESULT", file.getAbsolutePath());
+                    intent.putExtra("Type", mType);
                     setResult(RESULT_OK, intent);
                     Log.i(TAG, file.getAbsolutePath());
                     finish();

@@ -69,6 +69,7 @@ import app.insightfuleye.client.activities.privacyNoticeActivity.PrivacyNotice_A
 import app.insightfuleye.client.activities.searchPatientActivity.SearchPatientActivity;
 import app.insightfuleye.client.activities.settingsActivity.SettingsActivity;
 import app.insightfuleye.client.activities.todayPatientActivity.TodayPatientActivity;
+import app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity;
 import app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
@@ -289,7 +290,7 @@ public class HomeActivity extends AppCompatActivity {
         c7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, uploadImageInfoActivity.class);
+                Intent intent = new Intent(HomeActivity.this, uploadImageActivity.class);
                 startActivity(intent);
             }
         });
