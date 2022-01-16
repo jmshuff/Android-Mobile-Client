@@ -655,10 +655,20 @@
     <string name= "visual_acuity_right">Visual Acuity Right</string>
     <string name= "visual_acuity_left">Visual Acuity Left</string>
     <string name= "pinhole_acuity_right">Pinhole Acuity Right</string>
-    <string name= "pinhole_acuity_left">Visual Acuity Left</string>
-    <string name="upload_image">Upload Image</string>
-
-
+    <string name= "pinhole_acuity_left">Pinhole Acuity Left</string>
+    <string name="upload_image">Hospital Image Upload</string>
+    <string name="mature_cataract">Mature Cataract</string>
+    <string name="immature_cataract">Immature Cataract</string>
+    <string name="pterygium">Pterygium</string>
+    <string name="corneal_opacity">Corneal Opacity</string>
+    <string name="corneal_ulcer">Corneal Ulcer</string>
+    <string name="normal_diagnosis">Normal</string>
+    <string name="blurry_vision_close">Blurry Vision Close</string>
+    <string name="blurry_vision_far">Blurry Vision Far</string>
+    <string name="redness_complaint">Redness</string>
+    <string name="eye_pain_irritation">Eye Pain/Irritation</string>
+    <string name="headache_complaint">Headache</string>
+    <string name="eye_trauma">Recent Eye Trauma</string>
 
 
 </resources>

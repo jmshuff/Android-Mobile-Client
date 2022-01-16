@@ -26,7 +26,9 @@ import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
 import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
 import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.utilities.exception.DAOException;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -184,7 +186,7 @@ public class ImagesPushDAO {
             }
             Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
             AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
-            Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(parts, creatorId, visitId, patientId, type, visual_acuity, pinhole_acuity, sex, age, complaints);
+            Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(parts, creatorId, visitId, patientId, type, visual_acuity, pinhole_acuity, sex, age, complaints, null);
             Log.d("AzureUpload", p.getImagePath());
             //is this the right type for the observable...
             azureObservable.subscribeOn(Schedulers.io())
@@ -226,6 +228,105 @@ public class ImagesPushDAO {
         sessionManager.setPushSyncFinished(true);
 //        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
 
+        return true;
+
+    }
+
+    public boolean azureAddDocsPush() throws DAOException {
+        sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
+//        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+//        localdb.execSQL("delete from tbl_azure_uploads");
+        String encoded = sessionManager.getEncoded();
+        Retrofit retrofit = AzureNetworkClient.getRetrofit();
+        ImagesDAO imagesDAO = new ImagesDAO();
+        List<azureResults> imageQueue = new ArrayList<>();
+        try {
+            imageQueue = imagesDAO.getAzureDocsQueue();
+            Log.e(TAG, imageQueue.toString());
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        int i = 0;
+        for (azureResults p : imageQueue) {
+            while (i < 2) {
+                //pass it like this
+                File fileRight = null;
+                fileRight = new File(AppConstants.IMAGE_PATH + p.getImagePath() + ".jpg");
+                RequestBody requestFileRight = RequestBody.create(MediaType.parse("multipart/form-data"), fileRight);
+
+                File fileLeft = null;
+                fileLeft = new File(AppConstants.IMAGE_PATH + p.getImageId() + ".jpg");
+                RequestBody requestFileLeft = RequestBody.create(MediaType.parse("multipart/form-data"), fileLeft);
+                // MultipartBody.Part is used to send also the actual file name
+                MultipartBody.Part imageRight = MultipartBody.Part.createFormData("file", fileRight.getName(), requestFileRight);
+                MultipartBody.Part imageLeft = MultipartBody.Part.createFormData("file", fileLeft.getName(), requestFileRight);
+                RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"), p.getChwName());
+                RequestBody visitId = RequestBody.create(MediaType.parse("text/plain"), p.getVisitId());
+                RequestBody patientId = RequestBody.create(MediaType.parse("text/plain"), p.getPatientId());
+                RequestBody right = RequestBody.create(MediaType.parse("text/plain"), "right");
+                RequestBody left = RequestBody.create(MediaType.parse("text/plain"), "left");
+                RequestBody sex = RequestBody.create(MediaType.parse("text/plain"), p.getSex());
+                RequestBody age = RequestBody.create(MediaType.parse("text/plain"), p.getAge());
+                RequestBody visual_acuity_right = RequestBody.create(MediaType.parse("text/plain"), p.getVARight());
+                RequestBody pinhole_acuity_right = RequestBody.create(MediaType.parse("text/plain"), p.getPinholeRight());
+                RequestBody visual_acuity_left = RequestBody.create(MediaType.parse("text/plain"), p.getVALeft());
+                RequestBody pinhole_acuity_left = RequestBody.create(MediaType.parse("text/plain"), p.getPinholeLeft());
+                RequestBody complaintsRight = RequestBody.create(MediaType.parse("text/plain"), p.getComplaintsRight().toString());
+                RequestBody complaintsLeft = RequestBody.create(MediaType.parse("text/plain"), p.getComplaintsLeft().toString());
+                RequestBody diagnosisRight = RequestBody.create(MediaType.parse("text/plain"), p.getDiagnosisRight().toString());
+                RequestBody diagnosisLeft = RequestBody.create(MediaType.parse("text/plain"), p.getDiagnosisLeft().toString());
+
+                Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
+                AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
+                i++;
+                Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(imageRight, creatorId, visitId, patientId, right, visual_acuity_right, pinhole_acuity_right, sex, age, complaintsRight, diagnosisRight);
+                if (i==1){
+                    azureObservable = uploadApis.uploadImageAsync(imageLeft, creatorId, visitId, patientId, left, visual_acuity_left, pinhole_acuity_left, sex, age, complaintsLeft, diagnosisLeft);
+                }
+                //is this the right type for the observable...
+                int finalI = i;
+                azureObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<ResponseBody>() {
+
+
+                            @Override
+                            public void onNext(@NonNull ResponseBody responseBody) {
+                                Log.d(TAG, "azure success");
+                                Log.d(TAG+"i", String.valueOf(finalI));
+                                //Remove request from database and delete file
+                                if(finalI ==2)
+                                try {
+                                    imagesDAO.removeAzureAddDoc(p.getVisitId(), p.getImagePath(), p.getImageId());
+                                } catch (DAOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Logger.logD(TAG, "Onerror " + e.getMessage());
+//                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", IntelehealthApplication.getAppContext());
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                Logger.logD(TAG, "success");
+                                try {
+                                    List<azureResults> azureQueue;
+                                    azureQueue = imagesDAO.getAzureDocsQueue();
+                                    Log.d("AzureQueue", azureQueue.toString());
+                                    Log.d(TAG, "complete");
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+            }
+        }
+        sessionManager.setPushSyncFinished(true);
+//        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
         return true;
 
     }

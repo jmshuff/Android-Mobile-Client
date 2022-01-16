@@ -1,8 +1,13 @@
 package app.insightfuleye.client.activities.uploadImageActivity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -31,8 +36,10 @@ import java.util.List;
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.additionalDocumentsActivity.AdditionalDocumentAdapter;
 import app.insightfuleye.client.activities.additionalDocumentsActivity.AdditionalDocumentViewHolder;
+import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.ImagesDAO;
+import app.insightfuleye.client.database.dao.ImagesPushDAO;
 import app.insightfuleye.client.models.DocumentObject;
 import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.utilities.StringUtils;
@@ -69,7 +76,7 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
 
     @Override
     public void onBindViewHolder(final uploadImageViewHolder holder, final int position) {
-
+        ImagesDAO imagesDAO=new ImagesDAO();
 //        holder.getDocumentNameTextView().setText(documentList.get(position).getDocumentName());
         holder.getDocumentNameTextView().setText
                 ("Document - " + (position + 1));
@@ -86,7 +93,9 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
         holder.getRootView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                displayImage(image);
+                Intent editIntent= new Intent(context, uploadImageInfoActivity.class);
+                editIntent.putExtra("visitId", documentList.get(position).getVisitId());
+                context.startActivity(editIntent);
             }
         });
 
@@ -94,13 +103,14 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
             @Override
             public void onClick(View v) {
                 if (image.exists()) image.delete();
+                String imageName= documentList.get(position).getImagePath();
+                String imageId=documentList.get(position).getImageId();
+                String visitId=documentList.get(position).getVisitId();
                 documentList.remove(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, documentList.size());
-                String imageName = holder.getDocumentNameTextView().getText().toString();
-
                 try {
-                    imagesDAO.deleteImageFromDatabase(StringUtils.getFileNameWithoutExtensionString(imageName));
+                    imagesDAO.removeAzureAddDoc(visitId,imageName+ ".jpg", imageId + ".jpg");
                 } catch (DAOException e) {
                     FirebaseCrashlytics.getInstance().recordException(e);
                 }
@@ -171,4 +181,5 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
         IntelehealthApplication.setAlertDialogCustomTheme(context, dialog);
 
     }
+
 }

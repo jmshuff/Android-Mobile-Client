@@ -5,15 +5,20 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.media.Image;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,12 +30,16 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.additionalDocumentsActivity.AdditionalDocumentAdapter;
 import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
+import app.insightfuleye.client.activities.complaintNodeActivity.ComplaintNodeActivity;
+import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.database.dao.ImagesDAO;
+import app.insightfuleye.client.database.dao.ImagesPushDAO;
 import app.insightfuleye.client.models.DocumentObject;
 import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.utilities.StringUtils;
@@ -44,6 +53,8 @@ public class uploadImageActivity extends AppCompatActivity {
     private String encounterAdultIntials;
     private List<azureResults> rowListItem;
     private uploadImageAdapter recyclerViewAdapter;
+    Context context;
+
 
 
     @Override
@@ -51,25 +62,34 @@ public class uploadImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_image);
         Toolbar topToolBar = findViewById(R.id.toolbar);
+        context=uploadImageActivity.this;
 
         //removes the bug of no translation seen even when provided....
         topToolBar.setTitle(getString(R.string.title_activity_additional_documents));
         setSupportActionBar(topToolBar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
 
+        ImagesDAO imagesDAO = new ImagesDAO();
+        ImagesPushDAO imagesPushDAO= new ImagesPushDAO();
+
+
+        FloatingActionButton fab=findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                Intent intentNew = new Intent(uploadImageActivity.this, uploadImageInfoActivity.class);
+                startActivity(intentNew);
             }
         });
+
+        Button upload = findViewById(R.id.manualsyncbutton);
+
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
             ArrayList<File> fileList = new ArrayList<File>();
             List<azureResults> additionalDocs= new ArrayList<>();
             try {
-                additionalDocs=getAzureImageQueue();
+                additionalDocs=imagesDAO.getAzureDocsQueue();
             } catch (DAOException e) {
                 e.printStackTrace();
             }
@@ -90,14 +110,53 @@ public class uploadImageActivity extends AppCompatActivity {
             recyclerViewAdapter = new uploadImageAdapter(this, rowListItem, AppConstants.IMAGE_PATH);
             recyclerView.setAdapter(recyclerViewAdapter);
 
-        }
-    }
+            upload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isNetworkConnected()) {
+                        Toast.makeText(context, getString(R.string.syncInProgress), Toast.LENGTH_LONG).show();
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(600);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
 
+                        while(rowListItem.size()>0){
+                            rowListItem.remove(0);
+                        }
+                        recyclerViewAdapter = new uploadImageAdapter(context, rowListItem, AppConstants.IMAGE_PATH);
+                        recyclerView.setAdapter(recyclerViewAdapter);
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.failed_synced), Toast.LENGTH_LONG).show();
+                    }
+                    try {
+                        imagesPushDAO.azureAddDocsPush();
+                    } catch (DAOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+            });
+
+
+        }
+
+
+    }
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_additional_docs, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+ */
+    @Override
+    public void onBackPressed() {
+        Intent intent2 = new Intent(uploadImageActivity.this, HomeActivity.class);
+        startActivity(intent2);
     }
 /*
     @Override
@@ -127,15 +186,7 @@ public class uploadImageActivity extends AppCompatActivity {
 
  */
 
-    private void updateImageDatabase(String imageuuid) {
-        ImagesDAO imagesDAO = new ImagesDAO();
-        try {
-            imagesDAO.insertObsImageDatabase(imageuuid, encounterAdultIntials, UuidDictionary.COMPLEX_IMAGE_AD);
-        } catch (DAOException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-        }
-    }
-
+/*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -148,38 +199,13 @@ public class uploadImageActivity extends AppCompatActivity {
         }
     }
 
-    public List<azureResults> getAzureImageQueue() throws DAOException {
-        //get unsynced images from local storage
-        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-        localdb.beginTransaction();
-        List<azureResults> azureResultList = new ArrayList<>();
-        try {
-            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_azure_additional_docs", null);
-            if (idCursor.getCount() != 0) {
-                while (idCursor.moveToNext()) {
-                    azureResults ImageQueue= new azureResults();
-                    ImageQueue.setChwName(idCursor.getString(idCursor.getColumnIndexOrThrow("creatorId")));
-                    ImageQueue.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName")));
-                    ImageQueue.setLeftRight(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
-                    ImageQueue.setVisitId(idCursor.getString(idCursor.getColumnIndexOrThrow("visitId")));
-                    ImageQueue.setPatientId(idCursor.getString(idCursor.getColumnIndexOrThrow("patientId")));
-                    ImageQueue.setVARight(idCursor.getString(idCursor.getColumnIndexOrThrow("VARight")));
-                    ImageQueue.setVALeft(idCursor.getString(idCursor.getColumnIndexOrThrow("VALeft")));
-                    ImageQueue.setPinholeRight(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeRight")));
-                    ImageQueue.setPinholeLeft(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeLeft")));
-                    ImageQueue.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
-                    ImageQueue.setSex(idCursor.getString(idCursor.getColumnIndexOrThrow("sex")));
-                    ImageQueue.setComplaints(idCursor.getString(idCursor.getColumnIndexOrThrow("complaints")));
-                    azureResultList.add(ImageQueue);
-                }
-            }
-            idCursor.close();
-        } catch (SQLiteException e) {
-            throw new DAOException(e);
-        } finally {
-            localdb.endTransaction();
+ */
 
-        }
-        return azureResultList;
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
+
+
 }

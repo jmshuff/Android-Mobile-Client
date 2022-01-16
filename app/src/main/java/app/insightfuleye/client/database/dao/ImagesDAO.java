@@ -14,6 +14,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import app.insightfuleye.client.models.azureResults;
@@ -374,6 +375,48 @@ public class ImagesDAO {
         }
     }
 
+    public void removeAzureAddDoc(String visitId, String imageName, String imageID) throws DAOException {
+        Log.d("imageName", imageName);
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        File file= new File(AppConstants.IMAGE_PATH + imageName);
+        File file1= new File(AppConstants.IMAGE_PATH + imageID);
+        try {
+            String query = "Select * from tbl_azure_additional_docs where visitId = \'" + visitId + "\'";
+            Cursor cursor = localdb.rawQuery(query, null);
+            if (cursor.getCount() > 0) {
+                //while (cursor.moveToNext()) {
+                //String dbImageName = cursor.getString(cursor.getColumnIndexOrThrow("imageName"));
+                //Log.d("FileErase", dbImageName);
+                //Log.d("File erase", imageName);
+                localdb.execSQL("DELETE from tbl_azure_additional_docs where visitId = \'" + visitId + "\'");
+                localdb.setTransactionSuccessful();
+//                    List<azureResults> imageQueue = new ArrayList<>();
+//                    try {
+//                        imageQueue = getAzureImageQueue();
+//                        Log.e(TAG, imageQueue.toString());
+//                    } catch (DAOException e) {
+//                        FirebaseCrashlytics.getInstance().recordException(e);
+//                    }
+
+                if (file.exists()) {
+                      file.delete();
+                  }
+                if(file1.exists()){
+                    file.delete();
+                }
+
+            }
+        }
+        catch (SQLException e){
+            throw new DAOException(e);
+        }
+        finally {
+            localdb.endTransaction();
+        }
+    }
+
 
     public ArrayList getImageUuid(String encounterUuid, String conceptuuid) throws DAOException {
         Logger.logD(TAG, "encounter uuid for image " + encounterUuid);
@@ -497,6 +540,44 @@ public class ImagesDAO {
                     ImageQueue.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
                     ImageQueue.setSex(idCursor.getString(idCursor.getColumnIndexOrThrow("sex")));
                     ImageQueue.setComplaints(idCursor.getString(idCursor.getColumnIndexOrThrow("complaints")));
+                    azureResultList.add(ImageQueue);
+                }
+            }
+            idCursor.close();
+        } catch (SQLiteException e) {
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return azureResultList;
+    }
+
+    public List<azureResults> getAzureDocsQueue() throws DAOException {
+        //get unsynced images from local storage
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        List<azureResults> azureResultList = new ArrayList<>();
+        try {
+            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_azure_additional_docs", null);
+            if (idCursor.getCount() != 0) {
+                while (idCursor.moveToNext()) {
+                    azureResults ImageQueue= new azureResults();
+                    ImageQueue.setChwName(idCursor.getString(idCursor.getColumnIndexOrThrow("creatorId")));
+                    ImageQueue.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName")));
+                    ImageQueue.setLeftRight(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
+                    ImageQueue.setVisitId(idCursor.getString(idCursor.getColumnIndexOrThrow("visitId")));
+                    ImageQueue.setPatientId(idCursor.getString(idCursor.getColumnIndexOrThrow("patientId")));
+                    ImageQueue.setVARight(idCursor.getString(idCursor.getColumnIndexOrThrow("VARight")));
+                    ImageQueue.setVALeft(idCursor.getString(idCursor.getColumnIndexOrThrow("VALeft")));
+                    ImageQueue.setPinholeRight(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeRight")));
+                    ImageQueue.setPinholeLeft(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeLeft")));
+                    ImageQueue.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
+                    ImageQueue.setSex(idCursor.getString(idCursor.getColumnIndexOrThrow("sex")));
+                    ImageQueue.setDiagnosisRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))).split(","))));
+                    ImageQueue.setDiagnosisLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))).split(","))));
+                    ImageQueue.setComplaintsRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))).split(","))));
+                    ImageQueue.setComplaintsLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
                     azureResultList.add(ImageQueue);
                 }
             }

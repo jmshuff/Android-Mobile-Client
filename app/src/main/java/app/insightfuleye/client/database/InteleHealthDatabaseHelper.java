@@ -182,6 +182,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "complaints TEXT" +
             ")";
 
+    public static final String drop_azure="DROP TABLE tbl_azure_additional_docs";
     public static final String AZURE_ADDITIONAL_DOCS= "CREATE TABLE IF NOT EXISTS tbl_azure_additional_docs(" +
             "imageName TEXT PRIMARY KEY," +
             "imageName2 TEXT," +
@@ -195,7 +196,10 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "PinholeLeft TEXT," +
             "age TEXT," +
             "sex TEXT," +
-            "complaints TEXT" +
+            "complaintsRight TEXT," +
+            "complaintsLeft TEXT," +
+            "diagnosisRight TEXT," +
+            "diagnosisLeft TEXT" +
             ")";
 
 
