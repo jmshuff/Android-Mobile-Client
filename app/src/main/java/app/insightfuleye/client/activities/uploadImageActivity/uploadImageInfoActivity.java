@@ -15,10 +15,12 @@ import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -26,10 +28,14 @@ import androidx.appcompat.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -71,6 +77,33 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     String visitId_edit;
     String visitId;
     azureResults patient= new azureResults();
+    //make a listview adapter. Never do this. This is such bad coding. I was in a hurry. I apologize to future me
+    CheckBox matCatR;
+    CheckBox matCatL;
+    CheckBox immatCatR;
+    CheckBox immatCatL;
+    CheckBox pterygiumR;
+    CheckBox pterygiumL;
+    CheckBox cornealUlcerR;
+    CheckBox cornealUlcerL;
+    CheckBox cornealOpacityR;
+    CheckBox cornealOpacityL;
+    CheckBox normalR;
+    CheckBox normalL;
+    CheckBox blurryCloseR;
+    CheckBox blurryCloseL;
+    CheckBox blurryFarR;
+    CheckBox blurryFarL;
+    CheckBox rednessR;
+    CheckBox rednessL;
+    CheckBox eyePainR;
+    CheckBox eyePainL;
+    CheckBox headacheR;
+    CheckBox headacheL;
+    CheckBox eyeTraumaR;
+    CheckBox eyeTraumaL;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +114,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,7 +135,32 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         vaRightText=findViewById(R.id.varight);
         phLeftText=findViewById(R.id.pinholeleft);
         phRightText=findViewById(R.id.pinholeright);
+//the absolute worst idea. kill me
+        matCatR=findViewById(R.id.checkbox_mature_cat_r);
+        matCatL=findViewById(R.id.checkbox_mature_cat_l);
+        immatCatR=findViewById(R.id.checkbox_immature_cat_r);
+        immatCatL=findViewById(R.id.checkbox_immature_cat_l);
+        pterygiumR=findViewById(R.id.checkbox_pterygium_r);
+        pterygiumL=findViewById(R.id.checkbox_pterygium_l);
+        cornealOpacityR=findViewById(R.id.checkbox_corneal_opacity_r);
+        cornealOpacityL=findViewById(R.id.checkbox_corneal_opacity_l);
+        cornealUlcerR=findViewById(R.id.checkbox_corneal_ulcer_r);
+        cornealUlcerL=findViewById(R.id.checkbox_corneal_ulcer_l);
+        normalR=findViewById(R.id.checkbox_normal_r);
+        normalL=findViewById(R.id.checkbox_normal_l);
 
+        blurryCloseR=findViewById(R.id.checkbox_blurry_close_r);
+        blurryCloseL=findViewById(R.id.checkbox_blurry_close_l);
+        blurryFarR=findViewById(R.id.checkbox_blurry_far_r);
+        blurryFarL=findViewById(R.id.checkbox_blurry_far_l);
+        rednessR=findViewById(R.id.checkbox_redness_r);
+        rednessL=findViewById(R.id.checkbox_redness_l);
+        eyePainR=findViewById(R.id.checkbox_eye_pain_r);
+        eyePainL=findViewById(R.id.checkbox_eye_pain_l);
+        headacheR=findViewById(R.id.checkbox_headache_r);
+        headacheL=findViewById(R.id.checkbox_headache_l);
+        eyeTraumaR=findViewById(R.id.checkbox_eye_trauma_r);
+        eyeTraumaL=findViewById(R.id.checkbox_eye_trauma_l);
 
         //load past details to edit
         Intent intent = this.getIntent(); // The intent was passed to the activity
@@ -134,14 +193,20 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             spinPinholeRight.setSelection(phRightAdapter.getPosition(String.valueOf(patient.getPinholeRight())));
             spinPinholeLeft.setSelection(phLeftAdapter.getPosition(String.valueOf(patient.getPinholeLeft())));
             //set images for edit
-            File imageNameRight=new File(AppConstants.IMAGE_PATH + patient.getImagePath());
-            File imageNameLeft= new File(AppConstants.IMAGE_PATH + patient.getImageId());
+            File imageNameRight=new File(AppConstants.IMAGE_PATH + patient.getImagePath()+ ".jpg");
+            File imageNameLeft= new File(AppConstants.IMAGE_PATH + patient.getImageId() +".jpg");
             if (imageNameRight.exists()){
                 mImageViewRight.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(imageNameRight)));
             }
             if(imageNameLeft.exists()){
                 mImageViewLeft.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(imageNameLeft)));
             }
+            mAge.setText(patient.getAge());
+            Log.d("righteyediag", patient.getDiagnosisRight().toString());
+            setCheckedRight(patient.getDiagnosisRight());
+            setCheckedRight(patient.getComplaintsRight());
+            setCheckedLeft(patient.getDiagnosisLeft());
+            setCheckedLeft(patient.getComplaintsLeft());
         }
 
         if (visitId_edit != null) {
@@ -249,7 +314,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                 if (!filePath.exists()) {
                     filePath.mkdir();
                 }
-                patient.setImagePath(imageNameLeft);
+                patient.setImageId(imageNameLeft);
                 Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
                 // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
                 cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameLeft);
@@ -281,6 +346,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             patient.setAge(mAge.getText().toString());
+            Log.d("Age", patient.getAge());
             patient.setVARight(vaRight);
             patient.setVALeft(vaLeft);
             patient.setPinholeRight(phRight);
@@ -341,9 +407,9 @@ public class uploadImageInfoActivity extends AppCompatActivity {
 
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
 
-        String patientSelection = "uuid=?";
+        String patientSelection = "visitId=?";
         String[] Args = {visitId};
-        String[] Columns = {"visitId", "imageName", "imageName2", "VARight", "VALeft", "PinholeRight", "PinholeLeft", "age", "sex"};
+        String[] Columns = {"visitId", "imageName", "imageName2", "VARight", "VALeft", "PinholeRight", "PinholeLeft", "age", "sex", "diagnosisRight", "diagnosisLeft", "complaintsRight", "complaintsLeft"};
         Cursor idCursor = db.query("tbl_azure_additional_docs", Columns, patientSelection, Args, null, null, null);
         if (idCursor.moveToFirst()) {
             do {
@@ -356,6 +422,11 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                 patient.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
                 patient.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName"))); //imagePath for imageNameRight
                 patient.setImageId(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName2"))); //imageID for imageNameLeft
+                patient.setDiagnosisRight(new ArrayList<>( Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))).split(","))));
+                patient.setDiagnosisLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))).split(","))));
+                patient.setComplaintsRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))).split(","))));
+                patient.setComplaintsLeft(new ArrayList<>( Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
+
             } while (idCursor.moveToNext());
             idCursor.close();
         }
@@ -392,10 +463,14 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             contentValues.put("VALeft", patient.getVALeft());
             contentValues.put("PinholeRight", patient.getPinholeRight());
             contentValues.put("PinholeLeft", patient.getPinholeLeft());
-            contentValues.put("age", String.valueOf(mAge));
+            contentValues.put("age", patient.getAge());
             contentValues.put("sex", mGender);
             contentValues.put("imageName", patient.getImagePath()); //imageNameRight
             contentValues.put("imageName2", patient.getImageId()); //imageNameLeft
+            contentValues.put("complaintsRight", patient.getComplaintsRight().toString());
+            contentValues.put("complaintsLeft", patient.getComplaintsLeft().toString());
+            contentValues.put("diagnosisRight", patient.getDiagnosisRight().toString());
+            contentValues.put("diagnosisLeft", patient.getDiagnosisLeft().toString());
             localdb.updateWithOnConflict("tbl_azure_additional_docs", contentValues, "visitId = ?", new String[]{visitId_edit}, SQLiteDatabase.CONFLICT_REPLACE);
             localdb.setTransactionSuccessful();
             isUpdated=true;
@@ -413,6 +488,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         localdb.beginTransaction();
         ContentValues contentValues = new ContentValues();
+        Gson gson = new Gson();
         try {
             contentValues.put("imageName", patient.getImagePath()); //imageNameRight
             contentValues.put("imageName2", patient.getImageId()); //imageNmaeLeft
@@ -423,9 +499,12 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             contentValues.put("VALeft", patient.getVALeft());
             contentValues.put("PinholeRight", patient.getPinholeRight());
             contentValues.put("PinholeLeft", patient.getPinholeLeft());
-            contentValues.put("age", String.valueOf(mAge));
+            contentValues.put("age", patient.getAge());
             contentValues.put("sex", mGender);
-            contentValues.put("complaints", "");
+            contentValues.put("complaintsRight", patient.getComplaintsRight().toString());
+            contentValues.put("complaintsLeft", patient.getComplaintsLeft().toString());
+            contentValues.put("diagnosisRight", patient.getDiagnosisRight().toString());
+            contentValues.put("diagnosisLeft", patient.getDiagnosisLeft().toString());
 
             //contentValues.put("sync", "false");
             localdb.insertWithOnConflict("tbl_azure_additional_docs", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
@@ -440,7 +519,103 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         }
         return isInserted;
     }
+    public void onDiagnosisRightClicked(View v){
+        boolean checked = ((CheckBox) v).isChecked();
+        ArrayList<String> selectedStrings= new ArrayList<>();
+        if(patient.getDiagnosisRight()!=null){
+            selectedStrings =patient.getDiagnosisRight();
+        }
+        if(checked){
+            selectedStrings.add(((CheckBox) v).getText().toString());
+        }
+        else{
+            selectedStrings.remove(((CheckBox) v).getText().toString());
+        }
+        patient.setDiagnosisRight(selectedStrings);
+        Log.d("SelectDiagR", patient.getDiagnosisRight().toString());
+    }
+
+    public void onDiagnosisLeftClicked(View v){
+        boolean checked = ((CheckBox) v).isChecked();
+        ArrayList<String> selectedStrings = new ArrayList<String>();
+        if(patient.getDiagnosisLeft()!=null){
+            selectedStrings=patient.getDiagnosisLeft();
+        }
+        if(checked){
+            selectedStrings.add(((CheckBox) v).getText().toString());
+        }
+        else{
+            selectedStrings.remove(((CheckBox) v).getText().toString());
+        }
+        patient.setDiagnosisLeft(selectedStrings);
+
+    }
+
+    public void onComplaintRightClicked(View v){
+        boolean checked = ((CheckBox) v).isChecked();
+        ArrayList<String> selectedStrings = new ArrayList<String>();
+        if(patient.getComplaintsRight()!=null){
+            selectedStrings=patient.getComplaintsRight();
+        }
+        if(checked){
+            selectedStrings.add(((CheckBox) v).getText().toString());
+        }
+        else{
+            selectedStrings.remove(((CheckBox) v).getText().toString());
+        }
+        patient.setComplaintsRight(selectedStrings);
+    }
+
+    public void onComplaintLeftClicked(View v){
+        boolean checked = ((CheckBox) v).isChecked();
+        ArrayList<String> selectedStrings = new ArrayList<String>();
+        if(patient.getComplaintsLeft()!=null){
+            selectedStrings=patient.getComplaintsLeft();
+        }
+        if(checked){
+            selectedStrings.add(((CheckBox) v).getText().toString());
+        }
+        else{
+            selectedStrings.remove(((CheckBox) v).getText().toString());
+        }
+        patient.setComplaintsLeft(selectedStrings);
+    }
 
 
+    public void setCheckedRight(ArrayList<String> checked){
+        for (String item: checked){
+            if (item.contains("Mature Cataract")) matCatR.setChecked(true);
+            else if(item.contains("Immature Cataract"))immatCatR.setChecked(true);
+            else if(item.contains("Pterygium")) pterygiumR.setChecked(true);
+            else if(item.contains("Corneal Opacity")) cornealOpacityR.setChecked(true);
+            else if (item.contains("Corneal Ulcer")) cornealUlcerR.setChecked(true);
+            else if(item.contains("Normal")) normalR.setChecked(true);
 
+            else if(item.contains("Blurry Vision Close")) blurryCloseR.setChecked(true);
+            else if (item.contains("Blurry Vision Far")) blurryFarR.setChecked(true);
+            else if (item.contains("Redness")) rednessR.setChecked(true);
+            else if (item.contains("Eye Pain")) eyePainR.setChecked(true);
+            else if (item.contains("Headache")) headacheR.setChecked(true);
+            else if (item.contains("Eye Trauma")) eyeTraumaR.setChecked(true);
+        }
+
+    }
+    public void setCheckedLeft(ArrayList<String> checked){
+        for (String item: checked){
+            if (item.contains("Mature Cataract")) matCatL.setChecked(true);
+            else if(item.contains("Immature Cataract"))immatCatL.setChecked(true);
+            else if(item.contains("Pterygium")) pterygiumL.setChecked(true);
+            else if(item.contains("Corneal Opacity")) cornealOpacityL.setChecked(true);
+            else if (item.contains("Corneal Ulcer")) cornealUlcerL.setChecked(true);
+            else if(item.contains("Normal")) normalL.setChecked(true);
+
+            else if(item.contains("Blurry Vision Close")) blurryCloseL.setChecked(true);
+            else if (item.contains("Blurry Vision Far")) blurryFarL.setChecked(true);
+            else if (item.contains("Redness")) rednessL.setChecked(true);
+            else if (item.contains("Eye Pain")) eyePainL.setChecked(true);
+            else if (item.contains("Headache")) headacheL.setChecked(true);
+            else if (item.contains("Eye Trauma")) eyeTraumaL.setChecked(true);
+        }
+
+    }
 }

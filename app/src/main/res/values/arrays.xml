@@ -59,6 +59,16 @@
         <item>No Light Perception</item>
     </string-array>
 
+    <string-array name="diagnoses">
+        <item></item>
+        <item>Mature Cataract</item>
+        <item>Immature Cataract</item>
+        <item>Pterygium</item>
+        <item>Corneal Opacity</item>
+        <item>Corneal Ulcer</item>
+        <item>Normal</item>
+        <item>Cannot comment</item>
+    </string-array>
     <string-array name="education_or">
         <item>ଶିକ୍ଷା ଚୟନ</item>
         <item>ଅଶିକ୍ଷିତ</item>

@@ -2,6 +2,9 @@ package app.insightfuleye.client.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class azureResults {
     @SerializedName("id")
     private String ImageId;
@@ -27,6 +30,44 @@ public class azureResults {
     private String age;
     private String sex;
     private String complaints;
+
+    private ArrayList<String> complaintsRight;
+
+    public ArrayList<String> getComplaintsRight() {
+        return complaintsRight;
+    }
+
+    public void setComplaintsRight(ArrayList<String> complaintsRight) {
+        this.complaintsRight = complaintsRight;
+    }
+
+    public ArrayList<String> getComplaintsLeft() {
+        return complaintsLeft;
+    }
+
+    public void setComplaintsLeft(ArrayList<String> complaintsLeft) {
+        this.complaintsLeft = complaintsLeft;
+    }
+
+    public ArrayList<String> getDiagnosisRight() {
+        return diagnosisRight;
+    }
+
+    public void setDiagnosisRight(ArrayList<String> diagnosisRight) {
+        this.diagnosisRight = diagnosisRight;
+    }
+
+    public ArrayList<String> getDiagnosisLeft() {
+        return diagnosisLeft;
+    }
+
+    public void setDiagnosisLeft(ArrayList<String> diagnosisLeft) {
+        this.diagnosisLeft = diagnosisLeft;
+    }
+
+    private ArrayList<String> complaintsLeft;
+    private ArrayList<String> diagnosisRight;
+    private ArrayList<String> diagnosisLeft;
 
     public String getImageId() {
         return ImageId;
@@ -152,4 +193,5 @@ public class azureResults {
     public String toString(){
         return "PatientID: " + patientId + ", CreatorId: " + chwName + ", Type: " + leftRight + ", VisitID: " + visitId + ", Image Path: " + imagePath + "VARight " + VARight + "VALeft: " + VALeft + "Age: " + age + "Sex: " + sex;
     }
+
 }

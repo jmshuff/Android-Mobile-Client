@@ -30,7 +30,82 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_done_24dp"
+        app:srcCompat="@drawable/ic_add_24dp"
         />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardview_home"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@color/white"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_marginRight="80dp"
+        android:layout_marginLeft="10dp"
+        android:padding="16dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="5dp"
+        android:layout_gravity="bottom"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <Button
+                android:id="@+id/manualsyncbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/button_layerlist"
+                android:clickable="true"
+                android:drawableLeft="@drawable/ic_baseline_refresh_24"
+                android:drawablePadding="5dp"
+                android:paddingHorizontal="10dp"
+                android:text="@string/refresh"
+                android:textColor="@color/colorPrimary"
+                android:includeFontPadding="false"
+                android:fontFamily="@font/lato_regular"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/manualsyncbutton"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/lastsynctextview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
+                    android:text="@string/lastsync"
+                    android:includeFontPadding="false"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/lastsyncago"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginEnd="10dp"
+                    tools:text="2 hours ago"
+                    android:visibility="gone"
+                    android:includeFontPadding="false"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
