@@ -748,6 +748,7 @@ public class Node implements Serializable {
 
                             }
                         } else {
+                            Log.d("generatelanguage",node_opt.getLanguage());
                             raw = raw + (bullet + " " + node_opt.getLanguage() + " - " + generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
                         }
 
@@ -760,6 +761,8 @@ public class Node implements Serializable {
                                 raw = raw + (bullet + " " + node_opt.getLanguage().substring(1) + " - " + node_opt.formLanguage()) + next_line;
                             } else {
                                 //getLanguge= language from json file
+                                Log.d("generatelanguage",node_opt.getLanguage());
+
                                 raw = raw + (bullet + " " + node_opt.getLanguage() + " - " + node_opt.formLanguage()) + next_line;
                             }
                         }

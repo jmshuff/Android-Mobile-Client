@@ -36,6 +36,8 @@ public class PhysicalExam extends Node {
     private String volunteerReferralLocation;
     private String volunteerDiagnosisRight;
     private String volunteerDiagnosisLeft;
+    private String physExamRight;
+    private String physExamLeft;
 
 
     public PhysicalExam(JSONObject jsonObject, ArrayList<String> selection) {
@@ -254,6 +256,9 @@ public class PhysicalExam extends Node {
 
     public void getPhysicalConcepts(){
         int total= this.totalExams;
+        List<String> rightPhysExamList= new ArrayList<>();
+        List<String> leftPhysExamList= new ArrayList<>();
+
         for (int i=0; i<total;i++){
             Node node=getExamNode(i);
             String title=getTitle(i);
@@ -273,7 +278,7 @@ public class PhysicalExam extends Node {
 
                 }
 
-                if (category.equals("Pinhole")){
+                else if (category.equals("Pinhole")){
                     String Pinholeright=node.formLanguageBilateral("right");
                     setPinholeRight(Pinholeright);
                     String Pinholeleft=node.formLanguageBilateral("left");
@@ -282,7 +287,7 @@ public class PhysicalExam extends Node {
                     Log.d("PinholeLeft lang", Pinholeleft);
                 }
 
-                if (category.equals("Referral")){
+                else if (category.equals("Referral")){
                     String volunteerReferral=node.formConceptLanguage("normal");
                     setVolunteerReferral(volunteerReferral);
                     //physicalExamMap.setVolunteerReferral(volunteerReferral.split(" ")[0]);
@@ -293,7 +298,7 @@ public class PhysicalExam extends Node {
              */
                 }
 
-                if (category.equals("Referral Reason")){
+                else if (category.equals("Referral Reason")){
                     String volunteerDiagnosisRight=node.formConceptLanguage("right");
                     String volunteerDiagnosisLeft=node.formConceptLanguage("left");
                     setVolunteerDiagnosisRight(volunteerDiagnosisRight);
@@ -328,10 +333,20 @@ public class PhysicalExam extends Node {
 //                    Log.d("DiagnosisRight",diagnosisRight);
 //                    Log.d("DiagnosisLeft", diagnosisLeft);
                 }
+                else{
+                    String physRight=node.formLanguageBilateral("right");
+                    String physLeft=node.formLanguageBilateral("left");
+                    Log.d("PhysExamResults", "Right: " + physRight+" Left: "+physLeft);
+                    if (physRight!="") rightPhysExamList.add(physRight);
+                    if (physLeft!="") leftPhysExamList.add(physLeft);
+                }
 
             }
-
         }
+        setPhysExamRight(rightPhysExamList.toString());
+        setPhysExamLeft(leftPhysExamList.toString());
+        Log.d("PhysExamRight", rightPhysExamList.toString());
+        Log.d("PhysExamLeft", leftPhysExamList.toString());
     }
     //TODO: Physical exam map needs to modified to make language generation easier.
     public String generateFindings() {
@@ -395,7 +410,6 @@ public class PhysicalExam extends Node {
         return mLanguage;
     }
 
-
     public String generateTable(){
         String mTable;
         String mRVA=getVARight();
@@ -404,7 +418,10 @@ public class PhysicalExam extends Node {
         String mLPin = getPinholeLeft();
         String leftSymptom=getLeftSympt();
         String rightSymptom=getRightSympt();
+        String mRPhys=getPhysExamRight();
+        String mLPhys=getPhysExamLeft();
         String footer=getFooter();
+        String mReferral=getVolunteerReferral();
 
         mTable="<table>" +
                 "<tr>"+
@@ -429,11 +446,12 @@ public class PhysicalExam extends Node {
                 "</tr>"+
                 "<tr>"+
                 "<th>Physical Exam</th>"+
-                //"<td>"+mRPhys+"</td>"+
-                //"<td>"+mLPhys+"</td>"+
+                "<td>"+mRPhys+"</td>"+
+                "<td>"+mLPhys+"</td>"+
                 "<tr>"+
                 "</table>"+
-                footer;
+                footer+
+                mReferral;
                 //mOther;
         return mTable;
 
@@ -642,7 +660,19 @@ public class PhysicalExam extends Node {
     public String getVolunteerReferral(){return volunteerReferral;}
     public String getVolunteerReferralLocation(){return volunteerReferralLocation;}
 
+    public String getPhysExamRight() {
+        return physExamRight;
+    }
 
+    public void setPhysExamRight(String physExamRight) {
+        this.physExamRight = physExamRight;
+    }
 
+    public String getPhysExamLeft() {
+        return physExamLeft;
+    }
 
+    public void setPhysExamLeft(String physExamLeft) {
+        this.physExamLeft = physExamLeft;
+    }
 }

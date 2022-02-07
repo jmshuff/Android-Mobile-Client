@@ -7,13 +7,13 @@ import java.util.ArrayList;
 
 public class azureResults {
     @SerializedName("id")
-    private String ImageId;
+    private String id;
     @SerializedName("visit_id")
     private String visitId;
     @SerializedName("patient_id")
     private String patientId;
     @SerializedName("image_path")
-    private String imagePath;
+    private String path;
     @SerializedName("created_by")
     private String chwName;
     @SerializedName("efficient")
@@ -22,16 +22,35 @@ public class azureResults {
     private String leftRight;
     @SerializedName("created_at")
     private String creationDate;
+    @SerializedName("age")
+    private String age;
+    @SerializedName("sex")
+    private String sex;
+    @SerializedName("complaints")
+    private String complaints;
+    @SerializedName("visual_acuity")
+    private String va;
+    @SerializedName("pinhole_acuity")
+    private String pa;
+    @SerializedName("diagnosis_id")
+    private String di;
 
+    private String imagePath;
+    private String ImageId;
     private String VARight;
     private String VALeft;
     private String PinholeRight;
     private String PinholeLeft;
-    private String age;
-    private String sex;
-    private String complaints;
 
     private ArrayList<String> complaintsRight;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public ArrayList<String> getComplaintsRight() {
         return complaintsRight;

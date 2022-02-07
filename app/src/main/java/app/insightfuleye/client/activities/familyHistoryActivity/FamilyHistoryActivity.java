@@ -294,7 +294,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
     private void onListClick(View v, int groupPosition, int childPosition, String type) {
         Node parentNode= familyHistoryMap.getOption(groupPosition);
         Node clickedNode = familyHistoryMap.getOption(groupPosition).getOption(childPosition);
-        Log.i(TAG, "onChildClick: ");
+        Log.i(TAG, "onChildClick: " + clickedNode.toString());
         clickedNode.toggleSelected();
         if (familyHistoryMap.getOption(groupPosition).anySubSelected()) {
             familyHistoryMap.getOption(groupPosition).setSelected(true);

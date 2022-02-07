@@ -1,19 +1,32 @@
 package app.insightfuleye.client.database.dao;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.util.ArrayMap;
 import android.util.Log;
+import android.util.TypedValue;
+import android.widget.Toast;
 
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.IntroActivity.IntroActivity;
+import app.insightfuleye.client.models.Location;
+import app.insightfuleye.client.models.Results;
 import app.insightfuleye.client.models.azureResultsPush;
+import app.insightfuleye.client.networkApiCalls.ApiClient;
+import app.insightfuleye.client.networkApiCalls.ApiInterface;
 import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
 import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
 import app.insightfuleye.client.utilities.Logger;
@@ -39,9 +52,12 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.http.Url;
 
 public class ImagesPushDAO {
     String TAG = ImagesPushDAO.class.getSimpleName();
@@ -186,7 +202,7 @@ public class ImagesPushDAO {
             }
             Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
             AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
-            Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(parts, creatorId, visitId, patientId, type, visual_acuity, pinhole_acuity, sex, age, complaints, null);
+            Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(parts, creatorId, visitId, patientId, type, visual_acuity, pinhole_acuity, sex, age, complaints);
             Log.d("AzureUpload", p.getImagePath());
             //is this the right type for the observable...
             azureObservable.subscribeOn(Schedulers.io())
@@ -246,46 +262,72 @@ public class ImagesPushDAO {
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
+        //Make a list of patients who have images. These will be the uploaded ones
+        List<azureResults> imagesToUpload = new ArrayList<>();
+        for (azureResults p : imageQueue){
+            File file = new File((AppConstants.IMAGE_PATH + p.getImagePath() +".jpg"));
+            File file1 = new File((AppConstants.IMAGE_PATH + p.getImageId()+ ".jpg"));
+            azureResults patient= new azureResults();
+            azureResults patient1 = new azureResults();
+            if (file.exists()){
+                Log.d("FileRight" , "exists");
+                patient.setImagePath(p.getImagePath());
+                if (p.getDiagnosisRight()!=null) patient.setDiagnosisRight(p.getDiagnosisRight());
+                if (p.getComplaintsRight()!=null) patient.setComplaintsRight(p.getComplaintsRight());
+                patient.setVisitId(p.getVisitId());
+                patient.setPatientId(p.getPatientId());
+                patient.setChwName(p.getChwName());
+                patient.setAge(p.getAge());
+                patient.setSex(p.getSex());
+                patient.setPinholeRight(p.getPinholeRight());
+                patient.setVARight(p.getVARight());
+                patient.setLeftRight("right");
+                imagesToUpload.add(patient);
+            }
+            if (file1.exists()){
+                Log.d("FileLeft" , "exists");
+                patient1.setImagePath(p.getImageId());
+                if (p.getDiagnosisLeft()!=null) patient1.setDiagnosisRight(p.getDiagnosisLeft());
+                if (p.getComplaintsLeft()!=null) patient1.setComplaintsRight(p.getComplaintsLeft());
+                patient1.setVisitId(p.getVisitId());
+                patient1.setPatientId(p.getPatientId());
+                patient1.setChwName(p.getChwName());
+                patient1.setAge(p.getAge());
+                patient1.setSex(p.getSex());
+                patient1.setPinholeRight(p.getPinholeLeft());
+                patient1.setVARight(p.getVALeft());
+                patient1.setLeftRight("left");
+                imagesToUpload.add(patient1);
+            }
+        }
+        Log.d(TAG, imagesToUpload.toString());
 
-        int i = 0;
-        for (azureResults p : imageQueue) {
-            while (i < 2) {
+        for (azureResults p : imagesToUpload) {
                 //pass it like this
-                File fileRight = null;
-                fileRight = new File(AppConstants.IMAGE_PATH + p.getImagePath() + ".jpg");
-                RequestBody requestFileRight = RequestBody.create(MediaType.parse("multipart/form-data"), fileRight);
+                File file = new File(AppConstants.IMAGE_PATH + p.getImagePath() + ".jpg");
+                RequestBody requestFileRight = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
-                File fileLeft = null;
-                fileLeft = new File(AppConstants.IMAGE_PATH + p.getImageId() + ".jpg");
-                RequestBody requestFileLeft = RequestBody.create(MediaType.parse("multipart/form-data"), fileLeft);
                 // MultipartBody.Part is used to send also the actual file name
-                MultipartBody.Part imageRight = MultipartBody.Part.createFormData("file", fileRight.getName(), requestFileRight);
-                MultipartBody.Part imageLeft = MultipartBody.Part.createFormData("file", fileLeft.getName(), requestFileRight);
+                MultipartBody.Part imageRight = MultipartBody.Part.createFormData("file", file.getName(), requestFileRight);
                 RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"), p.getChwName());
                 RequestBody visitId = RequestBody.create(MediaType.parse("text/plain"), p.getVisitId());
                 RequestBody patientId = RequestBody.create(MediaType.parse("text/plain"), p.getPatientId());
-                RequestBody right = RequestBody.create(MediaType.parse("text/plain"), "right");
-                RequestBody left = RequestBody.create(MediaType.parse("text/plain"), "left");
+                RequestBody type = RequestBody.create(MediaType.parse("text/plain"), p.getLeftRight());
                 RequestBody sex = RequestBody.create(MediaType.parse("text/plain"), p.getSex());
                 RequestBody age = RequestBody.create(MediaType.parse("text/plain"), p.getAge());
                 RequestBody visual_acuity_right = RequestBody.create(MediaType.parse("text/plain"), p.getVARight());
                 RequestBody pinhole_acuity_right = RequestBody.create(MediaType.parse("text/plain"), p.getPinholeRight());
-                RequestBody visual_acuity_left = RequestBody.create(MediaType.parse("text/plain"), p.getVALeft());
-                RequestBody pinhole_acuity_left = RequestBody.create(MediaType.parse("text/plain"), p.getPinholeLeft());
-                RequestBody complaintsRight = RequestBody.create(MediaType.parse("text/plain"), p.getComplaintsRight().toString());
-                RequestBody complaintsLeft = RequestBody.create(MediaType.parse("text/plain"), p.getComplaintsLeft().toString());
-                RequestBody diagnosisRight = RequestBody.create(MediaType.parse("text/plain"), p.getDiagnosisRight().toString());
-                RequestBody diagnosisLeft = RequestBody.create(MediaType.parse("text/plain"), p.getDiagnosisLeft().toString());
+                RequestBody complaintsRight=RequestBody.create(MediaType.parse("text/plain"), "");
+                if (p.getComplaintsRight()!=null) complaintsRight = RequestBody.create(MediaType.parse("text/plain"), p.getComplaintsRight().toString());
+                RequestBody diagnosisRight=RequestBody.create(MediaType.parse("text/plain"), "");
+                if (p.getDiagnosisRight()!=null) diagnosisRight = RequestBody.create(MediaType.parse("text/plain"), p.getDiagnosisRight().toString());
 
                 Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
                 AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
-                i++;
-                Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(imageRight, creatorId, visitId, patientId, right, visual_acuity_right, pinhole_acuity_right, sex, age, complaintsRight, diagnosisRight);
-                if (i==1){
-                    azureObservable = uploadApis.uploadImageAsync(imageLeft, creatorId, visitId, patientId, left, visual_acuity_left, pinhole_acuity_left, sex, age, complaintsLeft, diagnosisLeft);
-                }
+
+                Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(imageRight, creatorId, visitId, patientId, type, visual_acuity_right, pinhole_acuity_right, sex, age, diagnosisRight);
+
                 //is this the right type for the observable...
-                int finalI = i;
                 azureObservable.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableObserver<ResponseBody>() {
@@ -293,10 +335,11 @@ public class ImagesPushDAO {
 
                             @Override
                             public void onNext(@NonNull ResponseBody responseBody) {
-                                Log.d(TAG, "azure success");
-                                Log.d(TAG+"i", String.valueOf(finalI));
+                                Log.d(TAG, "azure success " + p.getVisitId());
+                                //getImageIdFromServer(p.getVisitId(), p.getPatientId(), p.getLeftRight(), p);
+                                //Log.d(TAG+"i", String.valueOf(finalI));
                                 //Remove request from database and delete file
-                                if(finalI ==2)
+                                //if(finalI ==2)
                                 try {
                                     imagesDAO.removeAzureAddDoc(p.getVisitId(), p.getImagePath(), p.getImageId());
                                 } catch (DAOException e) {
@@ -324,12 +367,102 @@ public class ImagesPushDAO {
                             }
                         });
             }
-        }
+
         sessionManager.setPushSyncFinished(true);
 //        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
         return true;
 
     }
+
+    public void getImageIdFromServer(String visitId, String patientId, String type, azureResults patient){
+        Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
+        AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
+        String url="api/v1/image/"+patientId+"/"+visitId;
+        Call<List<azureResults>> response = uploadApis.getAzureImage(url);
+        response.enqueue(new Callback<List<azureResults>>() {
+            @Override
+            public void onResponse(Call<List<azureResults>> call, Response<List<azureResults>> response) {
+                    Log.d("Response", response.message());
+                    Log.d("Response", response.body().toString());
+                    for (azureResults result : response.body()) {
+                        Log.d("azureresult", result.toString());
+                        Log.d(TAG, "VisitId: " + patient.getVisitId() + " ImageID: " + result.getImageId());
+                        if (result.getLeftRight() == type)
+                            azureAddDiagnosis(result.getId(), patient);
+                    }
+
+            }
+
+
+            @Override
+            public void onFailure(Call<List<azureResults>> call, Throwable t) {
+                Log.d(TAG, String.valueOf(t));
+
+            }
+
+
+        });
+    }
+
+
+    public boolean azureAddDiagnosis(String id, azureResults patient){
+        sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
+        String encoded = sessionManager.getEncoded();
+        Retrofit retrofit = AzureNetworkClient.getRetrofit();
+        ImagesDAO imagesDAO = new ImagesDAO();
+        String diagnosis_id= UUID.randomUUID().toString();
+        String diagnosis=patient.getDiagnosisRight().toString();
+        String creator= patient.getChwName();
+        Map<String, Object> jsonParams = new ArrayMap<>();
+//put something inside the map, could be null
+        jsonParams.put("diagnosis_id", diagnosis_id);
+        jsonParams.put("diagnosis", diagnosis);
+        jsonParams.put("creator_id", creator);
+        jsonParams.put("image_id", id);
+        String images= "[{\"id\" : \"" + id + "\", \"diagnosis_id\" : \"" + diagnosis_id + "\"}]";
+        jsonParams.put("images", images);
+        /*String postBody="{\n \"id\" : \""+ diagnosis_id + "\", \n " +
+                        "\"diagnosis\" : \"" + diagnosis + "\", \n"+
+                        "\"creator_id\" : \"" + creator + "\", \n"+
+                        "\"images\" : \"" + images + "\", \n}";
+         */
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),(new JSONObject(jsonParams)).toString());
+        Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
+        AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
+        Call<ResponseBody> response = uploadApis.addDiagnosis(body);
+
+        response.enqueue(new Callback<ResponseBody>()
+        {
+            @Override
+            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> rawResponse)
+            {
+                try
+                {
+                    //get your response....
+                    Log.d(TAG, "RetroFit2.0 :RetroGetLogin: " + rawResponse.body().string());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable throwable)
+            {
+                Log.d(TAG, String.valueOf(throwable));
+            }
+        });
+
+        //is this the right type for the observable...
+
+        sessionManager.setPushSyncFinished(true);
+//        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
+        return true;
+
+    }
+
+
 
     public boolean deleteObsImage() {
         sessionManager = new SessionManager(IntelehealthApplication.getAppContext());

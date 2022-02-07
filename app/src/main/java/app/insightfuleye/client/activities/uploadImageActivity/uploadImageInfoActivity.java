@@ -1,36 +1,64 @@
 package app.insightfuleye.client.activities.uploadImageActivity;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +86,9 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     EditText mAge;
     RadioButton mGenderM;
     RadioButton mGenderF;
+    RadioButton mohit;
+    RadioButton aravindStaff;
+    private String mImager;
     Spinner spinVARight;
     Spinner spinVALeft;
     Spinner spinPinholeRight;
@@ -90,6 +121,8 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     CheckBox cornealOpacityL;
     CheckBox normalR;
     CheckBox normalL;
+    CheckBox pciolR;
+    CheckBox pciolL;
     CheckBox blurryCloseR;
     CheckBox blurryCloseL;
     CheckBox blurryFarR;
@@ -102,6 +135,9 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     CheckBox headacheL;
     CheckBox eyeTraumaR;
     CheckBox eyeTraumaL;
+
+    LinearLayout previewRight;
+    LinearLayout previewLeft;
 
 
 
@@ -125,6 +161,8 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         mAge = findViewById(R.id.upload_image_age);
         mGenderM = findViewById(R.id.upload_image_gender_male);
         mGenderF = findViewById(R.id.upload_image_gender_female);
+        mohit=findViewById(R.id.upload_image_mohit);
+        aravindStaff=findViewById(R.id.upload_image_person_other);
         spinVARight=findViewById(R.id.spinner_varight);
         spinVALeft=findViewById(R.id.spinner_valeft);
         spinPinholeRight=findViewById(R.id.spinner_pinholeright);
@@ -148,6 +186,8 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         cornealUlcerL=findViewById(R.id.checkbox_corneal_ulcer_l);
         normalR=findViewById(R.id.checkbox_normal_r);
         normalL=findViewById(R.id.checkbox_normal_l);
+        pciolR=findViewById(R.id.checkbox_pciol_r);
+        pciolL=findViewById(R.id.checkbox_pciol_l);
 
         blurryCloseR=findViewById(R.id.checkbox_blurry_close_r);
         blurryCloseL=findViewById(R.id.checkbox_blurry_close_l);
@@ -161,6 +201,9 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         headacheL=findViewById(R.id.checkbox_headache_l);
         eyeTraumaR=findViewById(R.id.checkbox_eye_trauma_r);
         eyeTraumaL=findViewById(R.id.checkbox_eye_trauma_l);
+
+        previewRight=findViewById(R.id.preview_right_eye_picture);
+        previewLeft=findViewById(R.id.preview_left_eye_picture);
 
         //load past details to edit
         Intent intent = this.getIntent(); // The intent was passed to the activity
@@ -202,11 +245,10 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                 mImageViewLeft.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(imageNameLeft)));
             }
             mAge.setText(patient.getAge());
-            Log.d("righteyediag", patient.getDiagnosisRight().toString());
-            setCheckedRight(patient.getDiagnosisRight());
-            setCheckedRight(patient.getComplaintsRight());
-            setCheckedLeft(patient.getDiagnosisLeft());
-            setCheckedLeft(patient.getComplaintsLeft());
+            if (patient.getDiagnosisRight()!=null) setCheckedRight(patient.getDiagnosisRight());
+            if (patient.getComplaintsRight()!=null) setCheckedRight(patient.getComplaintsRight());
+            if (patient.getDiagnosisLeft()!=null) setCheckedLeft(patient.getDiagnosisLeft());
+            if (patient.getComplaintsLeft()!= null) setCheckedLeft(patient.getComplaintsLeft());
         }
 
         if (visitId_edit != null) {
@@ -221,6 +263,15 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                     mGenderM.setChecked(false);
                 Log.v(TAG, "yes");
             }
+            if(patient.getChwName().equals("Mohit")){
+                mohit.setChecked(true);
+                if(aravindStaff.isChecked())
+                    aravindStaff.setChecked(false);
+            }else{
+                aravindStaff.setChecked(true);
+                if(mohit.isChecked())
+                    mohit.setChecked(false);
+            }
 
         }
         if (mGenderM.isChecked()) {
@@ -229,6 +280,16 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         } else {
             mGender = "F";
         }
+
+        if(mohit.isChecked()){
+            mImager="Mohit";
+        } else{
+            mImager="Aravind Staff";
+        }
+
+     previewRight.setVisibility(View.GONE);
+
+     previewLeft.setVisibility(View.GONE);
 
         spinVARight.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -288,41 +349,67 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             }
         });
 
+        mohit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked2(v);
+            }
+        });
+
+        aravindStaff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked2(v);
+            }
+        });
+
         mImageViewRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String imageNameRight = UUID.randomUUID().toString();
-                File filePath = new File(AppConstants.IMAGE_PATH + imageNameRight);
-                if (!filePath.exists()) {
-                    filePath.mkdir();
+                if (patient.getImagePath()!=null){
+                    previewImage(uploadImageInfoActivity.this, patient.getImagePath(), "right");
+
+                }else {
+                    String imageNameRight = UUID.randomUUID().toString();
+                    File filePath = new File(AppConstants.IMAGE_PATH + imageNameRight);
+                    if (!filePath.exists()) {
+                        filePath.mkdir();
+                    }
+                    patient.setImagePath(imageNameRight);
+                    Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
+                    // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
+                    cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameRight);
+                    cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, filePath.toString());
+                    cameraIntent.putExtra(CameraActivity.SET_EYE_TYPE, "right");
+                    startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE);
                 }
-                patient.setImagePath(imageNameRight);
-                Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
-                // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
-                cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameRight);
-                cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, filePath.toString());
-                cameraIntent.putExtra(CameraActivity.SET_EYE_TYPE, "right");
-                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE);
             }
         });
 
         mImageViewLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String imageNameLeft = UUID.randomUUID().toString();
-                File filePath = new File(AppConstants.IMAGE_PATH + imageNameLeft);
-                if (!filePath.exists()) {
-                    filePath.mkdir();
+                if (patient.getImageId()!=null){
+                    previewImage(uploadImageInfoActivity.this, patient.getImageId(), "left");
                 }
-                patient.setImageId(imageNameLeft);
-                Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
-                // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
-                cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameLeft);
-                cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, filePath.toString());
-                cameraIntent.putExtra(CameraActivity.SET_EYE_TYPE, "left");
-                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE);
+
+                else {
+                    String imageNameLeft = UUID.randomUUID().toString();
+                    File filePath = new File(AppConstants.IMAGE_PATH + imageNameLeft);
+                    if (!filePath.exists()) {
+                        filePath.mkdir();
+                    }
+                    patient.setImageId(imageNameLeft);
+                    Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
+                    // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
+                    cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameLeft);
+                    cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, filePath.toString());
+                    cameraIntent.putExtra(CameraActivity.SET_EYE_TYPE, "left");
+                    startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE);
+                }
             }
         });
+
 
 
         mAge.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -352,6 +439,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             patient.setPinholeRight(phRight);
             patient.setPinholeLeft(phLeft);
             patient.setSex(mGender);
+            patient.setChwName(mImager);
             if (visitId_edit != null) {
                 try {
                     updateAzureImageDatabase();
@@ -409,7 +497,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
 
         String patientSelection = "visitId=?";
         String[] Args = {visitId};
-        String[] Columns = {"visitId", "imageName", "imageName2", "VARight", "VALeft", "PinholeRight", "PinholeLeft", "age", "sex", "diagnosisRight", "diagnosisLeft", "complaintsRight", "complaintsLeft"};
+        String[] Columns = {"visitId", "imageName", "imageName2", "VARight", "VALeft", "PinholeRight", "PinholeLeft", "age", "sex","creatorId", "diagnosisRight", "diagnosisLeft", "complaintsRight", "complaintsLeft"};
         Cursor idCursor = db.query("tbl_azure_additional_docs", Columns, patientSelection, Args, null, null, null);
         if (idCursor.moveToFirst()) {
             do {
@@ -422,10 +510,11 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                 patient.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
                 patient.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName"))); //imagePath for imageNameRight
                 patient.setImageId(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName2"))); //imageID for imageNameLeft
-                patient.setDiagnosisRight(new ArrayList<>( Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))).split(","))));
-                patient.setDiagnosisLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))).split(","))));
-                patient.setComplaintsRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))).split(","))));
-                patient.setComplaintsLeft(new ArrayList<>( Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
+                patient.setChwName(idCursor.getString(idCursor.getColumnIndexOrThrow("creatorId")));
+                if (idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))!=null)patient.setDiagnosisRight(new ArrayList<>( Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))).split(","))));
+                if (idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))!=null)patient.setDiagnosisLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))).split(","))));
+                if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))!=null)patient.setComplaintsRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))).split(","))));
+                if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))!=null)patient.setComplaintsLeft(new ArrayList<>( Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
 
             } while (idCursor.moveToNext());
             idCursor.close();
@@ -452,6 +541,21 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         mGenderM.setError(null);
         mGenderF.setError(null);
     }
+    public void onRadioButtonClicked2(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+        switch (view.getId()) {
+            case R.id.upload_image_mohit:
+                if(checked)
+                    mImager="Mohit";
+                break;
+            case R.id.upload_image_person_other:
+                if(checked)
+                    mImager="Aravind Staff";
+                break;
+        }
+        patient.setChwName(mImager);
+    }
+
 
     public boolean updateAzureImageDatabase() throws DAOException {
         boolean isUpdated =false;
@@ -467,10 +571,10 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             contentValues.put("sex", mGender);
             contentValues.put("imageName", patient.getImagePath()); //imageNameRight
             contentValues.put("imageName2", patient.getImageId()); //imageNameLeft
-            contentValues.put("complaintsRight", patient.getComplaintsRight().toString());
-            contentValues.put("complaintsLeft", patient.getComplaintsLeft().toString());
-            contentValues.put("diagnosisRight", patient.getDiagnosisRight().toString());
-            contentValues.put("diagnosisLeft", patient.getDiagnosisLeft().toString());
+            if (patient.getComplaintsRight()!=null) contentValues.put("complaintsRight", patient.getComplaintsRight().toString());
+            if (patient.getComplaintsLeft()!=null) contentValues.put("complaintsLeft", patient.getComplaintsLeft().toString());
+            if (patient.getDiagnosisRight()!= null) contentValues.put("diagnosisRight", patient.getDiagnosisRight().toString());
+            if (patient.getDiagnosisLeft()!=null) contentValues.put("diagnosisLeft", patient.getDiagnosisLeft().toString());
             localdb.updateWithOnConflict("tbl_azure_additional_docs", contentValues, "visitId = ?", new String[]{visitId_edit}, SQLiteDatabase.CONFLICT_REPLACE);
             localdb.setTransactionSuccessful();
             isUpdated=true;
@@ -494,17 +598,18 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             contentValues.put("imageName2", patient.getImageId()); //imageNmaeLeft
             contentValues.put("patientId", "Hospital-Upload");
             contentValues.put("visitId", UUID.randomUUID().toString());
-            contentValues.put("creatorId", sessionManager.getChwname());
+            //contentValues.put("creatorId", sessionManager.getChwname());
+            contentValues.put("creatorId", mImager);
             contentValues.put("VARight", patient.getVARight());
             contentValues.put("VALeft", patient.getVALeft());
             contentValues.put("PinholeRight", patient.getPinholeRight());
             contentValues.put("PinholeLeft", patient.getPinholeLeft());
             contentValues.put("age", patient.getAge());
             contentValues.put("sex", mGender);
-            contentValues.put("complaintsRight", patient.getComplaintsRight().toString());
-            contentValues.put("complaintsLeft", patient.getComplaintsLeft().toString());
-            contentValues.put("diagnosisRight", patient.getDiagnosisRight().toString());
-            contentValues.put("diagnosisLeft", patient.getDiagnosisLeft().toString());
+            if(patient.getComplaintsRight()!=null) contentValues.put("complaintsRight", patient.getComplaintsRight().toString());
+            if (patient.getComplaintsLeft()!=null) contentValues.put("complaintsLeft", patient.getComplaintsLeft().toString());
+            if (patient.getDiagnosisRight()!=null) contentValues.put("diagnosisRight", patient.getDiagnosisRight().toString());
+            if (patient.getComplaintsLeft()!=null) contentValues.put("diagnosisLeft", patient.getDiagnosisLeft().toString());
 
             //contentValues.put("sync", "false");
             localdb.insertWithOnConflict("tbl_azure_additional_docs", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
@@ -590,6 +695,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             else if(item.contains("Corneal Opacity")) cornealOpacityR.setChecked(true);
             else if (item.contains("Corneal Ulcer")) cornealUlcerR.setChecked(true);
             else if(item.contains("Normal")) normalR.setChecked(true);
+            else if(item.contains("PC IOL")) pciolR.setChecked(true);
 
             else if(item.contains("Blurry Vision Close")) blurryCloseR.setChecked(true);
             else if (item.contains("Blurry Vision Far")) blurryFarR.setChecked(true);
@@ -608,6 +714,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             else if(item.contains("Corneal Opacity")) cornealOpacityL.setChecked(true);
             else if (item.contains("Corneal Ulcer")) cornealUlcerL.setChecked(true);
             else if(item.contains("Normal")) normalL.setChecked(true);
+            else if (item.contains("PC IOL")) pciolL.setChecked(true);
 
             else if(item.contains("Blurry Vision Close")) blurryCloseL.setChecked(true);
             else if (item.contains("Blurry Vision Far")) blurryFarL.setChecked(true);
@@ -618,4 +725,188 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         }
 
     }
+
+    public AlertDialog previewImage(final Activity context, final String path, final String type) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        builder.setPositiveButton(R.string.visit_summary_button_download, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                downloadImage(path);
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(R.string.retake_image, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                File temp = new File(path);
+                if (temp.exists()) temp.delete();
+                Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
+                cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, path);
+                cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, AppConstants.IMAGE_PATH+path);
+                cameraIntent.putExtra(CameraActivity.SET_EYE_TYPE, type);
+                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE);
+                dialog.cancel();
+            }
+        });
+        final AlertDialog dialog = builder.create();
+        LayoutInflater inflater = context.getLayoutInflater();
+        View dialogLayout = inflater.inflate(R.layout.image_confirmation_dialog, null);
+
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT || Build.VERSION.SDK_INT==Build.VERSION_CODES.M || Build.VERSION.SDK_INT==Build.VERSION_CODES.LOLLIPOP || Build.VERSION.SDK_INT==Build.VERSION_CODES.LOLLIPOP_MR1) {
+            dialog.supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        } else {
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
+
+        dialog.setView(dialogLayout);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface d) {
+
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                context.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int screen_height = displayMetrics.heightPixels;
+                int screen_width = displayMetrics.widthPixels;
+
+                ImageView imageView = dialog.findViewById(R.id.confirmationImageView);
+                final ProgressBar progressBar = dialog.findViewById(R.id.progressBar);
+                Glide.with(context)
+                        .load(new File(AppConstants.IMAGE_PATH+path+".jpg"))
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .listener(new RequestListener<File, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, File file, Target<GlideDrawable> target, boolean b) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable glideDrawable, File file, Target<GlideDrawable> target, boolean b, boolean b1) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .override(screen_width, screen_height)
+                        .into(imageView);
+            }
+        });
+
+        dialog.show();
+        IntelehealthApplication.setAlertDialogCustomTheme(context, dialog);
+        return dialog;
+
+    }
+
+    private void downloadImage(String path){
+        ActivityCompat.requestPermissions(uploadImageInfoActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+        ActivityCompat.requestPermissions(uploadImageInfoActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+        Toast.makeText(this, "Downloading...", Toast.LENGTH_LONG).show();
+        String DIR_NAME="AROMA Photos";
+        File direct =
+                new File(Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                        .getAbsolutePath() + "/" + DIR_NAME + "/");
+
+        Log.d("Download Image: ", AppConstants.IMAGE_PATH+path+".jpg");
+
+        Bitmap bitmap = BitmapFactory.decodeFile(AppConstants.IMAGE_PATH+path+".jpg");
+
+        FileOutputStream outputStream = null;
+
+
+
+        direct.mkdirs();
+        File file = Environment.getExternalStorageDirectory();
+        String filename = String.format("%d.png",System.currentTimeMillis());
+        File outFile = new File(direct,filename);
+
+        try{
+            outputStream = new FileOutputStream(outFile);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+        try{
+            outputStream.flush();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try{
+            outputStream.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Uri contentUri = Uri.fromFile(outFile);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
+        /*
+        File oldFile=new File(AppConstants.IMAGE_PATH+path+".jpg");
+        File newFile = new File(direct+path+".jpg");
+        FileChannel outputChannel = null;
+        FileChannel inputChannel = null;
+        try {
+            outputChannel = new FileOutputStream(newFile).getChannel();
+            inputChannel = new FileInputStream(oldFile).getChannel();
+            inputChannel.transferTo(0, inputChannel.size(), outputChannel);
+            inputChannel.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (inputChannel != null) {
+                try {
+                    inputChannel.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (outputChannel != null) {
+                try {
+                    outputChannel.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+         */
+
+/*
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+                in = new FileInputStream(AppConstants.IMAGE_PATH + path + ".jpg");
+                out = new FileOutputStream(direct + path + ".jpg");
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+                in.close();
+                in = null;
+
+                // write the output file (You have now copied the file)
+                out.flush();
+                out.close();
+                out = null;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+ */
+
 }
+
