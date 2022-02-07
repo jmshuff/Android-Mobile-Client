@@ -31,9 +31,9 @@
     <ImageView
         android:id="@+id/alignCircle"
         android:layout_width="0dp"
-        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintWidth_percent="0.3"
         android:layout_height="0dp"
-        android:src="@drawable/circle_intelehealth"
+        android:src="@drawable/ic_circle_camera"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/camera"

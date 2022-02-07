@@ -497,27 +497,6 @@ public class ImagesDAO {
 
 
 
-    public List<azureResults> getAzureImages(){
-        //get data from Azure server
-        Retrofit retrofit = AzureNetworkClient.getRetrofit();
-        AzureUploadAPI getAzureImage = retrofit.create(AzureUploadAPI.class);
-        Call<List<azureResults>> call = getAzureImage.getAzureImage();
-        List<azureResults> resultsList= new ArrayList<>();
-        call.enqueue(new Callback<List<azureResults>>() {
-            @Override
-            public void onResponse(Call<List<azureResults>> call, Response<List<azureResults>> response) {
-                List<azureResults> resultsList = response.body();
-            }
-
-            @Override
-            public void onFailure(Call<List<azureResults>> call, Throwable t) {
-                Log.d("getAzureImage", t.toString());
-            }
-
-        });
-        return resultsList;
-    }
-
     public List<azureResults> getAzureImageQueue() throws DAOException {
         //get unsynced images from local storage
         SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
@@ -530,6 +509,7 @@ public class ImagesDAO {
                     azureResults ImageQueue= new azureResults();
                     ImageQueue.setChwName(idCursor.getString(idCursor.getColumnIndexOrThrow("creatorId")));
                     ImageQueue.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName")));
+                    ImageQueue.setImageId(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName2")));
                     ImageQueue.setLeftRight(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
                     ImageQueue.setVisitId(idCursor.getString(idCursor.getColumnIndexOrThrow("visitId")));
                     ImageQueue.setPatientId(idCursor.getString(idCursor.getColumnIndexOrThrow("patientId")));
@@ -565,6 +545,7 @@ public class ImagesDAO {
                     azureResults ImageQueue= new azureResults();
                     ImageQueue.setChwName(idCursor.getString(idCursor.getColumnIndexOrThrow("creatorId")));
                     ImageQueue.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName")));
+                    ImageQueue.setImageId(idCursor.getString(idCursor.getColumnIndexOrThrow("imageName2")));
                     ImageQueue.setLeftRight(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
                     ImageQueue.setVisitId(idCursor.getString(idCursor.getColumnIndexOrThrow("visitId")));
                     ImageQueue.setPatientId(idCursor.getString(idCursor.getColumnIndexOrThrow("patientId")));
@@ -574,10 +555,11 @@ public class ImagesDAO {
                     ImageQueue.setPinholeLeft(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeLeft")));
                     ImageQueue.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
                     ImageQueue.setSex(idCursor.getString(idCursor.getColumnIndexOrThrow("sex")));
-                    ImageQueue.setDiagnosisRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))).split(","))));
-                    ImageQueue.setDiagnosisLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))).split(","))));
-                    ImageQueue.setComplaintsRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))).split(","))));
-                    ImageQueue.setComplaintsLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
+                    if (idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))!=null) ImageQueue.setDiagnosisRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))).split(","))));
+                    if (idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))!=null)ImageQueue.setDiagnosisLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))).split(","))));
+                    if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))!=null)ImageQueue.setComplaintsRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))).split(","))));
+                    if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))!=null)ImageQueue.setComplaintsLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
+                    if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))!=null)ImageQueue.setComplaintsLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
                     azureResultList.add(ImageQueue);
                 }
             }

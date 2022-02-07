@@ -669,6 +669,8 @@
     <string name="eye_pain_irritation">Eye Pain/Irritation</string>
     <string name="headache_complaint">Headache</string>
     <string name="eye_trauma">Recent Eye Trauma</string>
+    <string name="pc_iol">PC IOL</string>
+    <string name="retake_image">Retake</string>
 
 
 </resources>

@@ -396,6 +396,8 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
             //  if(patientHistoryMap.anySubSelected()){
             patientHistory = patientHistoryMap.generateLanguage();
+            Log.i(TAG, patientHistory);
+
 
             if (flag == true) { // only if OK clicked, collect this new info (old patient)
                 phistory = phistory + patientHistory; // only PMH updated

@@ -25,7 +25,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.5"
-        android:src="@drawable/circle_intelehealth"
+        android:src="@drawable/ic_circle_camera"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@id/camera_surface_CameraView"
