@@ -203,9 +203,6 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         headacheL=findViewById(R.id.checkbox_headache_l);
         eyeTraumaR=findViewById(R.id.checkbox_eye_trauma_r);
         eyeTraumaL=findViewById(R.id.checkbox_eye_trauma_l);
-
-        previewRight=findViewById(R.id.preview_right_eye_picture);
-        previewLeft=findViewById(R.id.preview_left_eye_picture);
         mPrototype=findViewById(R.id.upload_image_prototype);
 
 
