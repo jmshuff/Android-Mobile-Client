@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionNodeActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
 import app.insightfuleye.client.app.AppConstants;
@@ -75,6 +76,9 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
     String patientName;
     String intentTag;
     private float float_ageYear_Month;
+    ArrayList<String> insertionList = new ArrayList<>();
+    String insertion = "";
+
 
     ArrayList<String> physicalExams;
     int lastExpandedPosition = -1;
@@ -363,7 +367,34 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
 
     private void fabClick() {
-        //If nothing is selected, there is nothing to put into the database.
+        if (patientHistoryMap.anySubSelected()) {
+            for (Node node : patientHistoryMap.getOptionsList()) {
+                if (node.isSelected()) {
+                    String patientString="";
+                    if (node.isBilateral()) patientString = node.generateBilateralLanguage();
+                    else patientString = node.generateLanguage();
+                    String toInsert = node.getText() + " : " + patientString;
+                    toInsert = toInsert.replaceAll(Node.bullet, "");
+                    toInsert = toInsert.replaceAll(" - ", ", ");
+                    toInsert = toInsert.replaceAll("<br/>", "");
+                    if (org.apache.commons.lang3.StringUtils.right(toInsert, 2).equals(", ")) {
+                        toInsert = toInsert.substring(0, toInsert.length() - 2);
+                    }
+                    toInsert = toInsert + ".<br/>";
+                    insertionList.add(toInsert);
+                }
+            }
+        }
+
+        for (int i = 0; i < insertionList.size(); i++) {
+            if (i == 0) {
+                insertion = Node.bullet + insertionList.get(i);
+            } else {
+                insertion = insertion + " " + Node.bullet + insertionList.get(i);
+            }
+        }
+
+        insertion = insertion.replaceAll("null.", "");
 
         List<String> imagePathList = patientHistoryMap.getImagePathList();
 
@@ -375,12 +406,8 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
 
         if (intentTag != null && intentTag.equals("edit")) {
-            if (patientHistoryMap.anySubSelected()) {
-                patientHistory = patientHistoryMap.generateLanguage();
-                updateDatabase(patientHistory); // update details of patient's visit, when edit button on VisitSummary is pressed
-            }
+            updateDatabase(insertion);
 
-            // displaying all values in another activity
             Intent intent = new Intent(PastMedicalHistoryActivity.this, VisitSummaryActivity.class);
             intent.putExtra("patientUuid", patientUuid);
             intent.putExtra("visitUuid", visitUuid);
@@ -394,25 +421,21 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             startActivity(intent);
         } else {
 
-            //  if(patientHistoryMap.anySubSelected()){
-            patientHistory = patientHistoryMap.generateLanguage();
-            Log.i(TAG, patientHistory);
-
-
-            if (flag == true) { // only if OK clicked, collect this new info (old patient)
-                phistory = phistory + patientHistory; // only PMH updated
-                sessionManager.setReturning(true);
-
-
+            if (flag == true) {
+                // only if OK clicked, collect this new info (old patient)
+                if (insertion.length() > 0) {
+                    phistory = phistory + insertion;
+                } else {
+                    phistory = phistory + "";
+                }
                 insertDb(phistory);
-
-                // however, we concat it here to patientHistory and pass it along to FH, not inserting into db
-            } else  // new patient, directly insert into database
-            {
-                insertDb(patientHistory);
+            } else {
+                insertDb(insertion); // new details of family history
             }
 
-            Intent intent = new Intent(PastMedicalHistoryActivity.this, FamilyHistoryActivity.class);
+            flag = false;
+            sessionManager.setReturning(false);
+            Intent intent = new Intent(PastMedicalHistoryActivity.this, FamilyHistoryActivity.class); // earlier it was vitals
             intent.putExtra("patientUuid", patientUuid);
             intent.putExtra("visitUuid", visitUuid);
             intent.putExtra("encounterUuidVitals", encounterVitals);
@@ -422,10 +445,10 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             intent.putExtra("name", patientName);
             intent.putExtra("float_ageYear_Month", float_ageYear_Month);
             intent.putExtra("tag", intentTag);
-            //       intent.putStringArrayListExtra("exams", physicalExams);
+            //   intent.putStringArrayListExtra("exams", physicalExams);
             startActivity(intent);
-
         }
+
     }
 
 

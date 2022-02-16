@@ -87,6 +87,7 @@ public class Node implements Serializable {
     static String leftSympt;
     static String rightSympt;
     static String footer;
+    static String duration;
     private String bilateralQuestion;
 
 
@@ -799,6 +800,90 @@ public class Node implements Serializable {
         return null;
     }
 
+    public String generateBilateralLanguage() {
+        //Makes the output result string
+
+        String raw = "";
+        List<Node> mOptions = optionsList;
+        String laterality="";
+        if (optionsList != null && !optionsList.isEmpty()) {
+            for (Node node_opt : mOptions) {
+                Log.d("Node", node_opt.toString());
+                if (node_opt.isSelected()) {
+                    if (node_opt.isRightSelected() && node_opt.isLeftSelected()) laterality="Both Eyes: ";
+                    else if (node_opt.isRightSelected()) laterality="Right Eye: ";
+                    else if (node_opt.isLeftSelected()) laterality="Left Eye: ";
+                    Log.d("isSelected", "true");
+                    String associatedTest = node_opt.getText();
+                    if (associatedTest != null && (associatedTest.trim().equals("Associated symptoms") || associatedTest.trim().equals("जुड़े लक्षण") ||
+                            (associatedTest.trim().equals("H/o specific illness")) ||
+                            (associatedTest.trim().equals("ସମ୍ପର୍କିତ ଲକ୍ଷଣଗୁଡ଼ିକ")))) {
+
+                        if ((associatedTest.trim().equals("Associated symptoms")) || associatedTest.trim().equals("जुड़े लक्षण") || (associatedTest.trim().equals("ସମ୍ପର୍କିତ ଲକ୍ଷଣଗୁଡ଼ିକ"))) {
+                            if (!generateAssociatedSymptomsOrHistory(node_opt).isEmpty()) {
+                                raw = raw + (generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
+                                raw = raw.substring(6);
+                                Log.e("FinalText= ", raw);
+                            } else {
+                                Log.e("FinalText= ", raw);
+
+                            }
+                        } else {
+                            Log.d("generatelanguage",node_opt.getLanguage());
+                            raw = raw + (bullet + " " + laterality+ node_opt.getLanguage() + " - " + generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
+                        }
+
+                    } else {
+                        Log.d("Node", "here");
+                        Log.d("getLang", node_opt.getLanguage());
+                        if (!node_opt.getLanguage().isEmpty()) {
+                            if (node_opt.getLanguage().equals("%")) {
+                                //raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
+                                //I think removing this will remove empty lines. JS confirm 12-28-21
+                            } else if (node_opt.getLanguage().substring(0, 1).equals("%")) {
+                                raw = raw + (bullet + " " + laterality + node_opt.getLanguage().substring(1) + " - " + node_opt.formLanguage()) + next_line;
+                            } else {
+                                //getLanguge= language from json file
+                                Log.d("generatelanguage",node_opt.getLanguage());
+
+                                raw = raw + (bullet + " " + laterality + node_opt.getLanguage() + " - " + node_opt.formLanguage()) + next_line;
+                            }
+                        }
+                    }
+                    //raw = raw + ("\n"+"\n" + bullet +" "+ node_opt.formLanguage());
+                } else {
+                    String associatedTest = node_opt.getText();
+                    if (associatedTest != null && (associatedTest.trim().equals("Associated symptoms")
+                            || associatedTest.trim().equals("जुड़े लक्षण") || (associatedTest.trim().equals("ସମ୍ପର୍କିତ ଲକ୍ଷଣଗୁଡ଼ିକ")))) {
+                        if (!generateAssociatedSymptomsOrHistory(node_opt).isEmpty()) {
+                            raw = raw + (generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
+                            raw = raw.substring(6);
+                            Log.e("FinalText= ", raw);
+                        } else {
+                            Log.e("FinalText= ", raw);
+                        }
+                    }
+                }
+            }
+        }
+        Log.d("Raw", raw);
+
+        String formatted;
+        if (!raw.isEmpty()) {
+            if (Character.toString(raw.charAt(0)).equals(",")) {
+                formatted = raw.substring(2);
+            } else {
+                formatted = raw;
+            }
+            formatted = formatted.replaceAll("\\. -", ".");
+            formatted = formatted.replaceAll("\\.,", ", ");
+            Log.i(TAG, "generateLanguage: " + formatted);
+            return formatted;
+        }
+        return null;
+    }
+
+
 
     public void generateTableResults() {
         Log.i("generateTableResults", "called");
@@ -807,6 +892,7 @@ public class Node implements Serializable {
         String leftSympt= "";
         String rightSympt="";
         String footer = "";
+        String duration= "";
         List<Node> mOptions = optionsList;
 
         if (optionsList != null && !optionsList.isEmpty()) {
@@ -822,6 +908,9 @@ public class Node implements Serializable {
                         if(node_opt.isLeftSelected()){
                             leftSympt= leftSympt+ bullet + " " + node_opt.formLanguageBilateral("left") +next_line;
                         }
+                    }
+                    else if (node_opt.getLanguage().toLowerCase().contains("duration")){
+                        duration= bullet + " " + node_opt.formLanguage() + next_line;
                     }
                     else if (node_opt.getLanguage().equals("%")) {
                         raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
@@ -880,6 +969,7 @@ public class Node implements Serializable {
         setLeftSympt(leftSympt);
         setRightSympt(rightSympt);
         setFooter(footer);
+        setDuration(duration);
 
     }
 
@@ -2155,8 +2245,13 @@ public class Node implements Serializable {
     public static String getRightSympt(){return rightSympt;}
     public static String getFooter(){return footer;}
 
+    public static String getDuration() {
+        return duration;
+    }
 
-
+    public static void setDuration(String duration) {
+        Node.duration = duration;
+    }
 
     public void addImageToList() {
         if (imagePathList == null) {

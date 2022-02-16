@@ -86,8 +86,8 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     EditText mAge;
     RadioButton mGenderM;
     RadioButton mGenderF;
-    RadioButton mohit;
-    RadioButton aravindStaff;
+    //RadioButton mohit;
+    //RadioButton aravindStaff;
     private String mImager;
     Spinner spinVARight;
     Spinner spinVALeft;
@@ -135,9 +135,11 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     CheckBox headacheL;
     CheckBox eyeTraumaR;
     CheckBox eyeTraumaL;
+    private String prototypeString;
 
     LinearLayout previewRight;
     LinearLayout previewLeft;
+    TextView mPrototype;
 
 
 
@@ -161,8 +163,8 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         mAge = findViewById(R.id.upload_image_age);
         mGenderM = findViewById(R.id.upload_image_gender_male);
         mGenderF = findViewById(R.id.upload_image_gender_female);
-        mohit=findViewById(R.id.upload_image_mohit);
-        aravindStaff=findViewById(R.id.upload_image_person_other);
+        //mohit=findViewById(R.id.upload_image_mohit);
+        //aravindStaff=findViewById(R.id.upload_image_person_other);
         spinVARight=findViewById(R.id.spinner_varight);
         spinVALeft=findViewById(R.id.spinner_valeft);
         spinPinholeRight=findViewById(R.id.spinner_pinholeright);
@@ -204,15 +206,21 @@ public class uploadImageInfoActivity extends AppCompatActivity {
 
         previewRight=findViewById(R.id.preview_right_eye_picture);
         previewLeft=findViewById(R.id.preview_left_eye_picture);
+        mPrototype=findViewById(R.id.upload_image_prototype);
+
 
         //load past details to edit
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
+            prototypeString=intent.getStringExtra("prototype");
             if (intent.hasExtra("visitId")) {
                 visitId_edit = intent.getStringExtra("visitId");
                 setscreen(visitId_edit);
             }
         }
+        String prototypeDisplay="Prototype: " + prototypeString;
+        mPrototype.setText(prototypeDisplay);
+
             //Age need to convert from Birthday
         Resources res = getResources();
         ArrayAdapter<CharSequence> vaRightAdapter = ArrayAdapter.createFromResource(this,
@@ -263,15 +271,15 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                     mGenderM.setChecked(false);
                 Log.v(TAG, "yes");
             }
-            if(patient.getChwName().equals("Mohit")){
-                mohit.setChecked(true);
-                if(aravindStaff.isChecked())
-                    aravindStaff.setChecked(false);
-            }else{
-                aravindStaff.setChecked(true);
-                if(mohit.isChecked())
-                    mohit.setChecked(false);
-            }
+//            if(patient.getChwName().equals("Mohit")){
+//                mohit.setChecked(true);
+//                if(aravindStaff.isChecked())
+//                    aravindStaff.setChecked(false);
+//            }else{
+//                aravindStaff.setChecked(true);
+//                if(mohit.isChecked())
+//                    mohit.setChecked(false);
+//            }
 
         }
         if (mGenderM.isChecked()) {
@@ -281,11 +289,11 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             mGender = "F";
         }
 
-        if(mohit.isChecked()){
-            mImager="Mohit";
-        } else{
-            mImager="Aravind Staff";
-        }
+//        if(mohit.isChecked()){
+//            mImager="Mohit";
+//        } else{
+//            mImager="Aravind Staff";
+//        }
 
      previewRight.setVisibility(View.GONE);
 
@@ -349,19 +357,19 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             }
         });
 
-        mohit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onRadioButtonClicked2(v);
-            }
-        });
-
-        aravindStaff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onRadioButtonClicked2(v);
-            }
-        });
+//        mohit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onRadioButtonClicked2(v);
+//            }
+//        });
+//
+//        aravindStaff.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onRadioButtonClicked2(v);
+//            }
+//        });
 
         mImageViewRight.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -439,7 +447,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             patient.setPinholeRight(phRight);
             patient.setPinholeLeft(phLeft);
             patient.setSex(mGender);
-            patient.setChwName(mImager);
+            patient.setChwName(prototypeString);
             if (visitId_edit != null) {
                 try {
                     updateAzureImageDatabase();
@@ -541,20 +549,20 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         mGenderM.setError(null);
         mGenderF.setError(null);
     }
-    public void onRadioButtonClicked2(View view) {
-        boolean checked = ((RadioButton) view).isChecked();
-        switch (view.getId()) {
-            case R.id.upload_image_mohit:
-                if(checked)
-                    mImager="Mohit";
-                break;
-            case R.id.upload_image_person_other:
-                if(checked)
-                    mImager="Aravind Staff";
-                break;
-        }
-        patient.setChwName(mImager);
-    }
+//    public void onRadioButtonClicked2(View view) {
+//        boolean checked = ((RadioButton) view).isChecked();
+//        switch (view.getId()) {
+//            case R.id.upload_image_mohit:
+//                if(checked)
+//                    mImager="Mohit";
+//                break;
+//            case R.id.upload_image_person_other:
+//                if(checked)
+//                    mImager="Aravind Staff";
+//                break;
+//        }
+//        patient.setChwName(mPrototype);
+//    }
 
 
     public boolean updateAzureImageDatabase() throws DAOException {
