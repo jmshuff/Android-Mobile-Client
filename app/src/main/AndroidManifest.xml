@@ -202,6 +202,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
+            android:name="app.insightfuleye.client.activities.prototypeIterationActivity.prototypeIterationActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="uiMode"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
             android:name="app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity"
             android:screenOrientation="portrait"
             android:configChanges="uiMode"

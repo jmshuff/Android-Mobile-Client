@@ -37,6 +37,7 @@ import app.insightfuleye.client.activities.additionalDocumentsActivity.Additiona
 import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
 import app.insightfuleye.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.insightfuleye.client.activities.homeActivity.HomeActivity;
+import app.insightfuleye.client.activities.prototypeIterationActivity.prototypeIterationActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ImagesPushDAO;
@@ -77,7 +78,7 @@ public class uploadImageActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentNew = new Intent(uploadImageActivity.this, uploadImageInfoActivity.class);
+                Intent intentNew = new Intent(uploadImageActivity.this, prototypeIterationActivity.class);
                 startActivity(intentNew);
             }
         });

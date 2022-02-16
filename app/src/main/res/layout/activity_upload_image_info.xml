@@ -97,56 +97,65 @@
                         android:orientation="vertical"
                         android:padding="8dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingBottom="8dp">
-
-
-
-                        <RadioGroup
-                            android:id="@+id/radioGrp1"
-                            android:layout_width="fill_parent"
+                        <TextView
+                            android:id="@+id/upload_image_prototype"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:paddingLeft="8dp"
-                            android:paddingRight="4dp"
-                            android:layout_weight="3"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true">
+                            android:text="Prototype: "
+                            android:fontFamily="@font/lato_bold"
+                            android:padding="8dp"
+                            android:textSize="20dp"/>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:fontFamily="@font/lato_bold"
-                                android:textSize="18sp"
-                                android:text="Imager:" />
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:orientation="horizontal"-->
+<!--                        android:paddingBottom="8dp">-->
 
-                            <RadioButton
-                                android:id="@+id/upload_image_mohit"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:fontFamily="@font/lato_regular"
-                                android:text="Mohit"
-                                android:textSize="@dimen/card_content_sub_text_size" />
 
-                            <RadioButton
-                                android:id="@+id/upload_image_person_other"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:drawablePadding="10dp"
-                                android:fontFamily="@font/lato_regular"
-                                android:text="Aravind staff"
-                                android:textSize="@dimen/card_content_sub_text_size"
-                                />
 
-                        </RadioGroup>
+<!--                        <RadioGroup-->
+<!--                            android:id="@+id/radioGrp1"-->
+<!--                            android:layout_width="fill_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:orientation="horizontal"-->
+<!--                            android:paddingLeft="8dp"-->
+<!--                            android:paddingRight="4dp"-->
+<!--                            android:layout_weight="3"-->
+<!--                            android:focusable="true"-->
+<!--                            android:focusableInTouchMode="true">-->
 
-                    </LinearLayout>
+<!--                            <TextView-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_weight="1"-->
+<!--                                android:fontFamily="@font/lato_bold"-->
+<!--                                android:textSize="18sp"-->
+<!--                                android:text="Imager:" />-->
+
+<!--                            <RadioButton-->
+<!--                                android:id="@+id/upload_image_mohit"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_weight="1"-->
+<!--                                android:fontFamily="@font/lato_regular"-->
+<!--                                android:text="Mohit"-->
+<!--                                android:textSize="@dimen/card_content_sub_text_size" />-->
+
+<!--                            <RadioButton-->
+<!--                                android:id="@+id/upload_image_person_other"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_weight="1"-->
+<!--                                android:drawablePadding="10dp"-->
+<!--                                android:fontFamily="@font/lato_regular"-->
+<!--                                android:text="Aravind staff"-->
+<!--                                android:textSize="@dimen/card_content_sub_text_size"-->
+<!--                                />-->
+
+<!--                        </RadioGroup>-->
+
+<!--                    </LinearLayout>-->
 
 
                         <LinearLayout

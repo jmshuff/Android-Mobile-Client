@@ -343,8 +343,8 @@ public class PhysicalExam extends Node {
 
             }
         }
-        setPhysExamRight(rightPhysExamList.toString());
-        setPhysExamLeft(leftPhysExamList.toString());
+        setPhysExamRight(rightPhysExamList.toString().replace("[", "").replace("]", ""));
+        setPhysExamLeft(leftPhysExamList.toString().replace("[", "").replace("]", ""));
         Log.d("PhysExamRight", rightPhysExamList.toString());
         Log.d("PhysExamLeft", leftPhysExamList.toString());
     }
@@ -422,6 +422,11 @@ public class PhysicalExam extends Node {
         String mLPhys=getPhysExamLeft();
         String footer=getFooter();
         String mReferral=getVolunteerReferral();
+        String duration = getDuration();
+        String rightDuration="";
+        String leftDuration="";
+        if (!leftSymptom.isEmpty()) leftDuration="<br>" + "&emsp" + duration;
+        if (!rightSymptom.isEmpty()) rightDuration= "<br>" + "&emsp" + duration;
 
         mTable="<table>" +
                 "<tr>"+
@@ -431,8 +436,8 @@ public class PhysicalExam extends Node {
                 "</tr>"+
                 "<tr>"+
                 "<th>Chief Complaint </th>"+
-                "<td>"+rightSymptom+"</td>"+
-                "<td>"+leftSymptom+"</td>"+
+                "<td>"+rightSymptom+ rightDuration+"</td>"+
+                "<td>"+leftSymptom+ leftDuration + "</td>"+
                 "</tr>"+
                 "<tr>"+
                 "<th>Visual Acuity</th>"+
@@ -451,7 +456,7 @@ public class PhysicalExam extends Node {
                 "<tr>"+
                 "</table>"+
                 footer+
-                mReferral;
+                "Referral: " + mReferral;
                 //mOther;
         return mTable;
 
