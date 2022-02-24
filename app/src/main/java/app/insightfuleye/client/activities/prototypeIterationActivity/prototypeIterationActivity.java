@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,8 +13,6 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity;
-import app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.utilities.SessionManager;
 
@@ -22,19 +21,24 @@ public class prototypeIterationActivity extends AppCompatActivity {
     SessionManager sessionManager = null;
     private boolean hasLicense = false;
 
+    public static final int PROTOTYPE = 206;
+
+
     RadioButton m10D;
     RadioButton m12D;
     RadioButton mWithScope;
     RadioButton mWithoutScope;
     RadioButton mLEDStrip;
     RadioButton mLEDBulb;
-    RadioButton m1Bulb;
-    RadioButton m2Bulb;
+    RadioButton mRBulb;
+    RadioButton mLBulb;
+    RadioButton mBothBulbs;
     private String mDiopter="";
     private String mScope="";
     private String mLightType="";
     private String mNumLights="";
     private String mPrototype="";
+    LinearLayout numBulbs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +63,13 @@ public class prototypeIterationActivity extends AppCompatActivity {
         mWithoutScope=findViewById(R.id.prototype_withoutScope);
         mLEDStrip=findViewById(R.id.prototype_ledStrip);
         mLEDBulb=findViewById(R.id.prototype_ledBulb);
-        m1Bulb=findViewById(R.id.prototype_1Bulb);
-        m2Bulb=findViewById(R.id.prototype_2Bulbs);
+        mRBulb=findViewById(R.id.prototype_RBulb);
+        mLBulb=findViewById(R.id.prototype_LBulb);
+        mBothBulbs=findViewById(R.id.prototype_BothBulbs);
+        numBulbs=findViewById(R.id.numBulbs);
+
+        numBulbs.setVisibility(View.GONE);
+
         FloatingActionButton fab = findViewById(R.id.fab);
 
         m10D.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +103,7 @@ public class prototypeIterationActivity extends AppCompatActivity {
         mLEDBulb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                numBulbs.setVisibility(View.VISIBLE);
                 onRadioButtonClicked(v);
             }
         });
@@ -105,19 +115,27 @@ public class prototypeIterationActivity extends AppCompatActivity {
             }
         });
 
-        m1Bulb.setOnClickListener(new View.OnClickListener() {
+        mRBulb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onRadioButtonClicked(v);
             }
         });
 
-        m2Bulb.setOnClickListener(new View.OnClickListener() {
+        mLBulb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onRadioButtonClicked(v);
             }
         });
+
+        mBothBulbs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,12 +181,17 @@ public class prototypeIterationActivity extends AppCompatActivity {
                 Log.v(TAG, "Light Type :" + mLightType);
                 break;
 
-            case R.id.prototype_1Bulb:
+            case R.id.prototype_RBulb:
                 if (checked)
-                    mNumLights = "1 Bulb";
+                    mNumLights = "Right Bulb";
                 Log.v(TAG, "Num Lights :" + mNumLights);
                 break;
-            case R.id.prototype_2Bulbs:
+            case R.id.prototype_LBulb:
+                if (checked)
+                    mNumLights = "2 Bulbs";
+                Log.v(TAG, "Num Lights: " + mNumLights);
+                break;
+            case R.id.prototype_BothBulbs:
                 if (checked)
                     mNumLights = "2 Bulbs";
                 Log.v(TAG, "Num Lights: " + mNumLights);
@@ -185,9 +208,10 @@ public class prototypeIterationActivity extends AppCompatActivity {
         }
         Log.d(TAG, "Prototype: " + mPrototype);
 
-        Intent intent1= new Intent(prototypeIterationActivity.this, uploadImageInfoActivity.class);
+        Intent intent1= new Intent();
         intent1.putExtra("prototype", mPrototype);
-        startActivity(intent1);
+        setResult(RESULT_OK, intent1);
+        finish();
     }
 
 }

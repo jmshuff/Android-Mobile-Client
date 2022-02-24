@@ -2,8 +2,6 @@ package app.insightfuleye.client.activities.cameraActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,25 +9,29 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.hardware.SensorManager;
-import android.media.ExifInterface;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import androidx.annotation.NonNull;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.OrientationEventListener;
+import android.view.ScaleGestureDetector;
+import android.view.Surface;
+import android.view.TextureView;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraControl;
 import androidx.camera.core.CameraInfo;
-import androidx.camera.core.CameraInfoUnavailableException;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.FocusMeteringAction;
-import androidx.camera.core.FocusMeteringResult;
-import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.ImageProxy;
@@ -43,23 +45,7 @@ import androidx.camera.view.PreviewView;
 import androidx.camera.view.TextureViewMeteringPointFactory;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
-
-import android.os.Looper;
-import android.util.Log;
-import android.view.Display;
-import android.view.MotionEvent;
-import android.view.OrientationEventListener;
-import android.view.ScaleGestureDetector;
-import android.view.Surface;
-import android.view.TextureView;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.Toast;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -70,7 +56,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.IllegalFormatWidthException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -87,6 +72,8 @@ import static android.widget.Toast.LENGTH_SHORT;
 public class CameraActivity extends AppCompatActivity {
 
     public static final int TAKE_IMAGE = 205;
+    public static final int TAKE_IMAGE_RIGHT=207;
+    public static final int TAKE_IMAGE_LEFT=208;
     /**
      * Bundle key used for the {@link String} setting custom Image Name
      * for the file generated
@@ -117,6 +104,7 @@ public class CameraActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private View focusView;
     private TextureView txView;
+    private TextView textType;
     //private ImageCapture imageCapture = null;
     private Runnable focusingTOInvisible = new Runnable() {
         @Override
@@ -143,6 +131,7 @@ public class CameraActivity extends AppCompatActivity {
         mPreviewView = findViewById(R.id.camera);
         captureImage = findViewById(R.id.take_picture);
         focusView = findViewById(R.id.focus);
+        textType=findViewById(R.id.camera_tv_type);
         txView=findViewById(R.id.view_finder);
         zoomBar = findViewById(R.id.zoomBar);
         zoomBar.setMax(100);
@@ -156,6 +145,12 @@ public class CameraActivity extends AppCompatActivity {
                 mFilePath = extras.getString(SET_IMAGE_PATH);
             if(extras.containsKey(SET_EYE_TYPE))
                 mType=extras.getString(SET_EYE_TYPE);
+            if (extras.containsKey("requestCode")){
+                if (extras.getInt("requestCode")==CameraActivity.TAKE_IMAGE_RIGHT)
+                    textType.setText("Right Eye");
+                if (extras.getInt("requestCode")==CameraActivity.TAKE_IMAGE_LEFT)
+                    textType.setText("Left Eye");
+            }
 
         }
 

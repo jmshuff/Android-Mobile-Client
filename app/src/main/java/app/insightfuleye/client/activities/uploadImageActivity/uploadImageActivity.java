@@ -2,49 +2,30 @@ package app.insightfuleye.client.activities.uploadImageActivity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.media.Image;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.additionalDocumentsActivity.AdditionalDocumentAdapter;
-import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
-import app.insightfuleye.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.insightfuleye.client.activities.homeActivity.HomeActivity;
-import app.insightfuleye.client.activities.prototypeIterationActivity.prototypeIterationActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ImagesPushDAO;
-import app.insightfuleye.client.models.DocumentObject;
 import app.insightfuleye.client.models.azureResults;
-import app.insightfuleye.client.utilities.StringUtils;
-import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class uploadImageActivity extends AppCompatActivity {
@@ -78,7 +59,7 @@ public class uploadImageActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentNew = new Intent(uploadImageActivity.this, prototypeIterationActivity.class);
+                Intent intentNew = new Intent(uploadImageActivity.this, uploadImageInfoActivity.class);
                 startActivity(intentNew);
             }
         });
@@ -94,6 +75,8 @@ public class uploadImageActivity extends AppCompatActivity {
             } catch (DAOException e) {
                 e.printStackTrace();
             }
+
+
             rowListItem = new ArrayList<>();
             for (azureResults doc : additionalDocs) {
                 String filename = AppConstants.IMAGE_PATH + doc.getImagePath() + ".jpg";

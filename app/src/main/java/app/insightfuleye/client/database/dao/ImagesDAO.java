@@ -5,10 +5,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.media.Image;
 import android.util.Log;
-import android.widget.Toast;
-
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -17,20 +14,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import app.insightfuleye.client.app.AppConstants;
+import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
 import app.insightfuleye.client.models.azureResults;
-import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
-import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
+import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
+import app.insightfuleye.client.models.uploadImage;
 import app.insightfuleye.client.utilities.Base64Utils;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.UuidDictionary;
-import app.insightfuleye.client.app.AppConstants;
-import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
-import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
 import app.insightfuleye.client.utilities.exception.DAOException;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class ImagesDAO {
     public String TAG = ImagesDAO.class.getSimpleName();
@@ -418,6 +410,44 @@ public class ImagesDAO {
     }
 
 
+    public void removeAzureGallery(String visitId, String imagePath) throws DAOException {
+        Log.d("imageName", imagePath);
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        File file= new File(imagePath);
+        try {
+            String query = "Select * from tbl_azure_gallery where imagePath = \'" + imagePath + "\'";
+            Cursor cursor = localdb.rawQuery(query, null);
+            if (cursor.getCount() > 0) {
+                //while (cursor.moveToNext()) {
+                //String dbImageName = cursor.getString(cursor.getColumnIndexOrThrow("imageName"));
+                //Log.d("FileErase", dbImageName);
+                //Log.d("File erase", imageName);
+                localdb.execSQL("DELETE from tbl_azure_gallery where imagePath = \'" + imagePath + "\'");
+                localdb.setTransactionSuccessful();
+//                    List<azureResults> imageQueue = new ArrayList<>();
+//                    try {
+//                        imageQueue = getAzureImageQueue();
+//                        Log.e(TAG, imageQueue.toString());
+//                    } catch (DAOException e) {
+//                        FirebaseCrashlytics.getInstance().recordException(e);
+//                    }
+
+                if (file.exists()) {
+                    file.delete();
+                }
+
+            }
+        }
+        catch (SQLException e){
+            throw new DAOException(e);
+        }
+        finally {
+            localdb.endTransaction();
+        }
+    }
+
     public ArrayList getImageUuid(String encounterUuid, String conceptuuid) throws DAOException {
         Logger.logD(TAG, "encounter uuid for image " + encounterUuid);
         ArrayList<String> uuidList = new ArrayList<>();
@@ -560,6 +590,33 @@ public class ImagesDAO {
                     if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))!=null)ImageQueue.setComplaintsRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))).split(","))));
                     if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))!=null)ImageQueue.setComplaintsLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
                     if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))!=null)ImageQueue.setComplaintsLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
+                    azureResultList.add(ImageQueue);
+                }
+            }
+            idCursor.close();
+        } catch (SQLiteException e) {
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return azureResultList;
+    }
+
+    public List<uploadImage> getAzureGalleryQueue() throws DAOException {
+        //get unsynced images from local storage
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        List<uploadImage> azureResultList = new ArrayList<>();
+        try {
+            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_azure_gallery", null);
+            if (idCursor.getCount() != 0) {
+                while (idCursor.moveToNext()) {
+                    uploadImage ImageQueue= new uploadImage();
+                    ImageQueue.setImagePath(idCursor.getString(idCursor.getColumnIndexOrThrow("imagePath")));
+                    ImageQueue.setPrototype(idCursor.getString(idCursor.getColumnIndexOrThrow("prototype")));
+                    ImageQueue.setVisitId(idCursor.getString(idCursor.getColumnIndexOrThrow("visitId")));
+                    ImageQueue.setImageType(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
                     azureResultList.add(ImageQueue);
                 }
             }

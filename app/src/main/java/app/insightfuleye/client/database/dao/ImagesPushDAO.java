@@ -1,11 +1,7 @@
 package app.insightfuleye.client.database.dao;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.util.ArrayMap;
 import android.util.Log;
-import android.util.TypedValue;
-import android.widget.Toast;
-
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
@@ -18,30 +14,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
-import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.IntroActivity.IntroActivity;
-import app.insightfuleye.client.models.Location;
-import app.insightfuleye.client.models.Results;
-import app.insightfuleye.client.models.azureResultsPush;
-import app.insightfuleye.client.networkApiCalls.ApiClient;
-import app.insightfuleye.client.networkApiCalls.ApiInterface;
+import app.insightfuleye.client.app.AppConstants;
+import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.models.ObsImageModel.ObsJsonResponse;
+import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
+import app.insightfuleye.client.models.azureResults;
+import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
+import app.insightfuleye.client.models.uploadImage;
 import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
 import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.UrlModifiers;
-import app.insightfuleye.client.app.AppConstants;
-import app.insightfuleye.client.app.IntelehealthApplication;
-import app.insightfuleye.client.models.ObsImageModel.ObsJsonResponse;
-import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
-import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
-import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.utilities.exception.DAOException;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -50,14 +36,12 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.http.Url;
 
 public class ImagesPushDAO {
     String TAG = ImagesPushDAO.class.getSimpleName();
@@ -256,55 +240,49 @@ public class ImagesPushDAO {
         Retrofit retrofit = AzureNetworkClient.getRetrofit();
         ImagesDAO imagesDAO = new ImagesDAO();
         List<azureResults> imageQueue = new ArrayList<>();
+        List<uploadImage> imageGallery = new ArrayList<>();
         try {
             imageQueue = imagesDAO.getAzureDocsQueue();
+            imageGallery=imagesDAO.getAzureGalleryQueue();
             Log.e(TAG, imageQueue.toString());
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
         //Make a list of patients who have images. These will be the uploaded ones
         List<azureResults> imagesToUpload = new ArrayList<>();
-        for (azureResults p : imageQueue){
-            File file = new File((AppConstants.IMAGE_PATH + p.getImagePath() +".jpg"));
-            File file1 = new File((AppConstants.IMAGE_PATH + p.getImageId()+ ".jpg"));
+
+        for (uploadImage p : imageGallery){
+            File file = new File(p.getImagePath());
             azureResults patient= new azureResults();
-            azureResults patient1 = new azureResults();
             if (file.exists()){
-                Log.d("FileRight" , "exists");
-                patient.setImagePath(p.getImagePath());
-                if (p.getDiagnosisRight()!=null) patient.setDiagnosisRight(p.getDiagnosisRight());
-                if (p.getComplaintsRight()!=null) patient.setComplaintsRight(p.getComplaintsRight());
+                patient.setLeftRight(p.getImageType());
+                patient.setChwName(p.getPrototype());
                 patient.setVisitId(p.getVisitId());
-                patient.setPatientId(p.getPatientId());
-                patient.setChwName(p.getChwName());
-                patient.setAge(p.getAge());
-                patient.setSex(p.getSex());
-                patient.setPinholeRight(p.getPinholeRight());
-                patient.setVARight(p.getVARight());
-                patient.setLeftRight("right");
-                imagesToUpload.add(patient);
-            }
-            if (file1.exists()){
-                Log.d("FileLeft" , "exists");
-                patient1.setImagePath(p.getImageId());
-                if (p.getDiagnosisLeft()!=null) patient1.setDiagnosisRight(p.getDiagnosisLeft());
-                if (p.getComplaintsLeft()!=null) patient1.setComplaintsRight(p.getComplaintsLeft());
-                patient1.setVisitId(p.getVisitId());
-                patient1.setPatientId(p.getPatientId());
-                patient1.setChwName(p.getChwName());
-                patient1.setAge(p.getAge());
-                patient1.setSex(p.getSex());
-                patient1.setPinholeRight(p.getPinholeLeft());
-                patient1.setVARight(p.getVALeft());
-                patient1.setLeftRight("left");
-                imagesToUpload.add(patient1);
+                patient.setImagePath(p.getImagePath());
+                Log.d("galleryID",p.getVisitId());
+                for (azureResults q : imageQueue){
+                    Log.d("QUeueID", q.getVisitId());
+                    if (p.getVisitId().equals(q.getVisitId())){
+                        Log.d(TAG,"match");
+                        if (q.getDiagnosisRight()!=null) patient.setDiagnosisRight(q.getDiagnosisRight());
+                        if (q.getComplaintsRight()!=null) patient.setComplaintsRight(q.getComplaintsRight());
+                        patient.setPatientId(q.getPatientId());
+                        patient.setAge(q.getAge());
+                        patient.setSex(q.getSex());
+                        patient.setPinholeRight(q.getPinholeRight());
+                        patient.setVARight(q.getVARight());
+                        imagesToUpload.add(patient);
+                    }
+                }
+
             }
         }
-        Log.d(TAG, imagesToUpload.toString());
+
+        Log.d(TAG, "imagestoupload: " + imagesToUpload.toString());
 
         for (azureResults p : imagesToUpload) {
                 //pass it like this
-                File file = new File(AppConstants.IMAGE_PATH + p.getImagePath() + ".jpg");
+                File file = new File(p.getImagePath());
                 RequestBody requestFileRight = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
                 // MultipartBody.Part is used to send also the actual file name
@@ -342,6 +320,7 @@ public class ImagesPushDAO {
                                 //if(finalI ==2)
                                 try {
                                     imagesDAO.removeAzureAddDoc(p.getVisitId(), p.getImagePath(), p.getImageId());
+                                    imagesDAO.removeAzureGallery(p.getVisitId(),p.getImagePath());
                                 } catch (DAOException e) {
                                     e.printStackTrace();
                                 }
