@@ -202,6 +202,14 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "diagnosisLeft TEXT" +
             ")";
 
+    public static final String drop_gall="DROP TABLE tbl_azure_gallery";
+
+    public static final String AZURE_GALLERY= "CREATE TABLE IF NOT EXISTS tbl_azure_gallery(" +
+            "imagePath TEXT PRIMARY KEY," +
+            "prototype TEXT," +
+            "type TEXT," +
+            "visitId TEXT" +
+            ")";
 
     public InteleHealthDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -269,6 +277,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_VISIT_ATTRIBUTES);
         db.execSQL(AZURE_UPLOADS);
         db.execSQL(AZURE_ADDITIONAL_DOCS);
+        db.execSQL(AZURE_GALLERY);
         uuidInsert(db);
         database = db;
 

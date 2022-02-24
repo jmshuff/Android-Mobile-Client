@@ -2,7 +2,6 @@ package app.insightfuleye.client.activities.uploadImageActivity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +13,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +22,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -34,13 +31,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -52,30 +50,19 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
-import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
+import app.insightfuleye.client.activities.prototypeIterationActivity.prototypeIterationActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.ImagesDAO;
-import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.models.azureResults;
-import app.insightfuleye.client.models.dto.PatientDTO;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
@@ -93,8 +80,8 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     Spinner spinVALeft;
     Spinner spinPinholeRight;
     Spinner spinPinholeLeft;
-    ImageView mImageViewRight;
-    ImageView mImageViewLeft;
+//    ImageView mImageViewRight;
+//    ImageView mImageViewLeft;
     EditText vaRightText;
     EditText vaLeftText;
     EditText phRightText;
@@ -139,7 +126,13 @@ public class uploadImageInfoActivity extends AppCompatActivity {
 
     LinearLayout previewRight;
     LinearLayout previewLeft;
-    TextView mPrototype;
+    String mPrototype;
+
+    private RecyclerView imagesRV;
+    private imageGalleryAdapter imageRVAdapter;
+
+    ArrayList imagePaths= new ArrayList();
+    ArrayList imageTypes= new ArrayList();
 
 
 
@@ -169,8 +162,6 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         spinVALeft=findViewById(R.id.spinner_valeft);
         spinPinholeRight=findViewById(R.id.spinner_pinholeright);
         spinPinholeLeft=findViewById(R.id.spinner_pinholeleft);
-        mImageViewRight=findViewById(R.id.imageview_right_eye_picture);
-        mImageViewLeft=findViewById(R.id.imageview_left_eye_picture);
         vaLeftText=findViewById(R.id.valeft);
         vaRightText=findViewById(R.id.varight);
         phLeftText=findViewById(R.id.pinholeleft);
@@ -203,20 +194,28 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         headacheL=findViewById(R.id.checkbox_headache_l);
         eyeTraumaR=findViewById(R.id.checkbox_eye_trauma_r);
         eyeTraumaL=findViewById(R.id.checkbox_eye_trauma_l);
-        mPrototype=findViewById(R.id.upload_image_prototype);
+
+        imagesRV = findViewById(R.id.upload_image_RecyclerView);
+
 
 
         //load past details to edit
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
-            prototypeString=intent.getStringExtra("prototype");
             if (intent.hasExtra("visitId")) {
                 visitId_edit = intent.getStringExtra("visitId");
                 setscreen(visitId_edit);
             }
+
         }
-        String prototypeDisplay="Prototype: " + prototypeString;
-        mPrototype.setText(prototypeDisplay);
+        if (visitId_edit != null){
+            visitId=visitId_edit;
+        }else visitId=UUID.randomUUID().toString();
+
+
+        Log.d("ImagePaths", imagePaths.toString());
+
+        prepareRecyclerView(imagePaths);
 
             //Age need to convert from Birthday
         Resources res = getResources();
@@ -241,14 +240,14 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             spinPinholeRight.setSelection(phRightAdapter.getPosition(String.valueOf(patient.getPinholeRight())));
             spinPinholeLeft.setSelection(phLeftAdapter.getPosition(String.valueOf(patient.getPinholeLeft())));
             //set images for edit
-            File imageNameRight=new File(AppConstants.IMAGE_PATH + patient.getImagePath()+ ".jpg");
-            File imageNameLeft= new File(AppConstants.IMAGE_PATH + patient.getImageId() +".jpg");
-            if (imageNameRight.exists()){
-                mImageViewRight.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(imageNameRight)));
-            }
-            if(imageNameLeft.exists()){
-                mImageViewLeft.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(imageNameLeft)));
-            }
+//            File imageNameRight=new File(AppConstants.IMAGE_PATH + patient.getImagePath()+ ".jpg");
+//            File imageNameLeft= new File(AppConstants.IMAGE_PATH + patient.getImageId() +".jpg");
+//            if (imageNameRight.exists()){
+//                mImageViewRight.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(imageNameRight)));
+//            }
+//            if(imageNameLeft.exists()){
+//                mImageViewLeft.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(imageNameLeft)));
+//            }
             mAge.setText(patient.getAge());
             if (patient.getDiagnosisRight()!=null) setCheckedRight(patient.getDiagnosisRight());
             if (patient.getComplaintsRight()!=null) setCheckedRight(patient.getComplaintsRight());
@@ -292,9 +291,6 @@ public class uploadImageInfoActivity extends AppCompatActivity {
 //            mImager="Aravind Staff";
 //        }
 
-     previewRight.setVisibility(View.GONE);
-
-     previewLeft.setVisibility(View.GONE);
 
         spinVARight.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -368,7 +364,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
 //            }
 //        });
 
-        mImageViewRight.setOnClickListener(new View.OnClickListener() {
+       /* mImageViewRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (patient.getImagePath()!=null){
@@ -414,7 +410,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                 }
             }
         });
-
+*/
 
 
         mAge.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -434,6 +430,22 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                 }
             }
         });
+
+        imagesRV.addOnItemTouchListener(
+                new RecyclerItemClickListener(context, imagesRV ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        Log.d(TAG, "Position: " + String.valueOf(position));
+                        Log.d(TAG, imagePaths.toString());
+                        previewImage(uploadImageInfoActivity.this, String.valueOf(imagePaths.get(position)), String.valueOf(imageTypes.get(position)));
+                        // do whatever
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+                        // do whatever
+                    }
+                })
+        );
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
@@ -466,15 +478,40 @@ public class uploadImageInfoActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         Log.v(TAG, "Result Received");
-        if (requestCode == CameraActivity.TAKE_IMAGE) {
+        Log.v(TAG, String.valueOf(requestCode));
+        Log.v(TAG, String.valueOf(resultCode));
+        if (requestCode == CameraActivity.TAKE_IMAGE_RIGHT) {
             Log.v(TAG, "Request Code " + CameraActivity.TAKE_IMAGE);
             if (resultCode == RESULT_OK) {
                 Log.i(TAG, "Result OK");
                 mCurrentPhotoPath = data.getStringExtra("RESULT");
                 mType= data.getStringExtra("Type");
-                Log.d("mType", mType);
-                if(mType.contains("right")) {
+                Log.d("PhotoPath", mCurrentPhotoPath);
+                try {
+                    savePicture(mCurrentPhotoPath, mPrototype, mType);
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
+
+                    String imageNameLeft = UUID.randomUUID().toString();
+                    File filePath1 = new File(AppConstants.IMAGE_PATH + imageNameLeft);
+                    if (!filePath1.exists()) {
+                        filePath1.mkdir();
+                    }
+                    patient.setImageId(imageNameLeft);
+                    Intent cameraIntent1 = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
+                    // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
+                    cameraIntent1.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameLeft);
+                    cameraIntent1.putExtra(CameraActivity.SET_IMAGE_PATH, filePath1.toString());
+                    cameraIntent1.putExtra(CameraActivity.SET_EYE_TYPE, "left");
+                    cameraIntent1.putExtra("requestCode", CameraActivity.TAKE_IMAGE_LEFT);
+                    startActivityForResult(cameraIntent1, CameraActivity.TAKE_IMAGE_LEFT);
+
+
+
+/*                if(mType.contains("right")) {
                     Log.d("mType","right");
                     Glide.with(this)
                             .load(new File(mCurrentPhotoPath))
@@ -482,16 +519,55 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
                             .skipMemoryCache(true)
                             .into(mImageViewRight);
-                }
-                else{
+                }*/
+/*                else{
                     Glide.with(this)
                             .load(new File(mCurrentPhotoPath))
                             .thumbnail(0.25f)
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
                             .skipMemoryCache(true)
                             .into(mImageViewLeft);
+                }*/
+            }
+
+        }
+        if(requestCode== CameraActivity.TAKE_IMAGE_LEFT){
+            if (resultCode == RESULT_OK) {
+                Log.i(TAG, "Result OK");
+                mCurrentPhotoPath = data.getStringExtra("RESULT");
+                mType = data.getStringExtra("Type");
+                Log.d("mType", mType);
+                try {
+                    savePicture(mCurrentPhotoPath, mPrototype, mType);
+                } catch (DAOException e) {
+                    e.printStackTrace();
                 }
             }
+
+        }
+        if (requestCode==prototypeIterationActivity.PROTOTYPE){
+            if(resultCode==RESULT_OK) {
+                mPrototype = data.getStringExtra("prototype");
+                Log.d("prototype", mPrototype);
+                patient.setChwName(mPrototype); //using chw as prototype for this tests
+
+                String imageNameRight = UUID.randomUUID().toString();
+                File filePath = new File(AppConstants.IMAGE_PATH + imageNameRight);
+                if (!filePath.exists()) {
+                    filePath.mkdir();
+                }
+                patient.setImagePath(imageNameRight);
+                Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
+                // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
+                cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameRight);
+                cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, filePath.toString());
+                cameraIntent.putExtra(CameraActivity.SET_EYE_TYPE, "right");
+                cameraIntent.putExtra("requestCode", CameraActivity.TAKE_IMAGE_RIGHT);
+                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE_RIGHT);
+            }
+
+
+
         }
     }
 
@@ -524,7 +600,15 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             } while (idCursor.moveToNext());
             idCursor.close();
         }
-
+        String [] Columns1={"imagePath", "type", "visitId"};
+        Cursor idCursor1 = db.query("tbl_azure_gallery", Columns1, patientSelection, Args, null, null, null);
+        if(idCursor1.moveToFirst()){
+            do{
+                imagePaths.add(idCursor1.getString(idCursor1.getColumnIndexOrThrow("imagePath")));
+                imageTypes.add(idCursor1.getString(idCursor1.getColumnIndexOrThrow("type")));
+            }while (idCursor1.moveToNext());
+            idCursor1.close();
+        }
     }
 
 
@@ -600,9 +684,9 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         Gson gson = new Gson();
         try {
             contentValues.put("imageName", patient.getImagePath()); //imageNameRight
-            contentValues.put("imageName2", patient.getImageId()); //imageNmaeLeft
+            contentValues.put("imageName2", patient.getImageId());
             contentValues.put("patientId", "Hospital-Upload");
-            contentValues.put("visitId", UUID.randomUUID().toString());
+            contentValues.put("visitId", visitId);
             //contentValues.put("creatorId", sessionManager.getChwname());
             contentValues.put("creatorId", mImager);
             contentValues.put("VARight", patient.getVARight());
@@ -779,7 +863,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                 ImageView imageView = dialog.findViewById(R.id.confirmationImageView);
                 final ProgressBar progressBar = dialog.findViewById(R.id.progressBar);
                 Glide.with(context)
-                        .load(new File(AppConstants.IMAGE_PATH+path+".jpg"))
+                        .load(new File(path))
                         .skipMemoryCache(true)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .listener(new RequestListener<File, GlideDrawable>() {
@@ -816,9 +900,9 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                         .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                         .getAbsolutePath() + "/" + DIR_NAME + "/");
 
-        Log.d("Download Image: ", AppConstants.IMAGE_PATH+path+".jpg");
+        Log.d("Download Image: ", path);
 
-        Bitmap bitmap = BitmapFactory.decodeFile(AppConstants.IMAGE_PATH+path+".jpg");
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
 
         FileOutputStream outputStream = null;
 
@@ -851,6 +935,70 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(outFile);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    public void takePhoto(View v){
+        Intent prototypeIntent = new Intent(uploadImageInfoActivity.this, prototypeIterationActivity.class);
+        prototypeIntent.putExtra("requestCode",prototypeIterationActivity.PROTOTYPE);
+        Log.d("prototype", "start");
+
+//        Intent intent = this.getIntent(); // The intent was passed to the activity
+//        if (intent != null) {
+//            if (intent.hasExtra("prototype")) {
+//                mPrototype = intent.getStringExtra("prototype");
+//                patient.setChwName(mPrototype); //using chw as prototype for this tests
+//            }
+//        }
+
+        startActivityForResult(prototypeIntent, prototypeIterationActivity.PROTOTYPE);
+
+    }
+
+    private boolean savePicture(String imagePath, String prototype, String type) throws DAOException {
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        Gson gson = new Gson();
+        Log.d("SaveImage", imagePath);
+        try {
+            contentValues.put("imagePath", imagePath);
+            contentValues.put("prototype", prototype);
+            contentValues.put("type", type);
+            contentValues.put("visitId", visitId);
+            localdb.insertWithOnConflict("tbl_azure_gallery", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        imagePaths.add(imagePath);
+        imageTypes.add(type);
+        imageRVAdapter.notifyDataSetChanged();
+        return isInserted;
+
+    }
+
+
+
+    private void prepareRecyclerView(ArrayList imagePaths) {
+
+        // in this method we are preparing our recycler view.
+        // on below line we are initializing our adapter class.
+
+        imageRVAdapter = new imageGalleryAdapter(uploadImageInfoActivity.this, imagePaths);
+
+        // on below line we are creating a new grid layout manager.
+        GridLayoutManager manager = new GridLayoutManager(uploadImageInfoActivity.this, 3);
+
+        // on below line we are setting layout
+        // manager and adapter to our recycler view.
+        imagesRV.setLayoutManager(manager);
+        imagesRV.setAdapter(imageRVAdapter);
     }
 
         /*
