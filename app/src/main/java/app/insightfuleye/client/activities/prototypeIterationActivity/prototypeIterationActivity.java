@@ -33,12 +33,16 @@ public class prototypeIterationActivity extends AppCompatActivity {
     RadioButton mRBulb;
     RadioButton mLBulb;
     RadioButton mBothBulbs;
+    RadioButton mRStrip;
+    RadioButton mLStrip;
+    RadioButton mBothStrip;
     private String mDiopter="";
     private String mScope="";
     private String mLightType="";
     private String mNumLights="";
     private String mPrototype="";
     LinearLayout numBulbs;
+    LinearLayout numStrips;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +71,13 @@ public class prototypeIterationActivity extends AppCompatActivity {
         mLBulb=findViewById(R.id.prototype_LBulb);
         mBothBulbs=findViewById(R.id.prototype_BothBulbs);
         numBulbs=findViewById(R.id.numBulbs);
+        numStrips=findViewById(R.id.numStrips);
+        mRStrip=findViewById(R.id.prototype_RStrip);
+        mLStrip=findViewById(R.id.prototype_LStrip);
+        mBothStrip=findViewById(R.id.prototype_BothStrip);
 
         numBulbs.setVisibility(View.GONE);
+        numStrips.setVisibility(View.GONE);
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
@@ -111,6 +120,7 @@ public class prototypeIterationActivity extends AppCompatActivity {
         mLEDStrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                numStrips.setVisibility(View.VISIBLE);
                 onRadioButtonClicked(v);
             }
         });
@@ -135,7 +145,24 @@ public class prototypeIterationActivity extends AppCompatActivity {
                 onRadioButtonClicked(v);
             }
         });
+        mRStrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { onRadioButtonClicked(v); }
+        });
 
+        mLStrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        mBothStrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,16 +209,20 @@ public class prototypeIterationActivity extends AppCompatActivity {
                 break;
 
             case R.id.prototype_RBulb:
+
+            case R.id.prototype_RStrip:
                 if (checked)
                     mNumLights = "Right Bulb";
                 Log.v(TAG, "Num Lights :" + mNumLights);
                 break;
             case R.id.prototype_LBulb:
+            case R.id.prototype_LStrip:
                 if (checked)
-                    mNumLights = "2 Bulbs";
+                    mNumLights = "Left Bulbs";
                 Log.v(TAG, "Num Lights: " + mNumLights);
                 break;
             case R.id.prototype_BothBulbs:
+            case R.id.prototype_BothStrip:
                 if (checked)
                     mNumLights = "2 Bulbs";
                 Log.v(TAG, "Num Lights: " + mNumLights);
