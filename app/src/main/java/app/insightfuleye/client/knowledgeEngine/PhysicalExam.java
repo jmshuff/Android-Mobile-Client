@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -425,8 +424,8 @@ public class PhysicalExam extends Node {
         String duration = getDuration();
         String rightDuration="";
         String leftDuration="";
-        if (!leftSymptom.isEmpty()) leftDuration="<br>" + "&emsp" + duration;
-        if (!rightSymptom.isEmpty()) rightDuration= "<br>" + "&emsp" + duration;
+        if (!leftSymptom.isEmpty()) leftDuration="<br>" + "&emsp;" + duration;
+        if (!rightSymptom.isEmpty()) rightDuration= "<br>" + "&emsp;" + duration;
 
         mTable="<table>" +
                 "<tr>"+
