@@ -9,19 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +22,17 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,27 +43,24 @@ import java.util.List;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
+import app.insightfuleye.client.activities.familyHistoryActivity.FamilyHistoryActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionNodeActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
+import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
+import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.UuidDictionary;
-
-import app.insightfuleye.client.activities.familyHistoryActivity.FamilyHistoryActivity;
-import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.utilities.pageindicator.ScrollingPagerIndicator;
-
-import app.insightfuleye.client.database.dao.PatientsDAO;
 
 public class PastMedicalHistoryActivity extends AppCompatActivity implements QuestionsAdapter.FabClickListener {
 
@@ -371,10 +366,11 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             for (Node node : patientHistoryMap.getOptionsList()) {
                 if (node.isSelected()) {
                     String patientString="";
-                    if (node.isBilateral()) patientString = node.generateBilateralLanguage();
-                    else patientString = node.generateLanguage();
-                    String toInsert = node.getText() + " : " + patientString;
+                    patientString = node.generateBilateralLanguage();
+                    String toInsert = node.getLanguage() + " : " + patientString;
+
                     toInsert = toInsert.replaceAll(Node.bullet, "");
+                    toInsert = toInsert.replaceAll("% :", "");
                     toInsert = toInsert.replaceAll(" - ", ", ");
                     toInsert = toInsert.replaceAll("<br/>", "");
                     if (org.apache.commons.lang3.StringUtils.right(toInsert, 2).equals(", ")) {
