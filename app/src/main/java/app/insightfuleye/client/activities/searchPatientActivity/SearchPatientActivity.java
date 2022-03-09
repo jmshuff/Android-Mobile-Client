@@ -1,5 +1,6 @@
 package app.insightfuleye.client.activities.searchPatientActivity;
 
+import android.app.DatePickerDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,15 +12,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
-
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,25 +19,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.ProviderDAO;
 import app.insightfuleye.client.models.dto.PatientDTO;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
-
-import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
@@ -59,6 +59,10 @@ public class SearchPatientActivity extends AppCompatActivity {
     MaterialAlertDialogBuilder dialogBuilder;
     private String TAG = SearchPatientActivity.class.getSimpleName();
     private SQLiteDatabase db;
+    Button dateFrom;
+    Button dateTo;
+    private DatePickerDialog datePickerDialogTo;
+    private DatePickerDialog datePickerDialogFrom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +79,15 @@ public class SearchPatientActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(Color.WHITE);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        initDatePicker();
+
         // Get the intent, verify the action and get the query
         sessionManager = new SessionManager(this);
         db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         msg = findViewById(R.id.textviewmessage);
         recyclerView = findViewById(R.id.recycle);
+        dateTo=findViewById(R.id.datePickerButton_to);
+        dateFrom=findViewById(R.id.datePickerButton_from);
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             query = intent.getStringExtra(SearchManager.QUERY);
@@ -105,6 +113,7 @@ public class SearchPatientActivity extends AppCompatActivity {
 
 
     }
+
 
     private void doQuery(String query) {
         try {
@@ -510,6 +519,90 @@ public class SearchPatientActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    private String getTodaysDate()
+    {
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        month = month + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return makeDateString(day, month, year);
+    }
+
+    private void initDatePicker()
+    {
+        DatePickerDialog.OnDateSetListener dateSetListenerTo = new DatePickerDialog.OnDateSetListener()
+        {
+            @Override
+            public void onDateSet(DatePicker datePicker, int yearTo, int monthTo, int dayTo)
+            {
+                monthTo = monthTo + 1;
+                String date = makeDateString(dayTo, monthTo, yearTo);
+                dateTo.setText(date);
+            }
+        };
+
+        Calendar cal = Calendar.getInstance();
+        int yearTo = cal.get(Calendar.YEAR);
+        int monthTo = cal.get(Calendar.MONTH);
+        int dayTo = cal.get(Calendar.DAY_OF_MONTH);
+
+        datePickerDialogTo = new DatePickerDialog(this, dateSetListenerTo, yearTo, monthTo, dayTo);
+        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
+        DatePickerDialog.OnDateSetListener dateSetListenFrom = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int yearFrom, int monthFrom, int dayFrom) {
+                monthFrom= monthFrom+1;
+                String date1= makeDateString(dayFrom, monthFrom,yearFrom);
+                dateFrom.setText(date1);
+
+            }
+        };
+
+    }
+
+    private String makeDateString(int day, int month, int year)
+    {
+        return getMonthFormat(month) + " " + day + " " + year;
+    }
+
+    private String getMonthFormat(int month)
+    {
+        if(month == 1)
+            return "JAN";
+        if(month == 2)
+            return "FEB";
+        if(month == 3)
+            return "MAR";
+        if(month == 4)
+            return "APR";
+        if(month == 5)
+            return "MAY";
+        if(month == 6)
+            return "JUN";
+        if(month == 7)
+            return "JUL";
+        if(month == 8)
+            return "AUG";
+        if(month == 9)
+            return "SEP";
+        if(month == 10)
+            return "OCT";
+        if(month == 11)
+            return "NOV";
+        if(month == 12)
+            return "DEC";
+
+        //default should never happen
+        return "JAN";
+    }
+
+    public void openDatePicker(View view)
+    {
+        datePickerDialogTo.show();
     }
 }
 

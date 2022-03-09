@@ -30,10 +30,61 @@
             tools:context=".activities.search_patient_activity.SearchPatientActivity"
             tools:showIn="@layout/activity_search_patient">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:id="@+id/find_patient_dates">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="from: "
+                    android:fontFamily="@font/lato_bold"
+                    android:textSize="16dp"/>
+
+
+                <Button
+                    android:id="@+id/datePickerButton_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14dp"
+                    style="?android:spinnerStyle"
+                    android:textColor="@color/font_black_0"
+                    android:layout_marginLeft="4dp"
+                    android:onClick="openDatePicker"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="to: "
+                    android:fontFamily="@font/lato_bold"
+                    android:layout_marginLeft="8dp"
+                    android:textSize="16dp"/>
+
+
+                <Button
+                    android:id="@+id/datePickerButton_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:textSize="14dp"
+                    style="?android:spinnerStyle"
+                    android:textColor="@color/font_black_0"
+                    android:onClick="openDatePicker"/>
+
+
+
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/textviewmessage"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_below="@id/find_patient_dates"
                 android:text="@string/please_wait_till_sync_is_completed"
                 android:fontFamily="@font/lato_regular"
                 android:visibility="visible" />
@@ -42,6 +93,7 @@
                 android:id="@+id/recycle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_below="@id/find_patient_dates"
                 android:visibility="gone" />
         </RelativeLayout>
 

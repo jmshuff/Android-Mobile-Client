@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-
-import androidx.appcompat.app.AlertDialog;
-
 import android.os.Build;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -25,12 +22,13 @@ import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -51,13 +49,12 @@ import java.util.List;
 import java.util.Locale;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
+import app.insightfuleye.client.activities.complaintNodeActivity.CustomArrayAdapter;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.utilities.InputFilterMinMax;
 import app.insightfuleye.client.utilities.SessionManager;
-
-import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
-import app.insightfuleye.client.activities.complaintNodeActivity.CustomArrayAdapter;
 
 /**
  * Created by Amal Afroz Alam on 21, April, 2016.
@@ -756,8 +753,7 @@ public class Node implements Serializable {
                     } else {
                         if (!node_opt.getLanguage().isEmpty()) {
                             if (node_opt.getLanguage().equals("%")) {
-                                //raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
-                                //I think removing this will remove empty lines. JS confirm 12-28-21
+                                raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
                             } else if (node_opt.getLanguage().substring(0, 1).equals("%")) {
                                 raw = raw + (bullet + " " + node_opt.getLanguage().substring(1) + " - " + node_opt.formLanguage()) + next_line;
                             } else {
@@ -838,8 +834,7 @@ public class Node implements Serializable {
                         Log.d("getLang", node_opt.getLanguage());
                         if (!node_opt.getLanguage().isEmpty()) {
                             if (node_opt.getLanguage().equals("%")) {
-                                //raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
-                                //I think removing this will remove empty lines. JS confirm 12-28-21
+                                raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
                             } else if (node_opt.getLanguage().substring(0, 1).equals("%")) {
                                 raw = raw + (bullet + " " + laterality + node_opt.getLanguage().substring(1) + " - " + node_opt.formLanguage()) + next_line;
                             } else {
