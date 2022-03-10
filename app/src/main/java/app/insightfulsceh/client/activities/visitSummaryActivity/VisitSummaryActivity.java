@@ -21,21 +21,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.print.PdfPrint;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintJob;
 import android.print.PrintManager;
-
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.telephony.SmsManager;
 import android.text.Html;
 import android.text.InputFilter;
@@ -66,6 +56,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -86,12 +86,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import app.insightfulsceh.client.BuildConfig;
 import app.insightfulsceh.client.R;
 import app.insightfulsceh.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfulsceh.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.insightfulsceh.client.activities.familyHistoryActivity.FamilyHistoryActivity;
+import app.insightfulsceh.client.activities.homeActivity.HomeActivity;
+import app.insightfulsceh.client.activities.identificationActivity.IdentificationActivity;
 import app.insightfulsceh.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
-import app.insightfulsceh.client.activities.patientSurveyActivity.PatientSurveyActivity;
+import app.insightfulsceh.client.activities.physcialExamActivity.PhysicalExamActivity;
 import app.insightfulsceh.client.app.AppConstants;
 import app.insightfulsceh.client.app.IntelehealthApplication;
 import app.insightfulsceh.client.database.dao.EncounterDAO;
@@ -111,16 +114,10 @@ import app.insightfulsceh.client.syncModule.SyncUtils;
 import app.insightfulsceh.client.utilities.DateAndTimeUtils;
 import app.insightfulsceh.client.utilities.FileUtils;
 import app.insightfulsceh.client.utilities.Logger;
-
-import android.print.PdfPrint;
-
+import app.insightfulsceh.client.utilities.NetworkConnection;
 import app.insightfulsceh.client.utilities.SessionManager;
 import app.insightfulsceh.client.utilities.UrlModifiers;
 import app.insightfulsceh.client.utilities.UuidDictionary;
-
-import app.insightfulsceh.client.activities.homeActivity.HomeActivity;
-import app.insightfulsceh.client.activities.physcialExamActivity.PhysicalExamActivity;
-import app.insightfulsceh.client.utilities.NetworkConnection;
 import app.insightfulsceh.client.utilities.exception.DAOException;
 
 public class VisitSummaryActivity extends AppCompatActivity {
@@ -147,6 +144,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     String medicalAdvice_HyperLink = "";
     String isSynedFlag = "";
     private float float_ageYear_Month;
+    String openmrs_id;
 
     Spinner speciality_spinner;
 
@@ -224,6 +222,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     CardView additionalCommentsCard;
     CardView followUpDateCard;
     CardView card_print, card_share;
+    String sceh_id;
 
 
     TextView diagnosisTextView;
@@ -234,6 +233,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     TextView followUpDateTextView;
     //added checkbox flag .m
     CheckBox flag;
+    ImageButton editPatient;
 
     Boolean isPastVisit = false, isVisitSpecialityExists = false;
     Boolean isReceiverRegistered = false;
@@ -272,6 +272,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
     ImageButton additionalDocumentsDownlaod;
     ImageButton onExaminationDownload;
+    String visitType="";
 
     DownloadPrescriptionService downloadPrescriptionService;
     private TextView additionalImageDownloadText;
@@ -437,6 +438,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
             isPastVisit = intent.getBooleanExtra("pastVisit", false);
 //            hasPrescription = intent.getStringExtra("hasPrescription");
             physicalDisplay=intent.getStringExtra("physicalDisplay");
+            openmrs_id=intent.getStringExtra("openmrs_id");
+            sceh_id=intent.getStringExtra("sceh_id");
 
             Set<String> selectedExams = sessionManager.getVisitSummary(patientUuid);
             if (physicalExams == null) physicalExams = new ArrayList<>();
@@ -444,6 +447,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
             if (selectedExams != null && !selectedExams.isEmpty()) {
                 physicalExams.addAll(selectedExams);
             }
+            if (intent.hasExtra("visitType"))
+                visitType=intent.getStringExtra("visitType");
         }
         registerBroadcastReceiverDynamically();
         registerDownloadPrescription();
@@ -508,6 +513,9 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
         card_print = findViewById(R.id.card_print);
         card_share = findViewById(R.id.card_share);
+        editPatient= findViewById(R.id.imagebutton_edit_patient);
+        if (!visitType.equals("uploadImage"))
+            editPatient.setVisibility(View.GONE);
 
         card_print.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -940,7 +948,11 @@ public class VisitSummaryActivity extends AppCompatActivity {
         visitView = findViewById(R.id.textView_visit_value);
         if (patient.getOpenmrs_id() != null && !patient.getOpenmrs_id().isEmpty()) {
             idView.setText(patient.getOpenmrs_id());
-        } else {
+        }
+        else if(openmrs_id!=null && openmrs_id!=""){
+            idView.setText(openmrs_id);
+        }
+        else {
             idView.setText(getString(R.string.patient_not_registered));
         }
 
@@ -1270,6 +1282,25 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 neutralb.setTypeface(ResourcesCompat.getFont(VisitSummaryActivity.this, R.font.lato_bold));
 
                 IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);
+            }
+        });
+
+        editPatient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent2 = new Intent(VisitSummaryActivity.this, IdentificationActivity.class);
+                intent2.putExtra("patientUuid", patientUuid);
+                intent2.putExtra("patientUuid", patientUuid);
+                intent2.putExtra("visitUuid", visitUuid);
+                intent2.putExtra("encounterUuidVitals", encounterVitals);
+                intent2.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                intent2.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+                intent2.putExtra("state", state);
+                intent2.putExtra("name", patientName);
+                intent2.putExtra("float_ageYear_Month", float_ageYear_Month);
+                intent2.putExtra("openmrs_id", idView.getText());
+                startActivity(intent2);
+
             }
         });
 
@@ -2968,35 +2999,25 @@ public class VisitSummaryActivity extends AppCompatActivity {
             if (visitIDCursor != null) visitIDCursor.close();
         }
         if (visitUUID != null && !visitUUID.isEmpty()) {
-            if (followUpDate != null && !followUpDate.isEmpty()) {
-                MaterialAlertDialogBuilder followUpAlert = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
-                followUpAlert.setMessage(getString(R.string.visit_summary_follow_up_reminder) + followUpDate);
-                followUpAlert.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(VisitSummaryActivity.this, PatientSurveyActivity.class);
-                        intent.putExtra("patientUuid", patientUuid);
-                        intent.putExtra("visitUuid", visitUuid);
-                        intent.putExtra("encounterUuidVitals", encounterVitals);
-                        intent.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
-                        intent.putExtra("state", state);
-                        intent.putExtra("name", patientName);
-                        intent.putExtra("tag", intentTag);
-                        startActivity(intent);
-                    }
-                });
-                followUpAlert.show();
-            } else {
-                Intent intent = new Intent(VisitSummaryActivity.this, PatientSurveyActivity.class);
-                intent.putExtra("patientUuid", patientUuid);
-                intent.putExtra("visitUuid", visitUuid);
-                intent.putExtra("encounterUuidVitals", encounterVitals);
-                intent.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
-                intent.putExtra("state", state);
-                intent.putExtra("name", patientName);
-                intent.putExtra("tag", intentTag);
-                startActivity(intent);
+            VisitsDAO visitsDAO = new VisitsDAO();
+            try {
+                visitsDAO.updateVisitEnddate(visitUuid, AppConstants.dateAndTimeUtils.currentDateTime());
+            } catch (DAOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
+
+            //SyncDAO syncDAO = new SyncDAO();
+            //syncDAO.pushDataApi();
+            //syncUtils.syncForeground("survey"); //Sync function will work in foreground of app and
+            // the Time will be changed for last sync.
+
+//        AppConstants.notificationUtils.DownloadDone(getString(R.string.end_visit_notif), getString(R.string.visit_ended_notif), 3, PatientSurveyActivity.this);
+
+            sessionManager.removeVisitSummary(patientUuid, visitUuid);
+
+            Intent i = new Intent(this, HomeActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
         } else {
 
             Log.d(TAG, "endVisit: null");
@@ -3014,6 +3035,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
         }
     }
+
 
 
     /**
@@ -3930,6 +3952,78 @@ public class VisitSummaryActivity extends AppCompatActivity {
             } while (visitCursor.moveToNext());
         }
         visitCursor.close();
+    }
+
+    public void shareImage() {
+        ImagesDAO imagesDAO = new ImagesDAO();
+        ArrayList<String> fileuuidList = new ArrayList<String>();
+        ArrayList<File> fileList = new ArrayList<File>();
+        ArrayList<Uri> uriArrayList=new ArrayList<>();
+        try {
+            fileuuidList = imagesDAO.getImageUuid(encounterUuidAdultIntial, UuidDictionary.COMPLEX_IMAGE_AD);
+            for (String fileuuid : fileuuidList) {
+                String filename = AppConstants.IMAGE_PATH + fileuuid + ".jpg";
+                Log.d("WhatsApp",filename);
+                if (new File(filename).exists()) {
+                    fileList.add(new File(filename));
+                }
+            }
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        try{
+            for (File file : fileList){
+                Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID+".provider", file);
+                uriArrayList.add(uri);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String text="Images for "+patientName + ", ID: "+ sceh_id;
+        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        //shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setPackage("com.whatsapp");
+        //shareIntent.putExtra(Intent.EXTRA_STREAM, uriArrayList.get(0));
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriArrayList);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        shareIntent.setType("image/*");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(shareIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(context, "Whatsapp is not installed.",Toast.LENGTH_SHORT).show();
+        }
+
+        /*Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        //Target whatsapp:
+        shareIntent.setPackage("com.whatsapp");
+        //String picture_text="Images for " + patientName;
+        //shareIntent.putExtra(Intent.EXTRA_TEXT, picture_text);
+
+        ArrayList<Uri> uriArrayList = new ArrayList<>();
+        for (File file : fileList){
+            Uri imageUri= Uri.parse(file.getAbsolutePath());
+            Log.d("share image", imageUri.toString());
+            uriArrayList.add(imageUri);
+        }
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriArrayList);
+        shareIntent.setType("image/*");
+
+        //Add text and then Image URI
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            startActivity(shareIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(context, "Whatsapp is not installed.",Toast.LENGTH_SHORT).show();
+        }
+
+         */
+
     }
 
 

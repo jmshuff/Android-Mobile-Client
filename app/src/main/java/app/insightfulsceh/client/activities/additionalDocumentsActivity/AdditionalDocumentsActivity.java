@@ -2,21 +2,20 @@ package app.insightfulsceh.client.activities.additionalDocumentsActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,13 +23,15 @@ import java.util.List;
 import java.util.UUID;
 
 import app.insightfulsceh.client.R;
+import app.insightfulsceh.client.activities.cameraActivity.CameraActivity;
+import app.insightfulsceh.client.activities.complaintNodeActivity.ComplaintNodeListAdapter;
+import app.insightfulsceh.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfulsceh.client.app.AppConstants;
 import app.insightfulsceh.client.database.dao.ImagesDAO;
+import app.insightfulsceh.client.knowledgeEngine.Node;
 import app.insightfulsceh.client.models.DocumentObject;
-import app.insightfulsceh.client.utilities.UuidDictionary;
-
-import app.insightfulsceh.client.activities.cameraActivity.CameraActivity;
 import app.insightfulsceh.client.utilities.StringUtils;
+import app.insightfulsceh.client.utilities.UuidDictionary;
 import app.insightfulsceh.client.utilities.exception.DAOException;
 
 public class AdditionalDocumentsActivity extends AppCompatActivity {
@@ -42,6 +43,16 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
     private String encounterAdultIntials;
     private List<DocumentObject> rowListItem;
     private AdditionalDocumentAdapter recyclerViewAdapter;
+
+    String state;
+    String patientName;
+    String intentTag;
+    SearchView searchView;
+    List<Node> complaints;
+    // CustomArrayAdapter listAdapter;
+    ComplaintNodeListAdapter listAdapter;
+    String EncounterAdultInitial_LatestVisit;
+    private float float_ageYear_Month;
 
 
     @Override
@@ -59,7 +70,20 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                Intent intent = new Intent(
+                        AdditionalDocumentsActivity.this, VisitSummaryActivity.class);
+                intent.putExtra("patientUuid", patientUuid);
+                intent.putExtra("visitUuid", visitUuid);
+                intent.putExtra("encounterUuidVitals", encounterVitals);
+                intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+                intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+                intent.putExtra("state", state);
+                intent.putExtra("name", patientName);
+                intent.putExtra("float_ageYear_Month", float_ageYear_Month);
+                if (intentTag != null) {
+                    intent.putExtra("tag", intentTag);
+                }
+                startActivity(intent);
             }
         });
         Intent intent = this.getIntent(); // The intent was passed to the activity
@@ -68,6 +92,11 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
             visitUuid = intent.getStringExtra("visitUuid");
             encounterVitals = intent.getStringExtra("encounterUuidVitals");
             encounterAdultIntials = intent.getStringExtra("encounterUuidAdultIntial");
+            EncounterAdultInitial_LatestVisit = intent.getStringExtra("EncounterAdultInitial_LatestVisit");
+            state = intent.getStringExtra("state");
+            patientName = intent.getStringExtra("name");
+            float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
+            intentTag = intent.getStringExtra("tag");
 
             ImagesDAO imagesDAO = new ImagesDAO();
             ArrayList<String> fileuuidList = new ArrayList<String>();

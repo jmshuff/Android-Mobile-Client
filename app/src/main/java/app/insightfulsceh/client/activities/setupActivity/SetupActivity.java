@@ -2,20 +2,15 @@ package app.insightfulsceh.client.activities.setupActivity;
 
 import android.accounts.Account;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -32,6 +27,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
@@ -45,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.insightfulsceh.client.R;
+import app.insightfulsceh.client.activities.homeActivity.HomeActivity;
 import app.insightfulsceh.client.app.AppConstants;
 import app.insightfulsceh.client.app.IntelehealthApplication;
 import app.insightfulsceh.client.models.DownloadMindMapRes;
@@ -64,8 +63,6 @@ import app.insightfulsceh.client.utilities.SessionManager;
 import app.insightfulsceh.client.utilities.StringEncryption;
 import app.insightfulsceh.client.utilities.UrlModifiers;
 import app.insightfulsceh.client.widget.materialprogressbar.CustomProgressDialog;
-
-import app.insightfulsceh.client.activities.homeActivity.HomeActivity;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -88,7 +85,7 @@ public class SetupActivity extends AppCompatActivity {
     Base64Utils base64Utils = new Base64Utils();
     String encoded = null;
     AlertDialog.Builder dialog;
-    String key = "aravind20212"; //JS
+    String key = "cbid-sceh"; //JS
     String licenseUrl = "testing.intelehealth.org"; //JS
     SessionManager sessionManager = null;
     public File base_dir;

@@ -60,25 +60,33 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
 import app.insightfulsceh.client.R;
+import app.insightfulsceh.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfulsceh.client.activities.cameraActivity.CameraActivity;
 import app.insightfulsceh.client.activities.homeActivity.HomeActivity;
 import app.insightfulsceh.client.activities.patientDetailActivity.PatientDetailActivity;
 import app.insightfulsceh.client.activities.setupActivity.SetupActivity;
+import app.insightfulsceh.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfulsceh.client.app.AppConstants;
 import app.insightfulsceh.client.app.IntelehealthApplication;
+import app.insightfulsceh.client.database.InteleHealthDatabaseHelper;
+import app.insightfulsceh.client.database.dao.EncounterDAO;
 import app.insightfulsceh.client.database.dao.ImagesDAO;
 import app.insightfulsceh.client.database.dao.ImagesPushDAO;
 import app.insightfulsceh.client.database.dao.PatientsDAO;
 import app.insightfulsceh.client.database.dao.SyncDAO;
+import app.insightfulsceh.client.database.dao.VisitsDAO;
 import app.insightfulsceh.client.models.Patient;
+import app.insightfulsceh.client.models.dto.EncounterDTO;
 import app.insightfulsceh.client.models.dto.PatientAttributesDTO;
 import app.insightfulsceh.client.models.dto.PatientDTO;
+import app.insightfulsceh.client.models.dto.VisitDTO;
 import app.insightfulsceh.client.utilities.DateAndTimeUtils;
 import app.insightfulsceh.client.utilities.EditTextUtils;
 import app.insightfulsceh.client.utilities.FileUtils;
@@ -86,6 +94,7 @@ import app.insightfulsceh.client.utilities.Logger;
 import app.insightfulsceh.client.utilities.NetworkConnection;
 import app.insightfulsceh.client.utilities.SessionManager;
 import app.insightfulsceh.client.utilities.StringUtils;
+import app.insightfulsceh.client.utilities.UuidDictionary;
 import app.insightfulsceh.client.utilities.UuidGenerator;
 import app.insightfulsceh.client.utilities.exception.DAOException;
 
@@ -150,6 +159,10 @@ public class IdentificationActivity extends AppCompatActivity {
     Context context;
     private String BlockCharacterSet_Others = "0123456789\\@$!=><&^*+€¥£`~";
     private String BlockCharacterSet_Name = "\\@$!=><&^*+\"\'€¥£`~";
+    String phistory = "";
+    String fhistory = "";
+    float float_ageYear_Month1;
+    float float_ageYear_Month;
 
     Intent i_privacy;
     String privacy_value;
@@ -162,6 +175,16 @@ public class IdentificationActivity extends AppCompatActivity {
     FrameLayout frameLayout;
     TextView health_textview, address_details_textview, personal_info_textview;
     String html_health, result_selection;
+
+    EncounterDTO encounterDTO = new EncounterDTO();
+    private String encounterVitals = "";
+    private String encounterAdultIntials = "";
+    private boolean returning;
+    String visitUuid1;
+    String EncounterAdultInitial_LatestVisit1="";
+    String fullName1;
+    private String encounterVitals1 = "";
+    private String encounterAdultIntials1 = "";
 
     Location gps_loc;
     Location network_loc;
@@ -342,6 +365,13 @@ public class IdentificationActivity extends AppCompatActivity {
                 patient1.setUuid(patientID_edit);
                 setscreen(patientID_edit);
             }
+
+            visitUuid1=intent.getStringExtra("visitUuid");
+            encounterVitals1=intent.getStringExtra("encounterVitals");
+            encounterAdultIntials1=intent.getStringExtra("encounterUuidAdultIntial");
+            EncounterAdultInitial_LatestVisit1=intent.getStringExtra("EncounterAdultInitial_LatestVisit");
+            fullName1=intent.getStringExtra("name");
+            float_ageYear_Month1=intent.getFloatExtra("float_ageYear_Month", 0);
         }
 //        if (sessionManager.valueContains("licensekey"))
         if (!sessionManager.getLicenseKey().isEmpty())
@@ -1864,7 +1894,10 @@ public class IdentificationActivity extends AppCompatActivity {
 //            else {
 //                AppConstants.notificationUtils.showNotifications(getString(R.string.patient_data_failed), getString(R.string.check_your_connectivity), 2, IdentificationActivity.this);
 //            }
-            if (isPatientInserted && isPatientImageInserted) {
+            if(isPatientInserted && isPatientImageInserted && examType.equals("uploadImage")){
+                createVisit();
+            }
+            else if (isPatientInserted && isPatientImageInserted) {
                 Logger.logD(TAG, "inserted");
                 Intent i = new Intent(getApplication(), PatientDetailActivity.class);
                 i.putExtra("patientUuid", uuid);
@@ -1875,7 +1908,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 Log.d(TAG, "Privacy Value on (Identification): " + privacy_value); //privacy value transferred to PatientDetail activity.
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 getApplication().startActivity(i);
-            } else {
+            }else {
                 Toast.makeText(IdentificationActivity.this, "Error of adding the data", Toast.LENGTH_SHORT).show();
             }
         } catch (DAOException e) {
@@ -2327,11 +2360,13 @@ public class IdentificationActivity extends AppCompatActivity {
         patientdto.setAddress2(StringUtils.getValue(mAddress2.getText().toString()));
         patientdto.setCity_village(StringUtils.getValue(mCity.getText().toString()));
         patientdto.setPostal_code(StringUtils.getValue(mPostal.getText().toString()));
-        patientdto.setCountry(StringUtils.getValue(mCountry.getSelectedItem().toString()));
+        //patientdto.setCountry(StringUtils.getValue(mCountry.getSelectedItem().toString()));
+        patientdto.setCountry("India");
         patientdto.setPatient_photo(mCurrentPhotoPath);
         patientdto.setEconomic_status(String.valueOf(latitude) + ", " + String.valueOf(longitude));
 //                patientdto.setEconomic(StringUtils.getValue(m));
-        patientdto.setState_province(StringUtils.getValue(patientdto.getState_province()));
+        //patientdto.setState_province(StringUtils.getValue(patientdto.getState_province()));
+        patientdto.setState_province("Delhi");
         patientAttributesDTO = new PatientAttributesDTO();
         patientAttributesDTO.setUuid(UUID.randomUUID().toString());
         patientAttributesDTO.setPatientuuid(uuid);
@@ -2432,7 +2467,24 @@ public class IdentificationActivity extends AppCompatActivity {
 //                    AppConstants.notificationUtils.DownloadDone(getString(R.string.patient_data_upload), "" + patientdto.getFirst_name() + "" + patientdto.getLast_name() + "'s Image not complete.", 4, getApplication());
 
             }
-            if (isPatientUpdated && isPatientImageUpdated) {
+            if (isPatientUpdated && isPatientImageUpdated && examType.equals("uploadImage")) {
+                Logger.logD(TAG, "updated");
+                Intent i = new Intent(getApplication(), VisitSummaryActivity.class);
+                i.putExtra("patientUuid", uuid);
+                i.putExtra("name", patientdto.getFirst_name() + " " + patientdto.getLast_name());
+                i.putExtra("tag", "newPatient");
+                i.putExtra("hasPrescription", "false");
+                i.putExtra("visitUuid", visitUuid1);
+
+                i.putExtra("encounterUuidVitals", encounterVitals1);
+                i.putExtra("encounterUuidAdultIntial", encounterAdultIntials1);
+                i.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit1);
+                i.putExtra("float_ageYear_Month", float_ageYear_Month1);
+
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                getApplication().startActivity(i);
+            }
+            else if (isPatientUpdated && isPatientImageUpdated) {
                 Logger.logD(TAG, "updated");
                 Intent i = new Intent(getApplication(), PatientDetailActivity.class);
                 i.putExtra("patientUuid", uuid);
@@ -2447,6 +2499,135 @@ public class IdentificationActivity extends AppCompatActivity {
         }
 
     }
+
+    public void createVisit(){
+        SimpleDateFormat currentDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault());
+        Date todayDate = new Date();
+        String thisDate = currentDate.format(todayDate);
+
+
+        if (encounterVitals.equalsIgnoreCase("") || encounterVitals == null) {
+            encounterVitals = UUID.randomUUID().toString();
+
+        }
+        String uuid = UUID.randomUUID().toString();
+        EncounterDAO encounterDAO = new EncounterDAO();
+        encounterDTO = new EncounterDTO();
+        encounterDTO.setUuid(encounterVitals);
+        encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_VITALS"));
+        encounterDTO.setEncounterTime(thisDate);
+        encounterDTO.setVisituuid(uuid);
+        encounterDTO.setSyncd(false);
+        encounterDTO.setProvideruuid(sessionManager.getProviderID());
+        Log.d("DTO", "DTO:detail " + encounterDTO.getProvideruuid());
+        encounterDTO.setVoided(0);
+        encounterDTO.setPrivacynotice_value(privacy_value);//privacy value added.
+
+
+
+        try {
+            encounterDAO.createEncountersToDB(encounterDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        InteleHealthDatabaseHelper mDatabaseHelper = new InteleHealthDatabaseHelper(IdentificationActivity.this);
+        SQLiteDatabase sqLiteDatabase = mDatabaseHelper.getReadableDatabase();
+
+        String CREATOR_ID = sessionManager.getCreatorID();
+        returning = false;
+        sessionManager.setReturning(returning);
+
+        String[] cols = {"value"};
+        Cursor cursor = sqLiteDatabase.query("tbl_obs", cols, "encounteruuid=? and conceptuuid=?",// querying for PMH (Past Medical History)
+                new String[]{encounterAdultIntials, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            // rows present
+            do {
+                // so that null data is not appended
+                phistory = phistory + cursor.getString(0);
+
+            }
+            while (cursor.moveToNext());
+            returning = true;
+            sessionManager.setReturning(returning);
+        }
+        cursor.close();
+
+        Cursor cursor1 = sqLiteDatabase.query("tbl_obs", cols, "encounteruuid=? and conceptuuid=?",// querying for FH (Family History)
+                new String[]{encounterAdultIntials, UuidDictionary.RHK_FAMILY_HISTORY_BLURB},
+                null, null, null);
+        if (cursor1.moveToFirst()) {
+            // rows present
+            do {
+                fhistory = fhistory + cursor1.getString(0);
+            }
+            while (cursor1.moveToNext());
+            returning = true;
+            sessionManager.setReturning(returning);
+        }
+        cursor1.close();
+
+        // Will display data for patient as it is present in database
+        // Toast.makeText(PatientDetailActivity.this,"PMH: "+phistory,Toast.LENGTH_SHORT).sƒhow();
+        // Toast.makeText(PatientDetailActivity.this,"FH: "+fhistory,Toast.LENGTH_SHORT).show();
+
+        Intent intent2 = new Intent(IdentificationActivity.this, AdditionalDocumentsActivity.class);
+        String fullName = patientdto.getFirstname() + " " + patientdto.getLastname();
+
+        VisitDTO visitDTO = new VisitDTO();
+
+        visitDTO.setUuid(uuid);
+        visitDTO.setPatientuuid(patientdto.getUuid());
+        visitDTO.setStartdate(thisDate);
+        visitDTO.setVisitTypeUuid(UuidDictionary.VISIT_TELEMEDICINE);
+        visitDTO.setLocationuuid(sessionManager.getLocationUuid());
+        visitDTO.setSyncd(false);
+        visitDTO.setCreatoruuid(sessionManager.getCreatorID());//static
+        VisitsDAO visitsDAO = new VisitsDAO();
+
+        try {
+            visitsDAO.insertPatientToDB(visitDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        if (encounterAdultIntials.equalsIgnoreCase("") || encounterAdultIntials == null) {
+            encounterAdultIntials = UUID.randomUUID().toString();
+
+        }
+
+
+        encounterDTO.setUuid(encounterAdultIntials);
+        encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_ADULTINITIAL"));
+        encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
+        encounterDTO.setVisituuid(uuid);
+        encounterDTO.setSyncd(false);
+        encounterDTO.setProvideruuid(sessionManager.getProviderID());
+        Log.d("DTO", "DTOcomp: " + encounterDTO.getProvideruuid());
+        encounterDTO.setVoided(0);
+        try {
+            encounterDAO.createEncountersToDB(encounterDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+        // visitUuid = String.valueOf(visitLong);
+//                localdb.close();
+        intent2.putExtra("patientUuid", patientdto.getUuid());
+        intent2.putExtra("visitUuid", uuid);
+        intent2.putExtra("encounterUuidVitals", encounterVitals);
+        intent2.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+        intent2.putExtra("EncounterAdultInitial_LatestVisit", encounterAdultIntials);
+        intent2.putExtra("name", fullName);
+        intent2.putExtra("tag", "new");
+        intent2.putExtra("float_ageYear_Month", float_ageYear_Month);
+        startActivity(intent2);
+    }
+
+
 
     public String health_condition() {
         if (ma_checkbox.isChecked() && !ab_checkbox.isChecked()) {
