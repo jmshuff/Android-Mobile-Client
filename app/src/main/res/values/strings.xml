@@ -73,6 +73,8 @@
     <string name="menu_option_settings">Settings</string>
     <string name="menu_option_end_of_day">End of Day</string>
     <string name="menu_option_logout">Logout</string>
+    <string name="button_comp_screening">Comprehensive Exam</string>
+    <string name="button_image_upload">Image Upload</string>
 
 
     //Identification Screen

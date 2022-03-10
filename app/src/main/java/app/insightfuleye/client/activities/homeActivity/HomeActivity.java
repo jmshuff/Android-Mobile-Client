@@ -18,24 +18,19 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.WorkManager;
 
@@ -61,8 +56,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.IntroActivity.IntroActivity;
-import app.insightfuleye.client.activities.activePatientsActivity.ActivePatientActivity;
 import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
 import app.insightfuleye.client.activities.loginActivity.LoginActivity;
 import app.insightfuleye.client.activities.privacyNoticeActivity.PrivacyNotice_Activity;
@@ -70,7 +63,6 @@ import app.insightfuleye.client.activities.searchPatientActivity.SearchPatientAc
 import app.insightfuleye.client.activities.settingsActivity.SettingsActivity;
 import app.insightfuleye.client.activities.todayPatientActivity.TodayPatientActivity;
 import app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity;
-import app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.models.CheckAppUpdateRes;
@@ -86,7 +78,6 @@ import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.OfflineLogin;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.widget.materialprogressbar.CustomProgressDialog;
-
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -175,6 +166,8 @@ public class HomeActivity extends AppCompatActivity {
         c5 = findViewById(R.id.cardview_video_libraby);
         c6 = findViewById(R.id.cardview_help_whatsapp);
         c7 = findViewById(R.id.cardview_upload_image);
+
+        c7.setVisibility(View.GONE);
         settings_card=findViewById(R.id.settings_card);
         updateProtocols_card=findViewById(R.id.updateProtocols_card);
         logout_card=findViewById(R.id.logout_card);
@@ -183,7 +176,7 @@ public class HomeActivity extends AppCompatActivity {
 
         //card textview referrenced to fix bug of localization not working in some cases...
         newPatient_textview = findViewById(R.id.newPatient_textview);
-        newPatient_textview.setText(R.string.new_patient);
+        newPatient_textview.setText(R.string.button_comp_screening);
 
         findPatients_textview = findViewById(R.id.findPatients_textview);
         findPatients_textview.setText(R.string.find_patient);
@@ -192,7 +185,7 @@ public class HomeActivity extends AppCompatActivity {
         todaysVisits_textview.setText(R.string.today_visits);
 
         activeVisits_textview = findViewById(R.id.activeVisits_textview);
-        activeVisits_textview.setText(R.string.active_visits);
+        activeVisits_textview.setText(R.string.button_image_upload);
 
         videoLibrary_textview = findViewById(R.id.videoLibrary_textview);
         videoLibrary_textview.setText(R.string.video_library);
@@ -276,7 +269,8 @@ public class HomeActivity extends AppCompatActivity {
         c4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, ActivePatientActivity.class);
+                Intent intent = new Intent(HomeActivity.this, IdentificationActivity.class);
+                intent.putExtra("type", "imageUpload");
                 startActivity(intent);
             }
         });

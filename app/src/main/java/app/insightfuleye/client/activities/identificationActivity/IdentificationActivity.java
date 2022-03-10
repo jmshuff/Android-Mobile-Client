@@ -2,7 +2,6 @@ package app.insightfuleye.client.activities.identificationActivity;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,18 +16,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-
-import com.google.android.material.checkbox.MaterialCheckBox;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputLayout;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-
-import android.provider.Settings;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -49,9 +36,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-
+import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
@@ -70,7 +66,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
+import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.activities.patientDetailActivity.PatientDetailActivity;
+import app.insightfuleye.client.activities.setupActivity.SetupActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.ImagesDAO;
@@ -84,14 +83,10 @@ import app.insightfuleye.client.utilities.DateAndTimeUtils;
 import app.insightfuleye.client.utilities.EditTextUtils;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.Logger;
-import app.insightfuleye.client.utilities.SessionManager;
-import app.insightfuleye.client.utilities.UuidGenerator;
-
-import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
-import app.insightfuleye.client.activities.homeActivity.HomeActivity;
-import app.insightfuleye.client.activities.setupActivity.SetupActivity;
 import app.insightfuleye.client.utilities.NetworkConnection;
+import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
+import app.insightfuleye.client.utilities.UuidGenerator;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class IdentificationActivity extends AppCompatActivity {
@@ -174,7 +169,11 @@ public class IdentificationActivity extends AppCompatActivity {
     double longitude;
     double latitude;
     String userCountry, userAddress;
-
+    String examType="";
+    LinearLayout addressDetailsLayout;
+    CardView cardView_Address;
+    LinearLayout othersLayout;
+    CardView cardView_others;
     private LocationManager locationManager = null;
     private LocationListener locationListener = null;
 
@@ -189,8 +188,11 @@ public class IdentificationActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         i_privacy = getIntent();
+
         context = IdentificationActivity.this;
         privacy_value = i_privacy.getStringExtra("privacy"); //privacy_accept value retrieved from previous act.
+        if(i_privacy.hasExtra("type"))
+            examType=i_privacy.getStringExtra("type");
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -269,9 +271,10 @@ public class IdentificationActivity extends AppCompatActivity {
         none_checkbox = findViewById(R.id.none_checkbox);
         frameLayout = findViewById(R.id.health_framelayout);
         health_textview = findViewById(R.id.health_textview);
-
-
-
+        addressDetailsLayout=findViewById(R.id.address_details_layout);
+        cardView_Address=findViewById(R.id.cardview2);
+        othersLayout=findViewById(R.id.others_layout);
+        cardView_others=findViewById(R.id.cardview3);
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -476,6 +479,27 @@ public class IdentificationActivity extends AppCompatActivity {
                 frameLayout.setVisibility(View.VISIBLE);
             } else {
                 frameLayout.setVisibility(View.GONE);
+            }
+
+            if (examType.contains("imageUpload")){
+                mMiddleName.setVisibility(View.GONE);
+                mDOB.setVisibility(View.GONE);
+                countryStateLayout.setVisibility(View.GONE);
+                mAddress1.setVisibility(View.GONE);
+                mAddress2.setVisibility(View.GONE);
+                mPhoneNum.setVisibility(View.GONE);
+                mCity.setVisibility(View.GONE);
+                frameLayout.setVisibility(View.GONE);
+                economicLayout.setVisibility(View.GONE);
+                educationLayout.setVisibility(View.GONE);
+                casteLayout.setVisibility(View.GONE);
+                eyeCampID.setVisibility(View.GONE);
+                mRelationship.setVisibility(View.GONE);
+                mOccupation.setVisibility(View.GONE);
+                addressDetailsLayout.setVisibility(View.GONE);
+                cardView_Address.setVisibility(View.GONE);
+                cardView_others.setVisibility(View.GONE);
+                othersLayout.setVisibility(View.GONE);
             }
 
         } catch (JSONException e) {
@@ -1001,6 +1025,26 @@ public class IdentificationActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
+            if (!mAge.getText().toString().isEmpty()) {
+                Calendar calendar = Calendar.getInstance();
+                int curYear = calendar.get(Calendar.YEAR);
+                int mAgeYear = Integer.parseInt(mAge.getText().toString());
+                int birthYear = curYear - mAgeYear; //mAge will just be the year JS
+                int curMonth = calendar.get(Calendar.MONTH);
+                int birthMonth = curMonth; //There is no birth month JS
+                int birthDay = calendar.get(Calendar.DAY_OF_MONTH);
+                //int totalDays = today.getActualMaximum(Calendar.DAY_OF_MONTH);
+                mDOBYear = birthYear;
+                mDOBMonth = birthMonth;
+                mDOBDay = birthDay;
+
+                Locale.setDefault(Locale.ENGLISH);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+                dob.set(mDOBYear, mDOBMonth, mDOBDay);
+                String dobString = simpleDateFormat.format(dob.getTime());
+                mDOB.setText(dobString);
+                mDOBPicker.updateDate(mDOBYear, mDOBMonth, mDOBDay);
+            }
             if (patientID_edit != null) {
                 onPatientUpdateClicked(patient1);
             } else {
@@ -1290,7 +1334,7 @@ public class IdentificationActivity extends AppCompatActivity {
             mGenderF.setError(getString(R.string.error_field_required));
 //            mGenderF.requestFocus();
 
-            mDOB.setError(getString(R.string.error_field_required));
+            //mDOB.setError(getString(R.string.error_field_required));
 //            mDOB.requestFocus();
 
             mAge.setError(getString(R.string.error_field_required));
@@ -1409,28 +1453,28 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         }
 
-        if (mCountry.getSelectedItemPosition() == 0) {
-            countryText.setError(getString(R.string.error_field_required));
-//            mCountry.requestFocus();
-            address_details_textview.requestFocus();
-            Toast.makeText(this, R.string.please_select_country, Toast.LENGTH_SHORT).show();
-            address_details_textview.clearFocus();
-            return;
-        } else {
-            countryText.setError(null);
-        }
+//        if (mCountry.getSelectedItemPosition() == 0) {
+//            countryText.setError(getString(R.string.error_field_required));
+////            mCountry.requestFocus();
+//            address_details_textview.requestFocus();
+//            Toast.makeText(this, R.string.please_select_country, Toast.LENGTH_SHORT).show();
+//            address_details_textview.clearFocus();
+//            return;
+//        } else {
+//            countryText.setError(null);
+//        }
 
-        if (mState.getSelectedItemPosition() == 0) {
-            stateText.setError(getString(R.string.error_field_required));
-//            mState.requestFocus();
-            address_details_textview.requestFocus();
-            Toast.makeText(this, R.string.please_select_state, Toast.LENGTH_SHORT).show();
-            address_details_textview.clearFocus();
-            return;
-        }
-        else {
-            stateText.setError(null);
-        }
+//        if (mState.getSelectedItemPosition() == 0) {
+//            stateText.setError(getString(R.string.error_field_required));
+////            mState.requestFocus();
+//            address_details_textview.requestFocus();
+//            Toast.makeText(this, R.string.please_select_state, Toast.LENGTH_SHORT).show();
+//            address_details_textview.clearFocus();
+//            return;
+//        }
+//        else {
+//            stateText.setError(null);
+//        }
 
         //if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
         //    mCity.setError(getString(R.string.error_field_required));
