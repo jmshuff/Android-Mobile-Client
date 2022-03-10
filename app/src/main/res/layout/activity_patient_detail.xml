@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context="app.insightfuleye.client.activities.patientDetailActivity.PatientDetailActivity">
+    tools:context="app.insightfulsceh.client.activities.patientDetailActivity.PatientDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

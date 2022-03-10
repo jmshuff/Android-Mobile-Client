@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity">
+    tools:context="app.insightfulsceh.client.activities.uploadImageActivity.uploadImageInfoActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity">
+        tools:context="app.insightfulsceh.client.activities.uploadImageActivity.uploadImageInfoActivity">
 
         <ScrollView
             android:id="@+id/identification_scrollView"
