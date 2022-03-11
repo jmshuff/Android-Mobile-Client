@@ -1545,6 +1545,11 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 addDocs.putExtra("encounterUuidVitals", encounterVitals);
                 addDocs.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
                 addDocs.putExtra("examType", examType);
+                addDocs.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+                addDocs.putExtra("state", state);
+                addDocs.putExtra("name", patientName);
+                addDocs.putExtra("float_ageYear_Month", float_ageYear_Month);
+                addDocs.putExtra("openmrs_id", idView.getText());
                 startActivity(addDocs);
             }
         });

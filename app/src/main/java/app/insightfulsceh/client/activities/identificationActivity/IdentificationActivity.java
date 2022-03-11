@@ -2508,6 +2508,8 @@ public class IdentificationActivity extends AppCompatActivity {
     }
 
     public void createVisit(){
+        Log.d("Createvisit", "enter");
+        Log.d("ExamType", examType);
         SimpleDateFormat currentDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault());
         Date todayDate = new Date();
         String thisDate = currentDate.format(todayDate);

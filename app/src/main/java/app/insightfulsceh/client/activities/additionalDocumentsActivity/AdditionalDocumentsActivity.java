@@ -47,6 +47,7 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
     String state;
     String patientName;
     String intentTag;
+    String openmrs_id;
     SearchView searchView;
     List<Node> complaints;
     // CustomArrayAdapter listAdapter;
@@ -82,6 +83,7 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
                 intent.putExtra("name", patientName);
                 intent.putExtra("float_ageYear_Month", float_ageYear_Month);
                 intent.putExtra("examType", examType);
+                intent.putExtra("openmrs_id", openmrs_id);
                 if (intentTag != null) {
                     intent.putExtra("tag", intentTag);
                 }
@@ -100,6 +102,7 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
             intentTag = intent.getStringExtra("tag");
             examType=intent.getStringExtra("examType");
+            openmrs_id=intent.getStringExtra("openmrs_id");
 
             ImagesDAO imagesDAO = new ImagesDAO();
             ArrayList<String> fileuuidList = new ArrayList<String>();

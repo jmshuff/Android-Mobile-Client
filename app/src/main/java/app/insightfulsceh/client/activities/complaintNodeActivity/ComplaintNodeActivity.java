@@ -3,19 +3,6 @@ package app.insightfulsceh.client.activities.complaintNodeActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +16,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,14 +43,12 @@ import app.insightfulsceh.client.activities.questionNodeActivity.QuestionNodeAct
 import app.insightfulsceh.client.app.AppConstants;
 import app.insightfulsceh.client.app.IntelehealthApplication;
 import app.insightfulsceh.client.database.dao.EncounterDAO;
+import app.insightfulsceh.client.database.dao.PatientsDAO;
 import app.insightfulsceh.client.knowledgeEngine.Node;
 import app.insightfulsceh.client.models.dto.EncounterDTO;
 import app.insightfulsceh.client.utilities.FileUtils;
 import app.insightfulsceh.client.utilities.SessionManager;
-
 import app.insightfulsceh.client.utilities.exception.DAOException;
-
-import app.insightfulsceh.client.database.dao.PatientsDAO;
 
 public class ComplaintNodeActivity extends AppCompatActivity {
     final String TAG = "Complaint Node Activity";
@@ -96,6 +92,7 @@ public class ComplaintNodeActivity extends AppCompatActivity {
 
         }
 
+        Log.d("EncounterAdult", encounterAdultIntials);
         EncounterDAO encounterDAO = new EncounterDAO();
         encounterDTO = new EncounterDTO();
         encounterDTO.setUuid(encounterAdultIntials);
