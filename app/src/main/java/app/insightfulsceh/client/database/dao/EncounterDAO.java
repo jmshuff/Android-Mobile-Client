@@ -100,6 +100,7 @@ public class EncounterDAO {
             db.endTransaction();
 
         }
+        Log.d("createEncounter", encounter.getUuid() + " " + isCreated);
         return isCreated;
     }
 

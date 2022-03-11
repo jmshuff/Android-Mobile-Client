@@ -458,6 +458,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
             if (intent.hasExtra("examType"))
                 examType=intent.getStringExtra("examType");
         }
+        Log.d("EncounterAdult", encounterUuidAdultIntial);
+        Log.d("EncounterLateset", EncounterAdultInitial_LatestVisit);
         registerBroadcastReceiverDynamically();
         registerDownloadPrescription();
         if (!sessionManager.getLicenseKey().isEmpty())
