@@ -1340,6 +1340,7 @@ public class IdentificationActivity extends AppCompatActivity {
     }
 
     public void onPatientCreateClicked() {
+        Log.d(TAG, "onPatientCreate");
         PatientsDAO patientsDAO = new PatientsDAO();
         PatientAttributesDTO patientAttributesDTO = new PatientAttributesDTO();
         List<PatientAttributesDTO> patientAttributesDTOList = new ArrayList<>();
@@ -1866,6 +1867,8 @@ public class IdentificationActivity extends AppCompatActivity {
             Logger.logD(TAG, "insertpatinet ");
             boolean isPatientInserted = patientsDAO.insertPatientToDB(patientdto, uuid);
             boolean isPatientImageInserted = imagesDAO.insertPatientProfileImages(mCurrentPhotoPath, uuid);
+
+            Log.d("isPatientInserted", String.valueOf(isPatientInserted));
 
             if (NetworkConnection.isOnline(getApplication())) {
 //                patientApiCall();
