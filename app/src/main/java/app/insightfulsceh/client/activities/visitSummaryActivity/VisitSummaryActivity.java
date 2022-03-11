@@ -28,7 +28,6 @@ import android.print.PrintJob;
 import android.print.PrintManager;
 import android.telephony.SmsManager;
 import android.text.Html;
-import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
@@ -37,7 +36,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -116,7 +114,6 @@ import app.insightfulsceh.client.utilities.FileUtils;
 import app.insightfulsceh.client.utilities.Logger;
 import app.insightfulsceh.client.utilities.NetworkConnection;
 import app.insightfulsceh.client.utilities.SessionManager;
-import app.insightfulsceh.client.utilities.UrlModifiers;
 import app.insightfulsceh.client.utilities.UuidDictionary;
 import app.insightfulsceh.client.utilities.exception.DAOException;
 
@@ -221,7 +218,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     CardView requestedTestsCard;
     CardView additionalCommentsCard;
     CardView followUpDateCard;
-    CardView card_print, card_share;
+    RelativeLayout card_share;
     String sceh_id;
 
 
@@ -237,6 +234,17 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
     Boolean isPastVisit = false, isVisitSpecialityExists = false;
     Boolean isReceiverRegistered = false;
+
+    TextView complaintsHeading;
+    TextView physExamHeading;
+    TextView medHistHeading;
+    TextView famHistHeading;
+    TextView healthWorkerHeading;
+    CardView complaintCard;
+    CardView physExamCard;
+    CardView medHistCard;
+    CardView famHistCard;
+    CardView healthWorkerCard;
 
     public static final String FILTER = "io.intelehealth.client.activities.visit_summary_activity.REQUEST_PROCESSED";
 
@@ -272,7 +280,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
     ImageButton additionalDocumentsDownlaod;
     ImageButton onExaminationDownload;
-    String visitType="";
+    String examType="";
 
     DownloadPrescriptionService downloadPrescriptionService;
     private TextView additionalImageDownloadText;
@@ -447,8 +455,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
             if (selectedExams != null && !selectedExams.isEmpty()) {
                 physicalExams.addAll(selectedExams);
             }
-            if (intent.hasExtra("visitType"))
-                visitType=intent.getStringExtra("visitType");
+            if (intent.hasExtra("examType"))
+                examType=intent.getStringExtra("examType");
         }
         registerBroadcastReceiverDynamically();
         registerDownloadPrescription();
@@ -511,29 +519,43 @@ public class VisitSummaryActivity extends AppCompatActivity {
         frameLayout_doctor = findViewById(R.id.frame_doctor);
         frameLayout_doctor.setVisibility(View.GONE);
 
-        card_print = findViewById(R.id.card_print);
-        card_share = findViewById(R.id.card_share);
+        card_share = findViewById(R.id.button_share);
         editPatient= findViewById(R.id.imagebutton_edit_patient);
-        if (!visitType.equals("uploadImage"))
+        if (!examType.equals("uploadImage"))
             editPatient.setVisibility(View.GONE);
 
-        card_print.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        complaintsHeading=findViewById(R.id.textView_heading_complaint);
+        physExamHeading=findViewById(R.id.textView_heading_physexam);
+        medHistHeading=findViewById(R.id.textView_heading_pathist);
+        famHistHeading=findViewById(R.id.textView_heading_famhist);
+        healthWorkerHeading=findViewById(R.id.title_health_worker);
+        complaintCard=findViewById(R.id.cardView_complaint);
+        physExamCard=findViewById(R.id.cardView_physexam);
+        medHistCard=findViewById(R.id.cardView_pathist);
+        famHistCard=findViewById(R.id.cardView_famhist);
+        healthWorkerCard=findViewById(R.id.chw_and_doctor_details);
 
-                try {
-                    doWebViewPrint_Button();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        if(examType.equals("uploadImage")){
+            complaintsHeading.setVisibility(View.GONE);
+            physExamHeading.setVisibility(View.GONE);
+            medHistHeading.setVisibility(View.GONE);
+            famHistHeading.setVisibility(View.GONE);
+            healthWorkerHeading.setVisibility(View.GONE);
+            complaintCard.setVisibility(View.GONE);
+            physExamCard.setVisibility(View.GONE);
+            medHistCard.setVisibility(View.GONE);
+            famHistCard.setVisibility(View.GONE);
+            healthWorkerCard.setVisibility(View.GONE);
+        }
+
 
         card_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                shareImage();
+            }
 
-                if (hasPrescription.equalsIgnoreCase("true")) {
+/*                if (hasPrescription.equalsIgnoreCase("true")) {
 //                    try {
 //                        doWebViewPrint();
 //                    } catch (ParseException e) {
@@ -616,7 +638,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 }
 
 
-            }
+            }*/
         });
 
 
@@ -1299,6 +1321,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 intent2.putExtra("name", patientName);
                 intent2.putExtra("float_ageYear_Month", float_ageYear_Month);
                 intent2.putExtra("openmrs_id", idView.getText());
+                intent2.putExtra("examType", examType);
                 startActivity(intent2);
 
             }
@@ -1521,6 +1544,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 addDocs.putExtra("visitUuid", visitUuid);
                 addDocs.putExtra("encounterUuidVitals", encounterVitals);
                 addDocs.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                addDocs.putExtra("examType", examType);
                 startActivity(addDocs);
             }
         });
@@ -3955,6 +3979,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     }
 
     public void shareImage() {
+        Log.d("ShareImage", "true");
         ImagesDAO imagesDAO = new ImagesDAO();
         ArrayList<String> fileuuidList = new ArrayList<String>();
         ArrayList<File> fileList = new ArrayList<File>();
@@ -3981,7 +4006,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        String text="Images for "+patientName + ", ID: "+ sceh_id;
+        String text="Images for "+patientName + ", ID: ";
         Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
         //shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.setPackage("com.whatsapp");

@@ -214,8 +214,8 @@ public class IdentificationActivity extends AppCompatActivity {
 
         context = IdentificationActivity.this;
         privacy_value = i_privacy.getStringExtra("privacy"); //privacy_accept value retrieved from previous act.
-        if(i_privacy.hasExtra("type"))
-            examType=i_privacy.getStringExtra("type");
+        if(i_privacy.hasExtra("examType"))
+            examType=i_privacy.getStringExtra("examType");
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -511,7 +511,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 frameLayout.setVisibility(View.GONE);
             }
 
-            if (examType.contains("imageUpload")){
+            if (examType.contains("uploadImage")){
                 mMiddleName.setVisibility(View.GONE);
                 mDOB.setVisibility(View.GONE);
                 countryStateLayout.setVisibility(View.GONE);
@@ -886,7 +886,7 @@ public class IdentificationActivity extends AppCompatActivity {
             mAgeYears = Integer.valueOf(ymdData[0]);
             mAgeMonths = Integer.valueOf(ymdData[1]);
             mAgeDays = Integer.valueOf(ymdData[2]);
-            mAge.setText(yrMoDays);
+            mAge.setText(String.valueOf(mAgeYears));
         }
         //mAge.setOnClickListener(new View.OnClickListener() {
         //    @Override
@@ -2087,7 +2087,7 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         }
 
-        if (mCountry.getSelectedItemPosition() == 0) {
+        /*if (mCountry.getSelectedItemPosition() == 0) {
             countryText.setError(getString(R.string.error_field_required));
 //            mCountry.requestFocus();
             address_details_textview.requestFocus();
@@ -2107,7 +2107,7 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         } else {
             stateText.setError(null);
-        }
+        }*/
 
        /* if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
             mCity.setError(getString(R.string.error_field_required));
@@ -2480,6 +2480,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 i.putExtra("encounterUuidAdultIntial", encounterAdultIntials1);
                 i.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit1);
                 i.putExtra("float_ageYear_Month", float_ageYear_Month1);
+                i.putExtra("examType", examType);
 
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 getApplication().startActivity(i);
@@ -2624,6 +2625,7 @@ public class IdentificationActivity extends AppCompatActivity {
         intent2.putExtra("name", fullName);
         intent2.putExtra("tag", "new");
         intent2.putExtra("float_ageYear_Month", float_ageYear_Month);
+        intent2.putExtra("examType", examType);
         startActivity(intent2);
     }
 

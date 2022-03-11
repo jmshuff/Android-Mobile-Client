@@ -270,7 +270,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, IdentificationActivity.class);
-                intent.putExtra("type", "imageUpload");
+                intent.putExtra("examType", "uploadImage");
                 startActivity(intent);
             }
         });

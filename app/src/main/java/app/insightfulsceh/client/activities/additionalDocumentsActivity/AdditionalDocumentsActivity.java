@@ -53,6 +53,7 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
     ComplaintNodeListAdapter listAdapter;
     String EncounterAdultInitial_LatestVisit;
     private float float_ageYear_Month;
+    String examType="";
 
 
     @Override
@@ -80,6 +81,7 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
                 intent.putExtra("state", state);
                 intent.putExtra("name", patientName);
                 intent.putExtra("float_ageYear_Month", float_ageYear_Month);
+                intent.putExtra("examType", examType);
                 if (intentTag != null) {
                     intent.putExtra("tag", intentTag);
                 }
@@ -97,6 +99,7 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
             patientName = intent.getStringExtra("name");
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
             intentTag = intent.getStringExtra("tag");
+            examType=intent.getStringExtra("examType");
 
             ImagesDAO imagesDAO = new ImagesDAO();
             ArrayList<String> fileuuidList = new ArrayList<String>();
