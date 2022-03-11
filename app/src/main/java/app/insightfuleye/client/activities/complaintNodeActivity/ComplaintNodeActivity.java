@@ -3,19 +3,6 @@ package app.insightfuleye.client.activities.complaintNodeActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +16,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,14 +43,12 @@ import app.insightfuleye.client.activities.questionNodeActivity.QuestionNodeActi
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
+import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
-
 import app.insightfuleye.client.utilities.exception.DAOException;
-
-import app.insightfuleye.client.database.dao.PatientsDAO;
 
 public class ComplaintNodeActivity extends AppCompatActivity {
     final String TAG = "Complaint Node Activity";
