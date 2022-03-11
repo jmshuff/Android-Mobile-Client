@@ -163,6 +163,7 @@ public class IdentificationActivity extends AppCompatActivity {
     String fhistory = "";
     float float_ageYear_Month1;
     float float_ageYear_Month;
+    String openmrs_id;
 
     Intent i_privacy;
     String privacy_value;
@@ -372,6 +373,7 @@ public class IdentificationActivity extends AppCompatActivity {
             EncounterAdultInitial_LatestVisit1=intent.getStringExtra("EncounterAdultInitial_LatestVisit");
             fullName1=intent.getStringExtra("name");
             float_ageYear_Month1=intent.getFloatExtra("float_ageYear_Month", 0);
+            openmrs_id=intent.getStringExtra("openmrs_id");
         }
 //        if (sessionManager.valueContains("licensekey"))
         if (!sessionManager.getLicenseKey().isEmpty())
@@ -2481,6 +2483,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 i.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit1);
                 i.putExtra("float_ageYear_Month", float_ageYear_Month1);
                 i.putExtra("examType", examType);
+                i.putExtra("openmrs_id", openmrs_id);
 
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 getApplication().startActivity(i);
