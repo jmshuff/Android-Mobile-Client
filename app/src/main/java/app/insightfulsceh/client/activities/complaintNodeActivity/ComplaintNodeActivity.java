@@ -88,6 +88,7 @@ public class ComplaintNodeActivity extends AppCompatActivity {
             intentTag = intent.getStringExtra("tag");
         }
         if (encounterAdultIntials.equalsIgnoreCase("") || encounterAdultIntials == null) {
+            Log.d("generateencounter", "adultinit");
             encounterAdultIntials = UUID.randomUUID().toString();
 
         }

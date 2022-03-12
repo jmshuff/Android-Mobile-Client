@@ -459,7 +459,6 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 examType=intent.getStringExtra("examType");
         }
         Log.d("EncounterAdult", encounterUuidAdultIntial);
-        Log.d("EncounterLateset", EncounterAdultInitial_LatestVisit);
         registerBroadcastReceiverDynamically();
         registerDownloadPrescription();
         if (!sessionManager.getLicenseKey().isEmpty())
@@ -3463,6 +3462,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
      */
 
     private void updateDatabase(String string, String conceptID) {
+        Log.d("updateDatabase", conceptID);
         ObsDTO obsDTO = new ObsDTO();
         ObsDAO obsDAO = new ObsDAO();
         try {
