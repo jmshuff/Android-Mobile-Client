@@ -266,6 +266,8 @@ public class IdentificationActivity extends AppCompatActivity {
         mPostal = findViewById(R.id.identification_postal_code);
         countryText = findViewById(R.id.identification_country);
         mCountry = findViewById(R.id.spinner_country);
+
+
         mGenderM = findViewById(R.id.identification_gender_male);
         mGenderF = findViewById(R.id.identification_gender_female);
         address_details_textview = findViewById(R.id.address_details_textview);
@@ -288,6 +290,7 @@ public class IdentificationActivity extends AppCompatActivity {
         economicLayout = findViewById(R.id.identification_txtleconomic);
         educationLayout = findViewById(R.id.identification_txtleducation);
         countryStateLayout = findViewById(R.id.identification_llcountry_state);
+        countryStateLayout.setVisibility(View.GONE);
         mImageView = findViewById(R.id.imageview_id_picture);
 
         ma_checkbox = findViewById(R.id.ma_checkbox);
@@ -445,6 +448,7 @@ public class IdentificationActivity extends AppCompatActivity {
             } else {
                 countryStateLayout.setVisibility(View.GONE);
             }
+            countryStateLayout.setVisibility(View.GONE);
             if (obj.getBoolean("mPostal")) {
                 mPostal.setVisibility(View.VISIBLE);
             } else {

@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -61,6 +62,7 @@ public class SearchPatientActivity extends AppCompatActivity {
     private SQLiteDatabase db;
     Button dateFrom;
     Button dateTo;
+    LinearLayout patientDates;
     private DatePickerDialog datePickerDialogTo;
     private DatePickerDialog datePickerDialogFrom;
 
@@ -88,6 +90,8 @@ public class SearchPatientActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycle);
         dateTo=findViewById(R.id.datePickerButton_to);
         dateFrom=findViewById(R.id.datePickerButton_from);
+        patientDates=findViewById(R.id.find_patient_dates);
+        patientDates.setVisibility(View.GONE);
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             query = intent.getStringExtra(SearchManager.QUERY);
