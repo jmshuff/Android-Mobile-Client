@@ -12,13 +12,6 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
@@ -37,11 +30,16 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.res.ResourcesCompat;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -57,6 +55,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 import app.insightfulsceh.client.R;
+import app.insightfulsceh.client.activities.complaintNodeActivity.ComplaintNodeActivity;
+import app.insightfulsceh.client.activities.homeActivity.HomeActivity;
+import app.insightfulsceh.client.activities.identificationActivity.IdentificationActivity;
+import app.insightfulsceh.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfulsceh.client.app.AppConstants;
 import app.insightfulsceh.client.app.IntelehealthApplication;
 import app.insightfulsceh.client.database.InteleHealthDatabaseHelper;
@@ -72,15 +74,10 @@ import app.insightfulsceh.client.utilities.DateAndTimeUtils;
 import app.insightfulsceh.client.utilities.DownloadFilesUtils;
 import app.insightfulsceh.client.utilities.FileUtils;
 import app.insightfulsceh.client.utilities.Logger;
+import app.insightfulsceh.client.utilities.NetworkConnection;
 import app.insightfulsceh.client.utilities.SessionManager;
 import app.insightfulsceh.client.utilities.UrlModifiers;
 import app.insightfulsceh.client.utilities.UuidDictionary;
-
-import app.insightfulsceh.client.activities.homeActivity.HomeActivity;
-import app.insightfulsceh.client.activities.identificationActivity.IdentificationActivity;
-import app.insightfulsceh.client.activities.complaintNodeActivity.ComplaintNodeActivity;
-import app.insightfulsceh.client.activities.visitSummaryActivity.VisitSummaryActivity;
-import app.insightfulsceh.client.utilities.NetworkConnection;
 import app.insightfulsceh.client.utilities.exception.DAOException;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;

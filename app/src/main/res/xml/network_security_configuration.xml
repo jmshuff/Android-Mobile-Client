@@ -11,5 +11,7 @@
         <domain includeSubdomains="true">aravind.org</domain>
         <domain includeSubdomains="true">community.aravind.org:8080</domain>
         <domain includeSubdomains="true">testing.visilant.org</domain>
+        <domain includeSubdomains="true">sceh.visilant.org</domain>
+        <domain includeSubdomains="true">20.198.2.22</domain>
     </domain-config>
 </network-security-config>
