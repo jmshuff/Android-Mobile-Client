@@ -267,6 +267,7 @@ public class PatientDetailActivity extends AppCompatActivity {
                 visitDTO.setLocationuuid(sessionManager.getLocationUuid());
                 visitDTO.setSyncd(false);
                 visitDTO.setCreatoruuid(sessionManager.getCreatorID());//static
+                visitDTO.setExamType("norm");
                 VisitsDAO visitsDAO = new VisitsDAO();
 
                 try {
@@ -696,7 +697,7 @@ public class PatientDetailActivity extends AppCompatActivity {
      * @param datetime variable of type String.
      * @return void
      */
-    private void createOldVisit(final String datetime, String visit_id, String end_datetime, String visitValue, String encounterVitalslocal, String encounterAdultIntialslocal) throws ParseException {
+    private void createOldVisit(final String datetime, String visit_id, String end_datetime, String visitValue, String encounterVitalslocal, String encounterAdultIntialslocal, String examType) throws ParseException {
 
         final Boolean past_visit;
         final TextView textView = new TextView(this);
@@ -812,6 +813,7 @@ public class PatientDetailActivity extends AppCompatActivity {
                 visitSummary.putExtra("name", patientName);
                 visitSummary.putExtra("float_ageYear_Month", float_ageYear_Month);
                 visitSummary.putExtra("tag", intentTag);
+                visitSummary.putExtra("examType", examType);
                 visitSummary.putExtra("pastVisit", past_visit);
                 if (hasPrescription.equalsIgnoreCase("true")) {
                     visitSummary.putExtra("hasPrescription", "true");
@@ -1027,7 +1029,7 @@ public class PatientDetailActivity extends AppCompatActivity {
     public void pastVisits(String patientuuid) {
         String visitSelection = "patientuuid = ?";
         String[] visitArgs = {patientuuid};
-        String[] visitColumns = {"uuid, startdate", "enddate"};
+        String[] visitColumns = {"uuid, startdate", "enddate", "examType"};
         String visitOrderBy = "startdate";
         Cursor visitCursor = db.query("tbl_visit", visitColumns, visitSelection, visitArgs, null, null, visitOrderBy);
 
@@ -1042,6 +1044,7 @@ public class PatientDetailActivity extends AppCompatActivity {
                     String date = visitCursor.getString(visitCursor.getColumnIndexOrThrow("startdate"));
                     String end_date = visitCursor.getString(visitCursor.getColumnIndexOrThrow("enddate"));
                     String visit_id = visitCursor.getString(visitCursor.getColumnIndexOrThrow("uuid"));
+                    String examType =visitCursor.getString(visitCursor.getColumnIndexOrThrow("examType"));
 
                     String encounterlocalAdultintial = "";
                     String encountervitalsLocal = null;
@@ -1096,7 +1099,7 @@ public class PatientDetailActivity extends AppCompatActivity {
 
                                     Date formatted = currentDate.parse(date);
                                     String visitDate = currentDate.format(formatted);
-                                    createOldVisit(visitDate, visit_id, end_date, visitValue, encountervitalsLocal, encounterlocalAdultintial);
+                                    createOldVisit(visitDate, visit_id, end_date, visitValue, encountervitalsLocal, encounterlocalAdultintial, examType);
                                 } catch (ParseException e) {
                                     FirebaseCrashlytics.getInstance().recordException(e);
                                 }
@@ -1109,7 +1112,7 @@ public class PatientDetailActivity extends AppCompatActivity {
 
                                 Date formatted = currentDate.parse(date);
                                 String visitDate = currentDate.format(formatted);
-                                createOldVisit(visitDate, visit_id, end_date, visitValue, encountervitalsLocal, encounterlocalAdultintial);
+                                createOldVisit(visitDate, visit_id, end_date, visitValue, encountervitalsLocal, encounterlocalAdultintial, examType);
                             } catch (ParseException e) {
                                 FirebaseCrashlytics.getInstance().recordException(e);
                             }
@@ -1122,7 +1125,7 @@ public class PatientDetailActivity extends AppCompatActivity {
 
                             Date formatted = currentDate.parse(date);
                             String visitDate = currentDate.format(formatted);
-                            createOldVisit(visitDate, visit_id, end_date, visitValue, encountervitalsLocal, encounterlocalAdultintial);
+                            createOldVisit(visitDate, visit_id, end_date, visitValue, encountervitalsLocal, encounterlocalAdultintial, examType);
                         } catch (ParseException e) {
                             FirebaseCrashlytics.getInstance().recordException(e);
                         }

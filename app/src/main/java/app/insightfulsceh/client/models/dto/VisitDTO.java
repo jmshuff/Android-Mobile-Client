@@ -34,9 +34,12 @@ public class VisitDTO {
     private Boolean syncd;
     @SerializedName("attributes")
     @Expose
+
     private List<VisitAttribute_Speciality> attributes = null;
 
     private List<VisitAttributeDTO> visitAttributeDTOS;
+
+    private String examType;
 
     public String getPatientuuid() {
         return patientuuid;
@@ -117,5 +120,13 @@ public class VisitDTO {
 
     public void setAttributes(List<VisitAttribute_Speciality> attributes) {
         this.attributes = attributes;
+    }
+
+    public String getExamType() {
+        return examType;
+    }
+
+    public void setExamType(String examType) {
+        this.examType = examType;
     }
 }

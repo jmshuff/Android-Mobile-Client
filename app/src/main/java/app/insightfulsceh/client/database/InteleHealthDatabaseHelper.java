@@ -95,6 +95,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "voided TEXT DEFAULT '0'," +
             "sync TEXT DEFAULT 'false' " +
             ")";
+
     public static final String CREATE_VISIT_MAIN = "CREATE TABLE IF NOT EXISTS tbl_visit (" +
             "uuid TEXT PRIMARY KEY," +
             "patientuuid TEXT," +
@@ -107,7 +108,8 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "isdownloaded TEXT DEFAULT 'false'," +
             "voided TEXT DEFAULT '0'," +
             "sync TEXT DEFAULT 'false' ," +
-            "issubmitted Integer DEFAULT 0" +
+            "issubmitted Integer DEFAULT 0," +
+            "examType TEXT" +
             ")";
 
 

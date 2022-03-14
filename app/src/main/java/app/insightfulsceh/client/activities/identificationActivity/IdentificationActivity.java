@@ -2595,6 +2595,7 @@ public class IdentificationActivity extends AppCompatActivity {
         visitDTO.setLocationuuid(sessionManager.getLocationUuid());
         visitDTO.setSyncd(false);
         visitDTO.setCreatoruuid(sessionManager.getCreatorID());//static
+        visitDTO.setExamType(examType);
         VisitsDAO visitsDAO = new VisitsDAO();
 
         try {

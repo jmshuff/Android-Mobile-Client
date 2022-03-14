@@ -86,6 +86,7 @@ public class VisitsDAO {
             values.put("startdate", visit.getStartdate());
             values.put("enddate", visit.getEnddate());
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("examType", visit.getExamType());
             values.put("sync", false);
 
             visitAttributeDTOS = visit.getVisitAttributeDTOS();
