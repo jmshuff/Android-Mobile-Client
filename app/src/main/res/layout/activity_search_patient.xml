@@ -54,7 +54,7 @@
                     style="?android:spinnerStyle"
                     android:textColor="@color/font_black_0"
                     android:layout_marginLeft="4dp"
-                    android:onClick="openDatePicker"/>
+                    android:onClick="openDatePickerFrom"/>
 
                 <TextView
                     android:layout_width="wrap_content"

@@ -1980,15 +1980,20 @@ public class Node implements Serializable {
             languageSeparator = " - ";
         }
         String mLanguage = "";
-        for (int i = 1; i < stringsList.size(); i++) {
-            if (i == 1) {
+        if (stringsList.size()==1){
+            mLanguage = mLanguage.concat(stringsList.get(0));
+        }
+        else{
+            for (int i = 1; i < stringsList.size(); i++) {
+                if (i == 1) {
 
-                if (!stringsList.get(i).isEmpty()) {
-                    mLanguage = mLanguage.concat(stringsList.get(i));
-                }
-            } else {
-                if (!stringsList.get(i).isEmpty()) {
-                    mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
+                    if (!stringsList.get(i).isEmpty()) {
+                        mLanguage = mLanguage.concat(stringsList.get(i));
+                    }
+                } else {
+                    if (!stringsList.get(i).isEmpty()) {
+                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
+                    }
                 }
             }
         }
