@@ -37,6 +37,7 @@ public class PhysicalExam extends Node {
     private String volunteerDiagnosisLeft;
     private String physExamRight;
     private String physExamLeft;
+    private String glasses;
 
 
     public PhysicalExam(JSONObject jsonObject, ArrayList<String> selection) {
@@ -254,6 +255,7 @@ public class PhysicalExam extends Node {
 
 
     public void getPhysicalConcepts(){
+        Log.d("getPhysicalConcepts", "enter");
         int total= this.totalExams;
         List<String> rightPhysExamList= new ArrayList<>();
         List<String> leftPhysExamList= new ArrayList<>();
@@ -295,6 +297,12 @@ public class PhysicalExam extends Node {
             }
 
              */
+                }
+                else if (category.contains("Glasses")){
+                    Log.d("Glasses", "enter");
+                    String patientGlasses=node.formConceptLanguage("normal");
+                    Log.d("GlassesAnser:", patientGlasses);
+                    setGlasses(patientGlasses);
                 }
 
                 else if (category.equals("Referral Reason")){
@@ -422,6 +430,7 @@ public class PhysicalExam extends Node {
         String footer=getFooter();
         String mReferral=getVolunteerReferral();
         String duration = getDuration();
+        String glasses= getGlasses();
         String rightDuration="";
         String leftDuration="";
         if (!leftSymptom.isEmpty()) leftDuration="<br>" + "&emsp;" + duration;
@@ -439,7 +448,7 @@ public class PhysicalExam extends Node {
                 "<td>"+leftSymptom+ leftDuration + "</td>"+
                 "</tr>"+
                 "<tr>"+
-                "<th>Visual Acuity</th>"+
+                "<th>Visual Acuity (" + glasses + ")</th>"+
                 "<td>"+mRVA+"</td>"+
                 "<td>"+mLVA+"</td>"+
                 "</tr>"+
@@ -678,5 +687,13 @@ public class PhysicalExam extends Node {
 
     public void setPhysExamLeft(String physExamLeft) {
         this.physExamLeft = physExamLeft;
+    }
+
+    public String getGlasses() {
+        return glasses;
+    }
+
+    public void setGlasses(String glasses) {
+        this.glasses = glasses;
     }
 }

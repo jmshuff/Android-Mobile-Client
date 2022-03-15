@@ -79,7 +79,8 @@ public class SearchPatientActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(Color.WHITE);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        initDatePicker();
+        initDatePickerTo();
+        initDatePickerFrom();
 
         // Get the intent, verify the action and get the query
         sessionManager = new SessionManager(this);
@@ -531,7 +532,7 @@ public class SearchPatientActivity extends AppCompatActivity {
         return makeDateString(day, month, year);
     }
 
-    private void initDatePicker()
+    private void initDatePickerTo()
     {
         DatePickerDialog.OnDateSetListener dateSetListenerTo = new DatePickerDialog.OnDateSetListener()
         {
@@ -550,18 +551,30 @@ public class SearchPatientActivity extends AppCompatActivity {
         int dayTo = cal.get(Calendar.DAY_OF_MONTH);
 
         datePickerDialogTo = new DatePickerDialog(this, dateSetListenerTo, yearTo, monthTo, dayTo);
-        //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        datePickerDialogTo.getDatePicker().setMaxDate(System.currentTimeMillis());
 
-        DatePickerDialog.OnDateSetListener dateSetListenFrom = new DatePickerDialog.OnDateSetListener() {
+    }
+
+    private void initDatePickerFrom()
+    {
+        DatePickerDialog.OnDateSetListener dateSetListenerFrom = new DatePickerDialog.OnDateSetListener()
+        {
             @Override
-            public void onDateSet(DatePicker view, int yearFrom, int monthFrom, int dayFrom) {
-                monthFrom= monthFrom+1;
-                String date1= makeDateString(dayFrom, monthFrom,yearFrom);
-                dateFrom.setText(date1);
-
+            public void onDateSet(DatePicker datePicker, int yearFrom, int monthFrom, int dayFrom)
+            {
+                monthFrom = monthFrom + 1;
+                String date = makeDateString(dayFrom, monthFrom, yearFrom);
+                dateFrom.setText(date);
             }
         };
 
+        Calendar cal = Calendar.getInstance();
+        int yearFrom = cal.get(Calendar.YEAR);
+        int monthFrom = cal.get(Calendar.MONTH);
+        int dayFrom = cal.get(Calendar.DAY_OF_MONTH);
+
+        datePickerDialogFrom = new DatePickerDialog(this, dateSetListenerFrom, yearFrom, monthFrom, dayFrom);
+        datePickerDialogFrom.getDatePicker().setMaxDate(System.currentTimeMillis());
     }
 
     private String makeDateString(int day, int month, int year)
@@ -603,8 +616,21 @@ public class SearchPatientActivity extends AppCompatActivity {
     public void openDatePicker(View view)
     {
         datePickerDialogTo.show();
+        datePickerDialogTo.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+        datePickerDialogTo.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
     }
+
+    public void openDatePickerFrom(View view)
+    {
+        datePickerDialogFrom.show();
+        datePickerDialogFrom.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+        datePickerDialogFrom.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+    }
+
 }
+
+
+
 
 
 
