@@ -61,6 +61,9 @@ public class SearchPatientActivity extends AppCompatActivity {
     private SQLiteDatabase db;
     Button dateFrom;
     Button dateTo;
+
+    String dateToSearch;
+    String dateFromSearch;
     private DatePickerDialog datePickerDialogTo;
     private DatePickerDialog datePickerDialogFrom;
 
@@ -119,6 +122,23 @@ public class SearchPatientActivity extends AppCompatActivity {
     private void doQuery(String query) {
         try {
             recycler = new SearchPatientAdapter(getQueryPatients(query), SearchPatientActivity.this);
+            RecyclerView.LayoutManager reLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(reLayoutManager);
+           /* recyclerView.addItemDecoration(new
+                    DividerItemDecoration(this,
+                    DividerItemDecoration.VERTICAL));*/
+            recyclerView.setAdapter(recycler);
+
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+            Logger.logE("doquery", "doquery", e);
+        }
+    }
+
+
+    private void doQueryDate() {
+        try {
+            recycler = new SearchPatientAdapter(getQueryDate(), SearchPatientActivity.this);
             RecyclerView.LayoutManager reLayoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(reLayoutManager);
            /* recyclerView.addItemDecoration(new
@@ -392,6 +412,39 @@ public class SearchPatientActivity extends AppCompatActivity {
 
     }
 
+    public List<PatientDTO> getQueryDate() {
+        List<PatientDTO> modelList = new ArrayList<PatientDTO>();
+        String dateToSearch= getDateToSearch();
+        String dateFromSearch= getDateFromSearch();
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWritableDatabase();
+        String query = "SELECT distinct a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.openmrs_id "+
+                "FROM tbl_visit a, tbl_patient b " +
+                "WHERE a.patientuuid = b.uuid " +
+                "AND a.startdate BETWEEN \'" + dateFromSearch + "\' AND \'" + dateToSearch + "\' " +
+                "ORDER BY a.patientuuid ASC ";
+        Logger.logD(TAG, query);
+        final Cursor searchCursor = db.rawQuery(query, null);
+        try {
+            if (searchCursor.moveToFirst()) {
+                do {
+                    PatientDTO model = new PatientDTO();
+                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
+                    model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
+                    model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
+                    model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")));
+                    model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
+                    model.setPhonenumber(StringUtils.mobileNumberEmpty(phoneNumber(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")))));
+                    modelList.add(model);
+                } while (searchCursor.moveToNext());
+            }
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+        for (PatientDTO model : modelList) Log.d("PatientDate", model.toString());
+        return modelList;
+    }
+
     private void doQueryWithProviders(String querytext, List<String> providersuuids) {
         if (querytext == null) {
             List<PatientDTO> modelListwihtoutQuery = new ArrayList<PatientDTO>();
@@ -542,6 +595,11 @@ public class SearchPatientActivity extends AppCompatActivity {
                 monthTo = monthTo + 1;
                 String date = makeDateString(dayTo, monthTo, yearTo);
                 dateTo.setText(date);
+                setDateToSearch(yearTo + "-" + String.format("%02d", monthTo) + "-" +String.format("%02d", dayTo));
+
+                if (getDateFromSearch()!=null && getDateToSearch()!=null){
+                    doQueryDate();
+                }
             }
         };
 
@@ -565,9 +623,12 @@ public class SearchPatientActivity extends AppCompatActivity {
                 monthFrom = monthFrom + 1;
                 String date = makeDateString(dayFrom, monthFrom, yearFrom);
                 dateFrom.setText(date);
+                setDateFromSearch(yearFrom + "-" + String.format("%02d", monthFrom) + "-" +String.format("%02d", dayFrom));
+                if (getDateFromSearch()!=null && getDateToSearch()!=null){
+                    doQueryDate();
+                }
             }
         };
-
         Calendar cal = Calendar.getInstance();
         int yearFrom = cal.get(Calendar.YEAR);
         int monthFrom = cal.get(Calendar.MONTH);
@@ -575,6 +636,7 @@ public class SearchPatientActivity extends AppCompatActivity {
 
         datePickerDialogFrom = new DatePickerDialog(this, dateSetListenerFrom, yearFrom, monthFrom, dayFrom);
         datePickerDialogFrom.getDatePicker().setMaxDate(System.currentTimeMillis());
+
     }
 
     private String makeDateString(int day, int month, int year)
@@ -627,6 +689,21 @@ public class SearchPatientActivity extends AppCompatActivity {
         datePickerDialogFrom.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
     }
 
+    public String getDateToSearch() {
+        return dateToSearch;
+    }
+
+    public void setDateToSearch(String dateToSearch) {
+        this.dateToSearch = dateToSearch;
+    }
+
+    public String getDateFromSearch() {
+        return dateFromSearch;
+    }
+
+    public void setDateFromSearch(String dateFromSearch) {
+        this.dateFromSearch = dateFromSearch;
+    }
 }
 
 
