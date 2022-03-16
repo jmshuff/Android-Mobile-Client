@@ -470,8 +470,9 @@ public class SearchPatientActivity extends AppCompatActivity {
                     model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
+                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
                     model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
-                    model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")));
+                    model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("patientuuid")));
                     model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
                     model.setPhonenumber(StringUtils.mobileNumberEmpty(phoneNumber(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")))));
                     modelList.add(model);
@@ -504,7 +505,7 @@ public class SearchPatientActivity extends AppCompatActivity {
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
                     model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
-                    model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")));
+                    model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("patientuuid")));
                     model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
                     model.setPhonenumber(StringUtils.mobileNumberEmpty(phoneNumber(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")))));
                     modelList.add(model);
