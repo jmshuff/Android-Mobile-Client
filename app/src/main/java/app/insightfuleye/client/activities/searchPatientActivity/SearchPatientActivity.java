@@ -66,6 +66,8 @@ public class SearchPatientActivity extends AppCompatActivity {
     String dateFromSearch;
     private DatePickerDialog datePickerDialogTo;
     private DatePickerDialog datePickerDialogFrom;
+    Button clearDateSearch;
+    TextView totalPatients;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +94,9 @@ public class SearchPatientActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycle);
         dateTo=findViewById(R.id.datePickerButton_to);
         dateFrom=findViewById(R.id.datePickerButton_from);
+        clearDateSearch=findViewById(R.id.clear_date_search_button);
+        totalPatients=findViewById(R.id.searchPatient_totalPatient);
+        if (getDateFromSearch()==null || getDateToSearch()==null) clearDateSearch.setVisibility(View.GONE);
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             query = intent.getStringExtra(SearchManager.QUERY);
@@ -115,6 +120,20 @@ public class SearchPatientActivity extends AppCompatActivity {
 
         }
 
+        clearDateSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firstQuery();
+                clearDateSearch.setVisibility(View.GONE);
+                dateTo.setText("");
+                dateFrom.setText("");
+                setDateFromSearch(null);
+                setDateToSearch(null);
+                initDatePickerFrom();
+                initDatePickerTo();
+            }
+        });
+
 
     }
 
@@ -136,16 +155,38 @@ public class SearchPatientActivity extends AppCompatActivity {
     }
 
 
-    private void doQueryDate() {
+    private void doQueryDateOne() {
         try {
-            recycler = new SearchPatientAdapter(getQueryDate(), SearchPatientActivity.this);
+            List<PatientDTO> patientList= getQueryDateOne();
+            recycler = new SearchPatientAdapter(patientList, SearchPatientActivity.this);
+            int totalPat=patientList.size();
+            totalPatients.setText("Total Patients: " + totalPat);
             RecyclerView.LayoutManager reLayoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(reLayoutManager);
            /* recyclerView.addItemDecoration(new
                     DividerItemDecoration(this,
                     DividerItemDecoration.VERTICAL));*/
             recyclerView.setAdapter(recycler);
+            clearDateSearch.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+            Logger.logE("doquery", "doquery", e);
+        }
+    }
 
+    private void doQueryDateTwo() {
+        try {
+            List<PatientDTO> patientList= getQueryDateTwo();
+            recycler = new SearchPatientAdapter(patientList, SearchPatientActivity.this);
+            int totalPat=patientList.size();
+            totalPatients.setText("Total Patients: " + totalPat);
+            RecyclerView.LayoutManager reLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(reLayoutManager);
+           /* recyclerView.addItemDecoration(new
+                    DividerItemDecoration(this,
+                    DividerItemDecoration.VERTICAL));*/
+            recyclerView.setAdapter(recycler);
+            clearDateSearch.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             FirebaseCrashlytics.getInstance().recordException(e);
             Logger.logE("doquery", "doquery", e);
@@ -154,11 +195,10 @@ public class SearchPatientActivity extends AppCompatActivity {
 
     private void firstQuery() {
         try {
-            getAllPatientsFromDB();
-
-            recycler = new SearchPatientAdapter(getAllPatientsFromDB(), SearchPatientActivity.this);
-
-
+            List<PatientDTO> patientList = getAllPatientsFromDB();
+            recycler = new SearchPatientAdapter(patientList, SearchPatientActivity.this);
+            int totalPat=patientList.size();
+            totalPatients.setText("Total Patients: " + totalPat);
 //            Log.i("db data", "" + getAllPatientsFromDB());
             RecyclerView.LayoutManager reLayoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(reLayoutManager);
@@ -412,7 +452,39 @@ public class SearchPatientActivity extends AppCompatActivity {
 
     }
 
-    public List<PatientDTO> getQueryDate() {
+    public List<PatientDTO> getQueryDateOne() {
+        List<PatientDTO> modelList = new ArrayList<PatientDTO>();
+        String dateFromSearch= getDateFromSearch();
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWritableDatabase();
+        String query = "SELECT distinct a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.openmrs_id "+
+                "FROM tbl_visit a, tbl_patient b " +
+                "WHERE a.patientuuid = b.uuid " +
+                "AND a.startdate LIKE \'" + dateFromSearch + "T%\' " +
+                "ORDER BY b.first_name ASC ";
+        Logger.logD(TAG, query);
+        final Cursor searchCursor = db.rawQuery(query, null);
+        try {
+            if (searchCursor.moveToFirst()) {
+                do {
+                    PatientDTO model = new PatientDTO();
+                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
+                    model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
+                    model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
+                    model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")));
+                    model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
+                    model.setPhonenumber(StringUtils.mobileNumberEmpty(phoneNumber(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")))));
+                    modelList.add(model);
+                } while (searchCursor.moveToNext());
+            }
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+        for (PatientDTO model : modelList) Log.d("PatientDate", model.toString());
+        return modelList;
+    }
+
+    public List<PatientDTO> getQueryDateTwo() {
         List<PatientDTO> modelList = new ArrayList<PatientDTO>();
         String dateToSearch= getDateToSearch();
         String dateFromSearch= getDateFromSearch();
@@ -421,7 +493,7 @@ public class SearchPatientActivity extends AppCompatActivity {
                 "FROM tbl_visit a, tbl_patient b " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND a.startdate BETWEEN \'" + dateFromSearch + "\' AND \'" + dateToSearch + "\' " +
-                "ORDER BY a.patientuuid ASC ";
+                "ORDER BY b.first_name ASC ";
         Logger.logD(TAG, query);
         final Cursor searchCursor = db.rawQuery(query, null);
         try {
@@ -595,10 +667,10 @@ public class SearchPatientActivity extends AppCompatActivity {
                 monthTo = monthTo + 1;
                 String date = makeDateString(dayTo, monthTo, yearTo);
                 dateTo.setText(date);
-                setDateToSearch(yearTo + "-" + String.format("%02d", monthTo) + "-" +String.format("%02d", dayTo));
+                setDateToSearch(yearTo + "-" + String.format("%02d", monthTo) + "-" +String.format("%02d", dayTo+1));
 
                 if (getDateFromSearch()!=null && getDateToSearch()!=null){
-                    doQueryDate();
+                    doQueryDateTwo();
                 }
             }
         };
@@ -623,9 +695,13 @@ public class SearchPatientActivity extends AppCompatActivity {
                 monthFrom = monthFrom + 1;
                 String date = makeDateString(dayFrom, monthFrom, yearFrom);
                 dateFrom.setText(date);
+                if(getDateToSearch()==null) dateTo.setText(date);
                 setDateFromSearch(yearFrom + "-" + String.format("%02d", monthFrom) + "-" +String.format("%02d", dayFrom));
+                if (getDateFromSearch()!=null && getDateToSearch()==null){
+                    doQueryDateOne();
+                }
                 if (getDateFromSearch()!=null && getDateToSearch()!=null){
-                    doQueryDate();
+                    doQueryDateTwo();
                 }
             }
         };
