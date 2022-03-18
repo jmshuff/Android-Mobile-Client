@@ -2,7 +2,6 @@ package app.insightfuleye.client.activities.identificationActivity;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,18 +16,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-
-import com.google.android.material.checkbox.MaterialCheckBox;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputLayout;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-
-import android.provider.Settings;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -49,9 +36,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-
+import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
@@ -70,7 +65,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
+import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.activities.patientDetailActivity.PatientDetailActivity;
+import app.insightfuleye.client.activities.setupActivity.SetupActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.ImagesDAO;
@@ -84,14 +82,10 @@ import app.insightfuleye.client.utilities.DateAndTimeUtils;
 import app.insightfuleye.client.utilities.EditTextUtils;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.Logger;
-import app.insightfuleye.client.utilities.SessionManager;
-import app.insightfuleye.client.utilities.UuidGenerator;
-
-import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
-import app.insightfuleye.client.activities.homeActivity.HomeActivity;
-import app.insightfuleye.client.activities.setupActivity.SetupActivity;
 import app.insightfuleye.client.utilities.NetworkConnection;
+import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
+import app.insightfuleye.client.utilities.UuidGenerator;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class IdentificationActivity extends AppCompatActivity {
@@ -1347,6 +1341,10 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         }
 
+
+
+
+
         if (!mGenderF.isChecked() && !mGenderM.isChecked()) {
             mGenderF.setError(getString(R.string.error_field_required));
             personal_info_textview.requestFocus();
@@ -1409,7 +1407,14 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         }
 
-        if (mCountry.getSelectedItemPosition() == 0) {
+        //JS added 03-16-22
+        if (eyeCampID.getText().toString().equals("") && eyeCampID.getText().toString().isEmpty()) {
+            eyeCampID.setError(getString(R.string.error_field_required));
+            eyeCampID.requestFocus();
+            return;
+        }
+
+       /* if (mCountry.getSelectedItemPosition() == 0) {
             countryText.setError(getString(R.string.error_field_required));
 //            mCountry.requestFocus();
             address_details_textview.requestFocus();
@@ -1431,7 +1436,7 @@ public class IdentificationActivity extends AppCompatActivity {
         else {
             stateText.setError(null);
         }
-
+*/
         //if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
         //    mCity.setError(getString(R.string.error_field_required));
         //    address_details_textview.requestFocus();
@@ -1693,10 +1698,10 @@ public class IdentificationActivity extends AppCompatActivity {
         patientdto.setAddress2(StringUtils.getValue(mAddress2.getText().toString()));
         patientdto.setCityvillage(StringUtils.getValue(mCity.getText().toString()));
         patientdto.setPostalcode(StringUtils.getValue(mPostal.getText().toString()));
-        patientdto.setCountry(StringUtils.getValue(mCountry.getSelectedItem().toString()));
+        patientdto.setCountry("India");
         patientdto.setPatientPhoto(mCurrentPhotoPath);
         patientdto.setEconomic(String.valueOf(latitude)+ ", " + String.valueOf(longitude));
-        patientdto.setStateprovince(StringUtils.getValue(mState.getSelectedItem().toString()));
+        patientdto.setStateprovince("TamilNadu");
 
         patientAttributesDTO = new PatientAttributesDTO();
         patientAttributesDTO.setUuid(UUID.randomUUID().toString());
@@ -2010,7 +2015,7 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         }
 
-        if (mCountry.getSelectedItemPosition() == 0) {
+/*        if (mCountry.getSelectedItemPosition() == 0) {
             countryText.setError(getString(R.string.error_field_required));
 //            mCountry.requestFocus();
             address_details_textview.requestFocus();
@@ -2030,7 +2035,7 @@ public class IdentificationActivity extends AppCompatActivity {
             return;
         } else {
             stateText.setError(null);
-        }
+        }*/
 
        /* if (mCity.getText().toString().equals("") && mCity.getText().toString().isEmpty()) {
             mCity.setError(getString(R.string.error_field_required));
