@@ -20,17 +20,16 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-
-import androidx.core.app.NavUtils;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NavUtils;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -39,11 +38,10 @@ import java.util.Locale;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.appCompatPreferenceActivity.AppCompatPreferenceActivity;
+import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.utilities.AdminPassword;
 import app.insightfuleye.client.utilities.SessionManager;
-
-import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
     private static boolean admin_password = false;

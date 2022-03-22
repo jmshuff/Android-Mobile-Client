@@ -1701,7 +1701,7 @@ public class IdentificationActivity extends AppCompatActivity {
         patientdto.setCountry("India");
         patientdto.setPatientPhoto(mCurrentPhotoPath);
         patientdto.setEconomic(String.valueOf(latitude)+ ", " + String.valueOf(longitude));
-        patientdto.setStateprovince("TamilNadu");
+        patientdto.setStateprovince("Tamil Nadu");
 
         patientAttributesDTO = new PatientAttributesDTO();
         patientAttributesDTO.setUuid(UUID.randomUUID().toString());
