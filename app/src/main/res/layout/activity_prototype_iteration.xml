@@ -328,6 +328,22 @@
                             android:text="Resistivity:" />
 
                         <RadioButton
+                            android:id="@+id/prototype_82k"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="8.2 Kohm"
+                            android:textSize="@dimen/card_content_sub_text_size" />
+
+                        <RadioButton
+                            android:id="@+id/prototype_68k"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="6.8 Kohm"
+                            android:textSize="@dimen/card_content_sub_text_size" />
+
+                        <RadioButton
                             android:id="@+id/prototype_33k"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

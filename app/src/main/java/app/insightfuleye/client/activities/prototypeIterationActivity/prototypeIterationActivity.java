@@ -47,6 +47,8 @@ public class prototypeIterationActivity extends AppCompatActivity {
     LinearLayout numStrips;
     LinearLayout typeLights;
 
+    RadioButton m82k;
+    RadioButton m68k;
     RadioButton m33k;
     RadioButton m15k;
     RadioButton m1k;
@@ -88,6 +90,8 @@ public class prototypeIterationActivity extends AppCompatActivity {
         mLStrip=findViewById(R.id.prototype_LStrip);
         mBothStrip=findViewById(R.id.prototype_BothStrip);
         typeLights=findViewById(R.id.prototype_typeOfLights);
+        m68k=findViewById(R.id.prototype_68k);
+        m82k=findViewById(R.id.prototype_82k);
         m33k=findViewById(R.id.prototype_33k);
         m15k=findViewById(R.id.prototype_15k);
         m1k= findViewById(R.id.prototype_1k);
@@ -188,6 +192,19 @@ public class prototypeIterationActivity extends AppCompatActivity {
             }
         });
 
+        m68k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        m82k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
         m33k.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -333,6 +350,18 @@ public class prototypeIterationActivity extends AppCompatActivity {
             case R.id.prototype_500:
                 if(checked)
                     mResistance = "500 ohm";
+                Log.v(TAG, "Resistance: " + mResistance);
+                break;
+
+            case R.id.prototype_68k:
+                if(checked)
+                    mResistance= "6.8 Kohm";
+                Log.v(TAG, "Resistance: " + mResistance);
+                break;
+
+            case R.id.prototype_82k:
+                if (checked)
+                    mResistance= "8.2 Kohm";
                 Log.v(TAG, "Resistance: " + mResistance);
                 break;
 

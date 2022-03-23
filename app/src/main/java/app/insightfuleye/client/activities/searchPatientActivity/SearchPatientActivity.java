@@ -115,7 +115,7 @@ public class SearchPatientActivity extends AppCompatActivity {
             if (sessionManager.isPullSyncFinished()) {
                 msg.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
-                firstQuery();
+                //firstQuery();
             }
 
         }
@@ -123,7 +123,7 @@ public class SearchPatientActivity extends AppCompatActivity {
         clearDateSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firstQuery();
+                //firstQuery();
                 clearDateSearch.setVisibility(View.GONE);
                 dateTo.setText("");
                 dateFrom.setText("");
@@ -151,6 +151,16 @@ public class SearchPatientActivity extends AppCompatActivity {
         } catch (Exception e) {
             FirebaseCrashlytics.getInstance().recordException(e);
             Logger.logE("doquery", "doquery", e);
+        }
+    }
+
+    public void clearRecycler(List<PatientDTO> data) {
+        int size =  data.size();
+        if (size > 0){
+            for (int i=0; i < size ; i++){
+                data.remove(0);
+            }
+            recycler.notifyItemRangeRemoved(0, size);
         }
     }
 
@@ -228,18 +238,23 @@ public class SearchPatientActivity extends AppCompatActivity {
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.d("Hack", "in query text change");
+            public boolean onQueryTextSubmit(String newText) {
                 SearchRecentSuggestions suggestions = new SearchRecentSuggestions(SearchPatientActivity.this,
                         SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
                 suggestions.clearHistory();
                 query = newText;
                 doQuery(newText);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {/*
+                Log.d("Hack", "in query text change");
+                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(SearchPatientActivity.this,
+                        SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
+                suggestions.clearHistory();
+                query = newText;
+                doQuery(newText);*/
                 return true;
             }
         });
