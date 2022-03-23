@@ -41,8 +41,20 @@ public class prototypeIterationActivity extends AppCompatActivity {
     private String mLightType="";
     private String mNumLights="";
     private String mPrototype="";
+    private String mResistance="";
+    private String mScopeLength="";
     LinearLayout numBulbs;
     LinearLayout numStrips;
+    LinearLayout typeLights;
+
+    RadioButton m33k;
+    RadioButton m15k;
+    RadioButton m1k;
+    RadioButton m800;
+    RadioButton m500;
+    RadioButton m10mm;
+    RadioButton m12mm;
+    RadioButton m14mm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +87,23 @@ public class prototypeIterationActivity extends AppCompatActivity {
         mRStrip=findViewById(R.id.prototype_RStrip);
         mLStrip=findViewById(R.id.prototype_LStrip);
         mBothStrip=findViewById(R.id.prototype_BothStrip);
+        typeLights=findViewById(R.id.prototype_typeOfLights);
+        m33k=findViewById(R.id.prototype_33k);
+        m15k=findViewById(R.id.prototype_15k);
+        m1k= findViewById(R.id.prototype_1k);
+        m800= findViewById(R.id.prototype_800);
+        m500=findViewById(R.id.prototype_500);
+        m10mm=findViewById(R.id.prototype_10mm);
+        m12mm=findViewById(R.id.prototype_12mm);
+        m14mm=findViewById(R.id.prototype_14mm);
+
+        typeLights.setVisibility(View.GONE);
 
         numBulbs.setVisibility(View.GONE);
         numStrips.setVisibility(View.GONE);
 
         FloatingActionButton fab = findViewById(R.id.fab);
+
 
         m10D.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,6 +188,61 @@ public class prototypeIterationActivity extends AppCompatActivity {
             }
         });
 
+        m33k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+        m15k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        m1k.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        m800.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        m500.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        m10mm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        m12mm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
+        m14mm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRadioButtonClicked(v);
+            }
+        });
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -227,16 +306,61 @@ public class prototypeIterationActivity extends AppCompatActivity {
                     mNumLights = "2 Bulbs";
                 Log.v(TAG, "Num Lights: " + mNumLights);
                 break;
+            case R.id.prototype_33k:
+                if (checked)
+                    mResistance="3.3 Kohm";
+                Log.v(TAG, "Resistance: " + mResistance);
+                break;
+
+            case R.id.prototype_15k:
+                if(checked)
+                    mResistance="1.5 Kohm";
+                Log.v(TAG, "Resistance: " + mResistance);
+                break;
+
+            case R.id.prototype_1k:
+                if (checked)
+                    mResistance="1 Kohm";
+                Log.v(TAG, "Resistance: " + mResistance);
+                break;
+
+            case R.id.prototype_800:
+                if(checked)
+                    mResistance= "800 ohm";
+                Log.v("TAG", "Resistance: " + mResistance);
+                break;
+
+            case R.id.prototype_500:
+                if(checked)
+                    mResistance = "500 ohm";
+                Log.v(TAG, "Resistance: " + mResistance);
+                break;
+
+            case R.id.prototype_10mm:
+                if(checked)
+                    mScopeLength="10mm";
+                Log.v(TAG, "Scope Length: " + mScopeLength);
+                break;
+
+            case R.id.prototype_12mm:
+                if(checked)
+                    mScopeLength="12mm";
+                Log.v(TAG,"Scope Length: " + mScopeLength);
+                break;
+
+            case R.id.prototype_14mm:
+                if (checked)
+                    mScopeLength="14mm";
+                Log.v(TAG, "Scope Length: " + mScopeLength);
+                break;
         }
     }
 
     private void onFabClicked(){
-        if (mLightType=="LED Bulb"){
-            mPrototype=mDiopter + " " + mScope + ", " + mLightType + ", " + mNumLights;
-        }
-        else{
-            mPrototype=mDiopter + " " + mScope + ", " + mLightType;
-        }
+        if(typeLights.getVisibility()==View.VISIBLE)
+            mPrototype=mDiopter + " " + mScope + ", " + mScopeLength + ", " + mLightType + ", " + mNumLights + ", " + mResistance;
+        else
+            mPrototype=mDiopter + " " + mScope + ", " + mScopeLength + ", " + mResistance;
         Log.d(TAG, "Prototype: " + mPrototype);
 
         Intent intent1= new Intent();

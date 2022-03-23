@@ -147,6 +147,7 @@
                     android:orientation="horizontal"
                     android:paddingTop="8dp"
                     android:paddingLeft="8dp"
+                    android:id="@+id/prototype_typeOfLights"
                     android:paddingRight="8dp">
 
 
@@ -293,6 +294,139 @@
                             android:drawablePadding="10dp"
                             android:fontFamily="@font/lato_regular"
                             android:text="Both Bulbs"
+                            android:textSize="@dimen/card_content_sub_text_size"
+                            />
+
+                    </RadioGroup>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+
+
+                    <RadioGroup
+                        android:id="@+id/radioGroupResist"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="4dp"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato_bold"
+                            android:textSize="18sp"
+                            android:text="Resistivity:" />
+
+                        <RadioButton
+                            android:id="@+id/prototype_33k"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="3.3 Kohm"
+                            android:textSize="@dimen/card_content_sub_text_size" />
+
+                        <RadioButton
+                            android:id="@+id/prototype_15k"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="1.5 Kohm"
+                            android:textSize="@dimen/card_content_sub_text_size" />
+
+                        <RadioButton
+                            android:id="@+id/prototype_1k"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="1 Kohm"
+                            android:textSize="@dimen/card_content_sub_text_size"
+                            />
+
+                        <RadioButton
+                            android:id="@+id/prototype_800"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="800 ohm"
+                            android:textSize="@dimen/card_content_sub_text_size"
+                            />
+
+                        <RadioButton
+                            android:id="@+id/prototype_500"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="500 ohm"
+                            android:textSize="@dimen/card_content_sub_text_size"
+                            />
+
+                    </RadioGroup>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+
+
+                    <RadioGroup
+                        android:id="@+id/radioGroupScopeLength"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="4dp"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato_bold"
+                            android:textSize="18sp"
+                            android:text="Scope Length:" />
+
+                        <RadioButton
+                            android:id="@+id/prototype_10mm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="10 mm"
+                            android:textSize="@dimen/card_content_sub_text_size" />
+
+                        <RadioButton
+                            android:id="@+id/prototype_12mm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="12 mm"
+                            android:textSize="@dimen/card_content_sub_text_size"
+                            />
+
+                        <RadioButton
+                            android:id="@+id/prototype_14mm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:fontFamily="@font/lato_regular"
+                            android:text="14 mm"
                             android:textSize="@dimen/card_content_sub_text_size"
                             />
 

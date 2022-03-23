@@ -268,6 +268,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_IMAGE_RECORDS);
         db.execSQL(CREATE_OBS_MAIN);
         db.execSQL(CREATE_VISIT_MAIN);
+        //db.execSQL(drop_attri);
         db.execSQL(CREATE_PATIENT_ATTRIBUTE_MASTER_MAIN);
         db.execSQL(CREATE_LOCATION);
         db.execSQL(CREATE_PROVIDER);

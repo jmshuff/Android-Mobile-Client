@@ -79,7 +79,7 @@ public class CameraActivity extends AppCompatActivity {
      * for the file generated
      */
     public static final String SET_IMAGE_NAME = "IMG_NAME";
-    /**
+    /**`
      * Bundle key used for the {@link String} setting custom FilePath for
      * storing the file generated
      */

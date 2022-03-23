@@ -685,7 +685,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         try {
             contentValues.put("imageName", patient.getImagePath()); //imageNameRight
             contentValues.put("imageName2", patient.getImageId());
-            contentValues.put("patientId", "Hospital-Upload");
+            contentValues.put("patientId", "03-23-22");
             contentValues.put("visitId", visitId);
             //contentValues.put("creatorId", sessionManager.getChwname());
             contentValues.put("creatorId", mImager);
