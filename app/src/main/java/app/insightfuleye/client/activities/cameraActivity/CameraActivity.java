@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -33,9 +34,7 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.MeteringPoint;
-import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
-import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
 import androidx.camera.core.ZoomState;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -55,7 +54,6 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.app.AppConstants;
@@ -108,9 +106,6 @@ public class CameraActivity extends AppCompatActivity {
             focusView.setVisibility(View.INVISIBLE);
         }
     };
-
-
-
 
 
     private Executor executor = Executors.newSingleThreadExecutor();
@@ -208,7 +203,7 @@ public class CameraActivity extends AppCompatActivity {
                     cInfo = camera.getCameraInfo();
 
                     //AutoFocus Every X Seconds
-                    MeteringPointFactory AFfactory = new SurfaceOrientedMeteringPointFactory((float)mPreviewView.getWidth(),(float)mPreviewView.getHeight());
+/*                    MeteringPointFactory AFfactory = new SurfaceOrientedMeteringPointFactory((float)mPreviewView.getWidth(),(float)mPreviewView.getHeight());
                     float centerWidth = (float)mPreviewView.getWidth()/2;
                     float centerHeight = (float)mPreviewView.getHeight()/2;
                     MeteringPoint AFautoFocusPoint = AFfactory.createPoint(centerWidth, centerHeight);
@@ -217,7 +212,7 @@ public class CameraActivity extends AppCompatActivity {
                         cControl.startFocusAndMetering(action);
                     }catch (Exception e){
 
-                    }
+                    }*/
 
                     OrientationEventListener orientationEventListener = new OrientationEventListener(this) {
                         @Override
@@ -375,7 +370,7 @@ public class CameraActivity extends AppCompatActivity {
         });
     }
 
-    private void setUpTapToFocus() {
+    public void setUpTapToFocus() {
         txView.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
             @Override
@@ -387,8 +382,12 @@ public class CameraActivity extends AppCompatActivity {
                 }
                 TextureViewMeteringPointFactory factory = new TextureViewMeteringPointFactory(txView);
                 MeteringPoint point = factory.createPoint(event.getX(), event.getY());
-                FocusMeteringAction action = new FocusMeteringAction.Builder(point).build();
+                FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF).disableAutoCancel().build();
+                FocusMeteringAction action1 = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AE).disableAutoCancel().build();
+                FocusMeteringAction action2 = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AWB).disableAutoCancel().build();
                 cControl.startFocusAndMetering(action);
+                cControl.startFocusAndMetering(action1);
+                cControl.startFocusAndMetering(action2);
                 handler.removeCallbacks(focusingTOInvisible);
                 focusView.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_focus));
                 focusView.setX(event.getX());
@@ -440,6 +439,24 @@ public class CameraActivity extends AppCompatActivity {
                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                     //  Bitmap bitmap = Bitmap.createScaledBitmap(bmp, 600, 800, false);
                     //  bitmap.recycle();
+
+                    int orientation=imageCapture.getTargetRotation();
+
+                    Log.e("EXIF", "Exif: " + orientation);
+                    Matrix matrix = new Matrix();
+                    if (orientation == 0) {
+                        matrix.postRotate(90);
+                        Log.e("EXIF", "Exif: " + orientation);
+                    } else if (orientation == 2) {
+                        matrix.postRotate(270);
+                        Log.e("EXIF", "Exif: " + orientation);
+                    } else if (orientation == 3) {
+                        matrix.postRotate(180);
+                        Log.e("EXIF", "Exif: " + orientation);
+                    }
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(),
+                            matrix, true);
+
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
                     os.flush();
                     os.close();
