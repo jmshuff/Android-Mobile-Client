@@ -6,9 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -51,7 +48,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -198,7 +194,7 @@ public class CameraActivity extends AppCompatActivity {
                 //bind Camera Preview to Surface provider ie:viewFinder in my case
                 Preview preview = new Preview.Builder().build();
 
-                ImageCapture imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                ImageCapture imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).setTargetAspectRatio(AspectRatio.RATIO_4_3).setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                                 //.setTargetRotation(this.getWindowManager().getDefaultDisplay().getRotation())
                                 .build();
 
@@ -450,7 +446,7 @@ public class CameraActivity extends AppCompatActivity {
                     bitmap.recycle();
 
 
-                    Bitmap scaledBitmap = null;
+/*                    Bitmap scaledBitmap = null;
 
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inJustDecodeBounds = true;
@@ -543,7 +539,7 @@ public class CameraActivity extends AppCompatActivity {
                         if (scaledBitmap != null) {
                             scaledBitmap.recycle();
                         }
-                    }
+                    }*/
                     Intent intent = new Intent();
                     intent.putExtra("RESULT", file.getAbsolutePath());
                     intent.putExtra("Type", mType);
