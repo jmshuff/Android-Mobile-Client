@@ -1,37 +1,21 @@
 package app.insightfuleye.client.activities.physcialExamActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,13 +26,27 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +55,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,38 +70,26 @@ import app.insightfuleye.client.database.dao.EncounterDAO;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ImagesPushDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
+import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
-import app.insightfuleye.client.models.Results;
 import app.insightfuleye.client.models.azureResults;
-import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.models.dto.ObsDTO;
-import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
-import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
-import app.insightfuleye.client.utilities.UuidDictionary;
-
 import app.insightfuleye.client.utilities.StringUtils;
+import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.utilities.pageindicator.ScrollingPagerIndicator;
-
-import app.insightfuleye.client.database.dao.PatientsDAO;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class PhysicalExamActivity extends AppCompatActivity implements QuestionsAdapter.FabClickListener {
     final static String TAG = PhysicalExamActivity.class.getSimpleName();
     // private SectionsPagerAdapter mSectionsPagerAdapter;
 
     // private ViewPager mViewPager;
+    private static final int PERMISSION_CODE = 1000;
+    private static final int IMAGE_CAPTURE_CODE = 1001;
+    Uri image_uri;
 
     static String patientUuid;
     static String visitUuid;
@@ -118,7 +103,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     SQLiteDatabase localdb;
 
 
-    static String imageName;
+    String imageName;
     static String baseDir;
     static File filePath;
     String azureType=null;
@@ -578,8 +563,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     azureType="left";
                 }
 
-                    Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
-
+                    //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
+                    manageCameraPermissions(imageName);
 
             } else {
                 Node.handleQuestion(question, this, adapter, null, null);
@@ -806,12 +791,13 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Node.TAKE_IMAGE_FOR_NODE) {
+        if (requestCode == IMAGE_CAPTURE_CODE) {
             if (resultCode == RESULT_OK) {
-                String mCurrentPhotoPath = data.getStringExtra("RESULT");
+                //String mCurrentPhotoPath = data.getStringExtra("RESULT");
+                String mCurrentPhotoPath= AppConstants.IMAGE_PATH + imageName + ".jpg";
                 physicalExamMap.setImagePath(mCurrentPhotoPath);
                 Log.i(TAG, mCurrentPhotoPath);
-                physicalExamMap.displayImage(this, filePath.getAbsolutePath(), imageName);
+                //physicalExamMap.displayImage(this, filePath.getAbsolutePath(), imageName);
                 updateImageDatabase();
                 //uploadAzureImage(filePath.getAbsolutePath(), imageName);
                 //instead of uploading it now, let's queue it now and upload everything later
@@ -1115,6 +1101,54 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
         return isUpdated;
     }
+
+    public void manageCameraPermissions(String imageName){
+
+        //if system os >=marshmellow, request runtime permissions
+        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_DENIED) {
+                //permisssions not enabled, check permissions
+                String[] permission= {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                ActivityCompat.requestPermissions(this, permission, PERMISSION_CODE);
+            }
+            else{
+                openCameraNative(imageName);
+            }
+        }
+        else{
+            //system os < marshmellow
+            openCameraNative(imageName);
+        }
+
+    }
+
+    public void openCameraNative(String imageName) {
+        String imagePath= AppConstants.IMAGE_PATH + imageName + ".jpg";
+        File file = new File(AppConstants.IMAGE_PATH + imageName + ".jpg");
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            if (file != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        file);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, IMAGE_CAPTURE_CODE);
+            }
+        }
+
+    }
+
+/*    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode==RESULT_OK){
+
+        }
+    }*/
 
 
 }
