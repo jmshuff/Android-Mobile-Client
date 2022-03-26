@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,30 +13,27 @@ import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.WorkManager;
 
@@ -61,7 +59,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.IntroActivity.IntroActivity;
 import app.insightfuleye.client.activities.activePatientsActivity.ActivePatientActivity;
 import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
 import app.insightfuleye.client.activities.loginActivity.LoginActivity;
@@ -70,9 +67,9 @@ import app.insightfuleye.client.activities.searchPatientActivity.SearchPatientAc
 import app.insightfuleye.client.activities.settingsActivity.SettingsActivity;
 import app.insightfuleye.client.activities.todayPatientActivity.TodayPatientActivity;
 import app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity;
-import app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.models.CheckAppUpdateRes;
 import app.insightfuleye.client.models.DownloadMindMapRes;
 import app.insightfuleye.client.networkApiCalls.ApiClient;
@@ -85,8 +82,8 @@ import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.OfflineLogin;
 import app.insightfuleye.client.utilities.SessionManager;
+import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.widget.materialprogressbar.CustomProgressDialog;
-
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -451,6 +448,91 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+        PatientsDAO patientattr= new PatientsDAO();
+        if (patientattr.getUuidForAttribute("Health Scheme Card")=="" || patientattr.getUuidForAttribute("Health Scheme Card")==null){
+            try {
+                createAttributes();
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
+    private boolean createAttributes() throws DAOException {
+
+        boolean isInserted = true;
+        Log.d("GetAttribute", "enter");
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+                values.put("uuid", "5a889d96-0c84-4a04-88dc-59a6e37db2d3");
+                values.put("name", "caste");
+                values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+                values.put("sync", "TRUE");
+                db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values1 = new ContentValues();
+            values.put("uuid", "14d4f066-15f5-102d-96e4-000c29c2a5d7");
+            values.put("name", "Telephone Number");
+            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values2 = new ContentValues();
+            values.put("uuid", " 1c718819-345c-4368-aad6-d69b4c267db7");
+            values.put("name", "Education Level");
+            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values3 = new ContentValues();
+            values.put("uuid", " 1c718819-345c-4368-aad6-d69b4c267db7");
+            values.put("name", "Economic Status");
+            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values4 = new ContentValues();
+            values.put("uuid", " ecdaadb6-14a0-4ed9-b5b7-cfed87b44b87");
+            values.put("name", "occupation");
+            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values5 = new ContentValues();
+            values.put("uuid", " 00784346-7f86-43ea-a40b-608d6deacfab");
+            values.put("name", "eyecampid");
+            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("sync", "TRUE");
+
+            ContentValues values6 = new ContentValues();
+            values.put("uuid", " 1b2f34f7-2bf8-4ef7-9736-f5b858afc160");
+            values.put("name", "Son/wife/daughter");
+            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values7 = new ContentValues();
+            values.put("uuid", "  c10cb61d-2291-4545-8517-d69c7cfac21e");
+            values.put("name", "Health Scheme Card");
+            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            isInserted = false;
+            FirebaseCrashlytics.getInstance().recordException(e);
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            db.endTransaction();
+        }
+
+        return isInserted;
     }
 
     InstallStateUpdatedListener installStateUpdatedListener = new
