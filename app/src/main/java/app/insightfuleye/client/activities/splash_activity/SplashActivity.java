@@ -5,10 +5,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
@@ -19,11 +18,10 @@ import java.util.Locale;
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.IntroActivity.IntroActivity;
 import app.insightfuleye.client.activities.homeActivity.HomeActivity;
+import app.insightfuleye.client.activities.loginActivity.LoginActivity;
 import app.insightfuleye.client.dataMigration.SmoothUpgrade;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
-
-import app.insightfuleye.client.activities.loginActivity.LoginActivity;
 
 
 public class SplashActivity extends AppCompatActivity {
@@ -106,7 +104,9 @@ public class SplashActivity extends AppCompatActivity {
                         Manifest.permission.GET_ACCOUNTS,
                         Manifest.permission.CAMERA,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION)
                 .check();
     }
 
