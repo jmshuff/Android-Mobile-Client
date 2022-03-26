@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -17,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +39,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -68,6 +72,10 @@ import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class uploadImageInfoActivity extends AppCompatActivity {
     private static final String TAG = uploadImageInfoActivity.class.getSimpleName();
+    private static final int PERMISSION_CODE = 1000;
+    private static final int IMAGE_CAPTURE_CODE = 1001;
+    public static final int TAKE_IMAGE_RIGHT=207;
+    public static final int TAKE_IMAGE_LEFT=208;
     SessionManager sessionManager = null;
     private boolean hasLicense = false;
     EditText mAge;
@@ -482,12 +490,12 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         Log.v(TAG, "Result Received");
         Log.v(TAG, String.valueOf(requestCode));
         Log.v(TAG, String.valueOf(resultCode));
-        if (requestCode == CameraActivity.TAKE_IMAGE_RIGHT) {
-            Log.v(TAG, "Request Code " + CameraActivity.TAKE_IMAGE);
+        if (requestCode == TAKE_IMAGE_RIGHT) {
             if (resultCode == RESULT_OK) {
                 Log.i(TAG, "Result OK");
-                mCurrentPhotoPath = data.getStringExtra("RESULT");
-                mType= data.getStringExtra("Type");
+                //mCurrentPhotoPath = data.getStringExtra("RESULT");
+                mCurrentPhotoPath=AppConstants.IMAGE_PATH + patient.getImagePath() + ".jpg";
+                mType= "right";
                 Log.d("PhotoPath", mCurrentPhotoPath);
                 try {
                     savePicture(mCurrentPhotoPath, mPrototype, mType);
@@ -501,13 +509,14 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                         filePath1.mkdir();
                     }
                     patient.setImageId(imageNameLeft);
-                    Intent cameraIntent1 = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
+                    manageCameraPermissions(imageNameLeft, TAKE_IMAGE_LEFT);
+                   /* Intent cameraIntent1 = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
                     // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
                     cameraIntent1.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameLeft);
                     cameraIntent1.putExtra(CameraActivity.SET_IMAGE_PATH, filePath1.toString());
                     cameraIntent1.putExtra(CameraActivity.SET_EYE_TYPE, "left");
                     cameraIntent1.putExtra("requestCode", CameraActivity.TAKE_IMAGE_LEFT);
-                    startActivityForResult(cameraIntent1, CameraActivity.TAKE_IMAGE_LEFT);
+                    startActivityForResult(cameraIntent1, CameraActivity.TAKE_IMAGE_LEFT);*/
 
 
 
@@ -531,11 +540,13 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             }
 
         }
-        if(requestCode== CameraActivity.TAKE_IMAGE_LEFT){
+
+        if(requestCode== TAKE_IMAGE_LEFT){
             if (resultCode == RESULT_OK) {
                 Log.i(TAG, "Result OK");
-                mCurrentPhotoPath = data.getStringExtra("RESULT");
-                mType = data.getStringExtra("Type");
+                //mCurrentPhotoPath = data.getStringExtra("RESULT");
+                mCurrentPhotoPath=AppConstants.IMAGE_PATH + patient.getImageId() +".jpg";
+                mType = "left";
                 Log.d("mType", mType);
                 try {
                     savePicture(mCurrentPhotoPath, mPrototype, mType);
@@ -557,13 +568,14 @@ public class uploadImageInfoActivity extends AppCompatActivity {
                     filePath.mkdir();
                 }
                 patient.setImagePath(imageNameRight);
-                Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
-                // cameraIntent.putExtra(CameraActivity.SHOW_DIALOG_MESSAGE, getString(R.string.camera_dialog_default));
+/*                Intent cameraIntent = new Intent(uploadImageInfoActivity.this, CameraActivity.class);
                 cameraIntent.putExtra(CameraActivity.SET_IMAGE_NAME, imageNameRight);
                 cameraIntent.putExtra(CameraActivity.SET_IMAGE_PATH, filePath.toString());
                 cameraIntent.putExtra(CameraActivity.SET_EYE_TYPE, "right");
                 cameraIntent.putExtra("requestCode", CameraActivity.TAKE_IMAGE_RIGHT);
-                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE_RIGHT);
+                startActivityForResult(cameraIntent, CameraActivity.TAKE_IMAGE_RIGHT);*/
+
+                manageCameraPermissions(imageNameRight, TAKE_IMAGE_RIGHT);
             }
 
 
@@ -1060,6 +1072,45 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         }
 
  */
+
+    public void manageCameraPermissions(String imageName, int requestCode){
+
+        //if system os >=marshmellow, request runtime permissions
+        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_DENIED) {
+                //permisssions not enabled, check permissions
+                String[] permission= {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                ActivityCompat.requestPermissions(this, permission, PERMISSION_CODE);
+            }
+            else{
+                openCameraNative(imageName, requestCode);
+            }
+        }
+        else{
+            //system os < marshmellow
+            openCameraNative(imageName, requestCode);
+        }
+
+    }
+
+    public void openCameraNative(String imageName, int requestCode) {
+        File file = new File(AppConstants.IMAGE_PATH + imageName + ".jpg");
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            if (file != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        file);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, IMAGE_CAPTURE_CODE);
+            }
+        }
+
+    }
+
 
 }
 
