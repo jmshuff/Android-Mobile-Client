@@ -5,16 +5,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-
+import android.util.Log;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import app.insightfuleye.client.services.MyIntentService;
-import app.insightfuleye.client.utilities.DateAndTimeUtils;
-import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.models.Patient;
@@ -22,6 +19,9 @@ import app.insightfuleye.client.models.dto.PatientAttributeTypeMasterDTO;
 import app.insightfuleye.client.models.dto.PatientAttributesDTO;
 import app.insightfuleye.client.models.dto.PatientDTO;
 import app.insightfuleye.client.models.pushRequestApiCall.Attribute;
+import app.insightfuleye.client.services.MyIntentService;
+import app.insightfuleye.client.utilities.DateAndTimeUtils;
+import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class PatientsDAO {
@@ -314,6 +314,16 @@ public class PatientsDAO {
         cursor.close();
 
         return attributeUuid;
+    }
+
+    public void getAllAttribute(){
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        Cursor cursor=db.rawQuery("SELECT uuid, name FROM tbl_patient_attribute_master", new String[]{});
+        if (cursor.getCount()!=0){
+            while ((cursor.moveToNext())){
+                Log.d("Attribute", cursor.getString(cursor.getColumnIndexOrThrow("name")) + ": " + cursor.getString(cursor.getColumnIndexOrThrow("uuid")));
+            }
+        }
     }
 
     public boolean updateOpemmrsId(String openmrsId, String synced, String uuid) throws DAOException {

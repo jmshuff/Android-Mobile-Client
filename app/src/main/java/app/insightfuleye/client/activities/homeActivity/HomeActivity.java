@@ -18,24 +18,19 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.WorkManager;
 
@@ -61,7 +56,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.IntroActivity.IntroActivity;
 import app.insightfuleye.client.activities.activePatientsActivity.ActivePatientActivity;
 import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
 import app.insightfuleye.client.activities.loginActivity.LoginActivity;
@@ -70,9 +64,9 @@ import app.insightfuleye.client.activities.searchPatientActivity.SearchPatientAc
 import app.insightfuleye.client.activities.settingsActivity.SettingsActivity;
 import app.insightfuleye.client.activities.todayPatientActivity.TodayPatientActivity;
 import app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity;
-import app.insightfuleye.client.activities.uploadImageActivity.uploadImageInfoActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.models.CheckAppUpdateRes;
 import app.insightfuleye.client.models.DownloadMindMapRes;
 import app.insightfuleye.client.networkApiCalls.ApiClient;
@@ -86,7 +80,6 @@ import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.OfflineLogin;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.widget.materialprogressbar.CustomProgressDialog;
-
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -201,6 +194,8 @@ public class HomeActivity extends AppCompatActivity {
 
         help_textview = findViewById(R.id.help_textview);
         help_textview.setText(R.string.Whatsapp_Help_Cardview);
+        PatientsDAO patientsDAO= new PatientsDAO();
+        patientsDAO.getAllAttribute();
 
 
         manualSyncButton.setText(R.string.refresh);
