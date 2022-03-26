@@ -198,6 +198,8 @@ public class HomeActivity extends AppCompatActivity {
 
         help_textview = findViewById(R.id.help_textview);
         help_textview.setText(R.string.Whatsapp_Help_Cardview);
+        PatientsDAO patientsDAO= new PatientsDAO();
+        patientsDAO.getAllAttribute();
 
 
         manualSyncButton.setText(R.string.refresh);

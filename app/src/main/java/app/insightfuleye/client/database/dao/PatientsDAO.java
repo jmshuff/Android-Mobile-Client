@@ -317,6 +317,16 @@ public class PatientsDAO {
         return attributeUuid;
     }
 
+    public void getAllAttribute(){
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        Cursor cursor=db.rawQuery("SELECT uuid, name FROM tbl_patient_attribute_master", new String[]{});
+        if (cursor.getCount()!=0){
+            while ((cursor.moveToNext())){
+                Log.d("Attribute", cursor.getString(cursor.getColumnIndexOrThrow("name")) + ": " + cursor.getString(cursor.getColumnIndexOrThrow("uuid")));
+            }
+        }
+    }
+
     public boolean updateOpemmrsId(String openmrsId, String synced, String uuid) throws DAOException {
         boolean isUpdated = true;
         Logger.logD("patinetdao", "updateopenmrs " + uuid + openmrsId + synced);
