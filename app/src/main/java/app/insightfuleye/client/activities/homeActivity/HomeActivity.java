@@ -449,7 +449,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
         PatientsDAO patientattr= new PatientsDAO();
-        if (patientattr.getUuidForAttribute("Health Scheme Card")=="" || patientattr.getUuidForAttribute("Health Scheme Card")==null){
+        if (patientattr.getUuidForAttribute("ProfileImageTimestamp")=="" || patientattr.getUuidForAttribute("ProfileImageTimestamp")==null){
             try {
                 createAttributes();
             } catch (DAOException e) {
@@ -476,54 +476,84 @@ public class HomeActivity extends AppCompatActivity {
                 db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
             ContentValues values1 = new ContentValues();
-            values.put("uuid", "14d4f066-15f5-102d-96e4-000c29c2a5d7");
-            values.put("name", "Telephone Number");
-            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("sync", "TRUE");
-            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            values1.put("uuid", "14d4f066-15f5-102d-96e4-000c29c2a5d7");
+            values1.put("name", "Telephone Number");
+            values1.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values1.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values1, SQLiteDatabase.CONFLICT_REPLACE);
 
             ContentValues values2 = new ContentValues();
-            values.put("uuid", " 1c718819-345c-4368-aad6-d69b4c267db7");
-            values.put("name", "Education Level");
-            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("sync", "TRUE");
-            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            values2.put("uuid", "1c718819-345c-4368-aad6-d69b4c267db7");
+            values2.put("name", "Education Level");
+            values2.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values2.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values2, SQLiteDatabase.CONFLICT_REPLACE);
 
             ContentValues values3 = new ContentValues();
-            values.put("uuid", " 1c718819-345c-4368-aad6-d69b4c267db7");
-            values.put("name", "Economic Status");
-            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("sync", "TRUE");
-            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            values3.put("uuid", "f4af0ef3-579c-448a-8157-750283409122");
+            values3.put("name", "Economic Status");
+            values3.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values3.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values3, SQLiteDatabase.CONFLICT_REPLACE);
 
             ContentValues values4 = new ContentValues();
-            values.put("uuid", " ecdaadb6-14a0-4ed9-b5b7-cfed87b44b87");
-            values.put("name", "occupation");
-            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("sync", "TRUE");
-            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            values4.put("uuid", "ecdaadb6-14a0-4ed9-b5b7-cfed87b44b87");
+            values4.put("name", "occupation");
+            values4.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values4.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values4, SQLiteDatabase.CONFLICT_REPLACE);
 
             ContentValues values5 = new ContentValues();
-            values.put("uuid", " 00784346-7f86-43ea-a40b-608d6deacfab");
-            values.put("name", "eyecampid");
-            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("sync", "TRUE");
+            values5.put("uuid", "00784346-7f86-43ea-a40b-608d6deacfab");
+            values5.put("name", "EyeCampID");
+            values5.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values5.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values5, SQLiteDatabase.CONFLICT_REPLACE);
 
             ContentValues values6 = new ContentValues();
-            values.put("uuid", " 1b2f34f7-2bf8-4ef7-9736-f5b858afc160");
-            values.put("name", "Son/wife/daughter");
-            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("sync", "TRUE");
-            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            values6.put("uuid", "1b2f34f7-2bf8-4ef7-9736-f5b858afc160");
+            values6.put("name", "Son/wife/daughter");
+            values6.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values6.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values6, SQLiteDatabase.CONFLICT_REPLACE);
 
             ContentValues values7 = new ContentValues();
-            values.put("uuid", "  c10cb61d-2291-4545-8517-d69c7cfac21e");
-            values.put("name", "Health Scheme Card");
-            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("sync", "TRUE");
-            db.insertWithOnConflict("tbl_patient_attribute_master", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            values7.put("uuid", "c10cb61d-2291-4545-8517-d69c7cfac21e");
+            values7.put("name", "Health Scheme Card");
+            values7.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values7.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values7, SQLiteDatabase.CONFLICT_REPLACE);
 
+            ContentValues values8 = new ContentValues();
+            values8.put("uuid", "4f07985c-88a5-4abd-aa0c-f3ec8324d8e7");
+            values8.put("name", "Unknown Patient");
+            values8.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values8.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values8, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values9 = new ContentValues();
+            values9.put("uuid", "4f07985c-88a5-4abd-aa0c-f3ec8324d8e7");
+            values9.put("name", "Test Patient");
+            values9.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values9.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values9, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values10 = new ContentValues();
+            values10.put("uuid", "b522e3ee-755f-4a71-b344-d93a65b56064");
+            values10.put("name", "Patient Image");
+            values10.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values10.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values10, SQLiteDatabase.CONFLICT_REPLACE);
+
+            ContentValues values11 = new ContentValues();
+            values11.put("uuid", "9b4b0eee-bffc-4078-9313-2ad22f9f947e");
+            values11.put("name", "ProfileImageTimestamp");
+            values11.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values11.put("sync", "TRUE");
+            db.insertWithOnConflict("tbl_patient_attribute_master", null, values11, SQLiteDatabase.CONFLICT_REPLACE);
             db.setTransactionSuccessful();
+
+
         } catch (SQLException e) {
             isInserted = false;
             FirebaseCrashlytics.getInstance().recordException(e);
