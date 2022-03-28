@@ -400,7 +400,7 @@ public class IdentificationActivity extends AppCompatActivity {
             }
 
             if (obj.getBoolean("countryStateLayout")) {
-                countryStateLayout.setVisibility(View.VISIBLE);
+                countryStateLayout.setVisibility(View.GONE);
             } else {
                 countryStateLayout.setVisibility(View.GONE);
             }

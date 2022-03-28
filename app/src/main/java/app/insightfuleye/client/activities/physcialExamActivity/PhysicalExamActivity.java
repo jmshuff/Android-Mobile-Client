@@ -26,7 +26,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -134,6 +133,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         sessionManager = new SessionManager(this);
+/*
         MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
         // AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
         alertDialogBuilder.setTitle(R.string.open_peek_acuity);
@@ -171,6 +171,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         Button pb = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
         pb.setTextColor(getResources().getColor((R.color.colorPrimary)));
         //pb.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+*/
 
 
         //select exams
