@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.familyHistoryActivity.FamilyHistoryActivity;
+import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionNodeActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
 import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
@@ -187,7 +187,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                         insertDb(phistory);
                     }
 
-                    Intent intent = new Intent(PastMedicalHistoryActivity.this, FamilyHistoryActivity.class);
+                    Intent intent = new Intent(PastMedicalHistoryActivity.this, PhysicalExamActivity.class);
                     intent.putExtra("patientUuid", patientUuid);
                     intent.putExtra("visitUuid", visitUuid);
                     intent.putExtra("encounterUuidVitals", encounterVitals);
@@ -431,7 +431,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
             flag = false;
             sessionManager.setReturning(false);
-            Intent intent = new Intent(PastMedicalHistoryActivity.this, FamilyHistoryActivity.class); // earlier it was vitals
+            Intent intent = new Intent(PastMedicalHistoryActivity.this, PhysicalExamActivity.class); // earlier it was vitals
             intent.putExtra("patientUuid", patientUuid);
             intent.putExtra("visitUuid", visitUuid);
             intent.putExtra("encounterUuidVitals", encounterVitals);
