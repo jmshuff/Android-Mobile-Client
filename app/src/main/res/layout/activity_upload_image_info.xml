@@ -91,80 +91,67 @@
 
 
 
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="8dp">
 
-                        <Button xmlns:android="http://schemas.android.com/apk/res/android"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawableLeft="@drawable/ic_camera_white"
-                            android:text="Take Photo"
-                            android:textSize="14dp"
-                            android:onClick="takePhoto"/>
 
 
-<!--                    <LinearLayout-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:orientation="horizontal"-->
-<!--                        android:paddingBottom="8dp">-->
-
-
-
-<!--                        <RadioGroup-->
-<!--                            android:id="@+id/radioGrp1"-->
-<!--                            android:layout_width="fill_parent"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:orientation="horizontal"-->
-<!--                            android:paddingLeft="8dp"-->
-<!--                            android:paddingRight="4dp"-->
-<!--                            android:layout_weight="3"-->
-<!--                            android:focusable="true"-->
-<!--                            android:focusableInTouchMode="true">-->
-
-<!--                            <TextView-->
-<!--                                android:layout_width="wrap_content"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_weight="1"-->
-<!--                                android:fontFamily="@font/lato_bold"-->
-<!--                                android:textSize="18sp"-->
-<!--                                android:text="Imager:" />-->
-
-<!--                            <RadioButton-->
-<!--                                android:id="@+id/upload_image_mohit"-->
-<!--                                android:layout_width="wrap_content"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_weight="1"-->
-<!--                                android:fontFamily="@font/lato_regular"-->
-<!--                                android:text="Mohit"-->
-<!--                                android:textSize="@dimen/card_content_sub_text_size" />-->
-
-<!--                            <RadioButton-->
-<!--                                android:id="@+id/upload_image_person_other"-->
-<!--                                android:layout_width="wrap_content"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_weight="1"-->
-<!--                                android:drawablePadding="10dp"-->
-<!--                                android:fontFamily="@font/lato_regular"-->
-<!--                                android:text="Aravind staff"-->
-<!--                                android:textSize="@dimen/card_content_sub_text_size"-->
-<!--                                />-->
-
-<!--                        </RadioGroup>-->
-
-<!--                    </LinearLayout>-->
-
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/upload_image_RecyclerView"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            tools:listitem="@layout/list_item_upload_image">
-                        </androidx.recyclerview.widget.RecyclerView>
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+                            <TextView
+                                android:id="@+id/textview_right_eye_picture"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Right Eye Photo"
+                                android:fontFamily="@font/lato_bold"
+                                android:gravity="center_horizontal"/>
+
+                            <TextView
+                                android:id="@+id/textview_left_eye_picture"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Left Eye Photo"
+                                android:fontFamily="@font/lato_bold"
+                                android:gravity="center_horizontal"/>
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+                            <ImageView
+                                android:id="@+id/imageview_right_eye_picture"
+                                android:layout_width="0dp"
+                                android:layout_height="170dp"
+                                android:layout_gravity="left|center_vertical"
+                                android:layout_weight="1"
+                                android:contentDescription="TODO"
+                                android:scaleType="centerCrop"
+                                android:paddingRight="5dp"
+                                app:srcCompat="@drawable/ic_camera_box" />
+
+                            <ImageView
+                                android:id="@+id/imageview_left_eye_picture"
+                                android:layout_width="0dp"
+                                android:layout_height="170dp"
+                                android:layout_gravity="right|center_vertical"
+                                android:layout_weight="1"
+                                android:contentDescription="TODO"
+                                android:scaleType="centerCrop"
+                                android:paddingLeft="5dp"
+                                app:srcCompat="@drawable/ic_camera_box" />
+                        </LinearLayout>
+
 
 
 
