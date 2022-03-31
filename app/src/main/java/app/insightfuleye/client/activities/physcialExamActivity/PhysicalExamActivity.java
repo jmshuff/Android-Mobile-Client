@@ -557,13 +557,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     Log.i("RES>", "" + filePath + " -> " + res);
                 }
                 imageName = UUID.randomUUID().toString();
+                Log.d("azureimagename", imageName);
                 if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("right")){
                     azureType="right";
                 }
                 if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")){
                     azureType="left";
                 }
-
+            Log.d("azuretype", azureType);
                     //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
                     manageCameraPermissions(imageName);
 

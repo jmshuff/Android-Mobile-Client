@@ -298,6 +298,11 @@ public class PhysicalExam extends Node {
 
              */
                 }
+                else if (category.equals("Refer Location")){
+                    String volunteerReferralLocation=node.formConceptLanguage("normal");
+                    setVolunteerReferralLocation(volunteerReferralLocation);
+                }
+
                 else if (category.contains("Glasses")){
                     Log.d("Glasses", "enter");
                     String patientGlasses=node.formConceptLanguage("normal");
@@ -305,7 +310,7 @@ public class PhysicalExam extends Node {
                     setGlasses(patientGlasses);
                 }
 
-                else if (category.equals("Referral Reason")){
+                else if (category.equals("Refer reason")){
                     String volunteerDiagnosisRight=node.formConceptLanguage("right");
                     String volunteerDiagnosisLeft=node.formConceptLanguage("left");
                     setVolunteerDiagnosisRight(volunteerDiagnosisRight);

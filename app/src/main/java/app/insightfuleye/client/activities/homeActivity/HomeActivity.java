@@ -450,14 +450,14 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
-        PatientsDAO patientattr= new PatientsDAO();
+/*        PatientsDAO patientattr= new PatientsDAO();
         if (patientattr.getUuidForAttribute("ProfileImageTimestamp")=="" || patientattr.getUuidForAttribute("ProfileImageTimestamp")==null){
             try {
                 createAttributes();
             } catch (DAOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
 
     }

@@ -9,19 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.os.Bundle;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +19,17 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,34 +46,22 @@ import java.util.Set;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
+import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
+import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
+import app.insightfuleye.client.database.dao.PatientsDAO;
+import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
-import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
-import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
-import app.insightfuleye.client.utilities.UuidDictionary;
-
-import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
-import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
-import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.utilities.StringUtils;
+import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.utilities.pageindicator.ScrollingPagerIndicator;
-
-import app.insightfuleye.client.database.dao.PatientsDAO;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 
 public class QuestionNodeActivity extends AppCompatActivity implements QuestionsAdapter.FabClickListener {
@@ -363,7 +349,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
      */
     private void fabClick() {
         nodeComplete = true;
-
+        complaintConfirmed=true;
         if (!complaintConfirmed) {
             questionsMissing();
         } else {

@@ -97,12 +97,15 @@ public class SyncDAO {
         String oldDate = sessionManager.getPullExcutedTime();
         String url = "http://" + sessionManager.getServerUrl() + "/EMR-Middleware/webapi/pull/pulldata/" + sessionManager.getLocationUuid() + "/" + sessionManager.getPullExcutedTime();
 //        String url = "http://" + sessionManager.getServerUrl() + "/pulldata/" + sessionManager.getLocationUuid() + "/" + sessionManager.getPullExcutedTime();
+        Log.d("EMR-url", url);
+        Log.d("EMR-encoded", encoded);
         Call<ResponseDTO> middleWarePullResponseCall = AppConstants.apiInterface.RESPONSE_DTO_CALL(url, "Basic " + encoded);
         Logger.logD("Start pull request", "Started");
         middleWarePullResponseCall.enqueue(new Callback<ResponseDTO>() {
             @Override
             public void onResponse(Call<ResponseDTO> call, Response<ResponseDTO> response) {
                 // AppConstants.notificationUtils.showNotifications("Sync background", "Sync in progress..", 1, IntelehealthApplication.getAppContext());
+                Log.d("EMR-response", response.body().toString());
                 if (response.body() != null && response.body().getData() != null) {
                     sessionManager.setPulled(response.body().getData().getPullexecutedtime());
                 }
@@ -126,6 +129,7 @@ public class SyncDAO {
                     }
                     //   AppConstants.notificationUtils.DownloadDone("Sync", "Successfully synced", 1, IntelehealthApplication.getAppContext());
                     else {
+                        Toast.makeText(context, "Sync Failed", Toast.LENGTH_SHORT).show();
 
                     }
                     //AppConstants.notificationUtils.DownloadDone("Sync", "Failed synced,You can try again", 1, IntelehealthApplication.getAppContext());
@@ -185,7 +189,10 @@ public class SyncDAO {
         sessionManager = new SessionManager(context);
         String encoded = sessionManager.getEncoded();
         String oldDate = sessionManager.getPullExcutedTime();
+        //String url = "http://community.aravind.org:8080/EMR-Middleware/webapi/pull/pulldata/5f855636-e04a-4027-afc9-690aa66cd3a8/2021-04-20 22:21:48 ";
         String url = "http://" + sessionManager.getServerUrl() + "/EMR-Middleware/webapi/pull/pulldata/" + sessionManager.getLocationUuid() + "/" + sessionManager.getPullExcutedTime();
+        Log.d("EMR-url", url);
+        Log.d("EMR-encoded", encoded);
 //        String url = "http://" + sessionManager.getServerUrl() + "/pulldata/" + sessionManager.getLocationUuid() + "/" + sessionManager.getPullExcutedTime();
         Call<ResponseDTO> middleWarePullResponseCall = AppConstants.apiInterface.RESPONSE_DTO_CALL(url, "Basic " + encoded);
         Logger.logD("Start pull request", "Started");
@@ -194,6 +201,7 @@ public class SyncDAO {
             public void onResponse(Call<ResponseDTO> call, Response<ResponseDTO> response) {
 //                AppConstants.notificationUtils.showNotifications("Sync background", "Sync in progress..", 1, IntelehealthApplication.getAppContext());
                 if (response.body() != null && response.body().getData() != null) {
+                    Log.d("EMR-response", response.body().toString());
                     sessionManager.setPulled(response.body().getData().getPullexecutedtime());
                 }
                 if (response.isSuccessful()) {
