@@ -517,10 +517,13 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         Node question = physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getOption(childPos);
         //Log.d("Clicked", question.language());
         question.toggleSelected();
-        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected()) {
-            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
-        } else {
-            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
+        if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
+
+            if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected()) {
+                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
+            } else {
+                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
+            }
         }
 
         if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()){
@@ -542,6 +545,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 } else {
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
                 }
+            }
+            //Toggle main is Selected
+            if(physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() || physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()){
+                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
+            }
+            if(!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()){
+                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
+
             }
         }
         adapter.notifyDataSetChanged();

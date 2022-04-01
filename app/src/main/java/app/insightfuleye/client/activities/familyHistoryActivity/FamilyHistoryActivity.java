@@ -291,14 +291,15 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
     private void onListClick(View v, int groupPosition, int childPosition, String type) {
         Node parentNode= familyHistoryMap.getOption(groupPosition);
         Node clickedNode = familyHistoryMap.getOption(groupPosition).getOption(childPosition);
-        Log.i(TAG, "onChildClick: " + clickedNode.toString());
-        clickedNode.toggleSelected();
-        if (familyHistoryMap.getOption(groupPosition).anySubSelected()) {
-            familyHistoryMap.getOption(groupPosition).setSelected(true);
-        } else {
-            familyHistoryMap.getOption(groupPosition).setUnselected();
+        if (!parentNode.isBilateral()) {
+            Log.i(TAG, "onChildClick: " + clickedNode.toString());
+            clickedNode.toggleSelected();
+            if (familyHistoryMap.getOption(groupPosition).anySubSelected()) {
+                familyHistoryMap.getOption(groupPosition).setSelected(true);
+            } else {
+                familyHistoryMap.getOption(groupPosition).setUnselected();
+            }
         }
-
         if (parentNode.isBilateral()) {
             if (type == "right" || type == "both") {
                 clickedNode.toggleRightSelected();
@@ -315,6 +316,12 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
                 } else {
                     familyHistoryMap.getOption(groupPosition).setLeftUnselected();
                 }
+            }
+            if(familyHistoryMap.getOption(groupPosition).anySubRightSelected() || familyHistoryMap.getOption(groupPosition).anySubLeftSelected()){
+                familyHistoryMap.getOption(groupPosition).setSelected(true);
+            }
+            if(!familyHistoryMap.getOption(groupPosition).anySubRightSelected() && !familyHistoryMap.getOption(groupPosition).anySubLeftSelected()){
+                familyHistoryMap.getOption(groupPosition).setUnselected();
             }
         }
         adapter.notifyDataSetChanged();

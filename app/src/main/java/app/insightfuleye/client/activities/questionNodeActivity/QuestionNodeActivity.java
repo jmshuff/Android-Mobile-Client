@@ -228,13 +228,15 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
 
         if ((currentNode.getOption(groupPosition).getChoiceType().equals("single")) && !currentNode.getOption(groupPosition).anySubSelected()) {
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
-            question.toggleSelected();
-            if (currentNode.getOption(groupPosition).anySubSelected()) {
-                currentNode.getOption(groupPosition).setSelected(true);
-            } else {
-                currentNode.getOption(groupPosition).setUnselected();
-            }
-            //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
+            if (!currentNode.getOption(groupPosition).isBilateral()){
+               question.toggleSelected();
+               if (currentNode.getOption(groupPosition).anySubSelected()) {
+                   currentNode.getOption(groupPosition).setSelected(true);
+               } else {
+                   currentNode.getOption(groupPosition).setUnselected();
+               }
+               //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
+           }
 
             if(currentNode.getOption(groupPosition).isBilateral()){
                 if(type=="right" || type=="both"){
@@ -252,6 +254,14 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                     } else {
                         currentNode.getOption(groupPosition).setLeftUnselected();
                     }
+                }
+
+                //Toggle main is Selected
+                if(currentNode.getOption(groupPosition).anySubRightSelected() || currentNode.getOption(groupPosition).anySubLeftSelected()){
+                    currentNode.getOption(groupPosition).setSelected(true);
+                }
+                if(!currentNode.getOption(groupPosition).anySubRightSelected() && !currentNode.getOption(groupPosition).anySubLeftSelected()){
+                    currentNode.getOption(groupPosition).setUnselected();
                 }
 
             }
@@ -298,6 +308,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
         } else {
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
+            if(!currentNode.getOption(groupPosition).isBilateral()) {
+
                 question.toggleSelected();
                 if (currentNode.getOption(groupPosition).anySubSelected()) {
                     currentNode.getOption(groupPosition).setSelected(true);
@@ -305,6 +317,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                     currentNode.getOption(groupPosition).setUnselected();
                 }
                 //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
+            }
 
             if(currentNode.getOption(groupPosition).isBilateral()){
                 if(type=="right" || type=="both"){
@@ -322,6 +335,14 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                     } else {
                         currentNode.getOption(groupPosition).setLeftUnselected();
                     }
+                }
+
+                //Toggle main is Selected
+                if(currentNode.getOption(groupPosition).anySubRightSelected() || currentNode.getOption(groupPosition).anySubLeftSelected()){
+                    currentNode.getOption(groupPosition).setSelected(true);
+                }
+                if(!currentNode.getOption(groupPosition).anySubRightSelected() && !currentNode.getOption(groupPosition).anySubLeftSelected()){
+                    currentNode.getOption(groupPosition).setUnselected();
                 }
 
             }
