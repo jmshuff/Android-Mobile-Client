@@ -277,7 +277,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_USER_CREDENTIALS);
         db.execSQL(CREATE_DR_SPECIALITY);
         db.execSQL(CREATE_VISIT_ATTRIBUTES);
-        //db.execSQL(drop_azure);
+   //     db.execSQL(drop_azure);
         db.execSQL(AZURE_UPLOADS);
         db.execSQL(AZURE_ADDITIONAL_DOCS);
         db.execSQL(AZURE_GALLERY);

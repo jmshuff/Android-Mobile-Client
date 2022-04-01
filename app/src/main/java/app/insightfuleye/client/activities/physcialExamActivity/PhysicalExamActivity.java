@@ -749,6 +749,54 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.VolunteerReferralLocation));
             obsDAO.updateObs(obsDTO);
 
+            obsDTO = new ObsDTO();
+            obsDTO.setConceptuuid(UuidDictionary.volunteerComplaintRight);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
+            obsDTO.setCreator(sessionManager.getCreatorID());
+            obsDTO.setValue(Node.getRightSympt());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.volunteerComplaintRight));
+            obsDAO.updateObs(obsDTO);
+
+            obsDTO = new ObsDTO();
+            obsDTO.setConceptuuid(UuidDictionary.volunteerComplaintLeft);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
+            obsDTO.setCreator(sessionManager.getCreatorID());
+            obsDTO.setValue(Node.getLeftSympt());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.volunteerComplaintLeft));
+            obsDAO.updateObs(obsDTO);
+
+            obsDTO=new ObsDTO();
+            obsDTO.setConceptuuid(UuidDictionary.patientEyeHistory);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
+            obsDTO.setCreator(sessionManager.getCreatorID());
+            obsDTO.setValue(Node.getPatHistDB());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.patientEyeHistory));
+            obsDAO.updateObs(obsDTO);
+
+
+            obsDTO=new ObsDTO();
+            obsDTO.setConceptuuid(UuidDictionary.surgicalHistoryEye);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
+            obsDTO.setCreator(sessionManager.getCreatorID());
+            obsDTO.setValue(Node.getSurgHistDB());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.surgicalHistoryEye));
+            obsDAO.updateObs(obsDTO);
+
+
+            obsDTO=new ObsDTO();
+            obsDTO.setConceptuuid(UuidDictionary.familyEyeHistory);
+            obsDTO.setEncounteruuid(encounterAdultIntials);
+            obsDTO.setCreator(sessionManager.getCreatorID());
+            obsDTO.setValue(Node.getFamHistDB());
+            obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.familyEyeHistory));
+            obsDAO.updateObs(obsDTO);
+
+            Log.d("VolunteerComplaintRight", Node.getRightSympt());
+            Log.d("VolunteerComplaintLeft", Node.getLeftSympt());
+            Log.d("patientEyeHist", Node.getPatHistDB());
+            Log.d("famEyeHist", Node.getFamHistDB());
+            Log.d("surgHist", Node.getSurgHistDB());
+
         } catch (DAOException dao) {
             FirebaseCrashlytics.getInstance().recordException(dao);
         }
