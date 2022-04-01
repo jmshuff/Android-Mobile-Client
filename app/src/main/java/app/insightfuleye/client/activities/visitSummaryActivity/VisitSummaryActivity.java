@@ -219,6 +219,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     CardView additionalCommentsCard;
     CardView followUpDateCard;
     CardView card_print, card_share;
+    CardView familyHistCard;
 
 
     TextView diagnosisTextView;
@@ -473,7 +474,6 @@ public class VisitSummaryActivity extends AppCompatActivity {
 
         setTitle(getString(R.string.title_activity_patient_summary));
         setTitle(patientName + ": " + getTitle());
-
         db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
 
 
@@ -500,6 +500,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         mDoctorName = findViewById(R.id.doctor_details);
         frameLayout_doctor = findViewById(R.id.frame_doctor);
         frameLayout_doctor.setVisibility(View.GONE);
+        familyHistCard= findViewById(R.id.cardView_famhist);
+        familyHistCard.setVisibility(View.GONE);
 
         card_print = findViewById(R.id.card_print);
         card_share = findViewById(R.id.card_share);

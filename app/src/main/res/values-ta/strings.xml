@@ -133,7 +133,7 @@
     <string name="question_answer_all">Are you sure you have answered all questions.</string>
     <string name="question_answer_all_phy_exam">Please answer all general exam questions.</string>
     <string name="question_duration_picker">Please enter duration</string>
-    <string name="question_text_input">Please enter text</string>
+    <string name="question_text_input">குறிப்பிடவும்</string>
     <string name="question_date_picker">Please select date</string>
     <string name="question_location_picker">Please select locations</string>
     <string name="question_number_picker">Please enter number</string>
@@ -475,7 +475,7 @@
     <string name="click_to_download_the_images">Click to download the images</string>
     <string name="doctor">Doctor Details</string>
     <string name="health_worker">Health worker</string>
-    <string name="priority">Priority</string>
+    <string name="priority">அவசர சிகிச்சை தேவை</string>
     <string name="server_url">Server url</string>
     <string name="sync">Upload</string>
     <string name="update_protocols">Update Protocols</string>
