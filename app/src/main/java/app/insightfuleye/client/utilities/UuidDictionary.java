@@ -33,6 +33,12 @@ public class UuidDictionary {
     public static final String VolunteerDiagnosisRight = "d33cecbf-03b8-47ca-8ef7-771343c31d40";
     public static final String VolunteerDiagnosisLeft = "44535c45-d3b4-4190-b423-b21e28633c02";
     public static final String VolunteerReferralLocation= "413a81ab-35a7-4660-8a66-9f29dd33e2bf";
+    public static final String volunteerComplaintLeft = "4ebf037e-ffbb-44d9-a643-fe5802829c5f";
+    public static final String volunteerComplaintRight= "d2e32fc7-024e-4366-964a-d142c0f2174b";
+
+    public static final String surgicalHistoryEye= "2d502a81-cefe-4c3c-b893-d0babd834e4b";
+    public static final String patientEyeHistory= "bff42ffc-f818-40ab-a3f8-f1c4e4c0bc28";
+    public static final String familyEyeHistory="a6d3b5ed-2897-4cf5-82f5-2800867b3b2c";
 
     public static final String TELEMEDICINE_DIAGNOSIS = "537bb20d-d09d-4f88-930b-cc45c7d662df";
     public static final String JSV_MEDICATIONS = "c38c0c50-2fd2-4ae3-b7ba-7dd25adca4ca";

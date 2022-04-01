@@ -85,6 +85,9 @@ public class Node implements Serializable {
     static String rightSympt;
     static String footer;
     static String duration;
+    static String patHistDB;
+    static String famHistDB;
+    static String surgHistDB;
     private String bilateralQuestion;
 
 
@@ -870,7 +873,7 @@ public class Node implements Serializable {
             } else {
                 formatted = raw;
             }
-            formatted = formatted.replaceAll("\\. -", ".");
+            formatted = formatted.replaceAll("\\. -", "");
             formatted = formatted.replaceAll("\\.,", ", ");
             Log.i(TAG, "generateLanguage: " + formatted);
             return formatted;
@@ -1900,6 +1903,36 @@ public class Node implements Serializable {
         return mLanguage;
     }
 
+    public void getHistoryConcepts() {
+        String patHist="";
+        String famHist="";
+        String surgHist="";
+
+        List<Node> mOptions = optionsList;
+
+        if (optionsList != null && !optionsList.isEmpty()) {
+            for (Node node_opt : mOptions) {
+                if (node_opt.isSelected()) {
+                    if (node_opt.getLanguage().toLowerCase().contains("patient history eye")){
+                        patHist=node_opt.formConceptLanguage("normal");
+                        setPatHistDB(patHist);
+                    }
+                    else if (node_opt.getLanguage().toLowerCase().contains("surgical history")){
+                        surgHist=node_opt.formConceptLanguage("normal");
+                        setSurgHistDB(surgHist);
+                    }
+                    else if (node_opt.getLanguage().toLowerCase().contains("family history")){
+                        famHist=node_opt.formConceptLanguage("normal");
+                        setFamHistDB(famHist);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
     public String formConceptLanguage(String type) {
         List<String> stringsList = new ArrayList<>();
         List<Node> mOptions = optionsList;
@@ -2251,6 +2284,30 @@ public class Node implements Serializable {
 
     public static void setDuration(String duration) {
         Node.duration = duration;
+    }
+
+    public static String getPatHistDB() {
+        return patHistDB;
+    }
+
+    public static void setPatHistDB(String patHistDB) {
+        Node.patHistDB = patHistDB;
+    }
+
+    public static String getFamHistDB() {
+        return famHistDB;
+    }
+
+    public static void setFamHistDB(String famHistDB) {
+        Node.famHistDB = famHistDB;
+    }
+
+    public static String getSurgHistDB() {
+        return surgHistDB;
+    }
+
+    public static void setSurgHistDB(String surgHistDB) {
+        Node.surgHistDB = surgHistDB;
     }
 
     public void addImageToList() {

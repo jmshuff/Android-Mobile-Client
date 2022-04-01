@@ -166,6 +166,8 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "voided TEXT DEFAULT '0'," +
             "sync TEXT DEFAULT 'false' " +
             ")";
+
+    public static final String drop_azure="DROP TABLE tbl_azure_uploads";
     public static final String AZURE_UPLOADS= "CREATE TABLE IF NOT EXISTS tbl_azure_uploads(" +
             "imageName TEXT PRIMARY KEY," +
             "imageName2 TEXT," +
@@ -182,7 +184,6 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "complaints TEXT" +
             ")";
 
-    public static final String drop_azure="DROP TABLE tbl_azure_additional_docs";
     public static final String AZURE_ADDITIONAL_DOCS= "CREATE TABLE IF NOT EXISTS tbl_azure_additional_docs(" +
             "imageName TEXT PRIMARY KEY," +
             "imageName2 TEXT," +
@@ -268,6 +269,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_IMAGE_RECORDS);
         db.execSQL(CREATE_OBS_MAIN);
         db.execSQL(CREATE_VISIT_MAIN);
+        //db.execSQL(drop_attri);
         db.execSQL(CREATE_PATIENT_ATTRIBUTE_MASTER_MAIN);
         db.execSQL(CREATE_LOCATION);
         db.execSQL(CREATE_PROVIDER);
@@ -275,6 +277,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_USER_CREDENTIALS);
         db.execSQL(CREATE_DR_SPECIALITY);
         db.execSQL(CREATE_VISIT_ATTRIBUTES);
+   //     db.execSQL(drop_azure);
         db.execSQL(AZURE_UPLOADS);
         db.execSQL(AZURE_ADDITIONAL_DOCS);
         db.execSQL(AZURE_GALLERY);

@@ -21,23 +21,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+import android.print.PdfPrint;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintJob;
 import android.print.PrintManager;
-
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.core.view.MenuItemCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.telephony.SmsManager;
 import android.text.Html;
 import android.text.InputFilter;
@@ -47,7 +35,6 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,6 +56,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -93,8 +89,10 @@ import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.additionalDocumentsActivity.AdditionalDocumentsActivity;
 import app.insightfuleye.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.insightfuleye.client.activities.familyHistoryActivity.FamilyHistoryActivity;
+import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
 import app.insightfuleye.client.activities.patientSurveyActivity.PatientSurveyActivity;
+import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
@@ -114,16 +112,10 @@ import app.insightfuleye.client.syncModule.SyncUtils;
 import app.insightfuleye.client.utilities.DateAndTimeUtils;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.Logger;
-
-import android.print.PdfPrint;
-
+import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.UrlModifiers;
 import app.insightfuleye.client.utilities.UuidDictionary;
-
-import app.insightfuleye.client.activities.homeActivity.HomeActivity;
-import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
-import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class VisitSummaryActivity extends AppCompatActivity {
@@ -1044,9 +1036,13 @@ public class VisitSummaryActivity extends AppCompatActivity {
             famHistView.setText(Html.fromHtml(famHistory.getValue()));
         if (patHistory.getValue() != null)
             patHistView.setText(Html.fromHtml(patHistory.getValue()));
-        if (phyExam.getValue() != null)
-            //physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
-            physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
+        if(physicalDisplay!=null)
+            physFindingsView.setText(Html.fromHtml(physicalDisplay));
+        else {
+            if (phyExam.getValue() != null)
+                //physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
+                physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
+        }
 
 /*
         editVitals.setOnClickListener(new View.OnClickListener() {
@@ -1296,10 +1292,14 @@ public class VisitSummaryActivity extends AppCompatActivity {
                         final MaterialAlertDialogBuilder textInput = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
                         textInput.setTitle(R.string.question_text_input);
                         final EditText dialogEditText = new EditText(VisitSummaryActivity.this);
-                        if (phyExam.getValue() != null)
+                        if (physicalDisplay!= null)
+                            dialogEditText.setText(Html.fromHtml(physicalDisplay));
+                        else if (phyExam.getValue()!=null){
                             dialogEditText.setText(Html.fromHtml(phyExam.getValue()));
-                        else
+                        }
+                        else {
                             dialogEditText.setText("");
+                        }
                         textInput.setView(dialogEditText);
                         textInput.setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
                             @Override
