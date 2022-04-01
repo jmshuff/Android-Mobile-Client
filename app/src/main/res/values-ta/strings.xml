@@ -97,7 +97,7 @@
     <string name="identification_screen_prompt_country">நாடு *</string>
     <string name="identification_screen_prompt_postal_code">Postal code</string>
     <string name="identification_screen_prompt_relationship">மிக நெருக்கமான பராமரிப்பாளர்</string>
-    <string name="identification_screen_prompt_occupation">Next of Kin Phone</string>
+    <string name="identification_screen_prompt_occupation">குடும்பதினரின் தொலைபேசி எண்</string>
     <string name="identification_screen_snack_patient_created">Patient created! Uploading to server.</string>
     <string name="identification_screen_error_data_fields">Error: data fields are not formatted correctly</string>
     <string name="identification_screen_dialog_age">Please enter age in years</string>
@@ -457,7 +457,7 @@
     <string name="please_wait_till_sync_is_completed">Please wait till refresh is completed</string>
     <string name="patient_name">Patient name</string>
     <string name="son_daughter_wife_of">Son/Daughter/Wife of</string>
-    <string name="occupation">Next of Kin Phone</string>
+    <string name="occupation">குடும்பதினரின் தொலைபேசி எண்</string>
     <string name="economic_status">Economic status</string>
     <string name="education_level">Education level</string>
     <string name="caste">Caste</string>
