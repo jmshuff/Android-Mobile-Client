@@ -244,10 +244,13 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
 
                 //Toggle main is Selected
                 if(currentNode.getOption(groupPosition).anySubRightSelected() || currentNode.getOption(groupPosition).anySubLeftSelected()){
+                    question.setSelected(true);
                     currentNode.getOption(groupPosition).setSelected(true);
+
                 }
                 if(!currentNode.getOption(groupPosition).anySubRightSelected() && !currentNode.getOption(groupPosition).anySubLeftSelected()){
                     currentNode.getOption(groupPosition).setUnselected();
+                    question.setUnselected();
                 }
 
             }
@@ -326,9 +329,11 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 //Toggle main is Selected
                 if(currentNode.getOption(groupPosition).anySubRightSelected() || currentNode.getOption(groupPosition).anySubLeftSelected()){
                     currentNode.getOption(groupPosition).setSelected(true);
+                    question.setSelected(true);
                 }
                 if(!currentNode.getOption(groupPosition).anySubRightSelected() && !currentNode.getOption(groupPosition).anySubLeftSelected()){
                     currentNode.getOption(groupPosition).setUnselected();
+                    question.setUnselected();
                 }
 
             }
