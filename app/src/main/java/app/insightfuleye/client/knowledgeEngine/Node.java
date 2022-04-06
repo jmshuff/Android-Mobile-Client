@@ -83,6 +83,8 @@ public class Node implements Serializable {
     private String max_age;
     static String leftSympt;
     static String rightSympt;
+    static String leftComplaint;
+    static String rightComplaint;
     static String footer;
     static String duration;
     static String patHistDB;
@@ -873,7 +875,7 @@ public class Node implements Serializable {
             } else {
                 formatted = raw;
             }
-            formatted = formatted.replaceAll("\\. -", "");
+            formatted = formatted.replaceAll("\\. - ", "");
             formatted = formatted.replaceAll("\\.,", ", ");
             Log.i(TAG, "generateLanguage: " + formatted);
             return formatted;
@@ -891,6 +893,8 @@ public class Node implements Serializable {
         String rightSympt="";
         String footer = "";
         String duration= "";
+        String leftComp="";
+        String rightComp="";
         List<Node> mOptions = optionsList;
 
         if (optionsList != null && !optionsList.isEmpty()) {
@@ -902,9 +906,12 @@ public class Node implements Serializable {
                     else if (node_opt.getLanguage().toLowerCase().contains("complaints")){
                         if(node_opt.isRightSelected()){
                             rightSympt= rightSympt+ bullet + " " + node_opt.formLanguageBilateral("right") +next_line;
+                            rightComp=rightComp +node_opt.formLanguageBilateral("right") + ", ";
                         }
                         if(node_opt.isLeftSelected()){
                             leftSympt= leftSympt+ bullet + " " + node_opt.formLanguageBilateral("left") +next_line;
+                            leftComp=leftComp +node_opt.formLanguageBilateral("left") + ", ";
+
                         }
                     }
                     else if (node_opt.getLanguage().toLowerCase().contains("duration")){
@@ -961,13 +968,24 @@ public class Node implements Serializable {
 //            }
 
         }
+        if (rightComp != null && rightComp.length() > 0 && rightComp.charAt(rightComp.length() - 1) == ' ') {
+            rightComp = rightComp.substring(0, rightComp.length() - 2);
+        }
+
+        if (leftComp != null && leftComp.length() > 0 && leftComp.charAt(leftComp.length() - 1) == ' ') {
+            leftComp = leftComp.substring(0, leftComp.length() - 2);
+        }
         Log.i("leftSympt", leftSympt);
         Log.i("rightSympt", rightSympt);
+        Log.i("leftComp", leftComp);
+        Log.i("rightComp", rightComp);
         Log.i("footer", footer);
         setLeftSympt(leftSympt);
         setRightSympt(rightSympt);
         setFooter(footer);
         setDuration(duration);
+        setRightComplaint(rightComp);
+        setLeftComplaint(leftComp);
 
     }
 
@@ -1808,7 +1826,7 @@ public class Node implements Serializable {
             } else {
                 if (!stringsList.get(i).isEmpty()) {
                     if (i == stringsList.size() - 1 && isTerminal) {
-                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i) + ".");
+                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
                     } else {
                         mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
                     }
@@ -1892,7 +1910,7 @@ public class Node implements Serializable {
             } else {
                 if (!stringsList.get(i).isEmpty()) {
                     if (i == stringsList.size() - 1 && isTerminal) {
-                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i) + ".");
+                        mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
                     } else {
                         mLanguage = mLanguage.concat(languageSeparator + stringsList.get(i));
                     }
@@ -1907,27 +1925,36 @@ public class Node implements Serializable {
         String patHist="";
         String famHist="";
         String surgHist="";
+        Log.d("gethistoryConcept", "enter");
 
         List<Node> mOptions = optionsList;
 
         if (optionsList != null && !optionsList.isEmpty()) {
             for (Node node_opt : mOptions) {
+                Log.d("1", node_opt.toString());
                 if (node_opt.isSelected()) {
-                    if (node_opt.getLanguage().toLowerCase().contains("patient history eye")){
-                        patHist=node_opt.formConceptLanguage("normal");
+                    Log.d("patHistGet", node_opt.getText());
+                    if (node_opt.getText().toLowerCase().contains("patient history eye")){
+                        patHist=node_opt.formLanguage();
+                        patHist.replace(" - ", ", ");
                         setPatHistDB(patHist);
                     }
-                    else if (node_opt.getLanguage().toLowerCase().contains("surgical history")){
-                        surgHist=node_opt.formConceptLanguage("normal");
+                    else if (node_opt.getText().toLowerCase().contains("surgical history")){
+                        surgHist=node_opt.formLanguage();
+                        surgHist.replace(" - ", ", ");
                         setSurgHistDB(surgHist);
                     }
-                    else if (node_opt.getLanguage().toLowerCase().contains("family history")){
-                        famHist=node_opt.formConceptLanguage("normal");
+                    else if (node_opt.getText().toLowerCase().contains("family history")){
+                        famHist=node_opt.formLanguage();
+                        famHist.replace(" - ", ", ");
                         setFamHistDB(famHist);
                     }
                 }
             }
         }
+        Log.d("patHistEye", patHist);
+        Log.d("surgHistEye", surgHist);
+        Log.d("famHistEye", famHist);
     }
 
 
@@ -2308,6 +2335,22 @@ public class Node implements Serializable {
 
     public static void setSurgHistDB(String surgHistDB) {
         Node.surgHistDB = surgHistDB;
+    }
+
+    public static String getLeftComplaint() {
+        return leftComplaint;
+    }
+
+    public static void setLeftComplaint(String leftComplaint) {
+        Node.leftComplaint = leftComplaint;
+    }
+
+    public static String getRightComplaint() {
+        return rightComplaint;
+    }
+
+    public static void setRightComplaint(String rightComplaint) {
+        Node.rightComplaint = rightComplaint;
     }
 
     public void addImageToList() {

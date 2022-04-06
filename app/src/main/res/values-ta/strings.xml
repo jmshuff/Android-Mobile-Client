@@ -80,8 +80,8 @@
     <string name="identification_screen_prompt_first_name">முதல் பெயர் *</string>
     <string name="identification_screen_prompt_middle_name">Middle name</string>
     <string name="identification_screen_prompt_last_name">கடைசி பெயர் *</string>
-    <string name="identification_screen_prompt_address">தாலுகா</string>
-    <string name="identification_screen_prompt_address2">மாவட்டம்</string>
+    <string name="identification_screen_prompt_address">கிராமம்</string>
+    <string name="identification_screen_prompt_address2">தாலுகா</string>
     <string name="identification_screen_prompt_phone_number">தொலைபேசி எண் *</string>
     <string name="admin_password_dialog_heading">Enter Admin Password</string>
     <string name="identification_screen_prompt_gender">பாலினம் *</string>
@@ -89,7 +89,7 @@
     <string name="identification_screen_checkbox_female">பெண்</string>
     <string name="identification_screen_prompt_birthday">Date of birth*</string>
     <string name="identification_screen_prompt_age">வயது *</string>
-    <string name="identification_screen_prompt_city">கிராமம்</string>
+    <string name="identification_screen_prompt_city">மாவட்டம்</string>
     <string name="identification_screen_prompt_state">மாநிலம் *</string>
     <string name="identification_screen_prompt_caste">Caste</string>
     <string name="identification_screen_prompt_economic_status">Economic status</string>
@@ -457,7 +457,7 @@
     <string name="please_wait_till_sync_is_completed">Please wait till refresh is completed</string>
     <string name="patient_name">Patient name</string>
     <string name="son_daughter_wife_of">Son/Daughter/Wife of</string>
-    <string name="occupation">Next of Kin Phone</string>
+    <string name="occupation">Family phone</string>
     <string name="economic_status">Economic status</string>
     <string name="education_level">Education level</string>
     <string name="caste">Caste</string>

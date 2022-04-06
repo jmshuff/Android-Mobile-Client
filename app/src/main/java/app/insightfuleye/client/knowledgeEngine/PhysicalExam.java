@@ -400,7 +400,7 @@ public class PhysicalExam extends Node {
         }
 
 //        mLanguage = removeCharsFindings(mLanguage);
-        mLanguage = mLanguage.replaceAll("\\. -", ".");
+        mLanguage = mLanguage.replaceAll("\\. -", "");
         mLanguage = mLanguage.replaceAll("\\.", "\\. ");
         mLanguage = mLanguage.replaceAll("\\: -", "\\: ");
         mLanguage = mLanguage.replaceAll("% - ", "");
@@ -423,13 +423,16 @@ public class PhysicalExam extends Node {
         String mLVA=getVALeft();
         String mRPin= getPinholeRight();
         String mLPin = getPinholeLeft();
-        String leftSymptom=getLeftSympt();
-        String rightSymptom=getRightSympt();
+        String leftSymptom="";
+        String rightSymptom="";
+        if (getLeftSympt()!=null) leftSymptom=getLeftSympt();
+        if (getRightSympt()!=null) rightSymptom=getRightSympt();
         String mRPhys=getPhysExamRight();
         String mLPhys=getPhysExamLeft();
         String footer=getFooter();
         String mReferral=getVolunteerReferral();
-        String duration = getDuration();
+        String duration = "";
+        if (getDuration()!=null) duration=getDuration();
         String glasses= getGlasses();
         String rightDuration="";
         String leftDuration="";

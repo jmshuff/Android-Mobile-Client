@@ -60,7 +60,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.familyHistoryActivity.FamilyHistoryActivity;
+import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
 import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfuleye.client.app.AppConstants;
@@ -417,6 +417,67 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             FirebaseCrashlytics.getInstance().recordException(e);
         }
 
+        obsDTO = new ObsDTO();
+        obsDTO.setConceptuuid(UuidDictionary.volunteerComplaintRight);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
+        obsDTO.setCreator(sessionManager.getCreatorID());
+        obsDTO.setValue(Node.getRightComplaint());
+        try {
+            obsDAO.insertObs(obsDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+
+        obsDTO = new ObsDTO();
+        obsDTO.setConceptuuid(UuidDictionary.volunteerComplaintLeft);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
+        obsDTO.setCreator(sessionManager.getCreatorID());
+        obsDTO.setValue(Node.getLeftComplaint());
+        try {
+            obsDAO.insertObs(obsDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+
+        obsDTO=new ObsDTO();
+        obsDTO.setConceptuuid(UuidDictionary.patientEyeHistory);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
+        obsDTO.setCreator(sessionManager.getCreatorID());
+        obsDTO.setValue(Node.getPatHistDB());
+        try {
+            obsDAO.insertObs(obsDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+
+        obsDTO=new ObsDTO();
+        obsDTO.setConceptuuid(UuidDictionary.surgicalHistoryEye);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
+        obsDTO.setCreator(sessionManager.getCreatorID());
+        obsDTO.setValue(Node.getSurgHistDB());
+        try {
+            obsDAO.insertObs(obsDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+
+
+        obsDTO=new ObsDTO();
+        obsDTO.setConceptuuid(UuidDictionary.familyEyeHistory);
+        obsDTO.setEncounteruuid(encounterAdultIntials);
+        obsDTO.setCreator(sessionManager.getCreatorID());
+        obsDTO.setValue(Node.getFamHistDB());
+        try {
+            obsDAO.insertObs(obsDTO);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
+
         return isInserted;
     }
 
@@ -763,7 +824,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setConceptuuid(UuidDictionary.volunteerComplaintRight);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
-            obsDTO.setValue(Node.getRightSympt());
+            obsDTO.setValue(Node.getRightComplaint());
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.volunteerComplaintRight));
             obsDAO.updateObs(obsDTO);
 
@@ -771,7 +832,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setConceptuuid(UuidDictionary.volunteerComplaintLeft);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
-            obsDTO.setValue(Node.getLeftSympt());
+            obsDTO.setValue(Node.getLeftComplaint());
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.volunteerComplaintLeft));
             obsDAO.updateObs(obsDTO);
 
@@ -801,11 +862,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.familyEyeHistory));
             obsDAO.updateObs(obsDTO);
 
-            Log.d("VolunteerComplaintRight", Node.getRightSympt());
-            Log.d("VolunteerComplaintLeft", Node.getLeftSympt());
-            Log.d("patientEyeHist", Node.getPatHistDB());
-            Log.d("famEyeHist", Node.getFamHistDB());
-            Log.d("surgHist", Node.getSurgHistDB());
 
         } catch (DAOException dao) {
             FirebaseCrashlytics.getInstance().recordException(dao);
@@ -999,7 +1055,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(
-                PhysicalExamActivity.this, FamilyHistoryActivity.class);
+                PhysicalExamActivity.this, PastMedicalHistoryActivity.class);
         intent.putExtra("patientUuid", patientUuid);
         intent.putExtra("visitUuid", visitUuid);
         intent.putExtra("encounterUuidVitals", encounterVitals);

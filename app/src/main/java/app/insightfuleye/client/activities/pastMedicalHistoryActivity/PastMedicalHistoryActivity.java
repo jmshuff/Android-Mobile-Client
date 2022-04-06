@@ -362,13 +362,15 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
 
     private void fabClick() {
+        patientHistoryMap.getHistoryConcepts();
         if (patientHistoryMap.anySubSelected()) {
             for (Node node : patientHistoryMap.getOptionsList()) {
                 if (node.isSelected()) {
                     String patientString="";
                     patientString = node.generateBilateralLanguage();
+                    Log.d("patientString", patientString);
                     String toInsert = node.getLanguage() + " : " + patientString;
-
+                    Log.d("toInsert", toInsert);
                     toInsert = toInsert.replaceAll(Node.bullet, "");
                     toInsert = toInsert.replaceAll("% :", "");
                     toInsert = toInsert.replaceAll(" - ", ", ");
@@ -376,7 +378,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                     if (org.apache.commons.lang3.StringUtils.right(toInsert, 2).equals(", ")) {
                         toInsert = toInsert.substring(0, toInsert.length() - 2);
                     }
-                    toInsert = toInsert + ".<br/>";
+                    toInsert = toInsert + "<br/>";
                     insertionList.add(toInsert);
                 }
             }
