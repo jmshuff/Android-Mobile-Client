@@ -22,7 +22,7 @@
     <string name="hello_my_name_is">"Hello, my name is "</string>
     <string name="i_need_assistance">" and I need some assistance."</string>
     <string name="economic_values_missing">Economic values are missing</string>
-    <string name="identification_screen_prompt_eyecampid">Eye Camp ID</string>
+    <string name="identification_screen_prompt_eyecampid">OP #</string>
     <string name="education_values_missing">Education values are missing</string>
     <string name="intelehealth_a_telemedicine_platform">InSightful is a telemedicine application that connects health workers in rural and remote areas with remote doctors so they can provide high quality health services for their patients.</string>
     <string name="intelehealth_name">InSightful</string>
