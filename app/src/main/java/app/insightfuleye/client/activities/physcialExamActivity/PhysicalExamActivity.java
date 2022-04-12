@@ -630,11 +630,15 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 }
                 imageName = UUID.randomUUID().toString();
                 Log.d("azureimagename", imageName);
+                Log.d("Text", physicalExamMap.getExamNode(physExamPos).getText().toLowerCase());
                 if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("right")){
                     azureType="right";
                 }
-                if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")){
+                else if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")){
                     azureType="left";
+                }
+                else{
+                    azureType="unknown";
                 }
             Log.d("azuretype", azureType);
                     //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);

@@ -283,18 +283,26 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 //If the knowledgeEngine is not terminal, that means there are more questions to be asked for this branch.
             }
         } else if ((currentNode.getOption(groupPosition).getChoiceType().equals("single")) && currentNode.getOption(groupPosition).anySubSelected()) {
-            MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
-            //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
-            alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
-            alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-            IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            Node question = currentNode.getOption(groupPosition).getOption(childPosition);
+            if(question.isSelected()){
+                question.toggleSelected();
+                currentNode.getOption(groupPosition).setUnselected();
+            }
+            else{
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            }
+
         } else {
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
             if(!currentNode.getOption(groupPosition).isBilateral()) {
