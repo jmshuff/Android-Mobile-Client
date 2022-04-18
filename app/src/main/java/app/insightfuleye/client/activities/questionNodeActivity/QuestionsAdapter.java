@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ import app.insightfuleye.client.activities.questionNodeActivity.adapters.imageDi
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
+import app.insightfuleye.client.models.imageDisplay;
 
 /**
  * Created by Sagar Shimpi
@@ -51,6 +53,8 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
     String _mCallingClass;
     boolean isAssociateSym;
     boolean showPopUp;
+    ArrayList<imageDisplay> imageList;
+    imageDisplayAdapter imageDisplayAdapter;
 
 
     public void updateNode(Node currentNode) {
@@ -92,13 +96,14 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
     PhysicalExam physicalExam;
 
     public QuestionsAdapter(Context _context, PhysicalExam node, RecyclerView _rvQuestions, String callingClass,
-                            FabClickListener _mListener, boolean isAssociateSym) {
+                            FabClickListener _mListener, boolean isAssociateSym, ArrayList<imageDisplay> imageList) {
         this.context = _context;
         this.physicalExam = node;
         this.recyclerView = _rvQuestions;
         this._mCallingClass = callingClass;
         this._mListener = _mListener;
         this.isAssociateSym = isAssociateSym;
+        this.imageList= imageList;
 
     }
 
@@ -113,7 +118,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
     }
 
     @Override
-    public void onBindViewHolder(QuestionsAdapter.ChipsAdapterViewHolder holder, int position) {
+    public void onBindViewHolder(ChipsAdapterViewHolder holder, int position) {
         Node _mNode;
         if (_mCallingClass.equalsIgnoreCase(PhysicalExamActivity.class.getSimpleName())) {
             _mNode = physicalExam.getExamNode(position).getOption(0);
@@ -162,6 +167,18 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
                 }
             }
 
+            ArrayList<imageDisplay> imageDisplayList = new ArrayList<>();
+            Log.d("Pos", String.valueOf(position));
+            for (imageDisplay imageInfo : imageList){
+                Log.d("makeimagelist", imageInfo.getImagePath() + " pos: " + imageInfo.getPosition());
+
+                if (imageInfo.getPosition()==position){
+                    imageDisplayList.add(imageInfo);
+                }
+            }
+            imageDisplayAdapter=new imageDisplayAdapter(imageDisplayList);
+            holder.rvImages.setAdapter(imageDisplayAdapter);
+
         } else {
             _mNode = currentNode;
             if (isAssociateSym && currentNode.getOptionsList().size() == 1) {
@@ -185,6 +202,15 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
 
         if (position == getItemCount() - 1) {
             holder.fab.setVisibility(View.VISIBLE);
+            
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.llBody.getLayoutParams();
+            layoutParams.weight = (float) 0.88;
+            holder.llBody.setLayoutParams(layoutParams);
+
+            //RelativeLayout.LayoutParams layoutParams1 = (RelativeLayout.LayoutParams) holder.fabLayout.getLayoutParams();
+            //layoutParams1.weight = (float) 0.12;
+            
+
         } else {
             holder.fab.setVisibility(View.INVISIBLE);
         }
@@ -251,7 +277,9 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
         FloatingActionButton fab;
         ComplaintNodeListAdapter chipsAdapter;
         AssociatedSysAdapter associatedSysAdapter;
-        imageDisplayAdapter imageDisplayAdapter;
+        LinearLayout llBody;
+        RelativeLayout fabLayout;
+
 
 
         public ChipsAdapterViewHolder(View itemView) {
@@ -262,6 +290,8 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             fab = itemView.findViewById(R.id.fab);
             physical_exam_text_view = itemView.findViewById(R.id.physical_exam_text_view);
             physical_exam_image_view = itemView.findViewById(R.id.physical_exam_image_view);
+            llBody=itemView.findViewById(R.id.LL_body);
+            fabLayout=itemView.findViewById(R.id.fab_layout);
 
 
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
@@ -305,11 +335,6 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
                 rvChips.setAdapter(chipsAdapter);
             }
 
-            ArrayList<String> imageList =new ArrayList<>();
-            imageList.add("/storage/emulated/0/DCIM/Camera/PXL_20220416_184052045.jpg");
-            imageList.add("/storage/emulated/0/DCIM/Camera/PXL_20220416_184047857.jpg");
-            imageDisplayAdapter=new imageDisplayAdapter(imageList);
-            rvImages.setAdapter(imageDisplayAdapter);
 
         }
     }
@@ -368,6 +393,22 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
 
             Node groupNode = mGroupNode.getOption(mGroupPos);
             //Log.d("isBilateral", String.valueOf(groupNode.isBilateral()));
+
+            if (thisNode.getInputType().equals("camera")){
+                itemViewHolder.mChipImage.setImageResource(R.drawable.ic_camera_black);
+
+                int padding_start_dp = 36;  // 6 dps
+                int padding_end_dp=15;
+                int padding_top_dp=10;
+                int padding_bottom_dp=10;
+                final float scale = context.getResources().getDisplayMetrics().density;
+                int padding_start_px = (int) (padding_start_dp * scale + 0.5f);
+                int padding_end_px= (int) (padding_end_dp * scale + 0.5f);
+                int padding_top_px = (int) (padding_top_dp * scale + 0.5f);
+                int padding_bot_px = (int) (padding_bottom_dp * scale + 0.5f);
+                itemViewHolder.mChipText.setPaddingRelative(padding_start_px, padding_top_px, padding_end_px, padding_bot_px);
+            }
+
 
             //Change color of the node if it is selected
             if(mGroupNode.isBilateral() || mGroupNode.getOption(mGroupPos).isBilateral()){
@@ -574,6 +615,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             RelativeLayout mChip;
             TextView mChipLeft;
             TextView mChipRight;
+            ImageView mChipImage;
 
             public ItemViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -590,6 +632,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
                 else {
                     mChip = itemView.findViewById(R.id.complaint_chip);
                     mChipText = itemView.findViewById(R.id.tvChipText);
+                    mChipImage=itemView.findViewById(R.id.ivChip);
                 }
             }
         }

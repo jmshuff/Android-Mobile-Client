@@ -6,16 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/imageDisplayCard"
-    android:padding="16dp"
+    android:padding="8dp"
     app:cardBackgroundColor="@color/light_gray"
-    app:cardElevation="10dp"
+    app:cardElevation="8dp"
     app:cardUseCompatPadding="true">
 
     <RelativeLayout
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:id="@+id/imageDisplay_relative"
-        android:padding="16dp">
+        android:layout_marginTop="5dp"
+        android:padding="8dp">
 
         <ImageView
             android:layout_width="match_parent"

@@ -1,6 +1,7 @@
 package app.insightfuleye.client.activities.questionNodeActivity.adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,22 +16,27 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.models.imageDisplay;
 
 public class imageDisplayAdapter extends RecyclerView.Adapter<imageDisplayAdapter.MyViewHolder> {
 
-    private ArrayList<String> imagesList;
+    private ArrayList<imageDisplay> imagesList;
     Context context;
-    public imageDisplayAdapter(ArrayList<String> imagesList){
-        this.imagesList=imagesList;
-    } ;
 
+    public imageDisplayAdapter(ArrayList<imageDisplay> imagesList) {
+        this.imagesList = imagesList;
+    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
         private ImageView imageView;
@@ -53,27 +59,54 @@ public class imageDisplayAdapter extends RecyclerView.Adapter<imageDisplayAdapte
 
     @Override
     public void onBindViewHolder(@NonNull imageDisplayAdapter.MyViewHolder holder, int position) {
-        String imagePath=imagesList.get(position);
+        String imagePath=imagesList.get(position).getImagePath();
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
         holder.imageView.setImageBitmap(bitmap);
 
         holder.deleteImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File file= new File(imagesList.get(position));
-                if (file.exists()) file.delete();
-                imagesList.remove(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, imagesList.size());
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(context);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.delete_confirmation);
+                alertDialogBuilder.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        File file= new File(imagesList.get(position).getImagePath());
+                        if (file.exists()) file.delete();
+                        imagesList.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, imagesList.size());
+                        dialog.dismiss();
+                    }
+                });
+                alertDialogBuilder.setNegativeButton(R.string.generic_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.show();
+                //alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(context, alertDialog);
             }
         });
 
         holder.downloadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                downloadImage(imagesList.get(position));
+                downloadImage(imagesList.get(position).getImagePath());
             }
         });
+
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                previewImage(imagesList.get(position).getImagePath());
+            }
+        });
+
+
 
     }
 
@@ -127,5 +160,9 @@ public class imageDisplayAdapter extends RecyclerView.Adapter<imageDisplayAdapte
         Uri contentUri = Uri.fromFile(outFile);
         mediaScanIntent.setData(contentUri);
         context.sendBroadcast(mediaScanIntent);
+    }
+
+    private void previewImage(String path){
+
     }
 }
