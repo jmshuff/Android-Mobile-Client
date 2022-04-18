@@ -60,10 +60,26 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/physical_node_title" />
 
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_image_display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+
+            android:scrollbarThumbVertical="@color/colorPrimary"
+            android:fitsSystemWindows="true"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:fadeScrollbars="false"
+            android:scrollbarFadeDuration="0"
+            android:nestedScrollingEnabled="true"
+            android:scrollbars="vertical" />
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_chips"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
 
             android:scrollbarThumbVertical="@color/colorPrimary"

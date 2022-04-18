@@ -125,6 +125,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     String mgender;
     String mAge;
     ScrollingPagerIndicator recyclerViewIndicator;
+    static ArrayList<String> imageRightList;
+    ArrayList<String> imageLeftList;
 
 
     @Override
@@ -243,11 +245,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         setTitle(patientName + ": " + getTitle());
         physExam_recyclerView = findViewById(R.id.physExam_recyclerView);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
         physExam_recyclerView.setLayoutManager(linearLayoutManager);
         physExam_recyclerView.setItemAnimator(new DefaultItemAnimator());
         PagerSnapHelper helper = new PagerSnapHelper();
         helper.attachToRecyclerView(physExam_recyclerView);
+        imageRightList=new ArrayList<>();
+        imageLeftList=new ArrayList<>();
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
        /* mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), physicalExamMap);
@@ -633,9 +638,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 Log.d("Text", physicalExamMap.getExamNode(physExamPos).getText().toLowerCase());
                 if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("right")){
                     azureType="right";
+                    imageRightList.add(AppConstants.IMAGE_PATH + imageName + ".jpg");
                 }
                 else if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")){
                     azureType="left";
+                    imageLeftList.add(AppConstants.IMAGE_PATH + imageName + ".jpg");
                 }
                 else{
                     azureType="unknown";
@@ -985,12 +992,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             TextView textView = rootView.findViewById(R.id.physical_exam_text_view);
             ExpandableListView expandableListView = rootView.findViewById(R.id.physical_exam_expandable_list_view);
 
+
             int viewNumber = getArguments().getInt(ARG_SECTION_NUMBER);
             final String patientUuid1 = getArguments().getString("patientUuid");
             final String visitUuid1 = getArguments().getString("visitUuid");
             final Node viewNode = exam_list.getExamNode(viewNumber - 1);
             final String parent_name = exam_list.getExamParentNodeName(viewNumber - 1);
             String nodeText = parent_name + " : " + viewNode.findDisplay();
+            Log.d("onCreateView", "nodeText: " + nodeText + ", parent_name: " + parent_name);
 
             textView.setText(nodeText);
             Node displayNode = viewNode.getOption(0);
@@ -1048,6 +1057,9 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
             return rootView;
         }
+
+
+
 
 
     }

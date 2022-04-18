@@ -671,6 +671,8 @@
     <string name="eye_trauma">Recent Eye Trauma</string>
     <string name="pc_iol">PC IOL</string>
     <string name="retake_image">Retake</string>
+    <string name="delete_button_caps">DELETE</string>
+    <string name="download_button_caps">DOWNLOAD</string>
 
 
 </resources>

@@ -13,7 +13,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -24,8 +23,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.collect.ImmutableList;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,6 +31,7 @@ import java.util.List;
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.adapters.AssociatedSysAdapter;
+import app.insightfuleye.client.activities.questionNodeActivity.adapters.imageDisplayAdapter;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
@@ -153,6 +151,17 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
                 holder.physical_exam_image_view.setVisibility(View.GONE);
             }
             holder.tvQuestion.setText(_mNode.findDisplay());
+
+            //JS display images taken by camera
+            holder.rvImages.setVisibility(View.GONE);
+            for(int i=0; i<physicalExam.getExamNode(position).getOption(0).size(); i++){
+                if (physicalExam.getExamNode(position).getOption(0).getOption(i).getInputType().equals("camera")){
+                    Log.d("inputtype", "camera");
+                    holder.rvImages.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+
         } else {
             _mNode = currentNode;
             if (isAssociateSym && currentNode.getOptionsList().size() == 1) {
@@ -162,6 +171,16 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             }
             holder.physical_exam_image_view.setVisibility(View.GONE);
             holder.physical_exam_text_view.setVisibility(View.GONE);
+
+            //JS display images taken by camera
+            holder.rvImages.setVisibility(View.GONE);
+            for(int i=0; i<_mNode.getOption(0).size(); i++){
+                if (_mNode.getOption(0).getOption(i).getInputType().equals("camera")){
+                    Log.d("inputtype", "camera");
+                    holder.rvImages.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
         }
 
         if (position == getItemCount() - 1) {
@@ -169,6 +188,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
         } else {
             holder.fab.setVisibility(View.INVISIBLE);
         }
+
 
 
 
@@ -227,25 +247,32 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
         TextView tvQuestion, physical_exam_text_view;
         ImageView ivAyu, physical_exam_image_view;
         RecyclerView rvChips;
+        RecyclerView rvImages;
         FloatingActionButton fab;
         ComplaintNodeListAdapter chipsAdapter;
         AssociatedSysAdapter associatedSysAdapter;
+        imageDisplayAdapter imageDisplayAdapter;
 
 
         public ChipsAdapterViewHolder(View itemView) {
             super(itemView);
             tvQuestion = itemView.findViewById(R.id.tv_complaintQuestion);
             rvChips = itemView.findViewById(R.id.rv_chips);
+            rvImages=itemView.findViewById(R.id.rv_image_display);
             fab = itemView.findViewById(R.id.fab);
             physical_exam_text_view = itemView.findViewById(R.id.physical_exam_text_view);
             physical_exam_image_view = itemView.findViewById(R.id.physical_exam_image_view);
 
 
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
+            LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
+
             rvChips.setLayoutManager(linearLayoutManager);
             rvChips.setHasFixedSize(true);
             //rvChips.setItemAnimator(new DefaultItemAnimator());
             rvChips.setNestedScrollingEnabled(true);
+
+            rvImages.setLayoutManager(linearLayoutManager1);
 
             Node groupNode;
             List<Node> chipList = new ArrayList<>();
@@ -277,6 +304,12 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
                 chipsAdapter = new ComplaintNodeListAdapter(context, chipList, groupNode, groupPos, _mListener, _mCallingClass, pos);
                 rvChips.setAdapter(chipsAdapter);
             }
+
+            ArrayList<String> imageList =new ArrayList<>();
+            imageList.add("/storage/emulated/0/DCIM/Camera/PXL_20220416_184052045.jpg");
+            imageList.add("/storage/emulated/0/DCIM/Camera/PXL_20220416_184047857.jpg");
+            imageDisplayAdapter=new imageDisplayAdapter(imageList);
+            rvImages.setAdapter(imageDisplayAdapter);
 
         }
     }
