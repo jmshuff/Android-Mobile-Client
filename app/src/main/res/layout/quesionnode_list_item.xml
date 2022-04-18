@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="5dp"
-        android:layout_weight="0.88"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="1"
         android:gravity="top"
         android:orientation="vertical">
 
@@ -60,35 +61,42 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/physical_node_title" />
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_image_display"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content">
 
-            android:scrollbarThumbVertical="@color/colorPrimary"
-            android:fitsSystemWindows="true"
-            android:scrollbarAlwaysDrawVerticalTrack="true"
-            android:fadeScrollbars="false"
-            android:scrollbarFadeDuration="0"
-            android:nestedScrollingEnabled="true"
-            android:scrollbars="vertical" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_image_display"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:nestedScrollingEnabled="false"
+                    />
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_chips"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_chips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
 
-            android:scrollbarThumbVertical="@color/colorPrimary"
-            android:fitsSystemWindows="true"
-            android:scrollbarAlwaysDrawVerticalTrack="true"
-            android:fadeScrollbars="false"
-            android:scrollbarFadeDuration="0"
-            android:nestedScrollingEnabled="true"
-            android:scrollbars="vertical" />
+                    android:scrollbarThumbVertical="@color/colorPrimary"
+                    android:fitsSystemWindows="true"
+                    android:scrollbarAlwaysDrawVerticalTrack="true"
+                    android:fadeScrollbars="false"
+                    android:scrollbarFadeDuration="0"
+                    android:nestedScrollingEnabled="false"
+                    android:scrollbars="vertical" />
+
+            </LinearLayout>
+        </ScrollView>
+
+
 
 
         <!--        <app.intelehealth.client.utilities.AutoFitGridRecyclerView-->
@@ -107,8 +115,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-
-        android:layout_weight=".12">
+        android:layout_weight="0.12"
+        android:id="@+id/fab_layout">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

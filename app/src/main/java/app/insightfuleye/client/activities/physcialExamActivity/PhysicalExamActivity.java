@@ -74,6 +74,7 @@ import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
 import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.models.dto.ObsDTO;
+import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
@@ -125,8 +126,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     String mgender;
     String mAge;
     ScrollingPagerIndicator recyclerViewIndicator;
-    static ArrayList<String> imageRightList;
-    ArrayList<String> imageLeftList;
+    ArrayList<imageDisplay> imageList;
 
 
     @Override
@@ -178,6 +178,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         //select exams
         selectedExamsList = new ArrayList<>();
+        imageList=new ArrayList<>();
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
             patientUuid = intent.getStringExtra("patientUuid");
@@ -251,8 +252,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         physExam_recyclerView.setItemAnimator(new DefaultItemAnimator());
         PagerSnapHelper helper = new PagerSnapHelper();
         helper.attachToRecyclerView(physExam_recyclerView);
-        imageRightList=new ArrayList<>();
-        imageLeftList=new ArrayList<>();
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
        /* mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), physicalExamMap);
@@ -301,7 +300,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         physicalExamMap.fetchAge(float_ageYear_Month);
         physicalExamMap.refresh(selectedExamsList); //refreshing the physical exam nodes with updated json
 
-        adapter = new QuestionsAdapter(this, physicalExamMap, physExam_recyclerView, this.getClass().getSimpleName(), this, false);
+        adapter = new QuestionsAdapter(this, physicalExamMap, physExam_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
         physExam_recyclerView.setAdapter(adapter);
         recyclerViewIndicator.attachToRecyclerView(physExam_recyclerView);
 
@@ -582,6 +581,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     public void onChildListClickEvent(int groupPosition, int childPos, int physExamPos, String type) {
         Node question = physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getOption(childPos);
         //Log.d("Clicked", question.language());
+        //Log.d("listclicked", "grouppos: " + String.valueOf(groupPosition) + " childPos: " + String.valueOf(childPos) + " physPos: " + String.valueOf(physExamPos));
         question.toggleSelected();
         if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
 
@@ -629,6 +629,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         if (question.getInputType() != null && question.isSelected()) {
 
             if (question.getInputType().equals("camera")) {
+                question.toggleSelected();
+                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
                 if (!filePath.exists()) {
                     boolean res = filePath.mkdirs();
                     Log.i("RES>", "" + filePath + " -> " + res);
@@ -638,18 +640,26 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 Log.d("Text", physicalExamMap.getExamNode(physExamPos).getText().toLowerCase());
                 if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("right")){
                     azureType="right";
-                    imageRightList.add(AppConstants.IMAGE_PATH + imageName + ".jpg");
                 }
                 else if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")){
                     azureType="left";
-                    imageLeftList.add(AppConstants.IMAGE_PATH + imageName + ".jpg");
                 }
                 else{
                     azureType="unknown";
                 }
-            Log.d("azuretype", azureType);
-                    //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
-                    manageCameraPermissions(imageName);
+                Log.d("azuretype", azureType);
+                //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
+                manageCameraPermissions(imageName);
+
+                for (imageDisplay temp : imageList){
+                    File file = new File (temp.getImagePath());
+                    if (!file.exists()){
+                        imageList.remove(temp);
+                    }
+                }
+                imageDisplay imageInfo= new imageDisplay(AppConstants.IMAGE_PATH + imageName + ".jpg", physExamPos);
+                imageList.add(imageInfo);
+
 
             } else {
                 Node.handleQuestion(question, this, adapter, null, null);
@@ -943,7 +953,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 } catch (DAOException e) {
                     e.printStackTrace();
                 }
-
+                adapter.notifyDataSetChanged();
             }
 
         }
