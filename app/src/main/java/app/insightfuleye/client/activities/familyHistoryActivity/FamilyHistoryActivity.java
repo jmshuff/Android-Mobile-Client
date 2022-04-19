@@ -294,56 +294,151 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
     private void onListClick(View v, int groupPosition, int childPosition, String type) {
         Node parentNode= familyHistoryMap.getOption(groupPosition);
         Node clickedNode = familyHistoryMap.getOption(groupPosition).getOption(childPosition);
-        if (!parentNode.isBilateral()) {
-            Log.i(TAG, "onChildClick: " + clickedNode.toString());
-            clickedNode.toggleSelected();
-            if (familyHistoryMap.getOption(groupPosition).anySubSelected()) {
-                familyHistoryMap.getOption(groupPosition).setSelected(true);
-            } else {
-                familyHistoryMap.getOption(groupPosition).setUnselected();
-            }
-        }
-        if (parentNode.isBilateral()) {
-            if (type == "right" || type == "both") {
-                clickedNode.toggleRightSelected();
-                if (familyHistoryMap.getOption(groupPosition).anySubRightSelected()) {
-                    familyHistoryMap.getOption(groupPosition).setRightSelected(true);
+        if ( !parentNode.getChoiceType().equals("single")
+                || (parentNode.getChoiceType().equals("single") && !parentNode.anySubSelected())
+                || (parentNode.getChoiceType().equals("single") && type == "right" && !parentNode.anySubRightSelected())
+                || (parentNode.getChoiceType().equals("single") && type == "left" && ! parentNode.anySubLeftSelected())) {
+            if (!parentNode.isBilateral()) {
+                Log.i(TAG, "onChildClick: " + clickedNode.toString());
+                clickedNode.toggleSelected();
+                if (familyHistoryMap.getOption(groupPosition).anySubSelected()) {
+                    familyHistoryMap.getOption(groupPosition).setSelected(true);
                 } else {
-                    familyHistoryMap.getOption(groupPosition).setRightUnselected();
+                    familyHistoryMap.getOption(groupPosition).setUnselected();
                 }
             }
-            if (type == "left" || type == "both") {
-                clickedNode.toggleLeftSelected();
-                if (familyHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
-                    familyHistoryMap.getOption(groupPosition).setLeftSelected(true);
-                } else {
-                    familyHistoryMap.getOption(groupPosition).setLeftUnselected();
+            if (parentNode.isBilateral()) {
+                if (type == "right" || type == "both") {
+                    clickedNode.toggleRightSelected();
+                    if (familyHistoryMap.getOption(groupPosition).anySubRightSelected()) {
+                        familyHistoryMap.getOption(groupPosition).setRightSelected(true);
+                    } else {
+                        familyHistoryMap.getOption(groupPosition).setRightUnselected();
+                    }
+                }
+                if (type == "left" || type == "both") {
+                    clickedNode.toggleLeftSelected();
+                    if (familyHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
+                        familyHistoryMap.getOption(groupPosition).setLeftSelected(true);
+                    } else {
+                        familyHistoryMap.getOption(groupPosition).setLeftUnselected();
+                    }
+                }
+                if (familyHistoryMap.getOption(groupPosition).anySubRightSelected() || familyHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
+                    familyHistoryMap.getOption(groupPosition).setSelected(true);
+                }
+                if (!familyHistoryMap.getOption(groupPosition).anySubRightSelected() && !familyHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
+                    familyHistoryMap.getOption(groupPosition).setUnselected();
                 }
             }
-            if(familyHistoryMap.getOption(groupPosition).anySubRightSelected() || familyHistoryMap.getOption(groupPosition).anySubLeftSelected()){
-                familyHistoryMap.getOption(groupPosition).setSelected(true);
-            }
-            if(!familyHistoryMap.getOption(groupPosition).anySubRightSelected() && !familyHistoryMap.getOption(groupPosition).anySubLeftSelected()){
-                familyHistoryMap.getOption(groupPosition).setUnselected();
-            }
-        }
-        adapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
 
-        if (clickedNode.getInputType() != null) {
-            if (!clickedNode.getInputType().equals("camera")) {
-                Node.handleQuestion(clickedNode, FamilyHistoryActivity.this, adapter, null, null);
+            if (clickedNode.getInputType() != null) {
+                if (!clickedNode.getInputType().equals("camera")) {
+                    Node.handleQuestion(clickedNode, FamilyHistoryActivity.this, adapter, null, null);
+                }
             }
-        }
-        if (!filePath.exists()) {
-            boolean res = filePath.mkdirs();
-            Log.i("RES>", "" + filePath + " -> " + res);
-        }
+            if (!filePath.exists()) {
+                boolean res = filePath.mkdirs();
+                Log.i("RES>", "" + filePath + " -> " + res);
+            }
 
-        imageName = UUID.randomUUID().toString();
+            imageName = UUID.randomUUID().toString();
 
-        if (!familyHistoryMap.getOption(groupPosition).getOption(childPosition).isTerminal() &&
-                familyHistoryMap.getOption(groupPosition).getOption(childPosition).isSelected()) {
-            Node.subLevelQuestion(clickedNode, FamilyHistoryActivity.this, adapter, filePath.toString(), imageName);
+            if (!familyHistoryMap.getOption(groupPosition).getOption(childPosition).isTerminal() &&
+                    familyHistoryMap.getOption(groupPosition).getOption(childPosition).isSelected()) {
+                Node.subLevelQuestion(clickedNode, FamilyHistoryActivity.this, adapter, filePath.toString(), imageName);
+            }
+        } else if (parentNode.getChoiceType().equals("single")
+                && parentNode.anySubSelected()
+                && !parentNode.isBilateral()) {
+            //check if what is clicked is what's already selected. If so, unselect it.
+            if(clickedNode.isSelected()){
+                clickedNode.toggleSelected();
+                parentNode.setUnselected();
+            }
+            else {
+                //is a second answer was clicked, give an error
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            }
+        } else {
+            if(!clickedNode.isSelected()) { //may need to split into is right selected is left selected
+                //is a second answer was clicked, give an error
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            }
+            else{
+                if (type=="right"){
+                    clickedNode.toggleRightSelected();
+                    parentNode.setRightUnselected();
+                }
+
+                if (type=="left") {
+                    clickedNode.toggleLeftSelected();
+                    parentNode.setLeftUnselected();
+                }
+
+                if (type=="both"){
+                    if (clickedNode.isRightSelected() && clickedNode.isLeftSelected()){
+                        clickedNode.toggleLeftSelected();
+                        if (parentNode.anySubLeftSelected()) {
+                            parentNode.setLeftSelected(true);
+                        } else {
+                            parentNode.setLeftUnselected();
+                        }
+                        clickedNode.toggleRightSelected();
+                        if (parentNode.anySubRightSelected()) {
+                            parentNode.setRightSelected(true);
+                        } else {
+                            parentNode.setRightUnselected();
+                        }
+                    }
+                    else if (clickedNode.isRightSelected()){
+                        clickedNode.toggleLeftSelected();
+                        if (parentNode.anySubLeftSelected()) {
+                            parentNode.setLeftSelected(true);
+                        } else {
+                            parentNode.setLeftUnselected();
+                        }
+                    }
+                    else if(clickedNode.isLeftSelected()){
+                        clickedNode.toggleRightSelected();
+                        if (parentNode.anySubRightSelected()) {
+                            parentNode.setRightSelected(true);
+                        } else {
+                            parentNode.setRightUnselected();
+                        }
+                    }
+
+                }
+
+                if(!parentNode.anySubRightSelected() && !parentNode.anySubLeftSelected()){
+                    parentNode.setUnselected();
+                    clickedNode.setUnselected();
+                }
+            }
+
         }
 
     }
