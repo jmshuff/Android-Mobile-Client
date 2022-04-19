@@ -83,7 +83,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
 
 
     public QuestionsAdapter(Context _context, Node node, RecyclerView _rvQuestions, String callingClass,
-                            FabClickListener _mListener, boolean isAssociateSym) {
+                            FabClickListener _mListener, boolean isAssociateSym, ArrayList<imageDisplay> imageList) {
         this.context = _context;
         this.currentNode = node;
         this.recyclerView = _rvQuestions;
