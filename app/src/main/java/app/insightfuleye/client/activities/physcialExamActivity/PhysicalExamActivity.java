@@ -579,165 +579,187 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
     @Override
     public void onChildListClickEvent(int groupPosition, int childPos, int physExamPos, String type) {
+
         Node question = physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getOption(childPos);
-        //Log.d("Clicked", question.language());
-        //Log.d("listclicked", "grouppos: " + String.valueOf(groupPosition) + " childPos: " + String.valueOf(childPos) + " physPos: " + String.valueOf(physExamPos));
-        question.toggleSelected();
-        if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
 
-            if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected()) {
-                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
-            } else {
-                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
-            }
-        }
+        if ( !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single")
+                || (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single") && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected())
+                || (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single") && type == "right" && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected())
+                || (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single") && type == "left" && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected())) {
 
-        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()){
-            Log.d("QuestionisBilateral", "true");
-            if(type=="right" || type=="both"){
-                //Log.d("SetRSelect", "true");
-                question.toggleRightSelected();
-                if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
-                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
+            question.toggleSelected();
+            if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
+
+                if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected()) {
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
                 } else {
-                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
                 }
             }
-            if(type=="left" || type=="both"){
-                question.toggleLeftSelected();
-                //Log.d("SetLSelect", "true");
-                if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
-                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
-                } else {
-                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
-                }
-            }
-            //Toggle main is Selected
-            if(physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() || physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()){
-                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
-            }
-            if(!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()){
-                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
 
-            }
-        }
-        adapter.notifyDataSetChanged();
-
-
-
-
-        if (question.getInputType() != null && question.isSelected()) {
-
-            if (question.getInputType().equals("camera")) {
-                question.toggleSelected();
-                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
-                if (!filePath.exists()) {
-                    boolean res = filePath.mkdirs();
-                    Log.i("RES>", "" + filePath + " -> " + res);
-                }
-                imageName = UUID.randomUUID().toString();
-                Log.d("azureimagename", imageName);
-                Log.d("Text", physicalExamMap.getExamNode(physExamPos).getText().toLowerCase());
-                if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("right")){
-                    azureType="right";
-                }
-                else if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")){
-                    azureType="left";
-                }
-                else{
-                    azureType="unknown";
-                }
-                Log.d("azuretype", azureType);
-                //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
-                manageCameraPermissions(imageName);
-
-                for (imageDisplay temp : imageList){
-                    File file = new File (temp.getImagePath());
-                    if (!file.exists()){
-                        imageList.remove(temp);
+            if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
+                Log.d("QuestionisBilateral", "true");
+                if (type == "right" || type == "both") {
+                    //Log.d("SetRSelect", "true");
+                    question.toggleRightSelected();
+                    if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
+                        physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
+                    } else {
+                        physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
                     }
                 }
-                imageDisplay imageInfo= new imageDisplay(AppConstants.IMAGE_PATH + imageName + ".jpg", physExamPos);
-                imageList.add(imageInfo);
-
-
-            } else {
-                Node.handleQuestion(question, this, adapter, null, null);
-            }
-
-
-        }
-
-        if (!question.isTerminal() && question.isSelected()) {
-            Node.subLevelQuestion(question, this, adapter, filePath.toString(), imageName);
-        }
-
-        //JS, get values for physical exam questions
-        /*Node category= physicalExamMap.getExamNode(physExamPos);
-        //category equals the first branch in free mind
-        if (category.getText().equals("VA right")){
-            String VAright=category.formConceptLanguage();
-            physicalExamMap.setVARight(VAright);
-        }
-        if (category.getText().equals("VA left")){
-            String Valeft=category.formConceptLanguage();
-            physicalExamMap.setVALeft(Valeft);
-        }
-
-        if (category.getText().equals("Pinhole right")){
-            String Pinholeright=category.formConceptLanguage();
-            physicalExamMap.setPinholeRight(Pinholeright);
-        }
-        if (category.getText().equals("Pinhole left")){
-            String Pinholeleft=category.formConceptLanguage();
-            physicalExamMap.setPinholeLeft(Pinholeleft);
-        }
-
-        if (category.getText().equals("Referral")){
-            String volunteerReferral=category.formConceptLanguage();
-            physicalExamMap.setVolunteerReferral(volunteerReferral);
-            //physicalExamMap.setVolunteerReferral(volunteerReferral.split(" ")[0]);
-            if (volunteerReferral.split(" ").length > 1){
-                physicalExamMap.setVolunteerReferralLocation(volunteerReferral.split(" ")[1]);
-            }
-
-
-        }
-
-        if (category.getText().equals("Referral Reason")){
-            String volunteerReferralReason=category.formConceptLanguage();
-            String diagnosisRight= "";
-            String diagnosisLeft="";
-            Log.d("Referral Reason", volunteerReferralReason);
-            String[] reasons=volunteerReferralReason.split("\\. - ");
-            Log.d("Reasons", Arrays.toString(reasons));
-            for (String reason : reasons){
-                Log.d("Diagnosis", reason);
-                if (reason.toLowerCase().contains("right")){
-                    diagnosisRight=diagnosisRight.concat(reason.split("-")[0]);
-                    diagnosisRight=diagnosisRight.concat(",");
+                if (type == "left" || type == "both") {
+                    question.toggleLeftSelected();
+                    //Log.d("SetLSelect", "true");
+                    if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                        physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
+                    } else {
+                        physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
+                    }
                 }
-                if (reason.toLowerCase().contains("left")){
-                    diagnosisLeft=diagnosisLeft.concat(reason.split("-")[0]);
-                    diagnosisLeft=diagnosisLeft.concat(",");
+                //Toggle main is Selected
+                if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() || physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
+                }
+                if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
+
                 }
             }
-            //remove last comma character
-            if (diagnosisRight.length()>1){
-                diagnosisRight=diagnosisRight.substring(0, diagnosisRight.length()-1);
-            }
-            if (diagnosisLeft.length()>1){
-                diagnosisLeft=diagnosisLeft.substring(0,diagnosisLeft.length()-1);
-            }
-            physicalExamMap.setVolunteerDiagnosisRight(diagnosisRight);
-            physicalExamMap.setVolunteerDiagnosisLeft(diagnosisLeft);
 
-            Log.d("DiagnosisRight",diagnosisRight);
-            Log.d("DiagnosisLeft", diagnosisLeft);
+            if (question.getInputType() != null && question.isSelected()) {
+
+                if (question.getInputType().equals("camera")) {
+                    question.toggleSelected();
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
+                    if (!filePath.exists()) {
+                        boolean res = filePath.mkdirs();
+                        Log.i("RES>", "" + filePath + " -> " + res);
+                    }
+                    imageName = UUID.randomUUID().toString();
+                    Log.d("azureimagename", imageName);
+                    Log.d("Text", physicalExamMap.getExamNode(physExamPos).getText().toLowerCase());
+                    if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("right")) {
+                        azureType = "right";
+                    } else if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")) {
+                        azureType = "left";
+                    } else {
+                        azureType = "unknown";
+                    }
+                    Log.d("azuretype", azureType);
+                    //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
+                    manageCameraPermissions(imageName);
+
+                    for (imageDisplay temp : imageList) {
+                        File file = new File(temp.getImagePath());
+                        if (!file.exists()) {
+                            imageList.remove(temp);
+                        }
+                    }
+                    imageDisplay imageInfo = new imageDisplay(AppConstants.IMAGE_PATH + imageName + ".jpg", physExamPos);
+                    imageList.add(imageInfo);
+                } else {
+                    Node.handleQuestion(question, this, adapter, null, null);
+                }
+            }
+
+            if (!question.isTerminal() && question.isSelected()) {
+                Node.subLevelQuestion(question, this, adapter, filePath.toString(), imageName);
+            }
         }
-        */
 
+        else if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single")
+                && physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected()
+                && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
+            //check if what is clicked is what's already selected. If so, unselect it.
+            if(question.isSelected()){
+                question.toggleSelected();
+                physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
+            }
+            else {
+                //is a second answer was clicked, give an error
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            }
+        } else {
+            if(!question.isSelected()) { //may need to split into is right selected is left selected
+                //is a second answer was clicked, give an error
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            }
+            else{
+                if (type=="right"){
+                    question.toggleRightSelected();
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
+                }
 
+                if (type=="left") {
+                    question.toggleLeftSelected();
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
+                }
+
+                if (type=="both"){
+                    if (question.isRightSelected() && question.isLeftSelected()){
+                        question.toggleLeftSelected();
+                        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
+                        } else {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
+                        }
+                        question.toggleRightSelected();
+                        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
+                        } else {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
+                        }
+                    }
+                    else if (question.isRightSelected()){
+                        question.toggleLeftSelected();
+                        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
+                        } else {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
+                        }
+                    }
+                    else if(question.isLeftSelected()){
+                        question.toggleRightSelected();
+                        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
+                        } else {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
+                        }
+                    }
+
+                }
+
+                if(!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()){
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
+                    question.setUnselected();
+                }
+            }
+
+        }
+        adapter.notifyDataSetChanged();
     }
 
 

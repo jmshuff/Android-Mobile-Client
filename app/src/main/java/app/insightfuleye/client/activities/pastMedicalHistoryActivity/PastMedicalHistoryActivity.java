@@ -318,47 +318,157 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
     private void onListClick(View v, int groupPosition, int childPosition, String type) {
         Node parentNode = patientHistoryMap.getOption(groupPosition);
         Node clickedNode = patientHistoryMap.getOption(groupPosition).getOption(childPosition);
-        clickedNode.toggleSelected();
 
-        //Nodes and the expandable list act funny, so if anything is clicked, a lot of stuff needs to be updated.
-        if (patientHistoryMap.getOption(groupPosition).anySubSelected()) {
-            patientHistoryMap.getOption(groupPosition).setSelected(true);
-        } else {
-            patientHistoryMap.getOption(groupPosition).setUnselected();
-        }
+        if ( !parentNode.getChoiceType().equals("single")
+                || (parentNode.getChoiceType().equals("single") && !parentNode.anySubSelected())
+                || (parentNode.getChoiceType().equals("single") && type == "right" && !parentNode.anySubRightSelected())
+                || (parentNode.getChoiceType().equals("single") && type == "left" && ! parentNode.anySubLeftSelected())) {
 
-        if (parentNode.isBilateral()) {
-            if (type == "right" || type == "both") {
-                clickedNode.toggleRightSelected();
-                if (patientHistoryMap.getOption(groupPosition).anySubRightSelected()) {
-                    patientHistoryMap.getOption(groupPosition).setRightSelected(true);
-                } else {
-                    patientHistoryMap.getOption(groupPosition).setRightUnselected();
+
+            clickedNode.toggleSelected();
+            //Nodes and the expandable list act funny, so if anything is clicked, a lot of stuff needs to be updated.
+            if (patientHistoryMap.getOption(groupPosition).anySubSelected()) {
+                patientHistoryMap.getOption(groupPosition).setSelected(true);
+            } else {
+                patientHistoryMap.getOption(groupPosition).setUnselected();
+            }
+
+            if (parentNode.isBilateral()) {
+                if (type == "right" || type == "both") {
+                    clickedNode.toggleRightSelected();
+                    if (patientHistoryMap.getOption(groupPosition).anySubRightSelected()) {
+                        patientHistoryMap.getOption(groupPosition).setRightSelected(true);
+                    } else {
+                        patientHistoryMap.getOption(groupPosition).setRightUnselected();
+                    }
+                }
+                if (type == "left" || type == "both") {
+                    clickedNode.toggleLeftSelected();
+                    if (patientHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
+                        patientHistoryMap.getOption(groupPosition).setLeftSelected(true);
+                    } else {
+                        patientHistoryMap.getOption(groupPosition).setLeftUnselected();
+                    }
                 }
             }
-            if (type == "left" || type == "both") {
-                clickedNode.toggleLeftSelected();
-                if (patientHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
-                    patientHistoryMap.getOption(groupPosition).setLeftSelected(true);
-                } else {
-                    patientHistoryMap.getOption(groupPosition).setLeftUnselected();
+
+            //Toggle main is Selected
+            if(parentNode.anySubRightSelected() || parentNode.anySubLeftSelected()){
+                clickedNode.setSelected(true);
+                parentNode.setSelected(true);
+
+            }
+            if(!parentNode.anySubRightSelected() && !parentNode.anySubLeftSelected()){
+                parentNode.setUnselected();
+                clickedNode.setUnselected();
+            }
+
+            if (clickedNode.getInputType() != null) {
+                if (!clickedNode.getInputType().equals("camera")) {
+                    imageName = UUID.randomUUID().toString();
+                    Node.handleQuestion(clickedNode, PastMedicalHistoryActivity.this, adapter, null, null);
                 }
             }
-        }
-        adapter.notifyDataSetChanged();
 
-        if (clickedNode.getInputType() != null) {
-            if (!clickedNode.getInputType().equals("camera")) {
+            Log.i(TAG, String.valueOf(clickedNode.isTerminal()));
+            if (!clickedNode.isTerminal() && clickedNode.isSelected()) {
                 imageName = UUID.randomUUID().toString();
-                Node.handleQuestion(clickedNode, PastMedicalHistoryActivity.this, adapter, null, null);
+                Node.subLevelQuestion(clickedNode, PastMedicalHistoryActivity.this, adapter, filePath.toString(), imageName);
             }
+        } else if (parentNode.getChoiceType().equals("single")
+                && parentNode.anySubSelected()
+                && !parentNode.isBilateral()) {
+            //check if what is clicked is what's already selected. If so, unselect it.
+            if(clickedNode.isSelected()){
+                clickedNode.toggleSelected();
+                parentNode.setUnselected();
+            }
+            else {
+                //is a second answer was clicked, give an error
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            }
+        } else {
+            if(!clickedNode.isSelected()) { //may need to split into is right selected is left selected
+                //is a second answer was clicked, give an error
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
+            }
+            else{
+                if (type=="right"){
+                    clickedNode.toggleRightSelected();
+                    parentNode.setRightUnselected();
+                }
+
+                if (type=="left") {
+                    clickedNode.toggleLeftSelected();
+                    parentNode.setLeftUnselected();
+                }
+
+                if (type=="both"){
+                    if (clickedNode.isRightSelected() && clickedNode.isLeftSelected()){
+                        clickedNode.toggleLeftSelected();
+                        if (parentNode.anySubLeftSelected()) {
+                            parentNode.setLeftSelected(true);
+                        } else {
+                            parentNode.setLeftUnselected();
+                        }
+                        clickedNode.toggleRightSelected();
+                        if (parentNode.anySubRightSelected()) {
+                            parentNode.setRightSelected(true);
+                        } else {
+                            parentNode.setRightUnselected();
+                        }
+                    }
+                    else if (clickedNode.isRightSelected()){
+                        clickedNode.toggleLeftSelected();
+                        if (parentNode.anySubLeftSelected()) {
+                            parentNode.setLeftSelected(true);
+                        } else {
+                            parentNode.setLeftUnselected();
+                        }
+                    }
+                    else if(clickedNode.isLeftSelected()){
+                        clickedNode.toggleRightSelected();
+                        if (parentNode.anySubRightSelected()) {
+                            parentNode.setRightSelected(true);
+                        } else {
+                            parentNode.setRightUnselected();
+                        }
+                    }
+
+                }
+
+                if(!parentNode.anySubRightSelected() && !parentNode.anySubLeftSelected()){
+                    parentNode.setUnselected();
+                    clickedNode.setUnselected();
+                }
+            }
+
         }
 
-        Log.i(TAG, String.valueOf(clickedNode.isTerminal()));
-        if (!clickedNode.isTerminal() && clickedNode.isSelected()) {
-            imageName = UUID.randomUUID().toString();
-            Node.subLevelQuestion(clickedNode, PastMedicalHistoryActivity.this, adapter, filePath.toString(), imageName);
-        }
+
+        adapter.notifyDataSetChanged();
 
     }
 
