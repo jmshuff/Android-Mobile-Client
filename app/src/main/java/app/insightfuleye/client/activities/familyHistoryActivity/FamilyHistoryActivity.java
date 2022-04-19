@@ -55,6 +55,7 @@ import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
+import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.UuidDictionary;
@@ -96,12 +97,14 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
     QuestionsAdapter adapter;
     String edit_FamHist = "";
     String new_result;
+    ArrayList<imageDisplay> imageList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sessionManager = new SessionManager(this);
         localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         filePath = new File(AppConstants.IMAGE_PATH);
+        imageList= new ArrayList<>();
 
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
@@ -252,7 +255,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
 
         //  familyListView = findViewById(R.id.family_history_expandable_list_view);
 
-        adapter = new QuestionsAdapter(this, familyHistoryMap, family_history_recyclerView, this.getClass().getSimpleName(), this, false);
+        adapter = new QuestionsAdapter(this, familyHistoryMap, family_history_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
         family_history_recyclerView.setAdapter(adapter);
         recyclerViewIndicator.attachToRecyclerView(family_history_recyclerView);
         /*adapter = new CustomExpandableListAdapter(this, familyHistoryMap, this.getClass().getSimpleName());

@@ -55,6 +55,7 @@ import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
+import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
@@ -110,6 +111,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
     QuestionsAdapter adapter;
     ScrollingPagerIndicator recyclerViewIndicator;
     String new_result;
+    ArrayList<imageDisplay> imageList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +139,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         }
 
         boolean past = sessionManager.isReturning();
+        imageList = new ArrayList<>();
         if (past && edit_PatHist == null) {
             MaterialAlertDialogBuilder alertdialog = new MaterialAlertDialogBuilder(this);
             alertdialog.setTitle(getString(R.string.question_update_details));
@@ -282,7 +285,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         // flaoting value of age is passed to Node for comparison...
         patientHistoryMap.fetchAge(float_ageYear_Month);
 
-        adapter = new QuestionsAdapter(this, patientHistoryMap, pastMedical_recyclerView, this.getClass().getSimpleName(), this, false);
+        adapter = new QuestionsAdapter(this, patientHistoryMap, pastMedical_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
         pastMedical_recyclerView.setAdapter(adapter);
 
         recyclerViewIndicator.attachToRecyclerView(pastMedical_recyclerView);
@@ -354,7 +357,6 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         Log.i(TAG, String.valueOf(clickedNode.isTerminal()));
         if (!clickedNode.isTerminal() && clickedNode.isSelected()) {
             imageName = UUID.randomUUID().toString();
-
             Node.subLevelQuestion(clickedNode, PastMedicalHistoryActivity.this, adapter, filePath.toString(), imageName);
         }
 

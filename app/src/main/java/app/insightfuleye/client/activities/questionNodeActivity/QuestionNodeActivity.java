@@ -56,6 +56,7 @@ import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
+import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
@@ -107,6 +108,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     private JSONArray assoSympArr = new JSONArray();
     private JSONObject finalAssoSympObj = new JSONObject();
     ScrollingPagerIndicator recyclerViewIndicator;
+    ArrayList<imageDisplay> imageList;
 
 
     FloatingActionButton fab;
@@ -132,6 +134,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         complaintDetails = new HashMap<>();
         physicalExams = new ArrayList<>();
         complaintsNodes = new ArrayList<>();
+        imageList= new ArrayList<>();
 
         boolean hasLicense = false;
         if (!sessionManager.getLicenseKey().isEmpty())
@@ -212,7 +215,11 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     public void onListClicked(View v, int groupPosition, int childPosition, String type) {
         Log.e(TAG, "CLICKED: " + currentNode.getOption(groupPosition).toString());
 
-        if ((currentNode.getOption(groupPosition).getChoiceType().equals("single")) && !currentNode.getOption(groupPosition).anySubSelected()) {
+        //if it's a multi-choice or if nothing is selected, proceed normally
+        if ( !currentNode.getOption(groupPosition).getChoiceType().equals("single")
+                || (currentNode.getOption(groupPosition).getChoiceType().equals("single") && !currentNode.getOption(groupPosition).anySubSelected())
+                || (currentNode.getOption(groupPosition).getChoiceType().equals("single") && type == "right" && !currentNode.getOption(groupPosition).anySubRightSelected())
+                || (currentNode.getOption(groupPosition).getChoiceType().equals("single") && type == "left" && !currentNode.getOption(groupPosition).anySubLeftSelected())) {
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
             if (!currentNode.getOption(groupPosition).isBilateral()){
                question.toggleSelected();
@@ -269,7 +276,14 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                         azureType="left";
                     }
 
-
+                    for (imageDisplay temp : imageList){
+                        File file = new File (temp.getImagePath());
+                        if (!file.exists()){
+                            imageList.remove(temp);
+                        }
+                    }
+                    imageDisplay imageInfo= new imageDisplay(AppConstants.IMAGE_PATH + imageName + ".jpg", groupPosition);
+                    imageList.add(imageInfo);
 
                     Node.handleQuestion(question, QuestionNodeActivity.this, adapter, filePath.toString(), imageName);
                 } else {
@@ -282,98 +296,99 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 Node.subLevelQuestion(question, QuestionNodeActivity.this, adapter, filePath.toString(), imageName);
                 //If the knowledgeEngine is not terminal, that means there are more questions to be asked for this branch.
             }
-        } else if ((currentNode.getOption(groupPosition).getChoiceType().equals("single")) && currentNode.getOption(groupPosition).anySubSelected()) {
+            //if it's not bilateral, single choice, and something is already selected
+        } else if (currentNode.getOption(groupPosition).getChoiceType().equals("single")
+                && currentNode.getOption(groupPosition).anySubSelected()
+                && !currentNode.getOption(groupPosition).isBilateral()) {
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
-            if (currentNode.getOption(groupPosition).isBilateral()){
-
+            //check if what is clicked is what's already selected. If so, unselect it.
+            if(question.isSelected()){
+                question.toggleSelected();
+                currentNode.getOption(groupPosition).setUnselected();
             }
-            else{
-                if(question.isSelected()){
-                    question.toggleSelected();
-                    currentNode.getOption(groupPosition).setUnselected();
-                }
-                else {
-                    MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
-                    //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
-                    alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
-                    alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+            else {
+                //is a second answer was clicked, give an error
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                         }
-                    });
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
-                    IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
-                }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
             }
-
         } else {
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
-            if(!currentNode.getOption(groupPosition).isBilateral()) {
-
-                question.toggleSelected();
-                if (currentNode.getOption(groupPosition).anySubSelected()) {
-                    currentNode.getOption(groupPosition).setSelected(true);
-                } else {
-                    currentNode.getOption(groupPosition).setUnselected();
-                }
-                //Log.d("CurrentNode", currentNode.getOption(groupPosition).getOption(childPosition).getText());
+            if(!question.isSelected()) { //may need to split into is right selected is left selected
+                //is a second answer was clicked, give an error
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.this_question_only_one_answer);
+                alertDialogBuilder.setNeutralButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
             }
-
-            if(currentNode.getOption(groupPosition).isBilateral()){
-                if(type=="right" || type=="both"){
+            else{
+                if (type=="right"){
                     question.toggleRightSelected();
-                    if (currentNode.getOption(groupPosition).anySubRightSelected()) {
-                        currentNode.getOption(groupPosition).setRightSelected(true);
-                    } else {
-                        currentNode.getOption(groupPosition).setRightUnselected();
-                    }
-                }
-                if(type=="left" || type=="both"){
-                    question.toggleLeftSelected();
-                    if (currentNode.getOption(groupPosition).anySubLeftSelected()) {
-                        currentNode.getOption(groupPosition).setLeftSelected(true);
-                    } else {
-                        currentNode.getOption(groupPosition).setLeftUnselected();
-                    }
+                    currentNode.getOption(groupPosition).setRightUnselected();
                 }
 
-                //Toggle main is Selected
-                if(currentNode.getOption(groupPosition).anySubRightSelected() || currentNode.getOption(groupPosition).anySubLeftSelected()){
-                    currentNode.getOption(groupPosition).setSelected(true);
-                    question.setSelected(true);
+                if (type=="left") {
+                    question.toggleLeftSelected();
+                    currentNode.getOption(groupPosition).setLeftUnselected();
                 }
+
+                if (type=="both"){
+                    if (question.isRightSelected() && question.isLeftSelected()){
+                        question.toggleLeftSelected();
+                        if (currentNode.getOption(groupPosition).anySubLeftSelected()) {
+                            currentNode.getOption(groupPosition).setLeftSelected(true);
+                        } else {
+                            currentNode.getOption(groupPosition).setLeftUnselected();
+                        }
+                        question.toggleRightSelected();
+                        if (currentNode.getOption(groupPosition).anySubRightSelected()) {
+                            currentNode.getOption(groupPosition).setRightSelected(true);
+                        } else {
+                            currentNode.getOption(groupPosition).setRightUnselected();
+                        }
+                    }
+                    else if (question.isRightSelected()){
+                        question.toggleLeftSelected();
+                        if (currentNode.getOption(groupPosition).anySubLeftSelected()) {
+                            currentNode.getOption(groupPosition).setLeftSelected(true);
+                        } else {
+                            currentNode.getOption(groupPosition).setLeftUnselected();
+                        }
+                    }
+                    else if(question.isLeftSelected()){
+                        question.toggleRightSelected();
+                        if (currentNode.getOption(groupPosition).anySubRightSelected()) {
+                            currentNode.getOption(groupPosition).setRightSelected(true);
+                        } else {
+                            currentNode.getOption(groupPosition).setRightUnselected();
+                        }
+                    }
+
+                }
+
                 if(!currentNode.getOption(groupPosition).anySubRightSelected() && !currentNode.getOption(groupPosition).anySubLeftSelected()){
                     currentNode.getOption(groupPosition).setUnselected();
                     question.setUnselected();
                 }
-
-            }
-            if (!question.getInputType().isEmpty() && question.isSelected()) {
-                if (question.getInputType().equals("camera")) {
-                    if (!filePath.exists()) {
-                        filePath.mkdirs();
-                    }
-                    String azureType=null;
-                    if (currentNode.getOption(childPosition).getText().toLowerCase().contains("right")){
-                        azureType="right";
-                    }
-                    if (currentNode.getOption(childPosition).getText().toLowerCase().contains("left")){
-                        azureType="left";
-                    }
-
-                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, filePath.toString(), imageName);
-                } else {
-                    Node.handleQuestion(question, QuestionNodeActivity.this, adapter, null, null);
-                }
-                //If there is an input type, then the question has a special method of data entry.
             }
 
-            if (!question.isTerminal() && question.isSelected()) {
-                Node.subLevelQuestion(question, QuestionNodeActivity.this, adapter, filePath.toString(), imageName);
-                //If the knowledgeEngine is not terminal, that means there are more questions to be asked for this branch.
-            }
         }
         //adapter.updateNode(currentNode);
         adapter.notifyDataSetChanged();
@@ -666,7 +681,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         currentNode.fetchAge(float_ageYear_Month);
 
 
-        adapter = new QuestionsAdapter(this, currentNode, question_recyclerView, this.getClass().getSimpleName(), this, false);
+        adapter = new QuestionsAdapter(this, currentNode, question_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
         question_recyclerView.setAdapter(adapter);
         recyclerViewIndicator.attachToRecyclerView(question_recyclerView);
       /*  adapter = new CustomExpandableListAdapter(this, currentNode, this.getClass().getSimpleName());
@@ -765,7 +780,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             // flaoting value of age is passed to Node for comparison...
             currentNode.fetchAge(float_ageYear_Month);
 
-            adapter = new QuestionsAdapter(this, currentNode, question_recyclerView, this.getClass().getSimpleName(), this, true);
+            adapter = new QuestionsAdapter(this, currentNode, question_recyclerView, this.getClass().getSimpleName(), this, true, imageList);
             question_recyclerView.setAdapter(adapter);
             setTitle(patientName + ": " + currentNode.getText());
 
@@ -819,6 +834,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 currentNode.setImagePath(mCurrentPhotoPath);
                 currentNode.displayImage(this, filePath.getAbsolutePath(), imageName);
                 //uploadAzureImage(filePath.getAbsolutePath(), imageName);
+                adapter.notifyDataSetChanged();
 
             }
         }

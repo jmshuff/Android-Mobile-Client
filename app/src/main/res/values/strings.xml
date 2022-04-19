@@ -511,6 +511,8 @@
     <string name="end_visit_notif">End visit</string>
     <string name="visit_ended_notif">Visit ended</string>
     <string name="this_question_only_one_answer">This question can have only one answer.</string>
+    <string name="this_question_only_one_answer_right">Select only one answer for right eye.</string>
+    <string name="this_question_only_one_answer_left">Select only one answer for left eye.</string>
     <string name="uploading_to_doctor_notif">Uploading to doctor.</string>
     <string name="visit_data_upload">Visit Data Upload</string>
     <string name="uploading_visit_data_notif">Uploading visit data</string>
