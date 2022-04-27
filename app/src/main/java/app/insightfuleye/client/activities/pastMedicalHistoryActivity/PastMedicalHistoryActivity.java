@@ -319,15 +319,16 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         Node parentNode = patientHistoryMap.getOption(groupPosition);
         Node clickedNode = patientHistoryMap.getOption(groupPosition).getOption(childPosition);
 
-        if ( !parentNode.getChoiceType().equals("single")
+        if (!parentNode.getChoiceType().equals("single")
                 || (parentNode.getChoiceType().equals("single") && !parentNode.anySubSelected())
                 || (parentNode.getChoiceType().equals("single") && type == "right" && !parentNode.anySubRightSelected())
                 || (parentNode.getChoiceType().equals("single") && type == "left" && ! parentNode.anySubLeftSelected())) {
 
-
+            Log.d("listClick", "enter");
             clickedNode.toggleSelected();
             //Nodes and the expandable list act funny, so if anything is clicked, a lot of stuff needs to be updated.
             if (patientHistoryMap.getOption(groupPosition).anySubSelected()) {
+                Log.d("subSelected", "enter");
                 patientHistoryMap.getOption(groupPosition).setSelected(true);
             } else {
                 patientHistoryMap.getOption(groupPosition).setUnselected();

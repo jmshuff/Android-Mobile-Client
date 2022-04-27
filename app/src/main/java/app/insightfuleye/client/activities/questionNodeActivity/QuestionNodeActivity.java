@@ -323,7 +323,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             }
         } else {
             Node question = currentNode.getOption(groupPosition).getOption(childPosition);
-            if(!question.isSelected()) { //may need to split into is right selected is left selected
+            if((!question.isRightSelected() && type=="right") || (!question.isLeftSelected() && type == "left")  || (!question.isRightSelected() && !question.isLeftSelected() && type =="both") || (type =="both" && question.isRightSelected() && !question.isLeftSelected() && currentNode.getOption(groupPosition).anySubLeftSelected()) || (type =="both" && question.isLeftSelected() && !question.isRightSelected() && currentNode.getOption(groupPosition).anySubRightSelected())) { //may need to split into is right selected is left selected
                 //is a second answer was clicked, give an error
                 MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
                 //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
@@ -383,6 +383,10 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
 
                 }
 
+                if(!question.isRightSelected() && !question.isLeftSelected()){
+                    question.setUnselected();
+                }
+
                 if(!currentNode.getOption(groupPosition).anySubRightSelected() && !currentNode.getOption(groupPosition).anySubLeftSelected()){
                     currentNode.getOption(groupPosition).setUnselected();
                     question.setUnselected();
@@ -392,7 +396,6 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         }
         //adapter.updateNode(currentNode);
         adapter.notifyDataSetChanged();
-
     }
 
     /**
