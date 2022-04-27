@@ -650,6 +650,20 @@ public class Node implements Serializable {
         }
     }
 
+    public void printSubSelected(){
+        if (!terminal) {
+            for (int i = 0; i < optionsList.size(); i++) {
+                if (optionsList.get(i).isSelected()) {
+                    subSelected = true;
+                    Log.d("SubSelected", String.valueOf(optionsList.get(i)));
+                    break;
+                } else {
+                    subSelected = false;
+                }
+            }
+        }
+    }
+
     public boolean anySubRightSelected() {
         if (!terminal) {
             for (int i = 0; i < optionsList.size(); i++) {
