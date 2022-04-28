@@ -327,11 +327,10 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
                 if (familyHistoryMap.getOption(groupPosition).anySubRightSelected() || familyHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
                     familyHistoryMap.getOption(groupPosition).setSelected(true);
                 }
-                if (!familyHistoryMap.getOption(groupPosition).anySubRightSelected() && !familyHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
+                if (familyHistoryMap.getOption(groupPosition).isBilateral() && !familyHistoryMap.getOption(groupPosition).anySubRightSelected() && !familyHistoryMap.getOption(groupPosition).anySubLeftSelected()) {
                     familyHistoryMap.getOption(groupPosition).setUnselected();
                 }
             }
-            adapter.notifyDataSetChanged();
 
             if (clickedNode.getInputType() != null) {
                 if (!clickedNode.getInputType().equals("camera")) {
@@ -373,7 +372,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
                 IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
             }
         } else {
-            if(!clickedNode.isSelected()) { //may need to split into is right selected is left selected
+            if((!clickedNode.isRightSelected() && type=="right") || (!clickedNode.isLeftSelected() && type == "left")  || (!clickedNode.isRightSelected() && !clickedNode.isLeftSelected() && type =="both") || (type =="both" && clickedNode.isRightSelected() && !clickedNode.isLeftSelected() && clickedNode.getOption(groupPosition).anySubLeftSelected()) || (type =="both" && clickedNode.isLeftSelected() && !clickedNode.isRightSelected() && clickedNode.getOption(groupPosition).anySubRightSelected())) { //may need to split into is right selected is left selected
                 //is a second answer was clicked, give an error
                 MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
                 //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
@@ -433,6 +432,10 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
 
                 }
 
+                if(!clickedNode.isRightSelected() && !clickedNode.isLeftSelected()){
+                    clickedNode.setUnselected();
+                }
+
                 if(!parentNode.anySubRightSelected() && !parentNode.anySubLeftSelected()){
                     parentNode.setUnselected();
                     clickedNode.setUnselected();
@@ -440,6 +443,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
             }
 
         }
+        adapter.notifyDataSetChanged();
 
     }
 

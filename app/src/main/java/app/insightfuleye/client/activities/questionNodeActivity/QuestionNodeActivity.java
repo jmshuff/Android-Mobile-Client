@@ -216,7 +216,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         Log.e(TAG, "CLICKED: " + currentNode.getOption(groupPosition).toString());
 
         //if it's a multi-choice or if nothing is selected, proceed normally
-        if ( !currentNode.getOption(groupPosition).getChoiceType().equals("single")
+        if (!currentNode.getOption(groupPosition).getChoiceType().equals("single")
                 || (currentNode.getOption(groupPosition).getChoiceType().equals("single") && !currentNode.getOption(groupPosition).anySubSelected())
                 || (currentNode.getOption(groupPosition).getChoiceType().equals("single") && type == "right" && !currentNode.getOption(groupPosition).anySubRightSelected())
                 || (currentNode.getOption(groupPosition).getChoiceType().equals("single") && type == "left" && !currentNode.getOption(groupPosition).anySubLeftSelected())) {
@@ -255,7 +255,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                     currentNode.getOption(groupPosition).setSelected(true);
 
                 }
-                if(!currentNode.getOption(groupPosition).anySubRightSelected() && !currentNode.getOption(groupPosition).anySubLeftSelected()){
+
+                if(currentNode.getOption(groupPosition).isBilateral() && !currentNode.getOption(groupPosition).anySubRightSelected() && !currentNode.getOption(groupPosition).anySubLeftSelected()){
                     currentNode.getOption(groupPosition).setUnselected();
                     question.setUnselected();
                 }

@@ -589,7 +589,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
             question.toggleSelected();
             if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
-
                 if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected()) {
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
                 } else {
@@ -620,10 +619,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 //Toggle main is Selected
                 if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() || physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
+                    question.setSelected(true);
                 }
-                if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
-
+                    question.setUnselected();
                 }
             }
 
@@ -692,7 +692,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
             }
         } else {
-            if(!question.isSelected()) { //may need to split into is right selected is left selected
+            if((!question.isRightSelected() && type=="right") || (!question.isLeftSelected() && type == "left")  || (!question.isRightSelected() && !question.isLeftSelected() && type =="both") || (type =="both" && question.isRightSelected() && !question.isLeftSelected() && physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) || (type =="both" && question.isLeftSelected() && !question.isRightSelected() && physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected())) { //may need to split into is right selected is left selected
                 //is a second answer was clicked, give an error
                 MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
                 //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
@@ -756,6 +756,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
                     question.setUnselected();
                 }
+
+                if(!question.isRightSelected() && !question.isLeftSelected()){
+                    question.setUnselected();
+                }
+
             }
 
         }
