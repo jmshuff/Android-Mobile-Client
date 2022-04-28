@@ -5,6 +5,8 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
@@ -30,12 +32,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,6 +63,7 @@ import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
+import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.UuidDictionary;
@@ -154,6 +160,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             }
             Node currentNode = new Node(currentFile);
             complaintsNodes.add(currentNode);
+
         }
 
         super.onCreate(savedInstanceState);
@@ -187,6 +194,11 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         helper.attachToRecyclerView(question_recyclerView);
 
         setupQuestions(complaintNumber);
+        Log.d("intentTag", intentTag);
+
+        if (intentTag.equals("edit")){
+            setScreen();
+        }
         //In the event there is more than one complaint, they will be prompted one at a time.
 
  /*       questionListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -209,6 +221,60 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             }
         });*/
 
+    }
+
+    private void setScreen() {
+        Log.d("setScreen", "enter");
+        String allSub = "";
+        String rightSub= "";
+        String leftSub="";
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        db.beginTransaction();
+
+        String nodeSelection = "visitID=? AND patientID=? AND type=?";
+        String[] nodeArgs = {visitUuid, patientUuid, "complaint"};
+        String[] columns = {"questionSubSelected", "questionRightSelected", "questionLeftSelected"};
+        try{
+            Cursor nodeCursor = db.query("tbl_edit_node", columns, nodeSelection, nodeArgs, null, null, null);
+            nodeCursor.moveToLast();
+            allSub = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionSubSelected"));
+            rightSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionRightSelected"));
+            leftSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionLeftSelected"));
+            nodeCursor.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<ArrayList<Integer>>>() {}.getType();
+        ArrayList<ArrayList<Integer>>  allSubSelected = gson.fromJson(allSub, type);
+        ArrayList<ArrayList<Integer>>  rightSubSelected = gson.fromJson(rightSub, type);
+        ArrayList<ArrayList<Integer>>  leftSubSelected = gson.fromJson(leftSub, type);
+
+        Log.d("allSelectedSet", String.valueOf(allSubSelected) + " " + String.valueOf(rightSubSelected) + " " + String.valueOf(leftSubSelected));
+        for (int i = 0 ; i < allSubSelected.size(); i++){
+            if(!currentNode.getOption(i).isBilateral()){
+                for (int j=0; j < allSubSelected.get(i).size(); j++){
+                    currentNode.getOption(i).getOption(allSubSelected.get(i).get(j)).setSelected(true);
+                }
+
+            }
+            else{
+                for (int j=0; j < rightSubSelected.get(i).size(); j++){
+                    Log.d("arraylistR", String.valueOf(i) + " " + String.valueOf(j));
+                    currentNode.getOption(i).getOption(rightSubSelected.get(i).get(j)).setRightSelected(true);
+                    //if selected, set main selected
+                }
+                for (int j=0; j < leftSubSelected.get(i).size(); j++){
+                    Log.d("arraylistL", String.valueOf(i) + " " + String.valueOf(j));
+                    currentNode.getOption(i).getOption(leftSubSelected.get(i).get(j)).setLeftSelected(true);
+                    //if selected, set main selected
+                }
+            }
+        }
     }
 
 
@@ -419,6 +485,11 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 }
             }
 
+            try {
+                generateSelected();
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
             String complaintString = currentNode.generateLanguage();
             currentNode.generateTableResults();
 
@@ -541,9 +612,95 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
-
-
         return isInserted;
+    }
+
+    private boolean insertEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "complaint");
+            contentValues.put("questionSubSelected", subSelected);
+            contentValues.put("questionRightSelected", rightSelected);
+            contentValues.put("questionLeftSelected", leftSelected);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_edit_node", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return isInserted;
+    }
+
+    private void updateEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        int updatedCount=0;
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        String selection= "visitID=? AND patientID = ? AND type = ?";
+        String[] nodeArgs = {visitUuid, patientUuid, "complaint"};
+
+
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "complaint");
+            contentValues.put("questionSubSelected", subSelected);
+            contentValues.put("questionRightSelected", rightSelected);
+            contentValues.put("questionLeftSelected", leftSelected);
+            //contentValues.put("sync", "false");
+
+            updatedCount = localdb.update("tbl_edit_node", contentValues, selection, nodeArgs);
+
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            Logger.logE(TAG, "exception ", e);
+        } finally {
+            localdb.endTransaction();
+        }
+
+        if (updatedCount == 0) {
+            try {
+                insertEditDB(subSelected, rightSelected, leftSelected);
+            } catch (DAOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+            }
+        }
+    }
+
+    public void generateSelected() throws DAOException {
+        ArrayList<ArrayList<Integer>> allSelected= new ArrayList<>();
+        ArrayList<ArrayList<Integer>> rightSelected = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> leftSelected = new ArrayList<>();
+        for (int i=0; i< currentNode.getOptionsList().size(); i++ ){
+            allSelected.add(currentNode.getOption(i).getSubSelected());
+            rightSelected.add(currentNode.getOption(i).getRightSubSelected());
+            leftSelected.add(currentNode.getOption(i).getLeftSubSelected());
+        }
+        Log.d("AllSelected", String.valueOf(allSelected));
+        Log.d("RSelected", String.valueOf(rightSelected));
+        Log.d("LSelected", String.valueOf(leftSelected));
+
+        Gson gson = new Gson();
+        String inputSub= gson.toJson(allSelected);
+        String inputRight = gson.toJson(rightSelected);
+        String inputLeft = gson.toJson(leftSelected);
+
+        if(intentTag.equals("edit")){
+            updateEditDB(inputSub, inputRight, inputLeft);
+        }
+        else{
+            insertEditDB(inputSub, inputRight, inputLeft);
+
+        }
     }
 
 

@@ -650,6 +650,41 @@ public class Node implements Serializable {
         }
     }
 
+    public ArrayList<Integer> getSubSelected(){
+        ArrayList<Integer> selected = new ArrayList<>();
+        if (!terminal) {
+            for (int i = 0; i < optionsList.size(); i++) {
+                if (optionsList.get(i).isSelected()) {
+                    selected.add(i);
+                }
+            }
+        }
+        return selected;
+    }
+
+    public ArrayList<Integer> getRightSubSelected(){
+        ArrayList<Integer> selected = new ArrayList<>();
+        if (!terminal) {
+            for (int i = 0; i < optionsList.size(); i++) {
+                if (optionsList.get(i).isRightSelected()) {
+                    selected.add(i);
+                }
+            }
+        }
+        return selected;
+    }
+
+    public ArrayList<Integer> getLeftSubSelected(){
+        ArrayList<Integer> selected = new ArrayList<>();
+        if (!terminal) {
+            for (int i = 0; i < optionsList.size(); i++) {
+                if (optionsList.get(i).isLeftSelected()) {
+                    selected.add(i);
+                }
+            }
+        }
+        return selected;
+    }
     public void printSubSelected(){
         if (!terminal) {
             for (int i = 0; i < optionsList.size(); i++) {

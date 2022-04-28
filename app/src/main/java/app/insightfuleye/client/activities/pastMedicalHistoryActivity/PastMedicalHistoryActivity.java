@@ -119,7 +119,8 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         filePath = new File(AppConstants.IMAGE_PATH);
 //        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//        e = sharedPreferences.edit();
+//        e = sharedPreferences.edit();'
+
 
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {

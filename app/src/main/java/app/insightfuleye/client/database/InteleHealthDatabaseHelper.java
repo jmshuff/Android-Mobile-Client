@@ -212,6 +212,15 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "visitId TEXT" +
             ")";
 
+    public static final String CREATE_EDIT_TABLES = "CREATE TABLE IF NOT EXISTS tbl_edit_node(" +
+            "visitID TEXT PRIMARY KEY," +
+            "patientID TEXT," +
+            "type TEXT," + //physExam, complaint, patHist, famHist
+            "questionSubSelected TEXT," +
+            "questionRightSelected TEXT," +
+            "questionLeftSelected TEXT" +
+            ")";
+
     public InteleHealthDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -281,6 +290,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(AZURE_UPLOADS);
         db.execSQL(AZURE_ADDITIONAL_DOCS);
         db.execSQL(AZURE_GALLERY);
+        db.execSQL(CREATE_EDIT_TABLES);
         uuidInsert(db);
         database = db;
 
