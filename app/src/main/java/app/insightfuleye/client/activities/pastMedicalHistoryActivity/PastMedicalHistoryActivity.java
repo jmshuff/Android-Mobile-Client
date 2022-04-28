@@ -357,12 +357,13 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             if(parentNode.anySubRightSelected() || parentNode.anySubLeftSelected()){
                 clickedNode.setSelected(true);
                 parentNode.setSelected(true);
-
             }
-            if(!parentNode.anySubRightSelected() && !parentNode.anySubLeftSelected()){
+
+            if(parentNode.isBilateral() && !parentNode.anySubRightSelected() && !parentNode.anySubLeftSelected()){
                 parentNode.setUnselected();
                 clickedNode.setUnselected();
             }
+
 
             if (clickedNode.getInputType() != null) {
                 if (!clickedNode.getInputType().equals("camera")) {
@@ -376,7 +377,10 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                 imageName = UUID.randomUUID().toString();
                 Node.subLevelQuestion(clickedNode, PastMedicalHistoryActivity.this, adapter, filePath.toString(), imageName);
             }
-        } else if (parentNode.getChoiceType().equals("single")
+
+            adapter.notifyDataSetChanged();
+
+        }else if (parentNode.getChoiceType().equals("single")
                 && parentNode.anySubSelected()
                 && !parentNode.isBilateral()) {
             //check if what is clicked is what's already selected. If so, unselect it.
@@ -400,7 +404,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                 IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
             }
         } else {
-            if(!clickedNode.isSelected()) { //may need to split into is right selected is left selected
+            if((!clickedNode.isRightSelected() && type=="right") || (!clickedNode.isLeftSelected() && type == "left")  || (!clickedNode.isRightSelected() && !clickedNode.isLeftSelected() && type =="both") || (type =="both" && clickedNode.isRightSelected() && !clickedNode.isLeftSelected() && clickedNode.getOption(groupPosition).anySubLeftSelected()) || (type =="both" && clickedNode.isLeftSelected() && !clickedNode.isRightSelected() && clickedNode.getOption(groupPosition).anySubRightSelected())) { //may need to split into is right selected is left selected
                 //is a second answer was clicked, give an error
                 MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
                 //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
@@ -460,6 +464,10 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
                 }
 
+                if(!clickedNode.isRightSelected() && !clickedNode.isLeftSelected()){
+                    clickedNode.setUnselected();
+                }
+
                 if(!parentNode.anySubRightSelected() && !parentNode.anySubLeftSelected()){
                     parentNode.setUnselected();
                     clickedNode.setUnselected();
@@ -467,8 +475,6 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             }
 
         }
-
-
         adapter.notifyDataSetChanged();
 
     }
