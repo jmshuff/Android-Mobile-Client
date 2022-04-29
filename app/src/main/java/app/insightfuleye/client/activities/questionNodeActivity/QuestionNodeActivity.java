@@ -246,35 +246,39 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         }
         db.setTransactionSuccessful();
         db.endTransaction();
-        db.close();
 
         Gson gson = new Gson();
         Type type = new TypeToken<ArrayList<ArrayList<Integer>>>() {}.getType();
         ArrayList<ArrayList<Integer>>  allSubSelected = gson.fromJson(allSub, type);
         ArrayList<ArrayList<Integer>>  rightSubSelected = gson.fromJson(rightSub, type);
         ArrayList<ArrayList<Integer>>  leftSubSelected = gson.fromJson(leftSub, type);
-
         Log.d("allSelectedSet", String.valueOf(allSubSelected) + " " + String.valueOf(rightSubSelected) + " " + String.valueOf(leftSubSelected));
-        for (int i = 0 ; i < allSubSelected.size(); i++){
-            if(!currentNode.getOption(i).isBilateral()){
-                for (int j=0; j < allSubSelected.get(i).size(); j++){
-                    currentNode.getOption(i).getOption(allSubSelected.get(i).get(j)).setSelected(true);
+
+        if(allSubSelected!=null) {
+            if (allSubSelected.size() == currentNode.getOptionsList().size()) {
+                for (int i = 0; i < allSubSelected.size(); i++) {
+                    if (!currentNode.getOption(i).isBilateral()) {
+                        for (int j = 0; j < allSubSelected.get(i).size(); j++) {
+                            currentNode.getOption(i).getOption(allSubSelected.get(i).get(j)).setSelected(true);
+                        }
+
+                    } else {
+                        for (int j = 0; j < rightSubSelected.get(i).size(); j++) {
+                            Log.d("arraylistR", String.valueOf(i) + " " + String.valueOf(j));
+                            currentNode.getOption(i).getOption(rightSubSelected.get(i).get(j)).setRightSelected(true);
+                            //if selected, set main selected
+                        }
+                        for (int j = 0; j < leftSubSelected.get(i).size(); j++) {
+                            Log.d("arraylistL", String.valueOf(i) + " " + String.valueOf(j));
+                            currentNode.getOption(i).getOption(leftSubSelected.get(i).get(j)).setLeftSelected(true);
+                            //if selected, set main selected
+                        }
+                    }
                 }
 
-            }
-            else{
-                for (int j=0; j < rightSubSelected.get(i).size(); j++){
-                    Log.d("arraylistR", String.valueOf(i) + " " + String.valueOf(j));
-                    currentNode.getOption(i).getOption(rightSubSelected.get(i).get(j)).setRightSelected(true);
-                    //if selected, set main selected
-                }
-                for (int j=0; j < leftSubSelected.get(i).size(); j++){
-                    Log.d("arraylistL", String.valueOf(i) + " " + String.valueOf(j));
-                    currentNode.getOption(i).getOption(leftSubSelected.get(i).get(j)).setLeftSelected(true);
-                    //if selected, set main selected
-                }
             }
         }
+
     }
 
 
