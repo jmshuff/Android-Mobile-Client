@@ -13,6 +13,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -21,6 +24,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -60,6 +64,7 @@ import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
+import app.insightfuleye.client.knowledgeEngine.PhysicalExam;
 import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
@@ -86,7 +91,11 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     SessionManager sessionManager = null;
     private float float_ageYear_Month;
     String azureType=null;
-
+    //For menu activity
+    ArrayList<String> nodeHeaders = new ArrayList<>();
+    int complaintSize;
+    int patHistSize;
+    int physExamSize;
 
     //    Knowledge mKnowledge; //Knowledge engine
     // ExpandableListView questionListView;
@@ -105,8 +114,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     int lastExpandedPosition = -1;
     String insertion = "";
     private SharedPreferences prefs;
-    private String encounterVitals;
-    private String encounterAdultIntials, EncounterAdultInitial_LatestVisit;
+    String encounterVitals;
+    String encounterAdultIntials, EncounterAdultInitial_LatestVisit;
 
     private List<Node> optionsList = new ArrayList<>();
     Node assoSympNode;
@@ -220,6 +229,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 lastExpandedPosition = groupPosition;
             }
         });*/
+        getMenuHeaders();
 
     }
 
@@ -1058,5 +1068,148 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         onListClicked(null, groupPos, childPos, type);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater=getMenuInflater();
+        menuInflater.inflate(R.menu.menu_node_navigation, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id=item.getItemId()-1; //subtract 1 because it starts at 1 not 0
+        Log.d("menuId", String.valueOf(id));
+        if (0 <= id && id < complaintSize){
+/*            Intent intent = new Intent(QuestionNodeActivity.this, QuestionNodeActivity.class);
+            intent.putExtra("patientUuid", patientUuid);
+            intent.putExtra("visitUuid", visitUuid);
+            intent.putExtra("encounterUuidVitals", encounterVitals);
+            intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+            intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+            intent.putExtra("state", state);
+            intent.putExtra("name", patientName);
+            intent.putExtra("tag", intentTag);
+            intent.putExtra("scrollPos", id);
+            startActivity(intent);*/
+            question_recyclerView.scrollToPosition(id);
+        }
+        else if(complaintSize <= id && id < (complaintSize + patHistSize)){
+            Intent intent = new Intent(QuestionNodeActivity.this, PastMedicalHistoryActivity.class);
+            intent.putExtra("patientUuid", patientUuid);
+            intent.putExtra("visitUuid", visitUuid);
+            intent.putExtra("encounterUuidVitals", encounterVitals);
+            intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+            intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+            intent.putExtra("state", state);
+            intent.putExtra("name", patientName);
+            intent.putExtra("tag", intentTag);
+            intent.putExtra("scrollPos", id-complaintSize);
+            startActivity(intent);
+        }
+        else if((complaintSize + patHistSize) <= id && id < (complaintSize + patHistSize + physExamSize)){
+            Intent intent = new Intent(QuestionNodeActivity.this, PhysicalExamActivity.class);
+            intent.putExtra("patientUuid", patientUuid);
+            intent.putExtra("visitUuid", visitUuid);
+            intent.putExtra("encounterUuidVitals", encounterVitals);
+            intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+            intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+            intent.putExtra("state", state);
+            intent.putExtra("name", patientName);
+            intent.putExtra("tag", intentTag);
+            intent.putExtra("scrollPos", id-complaintSize-patHistSize);
+            startActivity(intent);
+        }
+
+        return true;
+    }
+
+    public void getMenuHeaders(){
+        boolean hasLicense = false;
+        if (!sessionManager.getLicenseKey().isEmpty())
+            hasLicense = true;
+
+        //JSONObject currentFile = null;
+
+/*        for (int i = 0; i < complaints.size(); i++) {
+            if (hasLicense) {
+                try {
+                    currentFile = new JSONObject(FileUtils.readFile(complaints.get(i) + ".json", this));
+                } catch (JSONException e) {
+                    FirebaseCrashlytics.getInstance().recordException(e);
+                }
+            } else {
+                String fileLocation = "engines/" + complaints.get(i) + ".json";
+                currentFile = FileUtils.encodeJSON(this, fileLocation);
+            }
+            Node currentNode = new Node(currentFile);
+            complaintsNodes.add(currentNode);
+
+        }*/
+        String famFileName = "famHist.json";
+        String patFileName = "patHist.json";
+        String physFileName = "physExam.json";
+        JSONObject patFile, famFile, physFile;
+        Node famHistoryMap= null, patHistoryMap= null;
+        PhysicalExam physExamMap= null;
+
+        ArrayList<String> physExamsTemp = new ArrayList<>();
+
+        ArrayList<String> childNodeSelectedPhysicalExams = currentNode.getPhysicalExamList();
+        if (!childNodeSelectedPhysicalExams.isEmpty())
+            physExamsTemp.addAll(childNodeSelectedPhysicalExams); //For Selected child nodes
+
+        ArrayList<String> rootNodePhysicalExams = parseExams(currentNode);
+        if (rootNodePhysicalExams != null && !rootNodePhysicalExams.isEmpty())
+            physExamsTemp.addAll(rootNodePhysicalExams); //For Root Node
+
+        if (intentTag!= null && intentTag.equals("edit")){
+            Set<String> selectedExams = new LinkedHashSet<>(physExamsTemp);
+            sessionManager.setVisitSummary(patientUuid, selectedExams);
+        }
+        else{
+            Set<String> selectedExams = new LinkedHashSet<>(physExamsTemp);
+            sessionManager.setVisitSummary(patientUuid, selectedExams);
+        }
+        if (hasLicense) {
+            try {
+                famFile = new JSONObject(FileUtils.readFileRoot(famFileName, this));
+                famHistoryMap = new Node(famFile); //Load the patient history mind map
+                patFile= new JSONObject(FileUtils.readFileRoot(patFileName, this));
+                 patHistoryMap = new Node(patFile);
+                physFile = new JSONObject(FileUtils.readFileRoot(physFileName,this));
+                 physExamMap= new PhysicalExam(physFile, physExamsTemp);
+            } catch (JSONException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+            }
+        } else {
+             patHistoryMap = new Node(FileUtils.encodeJSON(this, patFileName)); //Load the patient history mind map
+             famHistoryMap = new Node(FileUtils.encodeJSON(this, famFileName)); //Load the patient history mind map
+             physExamMap = new PhysicalExam(FileUtils.encodeJSON(this, physFileName), physExamsTemp); //Load the patient history mind map
+        }
+
+        for (int i=0; i< currentNode.getOptionsList().size(); i++){
+            nodeHeaders.add(currentNode.getOption(i).getText());
+        }
+        for (int i = 0; i < patHistoryMap.getOptionsList().size(); i++){
+            nodeHeaders.add(patHistoryMap.getOption(i).getText());
+        }
+        for (int i = 0; i < physExamMap.getTotalNumberOfExams(); i++){
+            Log.d("totExam", String.valueOf(i));
+            nodeHeaders.add(physExamMap.getExamNode(i).getText()); //will have to fix for physExam
+        }
+        Log.d("NodeHeaders", String.valueOf(nodeHeaders));
+        complaintSize=currentNode.getOptionsList().size();
+        patHistSize = patHistoryMap.getOptionsList().size();
+        physExamSize = physExamMap.getTotalNumberOfExams();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        for (int i=0; i < nodeHeaders.size(); i++){
+            menu.add(0, Menu.FIRST+i, Menu.NONE, nodeHeaders.get(i));
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
 
 }

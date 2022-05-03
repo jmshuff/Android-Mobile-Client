@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="Complaints"
+        android:id="@+id/menu_complaints"/>
+
+    <item
+        android:title="Patient History"
+        android:id="@+id/menu_patHist"/>
+    <item
+        android:title="Visual Acuity"
+        android:id="@+id/menu_va"/>
+
+
+</menu>

@@ -106,12 +106,15 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
     SessionManager sessionManager = null;
     private String encounterVitals;
-    private String encounterAdultIntials, EncounterAdultInitial_LatestVisit;
+    private String encounterAdultIntials,
+
+    EncounterAdultInitial_LatestVisit;
     RecyclerView pastMedical_recyclerView;
     QuestionsAdapter adapter;
     ScrollingPagerIndicator recyclerViewIndicator;
     String new_result;
     ArrayList<imageDisplay> imageList;
+    int scrollPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +137,8 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             patientName = intent.getStringExtra("name");
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
             intentTag = intent.getStringExtra("tag");
+            scrollPos=intent.getIntExtra("scrollPos", 0);
+
 
             if (edit_PatHist == null)
                 new_result = getPastMedicalVisitData();
@@ -290,6 +295,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         pastMedical_recyclerView.setAdapter(adapter);
 
         recyclerViewIndicator.attachToRecyclerView(pastMedical_recyclerView);
+        pastMedical_recyclerView.scrollToPosition(scrollPos);
 
 
 
@@ -733,9 +739,15 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         // String[] columns = {"value"};
 
         String[] columns = {"value", " conceptuuid"};
+        String[] medHistArgs;
         try {
             String medHistSelection = "encounteruuid = ? AND conceptuuid = ? AND voided!='1'";
-            String[] medHistArgs = {EncounterAdultInitial_LatestVisit, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB};
+            if (EncounterAdultInitial_LatestVisit!=null){
+                medHistArgs = new String[]{EncounterAdultInitial_LatestVisit, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB};
+            }
+            else{
+                medHistArgs = new String[]{encounterAdultIntials, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB};
+            }
             Cursor medHistCursor = localdb.query("tbl_obs", columns, medHistSelection, medHistArgs, null, null, null);
             medHistCursor.moveToLast();
             result = medHistCursor.getString(medHistCursor.getColumnIndexOrThrow("value"));

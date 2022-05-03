@@ -1983,7 +1983,7 @@ public class Node implements Serializable {
                 Log.d("1", node_opt.toString());
                 if (node_opt.isSelected()) {
                     Log.d("patHistGet", node_opt.getText());
-                    if (node_opt.getText().toLowerCase().contains("patient history eye")){
+                    if (node_opt.getText().toLowerCase().contains("medical history")){
                         patHist=node_opt.formLanguage();
                         patHist.replace(" - ", ", ");
                         setPatHistDB(patHist);

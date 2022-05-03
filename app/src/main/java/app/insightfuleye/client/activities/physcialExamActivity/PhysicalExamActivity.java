@@ -31,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -60,6 +59,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.MenuNodeActivity;
 import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
 import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
@@ -82,7 +82,7 @@ import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.utilities.pageindicator.ScrollingPagerIndicator;
 
-public class PhysicalExamActivity extends AppCompatActivity implements QuestionsAdapter.FabClickListener {
+public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsAdapter.FabClickListener {
     final static String TAG = PhysicalExamActivity.class.getSimpleName();
     // private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -97,6 +97,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     String patientName;
     String intentTag;
     private float float_ageYear_Month;
+    int scrollPos;
 
     ArrayList<String> selectedExamsList;
 
@@ -190,6 +191,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             patientName = intent.getStringExtra("name");
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
             intentTag = intent.getStringExtra("tag");
+            scrollPos= intent.getIntExtra("scrollPos", 0);
             Set<String> selectedExams = sessionManager.getVisitSummary(patientUuid);
             selectedExamsList.clear();
             if (selectedExams != null)
@@ -303,6 +305,8 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         adapter = new QuestionsAdapter(this, physicalExamMap, physExam_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
         physExam_recyclerView.setAdapter(adapter);
         recyclerViewIndicator.attachToRecyclerView(physExam_recyclerView);
+
+        physExam_recyclerView.scrollToPosition(scrollPos);
 
     }
 
