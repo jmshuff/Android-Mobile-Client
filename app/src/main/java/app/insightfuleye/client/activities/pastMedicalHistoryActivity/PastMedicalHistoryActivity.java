@@ -1,11 +1,13 @@
 package app.insightfuleye.client.activities.pastMedicalHistoryActivity;
 
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -33,11 +35,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +62,7 @@ import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
+import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.UuidDictionary;
@@ -291,6 +297,9 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         // flaoting value of age is passed to Node for comparison...
         patientHistoryMap.fetchAge(float_ageYear_Month);
 
+        if (intentTag.equals("edit")){
+            setScreen();
+        }
         adapter = new QuestionsAdapter(this, patientHistoryMap, pastMedical_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
         pastMedical_recyclerView.setAdapter(adapter);
 
@@ -528,6 +537,12 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             }
         }
 
+        try {
+            generateSelected();
+        } catch (DAOException e) {
+            e.printStackTrace();
+        }
+
 
         if (intentTag != null && intentTag.equals("edit")) {
             updateDatabase(insertion);
@@ -760,5 +775,203 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
         return result;
     }
+
+    private boolean insertEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        getEditNodeQueue();
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "patHist");
+            contentValues.put("questionSubSelected", subSelected);
+            contentValues.put("questionRightSelected", rightSelected);
+            contentValues.put("questionLeftSelected", leftSelected);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_edit_node", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+        } finally {
+            localdb.endTransaction();
+
+        }
+        getEditNodeQueue();
+        return isInserted;
+    }
+
+    private void updateEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        int updatedCount=0;
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        String selection= "visitID=? AND patientID = ? AND type = ?";
+        String[] nodeArgs = {visitUuid, patientUuid, "patHist"};
+
+
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "patHist");
+            contentValues.put("questionSubSelected", subSelected);
+            contentValues.put("questionRightSelected", rightSelected);
+            contentValues.put("questionLeftSelected", leftSelected);
+            //contentValues.put("sync", "false");
+
+            updatedCount = localdb.update("tbl_edit_node", contentValues, selection, nodeArgs);
+
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            Logger.logE(TAG, "exception ", e);
+        } finally {
+            localdb.endTransaction();
+        }
+
+        if (updatedCount == 0) {
+            try {
+                insertEditDB(subSelected, rightSelected, leftSelected);
+            } catch (DAOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+            }
+        }
+    }
+
+    public void generateSelected() throws DAOException {
+        ArrayList<ArrayList<Integer>> allSelected= new ArrayList<>();
+        ArrayList<ArrayList<Integer>> rightSelected = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> leftSelected = new ArrayList<>();
+        for (int i=0; i< patientHistoryMap.getOptionsList().size(); i++ ){
+            allSelected.add(patientHistoryMap.getOption(i).getSubSelected());
+            rightSelected.add(patientHistoryMap.getOption(i).getRightSubSelected());
+            leftSelected.add(patientHistoryMap.getOption(i).getLeftSubSelected());
+        }
+        Log.d("AllSelected", String.valueOf(allSelected));
+        Log.d("RSelected", String.valueOf(rightSelected));
+        Log.d("LSelected", String.valueOf(leftSelected));
+
+        Gson gson = new Gson();
+        String inputSub= gson.toJson(allSelected);
+        String inputRight = gson.toJson(rightSelected);
+        String inputLeft = gson.toJson(leftSelected);
+
+        if(intentTag.equals("edit")){
+            updateEditDB(inputSub, inputRight, inputLeft);
+        }
+        else{
+            insertEditDB(inputSub, inputRight, inputLeft);
+
+        }
+    }
+
+    private void setScreen() {
+        Log.d("setScreen", "enter");
+        String allSub = "";
+        String rightSub= "";
+        String leftSub="";
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        db.beginTransaction();
+
+        String nodeSelection = "visitID=? AND patientID=? AND type=?";
+        String[] nodeArgs = {visitUuid, patientUuid, "patHist"};
+        String[] columns = {"questionSubSelected", "questionRightSelected", "questionLeftSelected"};
+        try{
+            Cursor nodeCursor = db.query("tbl_edit_node", columns, nodeSelection, nodeArgs, null, null, null);
+            nodeCursor.moveToLast();
+            allSub = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionSubSelected"));
+            rightSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionRightSelected"));
+            leftSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionLeftSelected"));
+            nodeCursor.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<ArrayList<Integer>>>() {}.getType();
+        ArrayList<ArrayList<Integer>>  allSubSelected = gson.fromJson(allSub, type);
+        ArrayList<ArrayList<Integer>>  rightSubSelected = gson.fromJson(rightSub, type);
+        ArrayList<ArrayList<Integer>>  leftSubSelected = gson.fromJson(leftSub, type);
+        Log.d("allSelectedSet", String.valueOf(allSubSelected) + " " + String.valueOf(rightSubSelected) + " " + String.valueOf(leftSubSelected));
+
+        if(allSubSelected!=null) {
+            if (allSubSelected.size() == patientHistoryMap.getOptionsList().size()) {
+                for (int i = 0; i < allSubSelected.size(); i++) {
+                    if (!patientHistoryMap.getOption(i).isBilateral()) {
+                        for (int j = 0; j < allSubSelected.get(i).size(); j++) {
+                            patientHistoryMap.getOption(i).getOption(allSubSelected.get(i).get(j)).setSelected(true);
+                            if (patientHistoryMap.getOption(i).anySubSelected()) {
+                                patientHistoryMap.getOption(i).setSelected(true);
+                            }
+                        }
+
+                    } else {
+                        for (int j = 0; j < rightSubSelected.get(i).size(); j++) {
+                            Log.d("arraylistR", String.valueOf(i) + " " + String.valueOf(j));
+                            patientHistoryMap.getOption(i).getOption(rightSubSelected.get(i).get(j)).setRightSelected(true);
+                            if (patientHistoryMap.getOption(i).anySubRightSelected()) {
+                                patientHistoryMap.getOption(i).setRightSelected(true);
+                            }
+
+                            patientHistoryMap.getOption(i).getOption(rightSubSelected.get(i).get(j)).setSelected(true);
+                            if (patientHistoryMap.getOption(i).anySubSelected()) {
+                                patientHistoryMap.getOption(i).setSelected(true);
+                            }
+                        }
+                        for (int j = 0; j < leftSubSelected.get(i).size(); j++) {
+                            Log.d("arraylistL", String.valueOf(i) + " " + String.valueOf(j));
+                            patientHistoryMap.getOption(i).getOption(leftSubSelected.get(i).get(j)).setLeftSelected(true);
+                            if (patientHistoryMap.getOption(i).anySubLeftSelected()) {
+                                patientHistoryMap.getOption(i).setLeftSelected(true);
+                            }
+
+                            patientHistoryMap.getOption(i).getOption(leftSubSelected.get(i).get(j)).setSelected(true);
+                            if (patientHistoryMap.getOption(i).anySubSelected()) {
+                                patientHistoryMap.getOption(i).setSelected(true);
+                            }
+                        }
+
+
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    public ArrayList<ArrayList<String>> getEditNodeQueue() throws DAOException {
+        //get unsynced images from local storage
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ArrayList<ArrayList<String>> editQueue = new ArrayList<>();
+        try {
+            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_edit_node", null);
+            if (idCursor.getCount() != 0) {
+                while (idCursor.moveToNext()) {
+                    ArrayList<String> temp = new ArrayList<>();
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("patientID")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("visitID")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionSubSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionRightSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionLeftSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
+                    editQueue.add(temp);
+                }
+            }
+            idCursor.close();
+        } catch (SQLiteException e) {
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        Log.d("editqueue", String.valueOf(editQueue));
+        return editQueue;
+    }
+
 }
 

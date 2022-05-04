@@ -6,6 +6,8 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -45,6 +47,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +56,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -76,6 +81,7 @@ import app.insightfuleye.client.models.azureResults;
 import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
+import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.UuidDictionary;
@@ -302,6 +308,9 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         physicalExamMap.fetchAge(float_ageYear_Month);
         physicalExamMap.refresh(selectedExamsList); //refreshing the physical exam nodes with updated json
 
+        if (intentTag.equals("edit")){
+            setScreen();
+        }
         adapter = new QuestionsAdapter(this, physicalExamMap, physExam_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
         physExam_recyclerView.setAdapter(adapter);
         recyclerViewIndicator.attachToRecyclerView(physExam_recyclerView);
@@ -508,6 +517,12 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
                 for (String imagePath : imagePathList) {
                     updateImageDatabase();
                 }
+            }
+
+            try {
+                generateSelected();
+            } catch (DAOException e) {
+                e.printStackTrace();
             }
             //update azure database
             try {
@@ -1314,6 +1329,209 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         }
 
     }
+
+    private boolean insertEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        getEditNodeQueue();
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "physExam");
+            contentValues.put("questionSubSelected", subSelected);
+            contentValues.put("questionRightSelected", rightSelected);
+            contentValues.put("questionLeftSelected", leftSelected);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_edit_node", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+        } finally {
+            localdb.endTransaction();
+
+        }
+        getEditNodeQueue();
+        return isInserted;
+    }
+
+    private void updateEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        int updatedCount=0;
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        String selection= "visitID=? AND patientID = ? AND type = ?";
+        String[] nodeArgs = {visitUuid, patientUuid, "physExam"};
+
+
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "physExam");
+            contentValues.put("questionSubSelected", subSelected);
+            contentValues.put("questionRightSelected", rightSelected);
+            contentValues.put("questionLeftSelected", leftSelected);
+            //contentValues.put("sync", "false");
+
+            updatedCount = localdb.update("tbl_edit_node", contentValues, selection, nodeArgs);
+
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            Logger.logE(TAG, "exception ", e);
+        } finally {
+            localdb.endTransaction();
+        }
+
+        if (updatedCount == 0) {
+            try {
+                insertEditDB(subSelected, rightSelected, leftSelected);
+            } catch (DAOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+            }
+        }
+    }
+
+    public void generateSelected() throws DAOException {
+        ArrayList<ArrayList<Integer>> allSelected= new ArrayList<>();
+        ArrayList<ArrayList<Integer>> rightSelected = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> leftSelected = new ArrayList<>();
+        for (int i=0; i< physicalExamMap.getTotalNumberOfExams(); i++ ){
+            for(int j=0; j<physicalExamMap.getExamNode(i).getOptionsList().size(); j++){
+                allSelected.add(physicalExamMap.getExamNode(i).getOption(j).getSubSelected());
+                rightSelected.add(physicalExamMap.getExamNode(i).getOption(j).getRightSubSelected());
+                leftSelected.add(physicalExamMap.getExamNode(i).getOption(j).getLeftSubSelected());
+            }
+
+        }
+        Log.d("AllSelected", String.valueOf(allSelected));
+        Log.d("RSelected", String.valueOf(rightSelected));
+        Log.d("LSelected", String.valueOf(leftSelected));
+
+        Gson gson = new Gson();
+        String inputSub= gson.toJson(allSelected);
+        String inputRight = gson.toJson(rightSelected);
+        String inputLeft = gson.toJson(leftSelected);
+
+        if(intentTag.equals("edit")){
+            updateEditDB(inputSub, inputRight, inputLeft);
+        }
+        else{
+            insertEditDB(inputSub, inputRight, inputLeft);
+
+        }
+    }
+
+    private void setScreen() {
+        Log.d("setScreen", "enter");
+        String allSub = "";
+        String rightSub= "";
+        String leftSub="";
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        db.beginTransaction();
+
+        String nodeSelection = "visitID=? AND patientID=? AND type=?";
+        String[] nodeArgs = {visitUuid, patientUuid, "physExam"};
+        String[] columns = {"questionSubSelected", "questionRightSelected", "questionLeftSelected"};
+        try{
+            Cursor nodeCursor = db.query("tbl_edit_node", columns, nodeSelection, nodeArgs, null, null, null);
+            nodeCursor.moveToLast();
+            allSub = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionSubSelected"));
+            rightSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionRightSelected"));
+            leftSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionLeftSelected"));
+            nodeCursor.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<ArrayList<Integer>>>() {}.getType();
+        ArrayList<ArrayList<Integer>>  allSubSelected = gson.fromJson(allSub, type);
+        ArrayList<ArrayList<Integer>>  rightSubSelected = gson.fromJson(rightSub, type);
+        ArrayList<ArrayList<Integer>>  leftSubSelected = gson.fromJson(leftSub, type);
+        Log.d("allSelectedSet", String.valueOf(allSubSelected) + " " + String.valueOf(rightSubSelected) + " " + String.valueOf(leftSubSelected));
+
+        if(allSubSelected!=null) {
+            if (allSubSelected.size() == physicalExamMap.getTotalNumberOfExams()) {
+                for (int i = 0; i < physicalExamMap.getTotalNumberOfExams(); i++) {
+                    for (int k=0 ; k< physicalExamMap.getExamNode(i).getOptionsList().size(); k++){
+                        if (!physicalExamMap.getExamNode(i).getOption(k).isBilateral()) {
+                            for (int j = 0; j < allSubSelected.get(i).size(); j++) {
+                                physicalExamMap.getExamNode(i).getOption(k).getOption(allSubSelected.get(i).get(j)).setSelected(true);
+                                if (physicalExamMap.getExamNode(i).getOption(k).anySubSelected()) {
+                                    physicalExamMap.getExamNode(i).getOption(k).setSelected(true);
+                                }
+                            }
+
+                        } else {
+                            for (int j = 0; j < rightSubSelected.get(i).size(); j++) {
+                                Log.d("arraylistR", String.valueOf(i) + " " + String.valueOf(j));
+                                physicalExamMap.getExamNode(i).getOption(k).getOption(rightSubSelected.get(i).get(j)).setRightSelected(true);
+                                if (physicalExamMap.getExamNode(i).getOption(k).anySubRightSelected()) {
+                                    physicalExamMap.getExamNode(i).getOption(k).setRightSelected(true);
+                                }
+
+                                physicalExamMap.getExamNode(i).getOption(k).getOption(rightSubSelected.get(i).get(j)).setSelected(true);
+                                if (physicalExamMap.getExamNode(i).getOption(k).anySubSelected()) {
+                                    physicalExamMap.getExamNode(i).getOption(k).setSelected(true);
+                                }
+                            }
+                            for (int j = 0; j < leftSubSelected.get(i).size(); j++) {
+                                Log.d("arraylistL", String.valueOf(i) + " " + String.valueOf(j));
+                                physicalExamMap.getExamNode(i).getOption(k).getOption(leftSubSelected.get(i).get(j)).setLeftSelected(true);
+                                if (physicalExamMap.getExamNode(i).getOption(k).anySubLeftSelected()) {
+                                    physicalExamMap.getExamNode(i).getOption(k).setLeftSelected(true);
+                                }
+
+                                physicalExamMap.getExamNode(i).getOption(k).getOption(leftSubSelected.get(i).get(j)).setSelected(true);
+                                if (physicalExamMap.getExamNode(i).getOption(k).anySubSelected()) {
+                                    physicalExamMap.getExamNode(i).getOption(k).setSelected(true);
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+
+    }
+
+    public ArrayList<ArrayList<String>> getEditNodeQueue() throws DAOException {
+        //get unsynced images from local storage
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ArrayList<ArrayList<String>> editQueue = new ArrayList<>();
+        try {
+            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_edit_node", null);
+            if (idCursor.getCount() != 0) {
+                while (idCursor.moveToNext()) {
+                    ArrayList<String> temp = new ArrayList<>();
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("patientID")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("visitID")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionSubSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionRightSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionLeftSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
+                    editQueue.add(temp);
+                }
+            }
+            idCursor.close();
+        } catch (SQLiteException e) {
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        Log.d("editqueue", String.valueOf(editQueue));
+        return editQueue;
+    }
+
 
 
 

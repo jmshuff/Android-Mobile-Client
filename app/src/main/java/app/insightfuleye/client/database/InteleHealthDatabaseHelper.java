@@ -212,8 +212,9 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "visitId TEXT" +
             ")";
 
+    public static final String drop_edit="DROP TABLE tbl_edit_node";
     public static final String CREATE_EDIT_TABLES = "CREATE TABLE IF NOT EXISTS tbl_edit_node(" +
-            "visitID TEXT PRIMARY KEY," +
+            "visitID TEXT," +
             "patientID TEXT," +
             "type TEXT," + //physExam, complaint, patHist, famHist
             "questionSubSelected TEXT," +

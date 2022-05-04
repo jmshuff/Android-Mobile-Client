@@ -1,11 +1,13 @@
 package app.insightfuleye.client.activities.familyHistoryActivity;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -33,12 +35,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +62,7 @@ import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.models.imageDisplay;
 import app.insightfuleye.client.utilities.FileUtils;
+import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
@@ -255,6 +261,9 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
 
         //  familyListView = findViewById(R.id.family_history_expandable_list_view);
 
+        if (intentTag.equals("edit")){
+            setScreen();
+        }
         adapter = new QuestionsAdapter(this, familyHistoryMap, family_history_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
         family_history_recyclerView.setAdapter(adapter);
         recyclerViewIndicator.attachToRecyclerView(family_history_recyclerView);
@@ -485,6 +494,11 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
             }
         }
 
+        try {
+            generateSelected();
+        } catch (DAOException e) {
+            e.printStackTrace();
+        }
 
         if (intentTag != null && intentTag.equals("edit")) {
             updateDatabase(insertion);
@@ -653,6 +667,171 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
             Animation bottomUp = AnimationUtils.loadAnimation(this,
                     R.anim.bottom_up);
             v.startAnimation(bottomUp);
+        }
+
+    }
+
+    private boolean insertEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "famHist");
+            contentValues.put("questionSubSelected", subSelected);
+            contentValues.put("questionRightSelected", rightSelected);
+            contentValues.put("questionLeftSelected", leftSelected);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_edit_node", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return isInserted;
+    }
+
+    private void updateEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        int updatedCount=0;
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        String selection= "visitID=? AND patientID = ? AND type = ?";
+        String[] nodeArgs = {visitUuid, patientUuid, "famHist"};
+
+
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "famHist");
+            contentValues.put("questionSubSelected", subSelected);
+            contentValues.put("questionRightSelected", rightSelected);
+            contentValues.put("questionLeftSelected", leftSelected);
+            //contentValues.put("sync", "false");
+
+            updatedCount = localdb.update("tbl_edit_node", contentValues, selection, nodeArgs);
+
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            Logger.logE(TAG, "exception ", e);
+        } finally {
+            localdb.endTransaction();
+        }
+
+        if (updatedCount == 0) {
+            try {
+                insertEditDB(subSelected, rightSelected, leftSelected);
+            } catch (DAOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+            }
+        }
+    }
+
+    public void generateSelected() throws DAOException {
+        ArrayList<ArrayList<Integer>> allSelected= new ArrayList<>();
+        ArrayList<ArrayList<Integer>> rightSelected = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> leftSelected = new ArrayList<>();
+        for (int i=0; i< familyHistoryMap.getOptionsList().size(); i++ ){
+            allSelected.add(familyHistoryMap.getOption(i).getSubSelected());
+            rightSelected.add(familyHistoryMap.getOption(i).getRightSubSelected());
+            leftSelected.add(familyHistoryMap.getOption(i).getLeftSubSelected());
+        }
+        Log.d("AllSelected", String.valueOf(allSelected));
+        Log.d("RSelected", String.valueOf(rightSelected));
+        Log.d("LSelected", String.valueOf(leftSelected));
+
+        Gson gson = new Gson();
+        String inputSub= gson.toJson(allSelected);
+        String inputRight = gson.toJson(rightSelected);
+        String inputLeft = gson.toJson(leftSelected);
+
+        if(intentTag.equals("edit")){
+            updateEditDB(inputSub, inputRight, inputLeft);
+        }
+        else{
+            insertEditDB(inputSub, inputRight, inputLeft);
+
+        }
+    }
+
+    private void setScreen() {
+        Log.d("setScreen", "enter");
+        String allSub = "";
+        String rightSub= "";
+        String leftSub="";
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        db.beginTransaction();
+
+        String nodeSelection = "visitID=? AND patientID=? AND type=?";
+        String[] nodeArgs = {visitUuid, patientUuid, "famHist"};
+        String[] columns = {"questionSubSelected", "questionRightSelected", "questionLeftSelected"};
+        try{
+            Cursor nodeCursor = db.query("tbl_edit_node", columns, nodeSelection, nodeArgs, null, null, null);
+            nodeCursor.moveToLast();
+            allSub = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionSubSelected"));
+            rightSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionRightSelected"));
+            leftSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionLeftSelected"));
+            nodeCursor.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<ArrayList<Integer>>>() {}.getType();
+        ArrayList<ArrayList<Integer>>  allSubSelected = gson.fromJson(allSub, type);
+        ArrayList<ArrayList<Integer>>  rightSubSelected = gson.fromJson(rightSub, type);
+        ArrayList<ArrayList<Integer>>  leftSubSelected = gson.fromJson(leftSub, type);
+        Log.d("allSelectedSet", String.valueOf(allSubSelected) + " " + String.valueOf(rightSubSelected) + " " + String.valueOf(leftSubSelected));
+
+        if(allSubSelected!=null) {
+            if (allSubSelected.size() == familyHistoryMap.getOptionsList().size()) {
+                for (int i = 0; i < allSubSelected.size(); i++) {
+                    if (!familyHistoryMap.getOption(i).isBilateral()) {
+                        for (int j = 0; j < allSubSelected.get(i).size(); j++) {
+                            familyHistoryMap.getOption(i).getOption(allSubSelected.get(i).get(j)).setSelected(true);
+                            if (familyHistoryMap.getOption(i).anySubSelected()) {
+                                familyHistoryMap.getOption(i).setSelected(true);
+                            }
+                        }
+
+                    } else {
+                        for (int j = 0; j < rightSubSelected.get(i).size(); j++) {
+                            Log.d("arraylistR", String.valueOf(i) + " " + String.valueOf(j));
+                            familyHistoryMap.getOption(i).getOption(rightSubSelected.get(i).get(j)).setRightSelected(true);
+                            if (familyHistoryMap.getOption(i).anySubRightSelected()) {
+                                familyHistoryMap.getOption(i).setRightSelected(true);
+                            }
+
+                            familyHistoryMap.getOption(i).getOption(rightSubSelected.get(i).get(j)).setSelected(true);
+                            if (familyHistoryMap.getOption(i).anySubSelected()) {
+                                familyHistoryMap.getOption(i).setSelected(true);
+                            }
+                        }
+                        for (int j = 0; j < leftSubSelected.get(i).size(); j++) {
+                            Log.d("arraylistL", String.valueOf(i) + " " + String.valueOf(j));
+                            familyHistoryMap.getOption(i).getOption(leftSubSelected.get(i).get(j)).setLeftSelected(true);
+                            if (familyHistoryMap.getOption(i).anySubLeftSelected()) {
+                                familyHistoryMap.getOption(i).setLeftSelected(true);
+                            }
+
+                            familyHistoryMap.getOption(i).getOption(leftSubSelected.get(i).get(j)).setSelected(true);
+                            if (familyHistoryMap.getOption(i).anySubSelected()) {
+                                familyHistoryMap.getOption(i).setSelected(true);
+                            }
+                        }
+
+
+                    }
+                }
+
+            }
         }
 
     }

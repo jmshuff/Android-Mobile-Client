@@ -206,6 +206,13 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         Log.d("intentTag", intentTag);
 
         if (intentTag.equals("edit")){
+            ArrayList<ArrayList<String>> queue= null;
+            try {
+                queue = getEditNodeQueue();
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+            Log.d("queueEdit", String.valueOf(queue));
             setScreen();
         }
         //In the event there is more than one complaint, they will be prompted one at a time.
@@ -242,6 +249,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         db.beginTransaction();
 
         String nodeSelection = "visitID=? AND patientID=? AND type=?";
+        Log.d("params", visitUuid + " " + patientUuid);
         String[] nodeArgs = {visitUuid, patientUuid, "complaint"};
         String[] columns = {"questionSubSelected", "questionRightSelected", "questionLeftSelected"};
         try{
@@ -256,12 +264,13 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         }
         db.setTransactionSuccessful();
         db.endTransaction();
+        Log.d("allsubout", allSub);
 
         Gson gson = new Gson();
         Type type = new TypeToken<ArrayList<ArrayList<Integer>>>() {}.getType();
-        ArrayList<ArrayList<Integer>>  allSubSelected = gson.fromJson(allSub, type);
-        ArrayList<ArrayList<Integer>>  rightSubSelected = gson.fromJson(rightSub, type);
-        ArrayList<ArrayList<Integer>>  leftSubSelected = gson.fromJson(leftSub, type);
+        ArrayList<ArrayList<Integer>> allSubSelected = gson.fromJson(allSub, type);
+        ArrayList<ArrayList<Integer>> rightSubSelected = gson.fromJson(rightSub, type);
+        ArrayList<ArrayList<Integer>> leftSubSelected = gson.fromJson(leftSub, type);
         Log.d("allSelectedSet", String.valueOf(allSubSelected) + " " + String.valueOf(rightSubSelected) + " " + String.valueOf(leftSubSelected));
 
         if(allSubSelected!=null) {
@@ -270,19 +279,38 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                     if (!currentNode.getOption(i).isBilateral()) {
                         for (int j = 0; j < allSubSelected.get(i).size(); j++) {
                             currentNode.getOption(i).getOption(allSubSelected.get(i).get(j)).setSelected(true);
+                            if (currentNode.getOption(i).anySubSelected()) {
+                                currentNode.getOption(i).setSelected(true);
+                            }
                         }
 
                     } else {
                         for (int j = 0; j < rightSubSelected.get(i).size(); j++) {
                             Log.d("arraylistR", String.valueOf(i) + " " + String.valueOf(j));
                             currentNode.getOption(i).getOption(rightSubSelected.get(i).get(j)).setRightSelected(true);
-                            //if selected, set main selected
+                            if (currentNode.getOption(i).anySubRightSelected()) {
+                                currentNode.getOption(i).setRightSelected(true);
+                            }
+
+                            currentNode.getOption(i).getOption(rightSubSelected.get(i).get(j)).setSelected(true);
+                            if (currentNode.getOption(i).anySubSelected()) {
+                                currentNode.getOption(i).setSelected(true);
+                            }
                         }
                         for (int j = 0; j < leftSubSelected.get(i).size(); j++) {
                             Log.d("arraylistL", String.valueOf(i) + " " + String.valueOf(j));
                             currentNode.getOption(i).getOption(leftSubSelected.get(i).get(j)).setLeftSelected(true);
-                            //if selected, set main selected
+                            if (currentNode.getOption(i).anySubLeftSelected()) {
+                                currentNode.getOption(i).setLeftSelected(true);
+                            }
+
+                            currentNode.getOption(i).getOption(leftSubSelected.get(i).get(j)).setSelected(true);
+                            if (currentNode.getOption(i).anySubSelected()) {
+                                currentNode.getOption(i).setSelected(true);
+                            }
                         }
+
+
                     }
                 }
 
@@ -631,6 +659,8 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
 
     private boolean insertEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
         boolean isInserted = false;
+        Log.d("editdb", "enter");
+        Log.d("paramsinsert", visitUuid + " " + patientUuid + subSelected + " " + rightSelected + " " + leftSelected);
         SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         localdb.beginTransaction();
         ContentValues contentValues = new ContentValues();
@@ -651,10 +681,13 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             localdb.endTransaction();
 
         }
+        ArrayList<ArrayList<String>> editQueue = getEditNodeQueue();
+        Log.d("queue", String.valueOf(editQueue));
         return isInserted;
     }
 
     private void updateEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
+        Log.d("updateedit","enter");
         SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         int updatedCount=0;
         localdb.beginTransaction();
@@ -713,7 +746,6 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         }
         else{
             insertEditDB(inputSub, inputRight, inputLeft);
-
         }
     }
 
@@ -1210,6 +1242,36 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             menu.add(0, Menu.FIRST+i, Menu.NONE, nodeHeaders.get(i));
         }
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    public ArrayList<ArrayList<String>> getEditNodeQueue() throws DAOException {
+        //get unsynced images from local storage
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ArrayList<ArrayList<String>> editQueue = new ArrayList<>();
+        try {
+            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_edit_node", null);
+            if (idCursor.getCount() != 0) {
+                while (idCursor.moveToNext()) {
+                    ArrayList<String> temp = new ArrayList<>();
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("patientID")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("visitID")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionSubSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionRightSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("questionLeftSelected")));
+                    temp.add(idCursor.getString(idCursor.getColumnIndexOrThrow("type")));
+                    editQueue.add(temp);
+                }
+            }
+            idCursor.close();
+        } catch (SQLiteException e) {
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        Log.d("editqueue", String.valueOf(editQueue));
+        return editQueue;
     }
 
 }
