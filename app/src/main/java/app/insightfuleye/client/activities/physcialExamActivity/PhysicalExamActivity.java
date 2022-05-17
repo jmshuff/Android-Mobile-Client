@@ -511,12 +511,17 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     public void fabClickedAtEnd() {
 
         complaintConfirmed = physicalExamMap.areRequiredAnswered();
+        String physExamTamil="";
 
         if (complaintConfirmed) {
             physicalExamMap.getPhysicalConcepts();
             physicalDisplay = physicalExamMap.generateFindings();
             physicalString = physicalExamMap.generateTable();
 
+            if (sessionManager.getCurrentLang().equals("ta")){
+                physExamTamil= physicalExamMap.generateFindingsTamil();
+            }
+            insertLanguageTamil(physExamTamil, physicalDisplay);
 
             List<String> imagePathList = physicalExamMap.getImagePathList();
 
@@ -1796,6 +1801,37 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             physExam_recyclerView.scrollToPosition(id - complaintSize - patHistSize);
         }
         return true;
+    }
+
+    private boolean insertLanguageTamil(String physExamTamil, String physExamDisplay) {
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        ContentValues contentValues1 = new ContentValues();
+        try {
+            if (physExamTamil!= null && physExamTamil!= ""){
+                contentValues.put("visitID", visitUuid);
+                contentValues.put("patientID", patientUuid);
+                contentValues.put("type", "physExamTamil");
+                contentValues.put("inputString", physExamTamil);
+                //contentValues.put("sync", "false");
+                localdb.insertWithOnConflict("tbl_tamil_summary", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+            contentValues1.put("visitID", visitUuid);
+            contentValues1.put("patientID", patientUuid);
+            contentValues1.put("inputString", physExamDisplay);
+            contentValues1.put("type", "physExamDisplay");
+            localdb.insertWithOnConflict("tbl_tamil_summary", null, contentValues1, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return isInserted;
     }
 
 

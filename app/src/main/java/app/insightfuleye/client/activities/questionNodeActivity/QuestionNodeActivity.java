@@ -573,7 +573,6 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             String locale = sessionManager.getCurrentLang();
             if (locale.equals("ta")){
                 String complaintStringTamil=currentNode.generateLanguageTamil();
-                complaintStringTamil = complaintStringTamil.replace(" - ", " ");
                 insertLanguageTamil(complaintStringTamil);
             }
 
@@ -594,7 +593,6 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                     insertion = insertion.concat(Node.bullet_arrow + "<b>" + complaint + "</b>" + ": " + Node.next_line + " ");
                 }
             }
-            insertion= insertion.replace("-", "");
             insertion = insertion.replace(", Right Eye", "");
             insertion = insertion.replace(", Left Eye", "");
 

@@ -379,12 +379,10 @@ public class PhysicalExam extends Node {
                 }
 
                 else stringsList.add(bullet + " " + levelTwo + ": " + node.getLanguage());
-                Log.d("Findings1", String.valueOf(stringsList));
                 if (!node.isTerminal()) {
                     String lang = node.formLanguage();
                     stringsList.add(lang);
                 }
-                Log.i("Findings2", String.valueOf(stringsList));
 
             }
         }
@@ -408,9 +406,64 @@ public class PhysicalExam extends Node {
 //        mLanguage = removeCharsFindings(mLanguage);
         mLanguage = mLanguage.replaceAll("\\. -", "");
         mLanguage = mLanguage.replaceAll("\\.", "\\. ");
-        mLanguage = mLanguage.replaceAll("\\: -", "\\: ");
         mLanguage = mLanguage.replaceAll("% - ", "");
         mLanguage = mLanguage.replace(next_line,"-");
+        mLanguage = mLanguage.replaceAll("\\: -", "\\: ");
+        mLanguage = mLanguage.replaceAll("-"+ bullet, next_line + bullet);
+        mLanguage = mLanguage.replaceAll("-"+"<b>", next_line +"<b>");
+        mLanguage = mLanguage.replaceAll("</b>"+ bullet,"</b>"+ next_line + bullet);
+
+        if(StringUtils.right(mLanguage,2).equals(" -")){
+            mLanguage = mLanguage.substring(0,mLanguage.length()-2);
+        }
+
+        mLanguage = mLanguage.replaceAll("%-"," ");
+        return mLanguage;
+    }
+
+    public String generateFindingsTamil() {
+        String mLanguage = "";
+        Set<String> rootStrings = new HashSet<>();
+        List<String> stringsList = new ArrayList<>();
+
+        int total = this.totalExams;
+        for (int i = 0; i < total; i++) {
+            Node node = getExamNode(i);
+
+            String title = getTitle(i);
+            String[] split = title.split(" : ");
+            String levelOne = split[0];
+            String levelTwo = split[1];
+
+            if ((node.isSelected() | node.anySubSelected())) {
+                boolean checkSet = rootStrings.add(levelOne);
+
+                if (checkSet) {
+                    stringsList.add("<b>" + levelOne + ": " + "</b>" + bullet + " ");
+                    Log.d("checkSet", String.valueOf(stringsList));
+                }
+
+                else stringsList.add(bullet + " " + levelTwo + ": ");
+                if (!node.isTerminal()) {
+                    String lang = node.formLanguageTamil();
+                    stringsList.add(lang);
+                }
+
+            }
+        }
+
+
+        String languageSeparator = next_line;
+
+        for (int i = 0; i < stringsList.size(); i++) {
+            mLanguage = mLanguage.concat(stringsList.get(i) + languageSeparator);
+        }
+        mLanguage = mLanguage.replaceAll("\\. -", "");
+        mLanguage = mLanguage.replaceAll("\\.", "\\. ");
+        mLanguage = mLanguage.replaceAll("% - ", "");
+        mLanguage = mLanguage.replace(next_line,"-");
+        mLanguage = mLanguage.replaceAll("\\: -", "\\: ");
+        mLanguage = mLanguage.replaceAll(bullet + "-", bullet);
         mLanguage = mLanguage.replaceAll("-"+ bullet, next_line + bullet);
         mLanguage = mLanguage.replaceAll("-"+"<b>", next_line +"<b>");
         mLanguage = mLanguage.replaceAll("</b>"+ bullet,"</b>"+ next_line + bullet);

@@ -435,7 +435,6 @@ public class VisitSummaryActivity extends AppCompatActivity {
             intentTag = intent.getStringExtra("tag");
             isPastVisit = intent.getBooleanExtra("pastVisit", false);
 //            hasPrescription = intent.getStringExtra("hasPrescription");
-            physicalDisplay=intent.getStringExtra("physicalDisplay");
 
             Set<String> selectedExams = sessionManager.getVisitSummary(patientUuid);
             if (physicalExams == null) physicalExams = new ArrayList<>();
@@ -1041,15 +1040,15 @@ public class VisitSummaryActivity extends AppCompatActivity {
             famHistView.setText(Html.fromHtml(famHistory.getValue()));
         if (patHistory.getValue() != null)
             patHistView.setText(Html.fromHtml(patHistory.getValue()));
-        if(physicalDisplay!=null)
+
+        getTamilDisplay();
+        if(physicalDisplay!=null & physicalDisplay!="")
             physFindingsView.setText(Html.fromHtml(physicalDisplay));
         else {
             if (phyExam.getValue() != null)
                 //physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
                 physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
         }
-        getTamilDisplay();
-
         Log.d("lang", sessionManager.getCurrentLang());
         if(sessionManager.getCurrentLang().equals("ta")){
             if (complaintTamil!= null && complaintTamil!="") complaintView.setText(Html.fromHtml(complaintTamil));
@@ -3974,6 +3973,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
                     else if (type.equals("physExamTamil")){
                         physExamTamil=inputString;
                     }
+                    else if (type.equals("physExamDisplay"))
+                        physicalDisplay=inputString;
                 }
             }
             nodeCursor.close();

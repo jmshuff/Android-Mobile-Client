@@ -875,7 +875,7 @@ public class Node implements Serializable {
                             }
                         } else {
                             Log.d("generatelanguage",node_opt.getLanguage());
-                            raw = raw + (bullet + " " + node_opt.getLanguage() + " - " + generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
+                            raw = raw + (bullet + " " + node_opt.getLanguage() + " " + generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
                         }
 
                     } else {
@@ -883,12 +883,12 @@ public class Node implements Serializable {
                             if (node_opt.getLanguage().equals("%")) {
                                 raw = raw + bullet + " " + node_opt.formLanguageTamil() + next_line;
                             } else if (node_opt.getLanguage().substring(0, 1).equals("%")) {
-                                raw = raw + (bullet + " " + node_opt.getLanguage().substring(1) + " - " + node_opt.formLanguageTamil()) + next_line;
+                                raw = raw + (bullet + " " + node_opt.getLanguage().substring(1) + " " + node_opt.formLanguageTamil()) + next_line;
                             } else {
                                 //getLanguge= language from json file
                                 Log.d("generatelanguage",node_opt.getLanguage());
 
-                                raw = raw + (bullet + " " + node_opt.getLanguage() + " - " + node_opt.formLanguageTamil()) + next_line;
+                                raw = raw + (bullet + " " + node_opt.getLanguage() + " " + node_opt.formLanguageTamil()) + next_line;
                             }
                         }
                     }
@@ -1968,13 +1968,14 @@ public class Node implements Serializable {
         if (mOptions != null && !mOptions.isEmpty()) {
             for (int i = 0; i < mOptions.size(); i++) {
                 if (mOptions.get(i).isSelected()) {
-                    String test = mOptions.get(i).getDisplay_oriya();
+                    String test = mOptions.get(i).getLanguage();
+                    String input= mOptions.get(i).getDisplay_oriya();
                     if (!test.isEmpty()) {
                         if (test.equals("%")) {
                         } else if (test.substring(0, 1).equals("%")) {
-                            stringsList.add(test.substring(1));
+                            stringsList.add(input);
                         } else {
-                            stringsList.add(test);
+                            stringsList.add(input);
                             if (mOptions.get(i).isRightSelected()){
                                 stringsList.add(" Right Eye");
                             }
@@ -1985,7 +1986,7 @@ public class Node implements Serializable {
                     }
 
                     if (!mOptions.get(i).isTerminal()) {
-                        stringsList.add(mOptions.get(i).formLanguage());
+                        stringsList.add(mOptions.get(i).formLanguageTamil());
 
 
                         isTerminal = false;
@@ -2000,7 +2001,7 @@ public class Node implements Serializable {
         if (isTerminal) {
             languageSeparator = ", ";
         } else {
-            languageSeparator = " - ";
+            languageSeparator = " ";
         }
         String mLanguage = "";
         for (int i = 0; i < stringsList.size(); i++) {

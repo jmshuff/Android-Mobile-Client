@@ -562,6 +562,13 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                     insertionList.add(toInsert);
                 }
             }
+
+            if (sessionManager.getCurrentLang().equals("ta")){
+                String patHistTamil=patientHistoryMap.generateLanguageTamil();
+                patHistTamil = patHistTamil.replace(" - ", " ");
+                insertLanguageTamil(patHistTamil);
+            }
+
         }
 
         for (int i = 0; i < insertionList.size(); i++) {
@@ -1172,6 +1179,29 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             startActivity(intent);
         }
         return true;
+    }
+
+    private boolean insertLanguageTamil(String patHistTamil) {
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "patHistTamil");
+            contentValues.put("inputString", patHistTamil);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_tamil_summary", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return isInserted;
     }
 
 }
