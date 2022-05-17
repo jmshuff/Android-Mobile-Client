@@ -277,6 +277,9 @@ public class VisitSummaryActivity extends AppCompatActivity {
     private String hasPrescription = "";
     private boolean isRespiratory = false;
 
+    String complaintTamil="";
+    String patHistTamil="";
+    String physExamTamil="";
 
    /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -1045,6 +1048,14 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 //physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
                 physFindingsView.setText(Html.fromHtml(phyExam.getValue()));
         }
+        getTamilDisplay();
+
+        Log.d("lang", sessionManager.getCurrentLang());
+        if(sessionManager.getCurrentLang().equals("ta")){
+            if (complaintTamil!= null && complaintTamil!="") complaintView.setText(Html.fromHtml(complaintTamil));
+            if (patHistTamil!=null && patHistTamil!="") patHistView.setText(Html.fromHtml(patHistTamil));
+            if (physExamTamil!=null && physExamTamil!="") physFindingsView.setText(Html.fromHtml(physExamTamil));
+        }
 
 /*
         editVitals.setOnClickListener(new View.OnClickListener() {
@@ -1331,7 +1342,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 physicalDialog.setNegativeButton(getString(R.string.generic_erase_redo), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        if (obsImgdir.exists()) {
+/*                        if (obsImgdir.exists()) {
                             ImagesDAO imagesDAO = new ImagesDAO();
 
                             try {
@@ -1344,7 +1355,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                             } catch (DAOException e1) {
                                 FirebaseCrashlytics.getInstance().recordException(e1);
                             }
-                        }
+                        }*/
                         Intent intent1 = new Intent(VisitSummaryActivity.this, PhysicalExamActivity.class);
                         intent1.putExtra("patientUuid", patientUuid);
                         intent1.putExtra("visitUuid", visitUuid);
@@ -3936,5 +3947,42 @@ public class VisitSummaryActivity extends AppCompatActivity {
         visitCursor.close();
     }
 
+    public void getTamilDisplay(){
+        String type;
+        String inputString;
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        db.beginTransaction();
+
+        String nodeSelection = "visitID=? AND patientID=?";
+        Log.d("params", visitUuid + " " + patientUuid);
+        String[] nodeArgs = {visitUuid, patientUuid};
+        String[] columns = {"inputString", "type"};
+
+        try{
+            Cursor nodeCursor = db.query("tbl_tamil_summary", columns, nodeSelection, nodeArgs, null, null, null);
+            if (nodeCursor.getCount() != 0) {
+                while (nodeCursor.moveToNext()) {
+                    inputString = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("inputString"));
+                    type = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("type"));
+                    Log.d("inputString", inputString + " " + type);
+                    if (type.equals("complaintTamil")){
+                        complaintTamil=inputString;
+                    }
+                    else if (type.equals("patHistTamil")){
+                        patHistTamil=inputString;
+                    }
+                    else if (type.equals("physExamTamil")){
+                        physExamTamil=inputString;
+                    }
+                }
+            }
+            nodeCursor.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+
+        }
+        Log.d("getTamilDisplay", "complaintTamil: " + complaintTamil + " patHistTamil:" + patHistTamil + " physExamTamil: " + physExamTamil);
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
 
 }

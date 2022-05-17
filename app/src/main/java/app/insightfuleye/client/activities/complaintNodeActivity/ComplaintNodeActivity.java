@@ -1,3 +1,4 @@
+
 package app.insightfuleye.client.activities.complaintNodeActivity;
 
 import android.content.DialogInterface;
@@ -34,7 +35,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
@@ -346,6 +349,10 @@ public class ComplaintNodeActivity extends AppCompatActivity {
                 //    @Override
                 //    public void onClick(DialogInterface dialog, int which) {
                 //    dialog.dismiss();
+
+                Set<String> selectedComplaints = new LinkedHashSet<>(selection);
+                sessionManager.setComplaints(patientUuid, selectedComplaints);
+
                 Intent intent = new Intent(
                         ComplaintNodeActivity.this, QuestionNodeActivity.class);
                 intent.putExtra("patientUuid", patientUuid);

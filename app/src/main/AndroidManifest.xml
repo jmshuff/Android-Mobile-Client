@@ -240,12 +240,6 @@
             android:configChanges="uiMode"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity
-            android:name="app.insightfuleye.client.activities.MenuNodeActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="uiMode"
-            android:theme="@style/AppTheme.NoActionBar" />
-
         <service
             android:name="app.insightfuleye.client.utilities.OpenMRSAccountAuthenticatorService"
             android:exported="false">

@@ -55,8 +55,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
 import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
+import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
@@ -205,7 +207,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         setupQuestions(complaintNumber);
         Log.d("intentTag", intentTag);
 
-        if (intentTag.equals("edit")){
+        if (intentTag.equals("edit") || intentTag.equals("return")){
             ArrayList<ArrayList<String>> queue= null;
             try {
                 queue = getEditNodeQueue();
@@ -340,7 +342,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
            }
 
             if(currentNode.getOption(groupPosition).isBilateral()){
-                if(type=="right" || type=="both"){
+                if(type=="right"){
                     question.toggleRightSelected();
                     if (currentNode.getOption(groupPosition).anySubRightSelected()) {
                         currentNode.getOption(groupPosition).setRightSelected(true);
@@ -348,12 +350,44 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                         currentNode.getOption(groupPosition).setRightUnselected();
                     }
                 }
-                if(type=="left" || type=="both"){
+                if(type=="left"){
                     question.toggleLeftSelected();
                     if (currentNode.getOption(groupPosition).anySubLeftSelected()) {
                         currentNode.getOption(groupPosition).setLeftSelected(true);
                     } else {
                         currentNode.getOption(groupPosition).setLeftUnselected();
+                    }
+                }
+
+                if (type=="both"){
+                    if ((question.isRightSelected() && question.isLeftSelected()) || (!question.isRightSelected() && !question.isLeftSelected())){
+                        question.toggleLeftSelected();
+                        if (currentNode.getOption(groupPosition).anySubLeftSelected()) {
+                            currentNode.getOption(groupPosition).setLeftSelected(true);
+                        } else {
+                            currentNode.getOption(groupPosition).setLeftUnselected();
+                        }
+                        question.toggleRightSelected();
+                        if (currentNode.getOption(groupPosition).anySubRightSelected()) {
+                            currentNode.getOption(groupPosition).setRightSelected(true);
+                        } else {
+                            currentNode.getOption(groupPosition).setRightUnselected();
+                        }
+                    }
+                    else if (question.isRightSelected()){
+                        question.toggleLeftSelected();
+                        if (currentNode.getOption(groupPosition).anySubLeftSelected()) {
+                            currentNode.getOption(groupPosition).setLeftSelected(true);
+                        } else {
+                            currentNode.getOption(groupPosition).setLeftUnselected();
+                        }
+                    }else if(question.isLeftSelected()){
+                        question.toggleRightSelected();
+                        if (currentNode.getOption(groupPosition).anySubRightSelected()) {
+                            currentNode.getOption(groupPosition).setRightSelected(true);
+                        } else {
+                            currentNode.getOption(groupPosition).setRightUnselected();
+                        }
                     }
                 }
 
@@ -480,8 +514,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                         } else {
                             currentNode.getOption(groupPosition).setLeftUnselected();
                         }
-                    }
-                    else if(question.isLeftSelected()){
+                    }else if(question.isLeftSelected()){
                         question.toggleRightSelected();
                         if (currentNode.getOption(groupPosition).anySubRightSelected()) {
                             currentNode.getOption(groupPosition).setRightSelected(true);
@@ -533,6 +566,17 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 e.printStackTrace();
             }
             String complaintString = currentNode.generateLanguage();
+
+
+
+//        String locale = Locale.getDefault().getLanguage();
+            String locale = sessionManager.getCurrentLang();
+            if (locale.equals("ta")){
+                String complaintStringTamil=currentNode.generateLanguageTamil();
+                complaintStringTamil = complaintStringTamil.replace(" - ", " ");
+                insertLanguageTamil(complaintStringTamil);
+            }
+
             currentNode.generateTableResults();
 
             if (complaintString != null && !complaintString.isEmpty()) {
@@ -550,6 +594,10 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                     insertion = insertion.concat(Node.bullet_arrow + "<b>" + complaint + "</b>" + ": " + Node.next_line + " ");
                 }
             }
+            insertion= insertion.replace("-", "");
+            insertion = insertion.replace(", Right Eye", "");
+            insertion = insertion.replace(", Left Eye", "");
+
             ArrayList<String> selectedAssociatedComplaintsList = currentNode.getSelectedAssociations();
             if (selectedAssociatedComplaintsList != null && !selectedAssociatedComplaintsList.isEmpty()) {
                 for (String associatedComplaint : selectedAssociatedComplaintsList) {
@@ -583,7 +631,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                 if (intentTag != null && intentTag.equals("edit")) {
                     Log.i(TAG, "fabClick: update" + insertion);
                     updateDatabase(insertion);
-                    Intent intent = new Intent(QuestionNodeActivity.this, PhysicalExamActivity.class);
+                    Intent intent = new Intent(QuestionNodeActivity.this, VisitSummaryActivity.class);
                     intent.putExtra("patientUuid", patientUuid);
                     intent.putExtra("visitUuid", visitUuid);
                     intent.putExtra("encounterUuidVitals", encounterVitals);
@@ -629,6 +677,30 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         //question_recyclerView.notifyAll();
         recyclerViewIndicator.attachToRecyclerView(question_recyclerView);
 
+    }
+
+    private boolean insertLanguageTamil(String complaintStringTamil) {
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        Log.d("complaintStringTamil", complaintStringTamil);
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "complaintTamil");
+            contentValues.put("inputString", complaintStringTamil);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_tamil_summary", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return isInserted;
     }
 
     /**
@@ -1050,6 +1122,30 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
     @Override
     public void
     onBackPressed() {
+        Intent intent;
+        if (intentTag.equals("edit")){
+            intent = new Intent(
+                    QuestionNodeActivity.this, VisitSummaryActivity.class);
+        }
+        else{
+            intent = new Intent(
+                    QuestionNodeActivity.this, ComplaintNodeActivity.class);
+            intentTag = "return";
+
+        }
+        intent.putExtra("patientUuid", patientUuid);
+        intent.putExtra("visitUuid", visitUuid);
+        intent.putExtra("encounterUuidVitals", encounterVitals);
+        intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+        intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+        intent.putExtra("state", state);
+        intent.putExtra("name", patientName);
+        intent.putExtra("float_ageYear_Month", float_ageYear_Month);
+        if (intentTag != null) {
+            intent.putExtra("tag", intentTag);
+        }
+        startActivity(intent);
+
     }
 
 
@@ -1270,7 +1366,6 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             localdb.endTransaction();
 
         }
-        Log.d("editqueue", String.valueOf(editQueue));
         return editQueue;
     }
 

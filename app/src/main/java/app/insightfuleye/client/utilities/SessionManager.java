@@ -44,6 +44,7 @@ public class SessionManager {
     private static final String RETURNING_USER = "returninguser";
     private static final String VISIT_SUMMARY = "visit_summary";
     private static final String EXAM = "exam_";
+    private static final String COMPLAINT = "complaint_";
     private static final String MIGRATION_KEY = "migrationkey";
     private static final String TRIGGER_NOTI = "TRIGGER_NOTI";
     private static final String OFFLINE_OPENMRSID = "OFFLINE_OPENMRSID";
@@ -424,6 +425,20 @@ public class SessionManager {
         editor.remove(EXAM + patientUuid + "_" + visitUuid);
         editor.commit();
 
+    }
+
+    public void setComplaints(String patientUuid, Set<String> selectedComplaints){
+        editor.putStringSet(COMPLAINT + patientUuid, selectedComplaints);
+        editor.commit();
+    }
+
+    public void removeComplaint(String patientUuid, String visitUuid) {
+        editor.remove(COMPLAINT + patientUuid + "_" + visitUuid);
+        editor.commit();
+    }
+
+    public Set<String> getComplaints(String patientUUid) {
+        return pref.getStringSet(COMPLAINT + patientUUid, null);
     }
 
     public boolean isMigration() {

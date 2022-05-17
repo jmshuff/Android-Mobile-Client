@@ -20,6 +20,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -32,7 +35,9 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -64,8 +69,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.MenuNodeActivity;
 import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
+import app.insightfuleye.client.activities.questionNodeActivity.QuestionNodeActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionsAdapter;
 import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfuleye.client.app.AppConstants;
@@ -88,7 +93,7 @@ import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.utilities.pageindicator.ScrollingPagerIndicator;
 
-public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsAdapter.FabClickListener {
+public class PhysicalExamActivity extends AppCompatActivity implements QuestionsAdapter.FabClickListener {
     final static String TAG = PhysicalExamActivity.class.getSimpleName();
     // private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -113,8 +118,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
     String imageName;
     static String baseDir;
     static File filePath;
-    String azureType=null;
-
+    String azureType = null;
 
 
     String mFileName = "physExam.json";
@@ -134,6 +138,11 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
     String mAge;
     ScrollingPagerIndicator recyclerViewIndicator;
     ArrayList<imageDisplay> imageList;
+
+    ArrayList<String> nodeHeaders = new ArrayList<>();
+    int complaintSize;
+    int patHistSize;
+    int physExamSize;
 
 
     @Override
@@ -185,7 +194,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
 
         //select exams
         selectedExamsList = new ArrayList<>();
-        imageList=new ArrayList<>();
+        imageList = new ArrayList<>();
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
             patientUuid = intent.getStringExtra("patientUuid");
@@ -197,7 +206,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
             patientName = intent.getStringExtra("name");
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
             intentTag = intent.getStringExtra("tag");
-            scrollPos= intent.getIntExtra("scrollPos", 0);
+            scrollPos = intent.getIntExtra("scrollPos", 0);
             Set<String> selectedExams = sessionManager.getVisitSummary(patientUuid);
             selectedExamsList.clear();
             if (selectedExams != null)
@@ -296,7 +305,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         Log.e(TAG, "PhyExam: " + physicalExamMap.getTotalNumberOfExams());*/
 
         mgender = PatientsDAO.fetch_gender(patientUuid);
-        mAge= PatientsDAO.fetch_age(patientUuid);
+        mAge = PatientsDAO.fetch_age(patientUuid);
         if (mgender.equalsIgnoreCase("M")) {
             physicalExamMap.fetchItem("0");
         } else if (mgender.equalsIgnoreCase("F")) {
@@ -308,7 +317,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         physicalExamMap.fetchAge(float_ageYear_Month);
         physicalExamMap.refresh(selectedExamsList); //refreshing the physical exam nodes with updated json
 
-        if (intentTag.equals("edit")){
+        if (intentTag.equals("edit") || intentTag.equals("return")) {
             setScreen();
         }
         adapter = new QuestionsAdapter(this, physicalExamMap, physExam_recyclerView, this.getClass().getSimpleName(), this, false, imageList);
@@ -335,7 +344,6 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
-
 
 
         obsDTO = new ObsDTO();
@@ -369,7 +377,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         obsDTO.setValue(physicalExamMap.getPinholeRight());
 
         try {
-            isInserted=obsDAO.insertObs(obsDTO);
+            isInserted = obsDAO.insertObs(obsDTO);
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
@@ -458,7 +466,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         }
 
 
-        obsDTO=new ObsDTO();
+        obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.patientEyeHistory);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
@@ -470,7 +478,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         }
 
 
-        obsDTO=new ObsDTO();
+        obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.surgicalHistoryEye);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
@@ -482,8 +490,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         }
 
 
-
-        obsDTO=new ObsDTO();
+        obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.familyEyeHistory);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
@@ -507,7 +514,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
 
         if (complaintConfirmed) {
             physicalExamMap.getPhysicalConcepts();
-            physicalDisplay=physicalExamMap.generateFindings();
+            physicalDisplay = physicalExamMap.generateFindings();
             physicalString = physicalExamMap.generateTable();
 
 
@@ -532,9 +539,9 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
             }
             //Print Queue
             ImagesDAO imagesDAO = new ImagesDAO();
-            List<azureResults> azureQueue= new ArrayList<>();
+            List<azureResults> azureQueue = new ArrayList<>();
             try {
-                azureQueue=imagesDAO.getAzureImageQueue();
+                azureQueue = imagesDAO.getAzureImageQueue();
                 Log.d("AzureQueue", azureQueue.toString());
             } catch (DAOException e) {
                 e.printStackTrace();
@@ -550,6 +557,11 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
 
             if (intentTag != null && intentTag.equals("edit")) {
                 updateDatabase(physicalString);
+                try {
+                    updateImageList(imageList);
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
                 //updateVAConcepts();
                 Intent intent = new Intent(PhysicalExamActivity.this, VisitSummaryActivity.class);
                 intent.putExtra("patientUuid", patientUuid);
@@ -571,7 +583,12 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
                 startActivity(intent);
             } else {
                 boolean obsId = insertDb(physicalString);
-                Log.i(TAG, "In inserted"+ obsId);
+                try {
+                    insertImageList(imageList);
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
+                Log.i(TAG, "In inserted" + obsId);
                 Intent intent1 = new Intent(PhysicalExamActivity.this, VisitSummaryActivity.class); // earlier visitsummary
                 intent1.putExtra("patientUuid", patientUuid);
                 intent1.putExtra("visitUuid", visitUuid);
@@ -595,13 +612,12 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
     }
 
 
-
     @Override
     public void onChildListClickEvent(int groupPosition, int childPos, int physExamPos, String type) {
 
         Node question = physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getOption(childPos);
 
-        if ( !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single")
+        if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single")
                 || (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single") && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected())
                 || (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single") && type == "right" && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected())
                 || (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single") && type == "left" && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected())) {
@@ -617,7 +633,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
 
             if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
                 Log.d("QuestionisBilateral", "true");
-                if (type == "right" || type == "both") {
+                if (type == "right") {
                     //Log.d("SetRSelect", "true");
                     question.toggleRightSelected();
                     if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
@@ -626,13 +642,44 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
                         physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
                     }
                 }
-                if (type == "left" || type == "both") {
+                if (type == "left") {
                     question.toggleLeftSelected();
                     //Log.d("SetLSelect", "true");
                     if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
                         physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
                     } else {
                         physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
+                    }
+                }
+
+                if (type == "both") {
+                    if ((question.isRightSelected() && question.isLeftSelected()) || (!question.isRightSelected() && !question.isLeftSelected())) {
+                        question.toggleLeftSelected();
+                        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
+                        } else {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
+                        }
+                        question.toggleRightSelected();
+                        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
+                        } else {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
+                        }
+                    } else if (question.isRightSelected()) {
+                        question.toggleLeftSelected();
+                        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
+                        } else {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
+                        }
+                    } else if (question.isLeftSelected()) {
+                        question.toggleRightSelected();
+                        if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
+                        } else {
+                            physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
+                        }
                     }
                 }
                 //Toggle main is Selected
@@ -650,7 +697,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
 
                 if (question.getInputType().equals("camera")) {
                     question.toggleSelected();
-                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
+                    physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
                     if (!filePath.exists()) {
                         boolean res = filePath.mkdirs();
                         Log.i("RES>", "" + filePath + " -> " + res);
@@ -685,17 +732,14 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
             if (!question.isTerminal() && question.isSelected()) {
                 Node.subLevelQuestion(question, this, adapter, filePath.toString(), imageName);
             }
-        }
-
-        else if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single")
+        } else if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getChoiceType().equals("single")
                 && physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubSelected()
                 && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).isBilateral()) {
             //check if what is clicked is what's already selected. If so, unselect it.
-            if(question.isSelected()){
+            if (question.isSelected()) {
                 question.toggleSelected();
                 physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
-            }
-            else {
+            } else {
                 //is a second answer was clicked, give an error
                 MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
                 //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
@@ -711,7 +755,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
                 IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
             }
         } else {
-            if((!question.isRightSelected() && type=="right") || (!question.isLeftSelected() && type == "left")  || (!question.isRightSelected() && !question.isLeftSelected() && type =="both") || (type =="both" && question.isRightSelected() && !question.isLeftSelected() && physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) || (type =="both" && question.isLeftSelected() && !question.isRightSelected() && physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected())) { //may need to split into is right selected is left selected
+            if ((!question.isRightSelected() && type == "right") || (!question.isLeftSelected() && type == "left") || (!question.isRightSelected() && !question.isLeftSelected() && type == "both") || (type == "both" && question.isRightSelected() && !question.isLeftSelected() && physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) || (type == "both" && question.isLeftSelected() && !question.isRightSelected() && physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected())) { //may need to split into is right selected is left selected
                 //is a second answer was clicked, give an error
                 MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
                 //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(QuestionNodeActivity.this,R.style.AlertDialogStyle);
@@ -725,20 +769,19 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
                 IntelehealthApplication.setAlertDialogCustomTheme(this, alertDialog);
-            }
-            else{
-                if (type=="right"){
+            } else {
+                if (type == "right") {
                     question.toggleRightSelected();
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
                 }
 
-                if (type=="left") {
+                if (type == "left") {
                     question.toggleLeftSelected();
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
                 }
 
-                if (type=="both"){
-                    if (question.isRightSelected() && question.isLeftSelected()){
+                if (type == "both") {
+                    if (question.isRightSelected() && question.isLeftSelected()) {
                         question.toggleLeftSelected();
                         if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
                             physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
@@ -751,16 +794,14 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
                         } else {
                             physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightUnselected();
                         }
-                    }
-                    else if (question.isRightSelected()){
+                    } else if (question.isRightSelected()) {
                         question.toggleLeftSelected();
                         if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
                             physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftSelected(true);
                         } else {
                             physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setLeftUnselected();
                         }
-                    }
-                    else if(question.isLeftSelected()){
+                    } else if (question.isLeftSelected()) {
                         question.toggleRightSelected();
                         if (physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected()) {
                             physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setRightSelected(true);
@@ -771,12 +812,12 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
 
                 }
 
-                if(!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()){
+                if (!physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubRightSelected() && !physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).anySubLeftSelected()) {
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setUnselected();
                     question.setUnselected();
                 }
 
-                if(!question.isRightSelected() && !question.isLeftSelected()){
+                if (!question.isRightSelected() && !question.isLeftSelected()) {
                     question.setUnselected();
                 }
 
@@ -904,7 +945,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.volunteerComplaintLeft));
             obsDAO.updateObs(obsDTO);
 
-            obsDTO=new ObsDTO();
+            obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.patientEyeHistory);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
@@ -913,7 +954,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
             obsDAO.updateObs(obsDTO);
 
 
-            obsDTO=new ObsDTO();
+            obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.surgicalHistoryEye);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
@@ -922,7 +963,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
             obsDAO.updateObs(obsDTO);
 
 
-            obsDTO=new ObsDTO();
+            obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.familyEyeHistory);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
@@ -978,7 +1019,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         if (requestCode == IMAGE_CAPTURE_CODE) {
             if (resultCode == RESULT_OK) {
                 //String mCurrentPhotoPath = data.getStringExtra("RESULT");
-                String mCurrentPhotoPath= AppConstants.IMAGE_PATH + imageName + ".jpg";
+                String mCurrentPhotoPath = AppConstants.IMAGE_PATH + imageName + ".jpg";
                 physicalExamMap.setImagePath(mCurrentPhotoPath);
                 Log.i(TAG, mCurrentPhotoPath);
                 //physicalExamMap.displayImage(this, filePath.getAbsolutePath(), imageName);
@@ -986,15 +1027,15 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
                 //uploadAzureImage(filePath.getAbsolutePath(), imageName);
                 //instead of uploading it now, let's queue it now and upload everything later
                 try {
-                    insertAzureImageDatabase(azureType, imageName+".jpg");
+                    insertAzureImageDatabase(azureType, imageName + ".jpg");
                 } catch (DAOException e) {
                     e.printStackTrace();
                 }
                 //Test, code to print list of queded images for testing
                 ImagesDAO imagesDAO = new ImagesDAO();
-                List<azureResults> azureQueue= new ArrayList<>();
+                List<azureResults> azureQueue = new ArrayList<>();
                 try {
-                    azureQueue=imagesDAO.getAzureImageQueue();
+                    azureQueue = imagesDAO.getAzureImageQueue();
                     Log.d("AzureQueue", azureQueue.toString());
                 } catch (DAOException e) {
                     e.printStackTrace();
@@ -1115,9 +1156,6 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         }
 
 
-
-
-
     }
 
     @Override
@@ -1127,8 +1165,17 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(
-                PhysicalExamActivity.this, PastMedicalHistoryActivity.class);
+        Intent intent;
+        if (intentTag.equals("edit")){
+            intent = new Intent(
+                    PhysicalExamActivity.this, VisitSummaryActivity.class);
+        }
+        else{
+            intent = new Intent(
+                    PhysicalExamActivity.this, PastMedicalHistoryActivity.class);
+            intentTag = "return";
+
+        }
         intent.putExtra("patientUuid", patientUuid);
         intent.putExtra("visitUuid", visitUuid);
         intent.putExtra("encounterUuidVitals", encounterVitals);
@@ -1140,10 +1187,9 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         if (intentTag != null) {
             intent.putExtra("tag", intentTag);
         }
-        //intent.putStringArrayListExtra("complaints", selection);
-
         startActivity(intent);
 
+        //intent.putStringArrayListExtra("complaints", selection);
     }
 
     public void AnimateView(View v) {
@@ -1264,15 +1310,16 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         }
         return isInserted;
     }
-    public boolean updateAzureImageDatabase() throws DAOException{
-        boolean isUpdated =false;
-        SQLiteDatabase localdb=AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+
+    public boolean updateAzureImageDatabase() throws DAOException {
+        boolean isUpdated = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         localdb.beginTransaction();
-        ContentValues contentValues=new ContentValues();
-        PatientsDAO patientsDAO= new PatientsDAO();
-        String mAge=patientsDAO.fetch_age(patientUuid);
-        String mGender=patientsDAO.fetch_gender(patientUuid);
-        try{
+        ContentValues contentValues = new ContentValues();
+        PatientsDAO patientsDAO = new PatientsDAO();
+        String mAge = patientsDAO.fetch_age(patientUuid);
+        String mGender = patientsDAO.fetch_gender(patientUuid);
+        try {
             contentValues.put("VARight", physicalExamMap.getVARight());
             contentValues.put("VALeft", physicalExamMap.getVALeft());
             contentValues.put("PinholeRight", physicalExamMap.getPinholeRight());
@@ -1281,32 +1328,30 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
             contentValues.put("sex", mGender);
             localdb.updateWithOnConflict("tbl_azure_uploads", contentValues, "visitId = ?", new String[]{visitUuid}, SQLiteDatabase.CONFLICT_REPLACE);
             localdb.setTransactionSuccessful();
-            isUpdated=true;
-        }catch (SQLException e) {
+            isUpdated = true;
+        } catch (SQLException e) {
             isUpdated = false;
             throw new DAOException(e);
-        } finally{
+        } finally {
             localdb.endTransaction();
         }
         return isUpdated;
     }
 
-    public void manageCameraPermissions(String imageName){
+    public void manageCameraPermissions(String imageName) {
 
         //if system os >=marshmellow, request runtime permissions
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
                     PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_DENIED) {
                 //permisssions not enabled, check permissions
-                String[] permission= {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                String[] permission = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
                 ActivityCompat.requestPermissions(this, permission, PERMISSION_CODE);
-            }
-            else{
+            } else {
                 openCameraNative(imageName);
             }
-        }
-        else{
+        } else {
             //system os < marshmellow
             openCameraNative(imageName);
         }
@@ -1314,7 +1359,7 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
     }
 
     public void openCameraNative(String imageName) {
-        String imagePath= AppConstants.IMAGE_PATH + imageName + ".jpg";
+        String imagePath = AppConstants.IMAGE_PATH + imageName + ".jpg";
         File file = new File(AppConstants.IMAGE_PATH + imageName + ".jpg");
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -1359,10 +1404,10 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
 
     private void updateEditDB(String subSelected, String rightSelected, String leftSelected) throws DAOException {
         SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-        int updatedCount=0;
+        int updatedCount = 0;
         localdb.beginTransaction();
         ContentValues contentValues = new ContentValues();
-        String selection= "visitID=? AND patientID = ? AND type = ?";
+        String selection = "visitID=? AND patientID = ? AND type = ?";
         String[] nodeArgs = {visitUuid, patientUuid, "physExam"};
 
 
@@ -1394,11 +1439,11 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
     }
 
     public void generateSelected() throws DAOException {
-        ArrayList<ArrayList<Integer>> allSelected= new ArrayList<>();
+        ArrayList<ArrayList<Integer>> allSelected = new ArrayList<>();
         ArrayList<ArrayList<Integer>> rightSelected = new ArrayList<>();
         ArrayList<ArrayList<Integer>> leftSelected = new ArrayList<>();
-        for (int i=0; i< physicalExamMap.getTotalNumberOfExams(); i++ ){
-            for(int j=0; j<physicalExamMap.getExamNode(i).getOptionsList().size(); j++){
+        for (int i = 0; i < physicalExamMap.getTotalNumberOfExams(); i++) {
+            for (int j = 0; j < physicalExamMap.getExamNode(i).getOptionsList().size(); j++) {
                 allSelected.add(physicalExamMap.getExamNode(i).getOption(j).getSubSelected());
                 rightSelected.add(physicalExamMap.getExamNode(i).getOption(j).getRightSubSelected());
                 leftSelected.add(physicalExamMap.getExamNode(i).getOption(j).getLeftSubSelected());
@@ -1410,36 +1455,93 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         Log.d("LSelected", String.valueOf(leftSelected));
 
         Gson gson = new Gson();
-        String inputSub= gson.toJson(allSelected);
+        String inputSub = gson.toJson(allSelected);
         String inputRight = gson.toJson(rightSelected);
         String inputLeft = gson.toJson(leftSelected);
 
-        if(intentTag.equals("edit")){
+        if (intentTag.equals("edit")) {
             updateEditDB(inputSub, inputRight, inputLeft);
-        }
-        else{
+        } else {
             insertEditDB(inputSub, inputRight, inputLeft);
 
+        }
+    }
+
+    public boolean insertImageList(ArrayList<imageDisplay> imageList) throws DAOException {
+        Gson gson = new Gson();
+        String imageListString = gson.toJson(imageList);
+        boolean isInserted = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "physExam");
+            contentValues.put("imageList", imageListString);
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_images", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return isInserted;
+    }
+
+    public void updateImageList(ArrayList<imageDisplay> imageList) throws DAOException {
+        Gson gson = new Gson();
+        String imageListString = gson.toJson(imageList);
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        int updatedCount = 0;
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        String selection = "visitID=? AND patientID = ? AND type = ?";
+        String[] nodeArgs = {visitUuid, patientUuid, "physExam"};
+
+        try {
+            contentValues.put("visitID", visitUuid);
+            contentValues.put("patientID", patientUuid);
+            contentValues.put("type", "physExam");
+            contentValues.put("imageList", imageListString);
+            //contentValues.put("sync", "false");
+            updatedCount = localdb.update("tbl_images", contentValues, selection, nodeArgs);
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            Logger.logE(TAG, "exception ", e);
+        } finally {
+            localdb.endTransaction();
+        }
+
+        if (updatedCount == 0) {
+            try {
+                insertImageList(imageList);
+            } catch (DAOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+            }
         }
     }
 
     private void setScreen() {
         Log.d("setScreen", "enter");
         String allSub = "";
-        String rightSub= "";
-        String leftSub="";
+        String rightSub = "";
+        String leftSub = "";
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         db.beginTransaction();
 
         String nodeSelection = "visitID=? AND patientID=? AND type=?";
         String[] nodeArgs = {visitUuid, patientUuid, "physExam"};
         String[] columns = {"questionSubSelected", "questionRightSelected", "questionLeftSelected"};
-        try{
+        try {
             Cursor nodeCursor = db.query("tbl_edit_node", columns, nodeSelection, nodeArgs, null, null, null);
             nodeCursor.moveToLast();
             allSub = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionSubSelected"));
-            rightSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionRightSelected"));
-            leftSub= nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionLeftSelected"));
+            rightSub = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionRightSelected"));
+            leftSub = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("questionLeftSelected"));
             nodeCursor.close();
         } catch (CursorIndexOutOfBoundsException e) {
 
@@ -1448,16 +1550,17 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         db.endTransaction();
 
         Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<ArrayList<Integer>>>() {}.getType();
-        ArrayList<ArrayList<Integer>>  allSubSelected = gson.fromJson(allSub, type);
-        ArrayList<ArrayList<Integer>>  rightSubSelected = gson.fromJson(rightSub, type);
-        ArrayList<ArrayList<Integer>>  leftSubSelected = gson.fromJson(leftSub, type);
+        Type type = new TypeToken<ArrayList<ArrayList<Integer>>>() {
+        }.getType();
+        ArrayList<ArrayList<Integer>> allSubSelected = gson.fromJson(allSub, type);
+        ArrayList<ArrayList<Integer>> rightSubSelected = gson.fromJson(rightSub, type);
+        ArrayList<ArrayList<Integer>> leftSubSelected = gson.fromJson(leftSub, type);
         Log.d("allSelectedSet", String.valueOf(allSubSelected) + " " + String.valueOf(rightSubSelected) + " " + String.valueOf(leftSubSelected));
 
-        if(allSubSelected!=null) {
+        if (allSubSelected != null) {
             if (allSubSelected.size() == physicalExamMap.getTotalNumberOfExams()) {
                 for (int i = 0; i < physicalExamMap.getTotalNumberOfExams(); i++) {
-                    for (int k=0 ; k< physicalExamMap.getExamNode(i).getOptionsList().size(); k++){
+                    for (int k = 0; k < physicalExamMap.getExamNode(i).getOptionsList().size(); k++) {
                         if (!physicalExamMap.getExamNode(i).getOption(k).isBilateral()) {
                             for (int j = 0; j < allSubSelected.get(i).size(); j++) {
                                 physicalExamMap.getExamNode(i).getOption(k).getOption(allSubSelected.get(i).get(j)).setSelected(true);
@@ -1500,6 +1603,25 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
             }
         }
 
+        //Get images to edit
+        String imageListString = "";
+        db.beginTransaction();
+        String[] columns1 = {"imageList"};
+        try {
+            Cursor nodeCursor = db.query("tbl_images", columns1, nodeSelection, nodeArgs, null, null, null);
+            nodeCursor.moveToLast();
+            imageListString = nodeCursor.getString(nodeCursor.getColumnIndexOrThrow("imageList"));
+            nodeCursor.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        Type type1 = new TypeToken<ArrayList<imageDisplay>>() {
+        }.getType();
+        if (imageListString != null && imageListString!="")
+            imageList = gson.fromJson(imageListString, type1);
     }
 
     public ArrayList<ArrayList<String>> getEditNodeQueue() throws DAOException {
@@ -1532,7 +1654,149 @@ public class PhysicalExamActivity extends MenuNodeActivity implements QuestionsA
         return editQueue;
     }
 
+    public void getMenuHeaders() {
+        boolean hasLicense = false;
+        if (!sessionManager.getLicenseKey().isEmpty())
+            hasLicense = true;
 
+        String famFileName = "famHist.json";
+        String patFileName = "patHist.json";
+        String physFileName = "physExam.json";
+        JSONObject patFile, famFile, physFile;
+        Node famHistoryMap = null;
+        Node patHistoryMap = null;
+
+        ArrayList<String> physExamsTemp = new ArrayList<>();
+        ArrayList<String> selectedComplaintsList = new ArrayList<>();
+
+
+        Set<String> selectedComplaints = sessionManager.getComplaints(patientUuid);
+        selectedComplaintsList.clear();
+        if (selectedComplaints != null)
+            selectedComplaintsList.addAll(selectedComplaints);
+
+        ArrayList<Node> complaintsNodes = new ArrayList<>();
+        JSONObject tempFile = null;
+        for (int i = 0; i < selectedComplaintsList.size(); i++) {
+            if (hasLicense) {
+                try {
+                    tempFile = new JSONObject(FileUtils.readFile(selectedComplaintsList.get(i) + ".json", this));
+                } catch (JSONException e) {
+                    FirebaseCrashlytics.getInstance().recordException(e);
+                }
+            } else {
+                String fileLocation = "engines/" + selectedComplaintsList.get(i) + ".json";
+                tempFile = FileUtils.encodeJSON(this, fileLocation);
+            }
+            Node tempNode = new Node(tempFile);
+            complaintsNodes.add(tempNode);
+        }
+
+
+        if (hasLicense) {
+            try {
+                //famFile = new JSONObject(FileUtils.readFileRoot(famFileName, this));
+                //famHistoryMap = new Node(famFile); //Load the patient history mind map
+
+                famFile = new JSONObject(FileUtils.readFileRoot(famFileName, this));
+                famHistoryMap = new Node(famFile);
+                patFile = new JSONObject(FileUtils.readFileRoot(famFileName, this));
+                patHistoryMap = new Node(patFile);
+
+            } catch (JSONException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+            }
+        } else {
+            famHistoryMap = new Node(FileUtils.encodeJSON(this, famFileName)); //Load the patient history mind map
+            patHistoryMap = new Node(FileUtils.encodeJSON(this, patFileName)); //Load the patient history mind map
+
+        }
+
+        complaintSize = 0;
+        for (Node complaint : complaintsNodes) {
+            for (int i = 0; i < complaint.getOptionsList().size(); i++) {
+                nodeHeaders.add(complaint.getOption(i).getText());
+                complaintSize++;
+            }
+        }
+
+        for (int i = 0; i < famHistoryMap.getOptionsList().size(); i++) {
+            nodeHeaders.add(famHistoryMap.getOption(i).getText());
+        }
+
+        for (int i = 0; i < patHistoryMap.getOptionsList().size(); i++) {
+            nodeHeaders.add(patHistoryMap.getOption(i).getText());
+        }
+
+        for (int i = 0; i < physicalExamMap.getTotalNumberOfExams(); i++) {
+            Log.d("totExam", String.valueOf(i));
+            nodeHeaders.add(physicalExamMap.getExamNode(i).getText()); //will have to fix for physExam
+        }
+        Log.d("NodeHeaders", String.valueOf(nodeHeaders));
+        patHistSize = patHistoryMap.getOptionsList().size();
+        physExamSize = physicalExamMap.getTotalNumberOfExams();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        for (int i = 0; i < nodeHeaders.size(); i++) {
+            menu.add(0, Menu.FIRST + i, Menu.NONE, nodeHeaders.get(i));
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_node_navigation, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId() - 1; //subtract 1 because it starts at 1 not 0
+        Log.d("menuId", String.valueOf(id));
+        if (0 <= id && id < complaintSize) {
+            Intent intent = new Intent(PhysicalExamActivity.this, QuestionNodeActivity.class);
+            intent.putExtra("patientUuid", patientUuid);
+            intent.putExtra("visitUuid", visitUuid);
+            intent.putExtra("encounterUuidVitals", encounterVitals);
+            intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+            intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+            intent.putExtra("state", state);
+            intent.putExtra("name", patientName);
+            intent.putExtra("tag", intentTag);
+            intent.putExtra("scrollPos", id);
+            startActivity(intent);
+        } else if (complaintSize <= id && id < (complaintSize + patHistSize)) {
+            Intent intent = new Intent(PhysicalExamActivity.this, PastMedicalHistoryActivity.class);
+            intent.putExtra("patientUuid", patientUuid);
+            intent.putExtra("visitUuid", visitUuid);
+            intent.putExtra("encounterUuidVitals", encounterVitals);
+            intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+            intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+            intent.putExtra("state", state);
+            intent.putExtra("name", patientName);
+            intent.putExtra("tag", intentTag);
+            intent.putExtra("scrollPos", id - complaintSize);
+            startActivity(intent);
+        } else if ((complaintSize + patHistSize) <= id && id < (complaintSize + patHistSize + physExamSize)) {
+/*            Intent intent = new Intent(PhysicalExamActivity.this, PhysicalExamActivity.class);
+            intent.putExtra("patientUuid", patientUuid);
+            intent.putExtra("visitUuid", visitUuid);
+            intent.putExtra("encounterUuidVitals", encounterVitals);
+            intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+            intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+            intent.putExtra("state", state);
+            intent.putExtra("name", patientName);
+            intent.putExtra("tag", intentTag);
+            intent.putExtra("scrollPos", id-complaintSize-patHistSize);
+            startActivity(intent);*/
+            physExam_recyclerView.scrollToPosition(id - complaintSize - patHistSize);
+        }
+        return true;
+    }
 
 
 }

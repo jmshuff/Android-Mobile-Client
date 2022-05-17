@@ -222,6 +222,20 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "questionLeftSelected TEXT" +
             ")";
 
+    public static final String CREATE_IMAGE_TABLE = "CREATE TABLE IF NOT EXISTS tbl_images(" +
+            "visitID TEXT," +
+            "patientID TEXT," +
+            "type TEXT," + //physExam, complaint, patHist, famHist
+            "imageList TEXT" +
+            ")";
+
+    public static final String CREATE_TAMIL_TABLE = "CREATE TABLE IF NOT EXISTS tbl_tamil_summary(" +
+            "visitID TEXT," +
+            "patientID TEXT," +
+            "type TEXT," +
+            "inputString TEXT"+
+            ")";
+
     public InteleHealthDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -292,6 +306,8 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(AZURE_ADDITIONAL_DOCS);
         db.execSQL(AZURE_GALLERY);
         db.execSQL(CREATE_EDIT_TABLES);
+        db.execSQL(CREATE_IMAGE_TABLE);
+        db.execSQL(CREATE_TAMIL_TABLE);
         uuidInsert(db);
         database = db;
 

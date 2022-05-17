@@ -368,18 +368,24 @@ public class PhysicalExam extends Node {
             String title = getTitle(i);
             String[] split = title.split(" : ");
             String levelOne = split[0];
+            String levelTwo = split[1];
 
             if ((node.isSelected() | node.anySubSelected())) {
                 boolean checkSet = rootStrings.add(levelOne);
 
-                if (checkSet)
-                    stringsList.add("<b>"+levelOne + ": "+"</b>" + bullet + " " + node.getLanguage());
-                else stringsList.add(bullet + " " + node.getLanguage());
+                if (checkSet) {
+                    stringsList.add("<b>" + levelOne + ": " + "</b>" + bullet + " " + node.getLanguage());
+                    Log.d("checkSet", String.valueOf(stringsList));
+                }
+
+                else stringsList.add(bullet + " " + levelTwo + ": " + node.getLanguage());
+                Log.d("Findings1", String.valueOf(stringsList));
                 if (!node.isTerminal()) {
                     String lang = node.formLanguage();
-                    Log.i(TAG, "generateFindings: "+ lang);
                     stringsList.add(lang);
                 }
+                Log.i("Findings2", String.valueOf(stringsList));
+
             }
         }
 
