@@ -325,6 +325,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         recyclerViewIndicator.attachToRecyclerView(physExam_recyclerView);
 
         physExam_recyclerView.scrollToPosition(scrollPos);
+        getMenuHeaders();
+        if ((intentTag.equals("edit") || intentTag.equals("return")) && imageList!=null){
+            for (imageDisplay imageInfo : imageList){
+                int posSelected = imageInfo.getPosition();
+                physicalExamMap.getExamNode(posSelected).getOption(0).setSelected(true);
+            }
+
+        }
 
     }
 
@@ -1464,7 +1472,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         String inputRight = gson.toJson(rightSelected);
         String inputLeft = gson.toJson(leftSelected);
 
-        if (intentTag.equals("edit")) {
+        if(intentTag.equals("edit") || intentTag.equals("return")){
             updateEditDB(inputSub, inputRight, inputLeft);
         } else {
             insertEditDB(inputSub, inputRight, inputLeft);
@@ -1664,11 +1672,9 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         if (!sessionManager.getLicenseKey().isEmpty())
             hasLicense = true;
 
-        String famFileName = "famHist.json";
         String patFileName = "patHist.json";
         String physFileName = "physExam.json";
-        JSONObject patFile, famFile, physFile;
-        Node famHistoryMap = null;
+        JSONObject patFile, physFile;
         Node patHistoryMap = null;
 
         ArrayList<String> physExamsTemp = new ArrayList<>();
@@ -1700,19 +1706,13 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         if (hasLicense) {
             try {
-                //famFile = new JSONObject(FileUtils.readFileRoot(famFileName, this));
-                //famHistoryMap = new Node(famFile); //Load the patient history mind map
-
-                famFile = new JSONObject(FileUtils.readFileRoot(famFileName, this));
-                famHistoryMap = new Node(famFile);
-                patFile = new JSONObject(FileUtils.readFileRoot(famFileName, this));
+                patFile = new JSONObject(FileUtils.readFileRoot(patFileName, this));
                 patHistoryMap = new Node(patFile);
 
             } catch (JSONException e) {
                 FirebaseCrashlytics.getInstance().recordException(e);
             }
         } else {
-            famHistoryMap = new Node(FileUtils.encodeJSON(this, famFileName)); //Load the patient history mind map
             patHistoryMap = new Node(FileUtils.encodeJSON(this, patFileName)); //Load the patient history mind map
 
         }
@@ -1723,10 +1723,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 nodeHeaders.add(complaint.getOption(i).getText());
                 complaintSize++;
             }
-        }
-
-        for (int i = 0; i < famHistoryMap.getOptionsList().size(); i++) {
-            nodeHeaders.add(famHistoryMap.getOption(i).getText());
         }
 
         for (int i = 0; i < patHistoryMap.getOptionsList().size(); i++) {
@@ -1771,7 +1767,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
             intent.putExtra("state", state);
             intent.putExtra("name", patientName);
-            intent.putExtra("tag", intentTag);
+            intent.putExtra("tag", "return");
             intent.putExtra("scrollPos", id);
             startActivity(intent);
         } else if (complaintSize <= id && id < (complaintSize + patHistSize)) {
@@ -1783,7 +1779,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
             intent.putExtra("state", state);
             intent.putExtra("name", patientName);
-            intent.putExtra("tag", intentTag);
+            intent.putExtra("tag", "return");
             intent.putExtra("scrollPos", id - complaintSize);
             startActivity(intent);
         } else if ((complaintSize + patHistSize) <= id && id < (complaintSize + patHistSize + physExamSize)) {

@@ -795,7 +795,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
         String inputRight = gson.toJson(rightSelected);
         String inputLeft = gson.toJson(leftSelected);
 
-        if(intentTag.equals("edit")){
+        if(intentTag.equals("edit") || intentTag.equals("return")){
             updateEditDB(inputSub, inputRight, inputLeft);
         }
         else{

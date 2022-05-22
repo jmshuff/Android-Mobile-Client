@@ -801,7 +801,7 @@ public class Node implements Serializable {
                             }
                         } else {
                             Log.d("generatelanguage",node_opt.getLanguage());
-                            raw = raw + (bullet + " " + node_opt.getLanguage() + " - " + generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
+                            raw = raw + (bullet + " " + node_opt.getLanguage() + " " + generateAssociatedSymptomsOrHistory(node_opt)) + next_line;
                         }
 
                     } else {
@@ -809,12 +809,12 @@ public class Node implements Serializable {
                             if (node_opt.getLanguage().equals("%")) {
                                 raw = raw + bullet + " " + node_opt.formLanguage() + next_line;
                             } else if (node_opt.getLanguage().substring(0, 1).equals("%")) {
-                                raw = raw + (bullet + " " + node_opt.getLanguage().substring(1) + " - " + node_opt.formLanguage()) + next_line;
+                                raw = raw + (bullet + " " + node_opt.getLanguage().substring(1) + " " + node_opt.formLanguage()) + next_line;
                             } else {
                                 //getLanguge= language from json file
                                 Log.d("generatelanguage",node_opt.getLanguage());
 
-                                raw = raw + (bullet + " " + node_opt.getLanguage() + " - " + node_opt.formLanguage()) + next_line;
+                                raw = raw + (bullet + " " + node_opt.getLanguage() + " " + node_opt.formLanguage()) + next_line;
                             }
                         }
                     }
@@ -842,7 +842,7 @@ public class Node implements Serializable {
             } else {
                 formatted = raw;
             }
-            formatted = formatted.replaceAll("\\. -", ".");
+            formatted = formatted.replaceAll("\\. -", "");
             formatted = formatted.replaceAll("\\.,", ", ");
             Log.i(TAG, "generateLanguage: " + formatted);
             return formatted;
@@ -916,7 +916,7 @@ public class Node implements Serializable {
             } else {
                 formatted = raw;
             }
-            formatted = formatted.replaceAll("\\. -", ".");
+            formatted = formatted.replaceAll("\\. -", "");
             formatted = formatted.replaceAll("\\.,", ", ");
             Log.i(TAG, "generateLanguage: " + formatted);
             return formatted;
@@ -1073,7 +1073,7 @@ public class Node implements Serializable {
             } else {
                 formatted = raw;
             }
-            formatted = formatted.replaceAll("\\. -", ".");
+            formatted = formatted.replaceAll("\\. -", "");
             formatted = formatted.replaceAll("\\.,", ", ");
             Log.i(TAG, "generateLanguage: " + formatted);
 
@@ -1935,7 +1935,7 @@ public class Node implements Serializable {
         if (isTerminal) {
             languageSeparator = ", ";
         } else {
-            languageSeparator = " - ";
+            languageSeparator = " ";
         }
         String mLanguage = "";
         for (int i = 0; i < stringsList.size(); i++) {

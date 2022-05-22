@@ -146,12 +146,19 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
             patientName = intent.getStringExtra("name");
             intentTag = intent.getStringExtra("tag");
-            complaints = intent.getStringArrayListExtra("complaints");
+            //complaints = intent.getStringArrayListExtra("complaints");
         }
+
         complaintDetails = new HashMap<>();
         physicalExams = new ArrayList<>();
         complaintsNodes = new ArrayList<>();
         imageList= new ArrayList<>();
+        complaints = new ArrayList<>();
+
+        Set<String> selectedComplaints = sessionManager.getComplaints(patientUuid);
+        complaints.clear();
+        if (selectedComplaints != null)
+            complaints.addAll(selectedComplaints);
 
         boolean hasLicense = false;
         if (!sessionManager.getLicenseKey().isEmpty())
@@ -811,7 +818,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
         String inputRight = gson.toJson(rightSelected);
         String inputLeft = gson.toJson(leftSelected);
 
-        if(intentTag.equals("edit")){
+        if(intentTag.equals("edit") || intentTag.equals("return")){
             updateEditDB(inputSub, inputRight, inputLeft);
         }
         else{
@@ -1228,7 +1235,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
             intent.putExtra("state", state);
             intent.putExtra("name", patientName);
-            intent.putExtra("tag", intentTag);
+            intent.putExtra("tag", "return");
             intent.putExtra("scrollPos", id-complaintSize);
             startActivity(intent);
         }
@@ -1241,7 +1248,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
             intent.putExtra("state", state);
             intent.putExtra("name", patientName);
-            intent.putExtra("tag", intentTag);
+            intent.putExtra("tag", "return");
             intent.putExtra("scrollPos", id-complaintSize-patHistSize);
             startActivity(intent);
         }

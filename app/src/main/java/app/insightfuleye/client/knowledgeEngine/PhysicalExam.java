@@ -405,7 +405,7 @@ public class PhysicalExam extends Node {
 
 //        mLanguage = removeCharsFindings(mLanguage);
         mLanguage = mLanguage.replaceAll("\\. -", "");
-        mLanguage = mLanguage.replaceAll("\\.", "\\. ");
+        mLanguage = mLanguage.replaceAll("\\.", " ");
         mLanguage = mLanguage.replaceAll("% - ", "");
         mLanguage = mLanguage.replace(next_line,"-");
         mLanguage = mLanguage.replaceAll("\\: -", "\\: ");
@@ -459,7 +459,7 @@ public class PhysicalExam extends Node {
             mLanguage = mLanguage.concat(stringsList.get(i) + languageSeparator);
         }
         mLanguage = mLanguage.replaceAll("\\. -", "");
-        mLanguage = mLanguage.replaceAll("\\.", "\\. ");
+        mLanguage = mLanguage.replaceAll("\\.", " ");
         mLanguage = mLanguage.replaceAll("% - ", "");
         mLanguage = mLanguage.replace(next_line,"-");
         mLanguage = mLanguage.replaceAll("\\: -", "\\: ");

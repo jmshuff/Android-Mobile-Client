@@ -917,7 +917,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         String inputRight = gson.toJson(rightSelected);
         String inputLeft = gson.toJson(leftSelected);
 
-        if(intentTag.equals("edit")){
+        if(intentTag.equals("edit") || intentTag.equals("return")){
             updateEditDB(inputSub, inputRight, inputLeft);
         }
         else{
@@ -1038,11 +1038,9 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         if (!sessionManager.getLicenseKey().isEmpty())
             hasLicense = true;
 
-        String famFileName = "famHist.json";
         //String patFileName = "patHist.json";
         String physFileName = "physExam.json";
-        JSONObject patFile, famFile, physFile;
-        Node famHistoryMap= null;
+        JSONObject patFile, physFile;
         PhysicalExam physExamMap= null;
 
         ArrayList<String> physExamsTemp = new ArrayList<>();
@@ -1079,18 +1077,12 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
         if (hasLicense) {
             try {
-                //famFile = new JSONObject(FileUtils.readFileRoot(famFileName, this));
-                //famHistoryMap = new Node(famFile); //Load the patient history mind map
-
-                famFile= new JSONObject(FileUtils.readFileRoot(famFileName, this));
-                famHistoryMap = new Node(famFile);
                 physFile = new JSONObject(FileUtils.readFileRoot(physFileName,this));
                 physExamMap= new PhysicalExam(physFile, physExamsTemp);
             } catch (JSONException e) {
                 FirebaseCrashlytics.getInstance().recordException(e);
             }
         } else {
-            famHistoryMap = new Node(FileUtils.encodeJSON(this, famFileName)); //Load the patient history mind map
             physExamMap = new PhysicalExam(FileUtils.encodeJSON(this, physFileName), physExamsTemp); //Load the patient history mind map
         }
 
@@ -1102,9 +1094,6 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             }
         }
 
-        for (int i = 0; i < famHistoryMap.getOptionsList().size(); i++){
-            nodeHeaders.add(famHistoryMap.getOption(i).getText());
-        }
 
         for (int i = 0; i < patientHistoryMap.getOptionsList().size(); i++){
             nodeHeaders.add(patientHistoryMap.getOption(i).getText());
@@ -1148,12 +1137,12 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
             intent.putExtra("state", state);
             intent.putExtra("name", patientName);
-            intent.putExtra("tag", intentTag);
+            intent.putExtra("tag", "return");
             intent.putExtra("scrollPos", id);
             startActivity(intent);
         }
         else if(complaintSize <= id && id < (complaintSize + patHistSize)){
-            Intent intent = new Intent(PastMedicalHistoryActivity.this, PastMedicalHistoryActivity.class);
+/*            Intent intent = new Intent(PastMedicalHistoryActivity.this, PastMedicalHistoryActivity.class);
             intent.putExtra("patientUuid", patientUuid);
             intent.putExtra("visitUuid", visitUuid);
             intent.putExtra("encounterUuidVitals", encounterVitals);
@@ -1161,9 +1150,12 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
             intent.putExtra("state", state);
             intent.putExtra("name", patientName);
-            intent.putExtra("tag", intentTag);
+            intent.putExtra("tag", "return");
             intent.putExtra("scrollPos", id-complaintSize);
-            startActivity(intent);
+            startActivity(intent);*/
+
+            pastMedical_recyclerView.scrollToPosition(id - complaintSize);
+
         }
         else if((complaintSize + patHistSize) <= id && id < (complaintSize + patHistSize + physExamSize)){
             Intent intent = new Intent(PastMedicalHistoryActivity.this, PhysicalExamActivity.class);
@@ -1174,7 +1166,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
             intent.putExtra("state", state);
             intent.putExtra("name", patientName);
-            intent.putExtra("tag", intentTag);
+            intent.putExtra("tag", "return");
             intent.putExtra("scrollPos", id-complaintSize-patHistSize);
             startActivity(intent);
         }

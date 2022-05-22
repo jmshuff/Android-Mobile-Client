@@ -61,7 +61,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -1075,7 +1074,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
         editFamHist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MaterialAlertDialogBuilder famHistDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                /*MaterialAlertDialogBuilder famHistDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
                 //final MaterialAlertDialogBuilder famHistDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this,R.style.AlertDialogStyle);
                 famHistDialog.setTitle(getString(R.string.visit_summary_family_history));
                 final LayoutInflater inflater = getLayoutInflater();
@@ -1141,13 +1140,13 @@ public class VisitSummaryActivity extends AppCompatActivity {
                         intent1.putExtra("visitUuid", visitUuid);
                         intent1.putExtra("encounterUuidVitals", encounterVitals);
                         intent1.putExtra("edit_FamHist", "edit_FamHist");
-                     /*   if(EncounterAdultInitial_LatestVisit != null &&
+                     *//*   if(EncounterAdultInitial_LatestVisit != null &&
                                 !EncounterAdultInitial_LatestVisit.isEmpty()) {
                             intent1.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
                         }
                         else {
                             intent1.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
-                        }*/
+                        }*//*
                         intent1.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
                         intent1.putExtra("name", patientName);
                         intent1.putExtra("float_ageYear_Month", float_ageYear_Month);
@@ -1171,14 +1170,44 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 Button neutralb = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
                 neutralb.setTextColor(getResources().getColor((R.color.colorPrimary)));
                 neutralb.setTypeface(ResourcesCompat.getFont(VisitSummaryActivity.this, R.font.lato_bold));
-                IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);
+                IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);*/
+
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.edit_confirmation);
+                alertDialogBuilder.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent1 = new Intent(VisitSummaryActivity.this, FamilyHistoryActivity.class);
+                        intent1.putExtra("patientUuid", patientUuid);
+                        intent1.putExtra("visitUuid", visitUuid);
+                        intent1.putExtra("encounterUuidVitals", encounterVitals);
+                        intent1.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                        intent1.putExtra("name", patientName);
+                        intent1.putExtra("float_ageYear_Month", float_ageYear_Month);
+                        intent1.putExtra("tag", "edit");
+                        startActivity(intent1);
+                        dialog.dismiss();
+
+                    }
+                });
+                alertDialogBuilder.setNegativeButton(R.string.generic_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog alertDialog = alertDialogBuilder.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(context, alertDialog);
+
             }
         });
 
         editComplaint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final MaterialAlertDialogBuilder complaintDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                /*final MaterialAlertDialogBuilder complaintDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
                 complaintDialog.setTitle(getString(R.string.visit_summary_complaint));
                 final LayoutInflater inflater = getLayoutInflater();
                 View convertView = inflater.inflate(R.layout.dialog_edit_entry, null);
@@ -1280,14 +1309,43 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 neutralb.setTextColor(getResources().getColor((R.color.colorPrimary)));
                 neutralb.setTypeface(ResourcesCompat.getFont(VisitSummaryActivity.this, R.font.lato_bold));
 
-                IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);
+                IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);*/
+
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.edit_confirmation);
+                alertDialogBuilder.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent1 = new Intent(VisitSummaryActivity.this, ComplaintNodeActivity.class);
+                        intent1.putExtra("patientUuid", patientUuid);
+                        intent1.putExtra("visitUuid", visitUuid);
+                        intent1.putExtra("encounterUuidVitals", encounterVitals);
+                        intent1.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                        intent1.putExtra("name", patientName);
+                        intent1.putExtra("float_ageYear_Month", float_ageYear_Month);
+                        intent1.putExtra("tag", "edit");
+                        startActivity(intent1);
+                        dialog.dismiss();
+
+                    }
+                });
+                alertDialogBuilder.setNegativeButton(R.string.generic_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog alertDialog = alertDialogBuilder.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(context, alertDialog);
             }
         });
 
         editPhysical.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final MaterialAlertDialogBuilder physicalDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                /*final MaterialAlertDialogBuilder physicalDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
                 physicalDialog.setTitle(getString(R.string.visit_summary_on_examination));
                 final LayoutInflater inflater = getLayoutInflater();
                 View convertView = inflater.inflate(R.layout.dialog_edit_entry, null);
@@ -1341,7 +1399,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 physicalDialog.setNegativeButton(getString(R.string.generic_erase_redo), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-/*                        if (obsImgdir.exists()) {
+*//*                        if (obsImgdir.exists()) {
                             ImagesDAO imagesDAO = new ImagesDAO();
 
                             try {
@@ -1354,7 +1412,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
                             } catch (DAOException e1) {
                                 FirebaseCrashlytics.getInstance().recordException(e1);
                             }
-                        }*/
+                        }*//*
                         Intent intent1 = new Intent(VisitSummaryActivity.this, PhysicalExamActivity.class);
                         intent1.putExtra("patientUuid", patientUuid);
                         intent1.putExtra("visitUuid", visitUuid);
@@ -1392,14 +1450,42 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 neutralb.setTextColor(getResources().getColor((R.color.colorPrimary)));
                 neutralb.setTypeface(ResourcesCompat.getFont(VisitSummaryActivity.this, R.font.lato_bold));
 
-                IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);
+                IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);*/
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.edit_confirmation);
+                alertDialogBuilder.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent1 = new Intent(VisitSummaryActivity.this, PhysicalExamActivity.class);
+                        intent1.putExtra("patientUuid", patientUuid);
+                        intent1.putExtra("visitUuid", visitUuid);
+                        intent1.putExtra("encounterUuidVitals", encounterVitals);
+                        intent1.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                        intent1.putExtra("name", patientName);
+                        intent1.putExtra("float_ageYear_Month", float_ageYear_Month);
+                        intent1.putExtra("tag", "edit");
+                        startActivity(intent1);
+                        dialog.dismiss();
+
+                    }
+                });
+                alertDialogBuilder.setNegativeButton(R.string.generic_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog alertDialog = alertDialogBuilder.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(context, alertDialog);
             }
         });
 
         editMedHist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final MaterialAlertDialogBuilder historyDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                /*final MaterialAlertDialogBuilder historyDialog = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
                 historyDialog.setTitle(getString(R.string.visit_summary_medical_history));
                 final LayoutInflater inflater = getLayoutInflater();
                 View convertView = inflater.inflate(R.layout.dialog_edit_entry, null);
@@ -1492,7 +1578,35 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 Button neutralb = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
                 neutralb.setTextColor(getResources().getColor((R.color.colorPrimary)));
                 neutralb.setTypeface(ResourcesCompat.getFont(VisitSummaryActivity.this, R.font.lato_bold));
-                IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);
+                IntelehealthApplication.setAlertDialogCustomTheme(VisitSummaryActivity.this, alertDialog);*/
+
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.edit_confirmation);
+                alertDialogBuilder.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent1 = new Intent(VisitSummaryActivity.this, PastMedicalHistoryActivity.class);
+                        intent1.putExtra("patientUuid", patientUuid);
+                        intent1.putExtra("visitUuid", visitUuid);
+                        intent1.putExtra("encounterUuidVitals", encounterVitals);
+                        intent1.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                        intent1.putExtra("name", patientName);
+                        intent1.putExtra("float_ageYear_Month", float_ageYear_Month);
+                        intent1.putExtra("tag", "edit");
+                        startActivity(intent1);
+                        dialog.dismiss();
+
+                    }
+                });
+                alertDialogBuilder.setNegativeButton(R.string.generic_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(context, alertDialog);
             }
         });
 
