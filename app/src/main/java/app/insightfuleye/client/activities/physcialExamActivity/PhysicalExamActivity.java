@@ -474,11 +474,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
 
 
-        obsDTO = new ObsDTO();
-        obsDTO.setConceptuuid(UuidDictionary.patientEyeHistory);
+       /* obsDTO = new ObsDTO();
+        obsDTO.setConceptuuid(UuidDictionary.RHK_MEDICAL_HISTORY_BLURB);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
-        obsDTO.setValue(Node.getPatHistDB());
+        obsDTO.setValue(Node.getPatHistDB() + ", " + Node.getSurgHistDB());
         try {
             obsDAO.insertObs(obsDTO);
         } catch (DAOException e) {
@@ -487,19 +487,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
 
         obsDTO = new ObsDTO();
-        obsDTO.setConceptuuid(UuidDictionary.surgicalHistoryEye);
-        obsDTO.setEncounteruuid(encounterAdultIntials);
-        obsDTO.setCreator(sessionManager.getCreatorID());
-        obsDTO.setValue(Node.getSurgHistDB());
-        try {
-            obsDAO.insertObs(obsDTO);
-        } catch (DAOException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-        }
-
-
-        obsDTO = new ObsDTO();
-        obsDTO.setConceptuuid(UuidDictionary.familyEyeHistory);
+        obsDTO.setConceptuuid(UuidDictionary.RHK_FAMILY_HISTORY_BLURB);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
         obsDTO.setValue(Node.getFamHistDB());
@@ -508,7 +496,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
-
+*/
 
         return isInserted;
     }
@@ -958,6 +946,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.volunteerComplaintLeft));
             obsDAO.updateObs(obsDTO);
 
+/*
             obsDTO = new ObsDTO();
             obsDTO.setConceptuuid(UuidDictionary.patientEyeHistory);
             obsDTO.setEncounteruuid(encounterAdultIntials);
@@ -983,6 +972,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setValue(Node.getFamHistDB());
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.familyEyeHistory));
             obsDAO.updateObs(obsDTO);
+*/
 
 
         } catch (DAOException dao) {

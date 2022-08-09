@@ -113,6 +113,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
     String patientHistory;
     String phistory = "";
+    String fhistory="";
 
     boolean flag = false;
 
@@ -199,18 +200,24 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                     try {
                         String medHistSelection = "encounteruuid = ? AND conceptuuid = ? AND voided!='1'";
                         String[] medHistArgs = {EncounterAdultInitial_LatestVisit, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB};
+                        String [] famHistArgs= {EncounterAdultInitial_LatestVisit, UuidDictionary.RHK_FAMILY_HISTORY_BLURB};
                         Cursor medHistCursor = localdb.query("tbl_obs", columns, medHistSelection, medHistArgs, null, null, null);
+                        Cursor famHistCursor=localdb.query("tbl_obs", columns, medHistSelection, famHistArgs, null, null, null);
                         medHistCursor.moveToLast();
+                        famHistCursor.moveToLast();
                         phistory = medHistCursor.getString(medHistCursor.getColumnIndexOrThrow("value"));
+                        fhistory=famHistCursor.getString(famHistCursor.getColumnIndexOrThrow("value"));
                         medHistCursor.close();
+                        famHistCursor.close();
                     } catch (CursorIndexOutOfBoundsException e) {
                         phistory = ""; // if medical history does not exist
+                        fhistory="";
                     }
 
                     // skip
                     flag = false;
                     if (phistory != null && !phistory.isEmpty() && !phistory.equals("null")) {
-                        insertDb(phistory);
+                        insertDb(phistory, fhistory);
                     }
 
                     Intent intent = new Intent(PastMedicalHistoryActivity.this, PhysicalExamActivity.class);
@@ -597,7 +604,8 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
 
         if (intentTag != null && intentTag.equals("edit")) {
-            updateDatabase(insertion);
+
+            updateDatabase(Node.getPatHistDB()+ ", " + Node.getSurgHistDB(), Node.getFamHistDB());
 
             Intent intent = new Intent(PastMedicalHistoryActivity.this, VisitSummaryActivity.class);
             intent.putExtra("patientUuid", patientUuid);
@@ -619,9 +627,9 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                 } else {
                     phistory = phistory + "";
                 }
-                insertDb(phistory);
+                insertDb(Node.getPatHistDB() + ", " + Node.getSurgHistDB(), Node.getFamHistDB());
             } else {
-                insertDb(insertion); // new details of family history
+                insertDb(Node.getPatHistDB() + ", " + Node.getSurgHistDB(), Node.getFamHistDB()); // new details of family history
             }
 
             flag = false;
@@ -646,16 +654,16 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
     /**
      * This method inserts medical history of patient in database.
      *
-     * @param value variable of type String
+     * @param phistory variable of type String
      * @return long
      */
-    public boolean insertDb(String value) {
+    public boolean insertDb(String phistory, String fhistory) {
         ObsDAO obsDAO = new ObsDAO();
         ObsDTO obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.RHK_MEDICAL_HISTORY_BLURB);
         obsDTO.setEncounteruuid(encounterAdultIntials);
         obsDTO.setCreator(sessionManager.getCreatorID());
-        obsDTO.setValue(StringUtils.getValue(value));
+        obsDTO.setValue(StringUtils.getValue(phistory));
         boolean isInserted = false;
         try {
             isInserted = obsDAO.insertObs(obsDTO);
@@ -663,7 +671,22 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             FirebaseCrashlytics.getInstance().recordException(e);
         }
 
+        ObsDAO obsDAO1 = new ObsDAO();
+        ObsDTO obsDTO1 = new ObsDTO();
+        obsDTO1.setConceptuuid(UuidDictionary.RHK_FAMILY_HISTORY_BLURB);
+        obsDTO1.setEncounteruuid(encounterAdultIntials);
+        obsDTO1.setCreator(sessionManager.getCreatorID());
+        obsDTO1.setValue(StringUtils.getValue(fhistory));
+        try {
+            isInserted = obsDAO1.insertObs(obsDTO1);
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+
         return isInserted;
+
+
+
     }
 
 
@@ -685,10 +708,12 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
      * @param string variable of type String
      * @return void
      */
-    private void updateDatabase(String string) {
+    private void updateDatabase(String string, String fhistory) {
 
         ObsDTO obsDTO = new ObsDTO();
         ObsDAO obsDAO = new ObsDAO();
+        ObsDTO obsDTO1 = new ObsDTO();
+        ObsDAO obsDAO1 = new ObsDAO();
         try {
             obsDTO.setConceptuuid(UuidDictionary.RHK_MEDICAL_HISTORY_BLURB);
             obsDTO.setEncounteruuid(encounterAdultIntials);
@@ -697,6 +722,19 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB));
 
             obsDAO.updateObs(obsDTO);
+
+        } catch (DAOException dao) {
+            FirebaseCrashlytics.getInstance().recordException(dao);
+        }
+
+        try {
+            obsDTO1.setConceptuuid(UuidDictionary.RHK_FAMILY_HISTORY_BLURB);
+            obsDTO1.setEncounteruuid(encounterAdultIntials);
+            obsDTO1.setCreator(sessionManager.getCreatorID());
+            obsDTO1.setValue(fhistory);
+            obsDTO1.setUuid(obsDAO1.getObsuuid(encounterAdultIntials, UuidDictionary.RHK_FAMILY_HISTORY_BLURB));
+
+            obsDAO1.updateObs(obsDTO1);
 
         } catch (DAOException dao) {
             FirebaseCrashlytics.getInstance().recordException(dao);

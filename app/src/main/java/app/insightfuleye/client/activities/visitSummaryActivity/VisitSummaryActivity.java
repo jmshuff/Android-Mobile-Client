@@ -1038,7 +1038,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
         if (famHistory.getValue() != null)
             famHistView.setText(Html.fromHtml(famHistory.getValue()));
         if (patHistory.getValue() != null)
-            patHistView.setText(Html.fromHtml(patHistory.getValue()));
+            patHistView.setText("Medical History: " + Html.fromHtml(patHistory.getValue()) + "\nFamily History: " + Html.fromHtml(famHistory.getValue()));
 
         getTamilDisplay();
         if(physicalDisplay!=null & physicalDisplay!="")
