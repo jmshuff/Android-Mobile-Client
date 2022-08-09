@@ -16,8 +16,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -826,7 +828,7 @@ public class IdentificationActivity extends AppCompatActivity {
             mAgeYears = Integer.valueOf(ymdData[0]);
             mAgeMonths = Integer.valueOf(ymdData[1]);
             mAgeDays = Integer.valueOf(ymdData[2]);
-            mAge.setText(yrMoDays);
+            mAge.setText(String.valueOf(mAgeYears));
         }
         //mAge.setOnClickListener(new View.OnClickListener() {
         //    @Override
@@ -937,7 +939,42 @@ public class IdentificationActivity extends AppCompatActivity {
         //}
         //});
         //JS MAge
-        mAge.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        mAge.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!mAge.getText().toString().isEmpty()) {
+                    Calendar calendar = Calendar.getInstance();
+                    int curYear = calendar.get(Calendar.YEAR);
+                    int mAgeYear = Integer.parseInt(mAge.getText().toString());
+                    int birthYear = curYear - mAgeYear; //mAge will just be the year JS
+                    int curMonth = calendar.get(Calendar.MONTH);
+                    int birthMonth = curMonth; //There is no birth month JS
+                    int birthDay = calendar.get(Calendar.DAY_OF_MONTH);
+                    //int totalDays = today.getActualMaximum(Calendar.DAY_OF_MONTH);
+                    mDOBYear = birthYear;
+                    mDOBMonth = birthMonth;
+                    mDOBDay = birthDay;
+
+                    Locale.setDefault(Locale.ENGLISH);
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+                    dob.set(mDOBYear, mDOBMonth, mDOBDay);
+                    String dobString = simpleDateFormat.format(dob.getTime());
+                    mDOB.setText(dobString);
+                    mDOBPicker.updateDate(mDOBYear, mDOBMonth, mDOBDay);
+                }
+            }
+        });
+        /*mAge.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus) {
@@ -963,7 +1000,7 @@ public class IdentificationActivity extends AppCompatActivity {
                     }
                 }
             }
-        });
+        });*/
 
 
 
