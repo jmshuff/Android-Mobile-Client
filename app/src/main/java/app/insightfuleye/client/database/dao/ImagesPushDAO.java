@@ -174,7 +174,14 @@ public class ImagesPushDAO {
             RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"), p.getChwName());
             RequestBody visitId= RequestBody.create(MediaType.parse("text/plain"), p.getVisitId());
             RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), p.getPatientId());
-            RequestBody type = RequestBody.create(MediaType.parse("text/plain"), p.getLeftRight());
+            RequestBody type;
+            if (p.getLeftRight()!=null){
+                type = RequestBody.create(MediaType.parse("text/plain"), p.getLeftRight());
+            }
+            else{
+                imagesDAO.removeAzureSynced(p.getImagePath());
+                continue;
+            }
             RequestBody sex = RequestBody.create(MediaType.parse("text/plain"), p.getSex());
             RequestBody age= RequestBody.create(MediaType.parse("text/plain"), p.getAge());
             RequestBody visual_acuity = RequestBody.create(MediaType.parse("text/plain"), p.getVARight());

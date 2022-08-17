@@ -1,12 +1,7 @@
 package app.insightfuleye.client.networkApiCalls;
 
 
-import android.os.Build;
-
-import com.google.android.gms.common.api.Api;
-
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
