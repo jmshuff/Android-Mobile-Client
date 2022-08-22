@@ -55,6 +55,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
+import app.insightfuleye.client.BuildConfig;
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.activePatientsActivity.ActivePatientActivity;
 import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
@@ -109,6 +110,8 @@ public class HomeActivity extends AppCompatActivity {
     SyncUtils syncUtils = new SyncUtils();
     CardView c1, c2, c3, c4, c5, c6, c7;
     CardView settings_card, updateProtocols_card, logout_card;
+    TextView versionText;
+    TextView volunteerText;
     private String key = null;
     private String licenseUrl = null;
 
@@ -171,7 +174,13 @@ public class HomeActivity extends AppCompatActivity {
         settings_card=findViewById(R.id.settings_card);
         updateProtocols_card=findViewById(R.id.updateProtocols_card);
         logout_card=findViewById(R.id.logout_card);
+        versionText=findViewById(R.id.versionCode);
+        versionText.setText("Version: " + BuildConfig.VERSION_NAME);
 
+        volunteerText=findViewById(R.id.volunteerName);
+        volunteerText.setText("Hello, " + sessionManager.getChwname().substring(0, 1).toUpperCase() + sessionManager.getChwname().substring(1) + "!");
+
+        c4.setVisibility(View.GONE);
         c6.setVisibility(View.GONE); //JS remove help button
 
         //card textview referrenced to fix bug of localization not working in some cases...
@@ -504,9 +513,11 @@ public class HomeActivity extends AppCompatActivity {
         try {
             JSONObject obj = null;
             if (hasLicense) {
-                obj = new JSONObject(Objects.requireNonNullElse
-                        (FileUtils.readFileRoot(AppConstants.CONFIG_FILE_NAME, context),
-                                String.valueOf(FileUtils.encodeJSON(context, AppConstants.CONFIG_FILE_NAME)))); //Load the config file
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    obj = new JSONObject(Objects.requireNonNullElse
+                            (FileUtils.readFileRoot(AppConstants.CONFIG_FILE_NAME, context),
+                                    String.valueOf(FileUtils.encodeJSON(context, AppConstants.CONFIG_FILE_NAME)))); //Load the config file
+                }
 
             } else {
                 obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(this, AppConstants.CONFIG_FILE_NAME)));

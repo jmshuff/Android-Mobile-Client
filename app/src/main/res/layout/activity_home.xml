@@ -24,6 +24,19 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/volunteerName"
+                    android:text="Hello, World!"
+                    android:fontFamily="@font/lato_medium"
+                    android:textStyle="bold"
+                    android:paddingLeft="12sp"
+                    android:paddingBottom="4dp"
+                    android:textSize="18sp"/>
+
+
+
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardview_newpat"
                     android:layout_width="match_parent"
@@ -280,7 +293,6 @@
                             android:padding="16dp">
 
 
-
                             <ImageView
                                 android:id="@+id/iv_whatsapp_helpline"
                                 android:layout_width="30dp"
@@ -530,6 +542,16 @@
                     </RelativeLayout>
 
                 </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:id="@+id/versionCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Version: "
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="14sp"
+                    android:paddingLeft="14dp"/>
+
             </LinearLayout>
 
         </ScrollView>

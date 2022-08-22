@@ -717,14 +717,16 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
                     manageCameraPermissions(imageName);
 
-                    for (imageDisplay temp : imageList) {
+/*                    for (imageDisplay temp : imageList) {
                         File file = new File(temp.getImagePath());
                         if (!file.exists()) {
                             imageList.remove(temp);
                         }
-                    }
+                    }*/ //JS 082122
                     imageDisplay imageInfo = new imageDisplay(AppConstants.IMAGE_PATH + imageName + ".jpg", physExamPos);
                     imageList.add(imageInfo);
+
+
                 } else {
                     Node.handleQuestion(question, this, adapter, null, null);
                 }
