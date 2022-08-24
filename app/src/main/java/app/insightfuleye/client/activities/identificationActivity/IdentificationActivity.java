@@ -15,6 +15,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -38,6 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -120,7 +122,7 @@ public class IdentificationActivity extends AppCompatActivity {
     EditText mAge;
     //MaterialAlertDialogBuilder mAgePicker;
     EditText mAddress1;
-    EditText mAddress2;
+    AutoCompleteTextView mAddress2;
     AutoCompleteTextView mCity;
     EditText mPostal;
     RadioGroup radioGroup;
@@ -175,6 +177,7 @@ public class IdentificationActivity extends AppCompatActivity {
     private LocationListener locationListener = null;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -209,6 +212,7 @@ public class IdentificationActivity extends AppCompatActivity {
         mDOB = findViewById(R.id.identification_birth_date_text_view);
         mPhoneNum = findViewById(R.id.identification_phone_number);
 
+
      /*   mPhoneNum.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -225,11 +229,20 @@ public class IdentificationActivity extends AppCompatActivity {
         mAddress1 = findViewById(R.id.identification_address1);
         mAddress1.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50), inputFilter_Name}); //maxlength 50
 
+
         mAddress2 = findViewById(R.id.identification_address2);
         mAddress2.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50), inputFilter_Name}); //maxlength 50
 
         mCity = findViewById(R.id.identification_city);
         mCity.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25), inputFilter_Others}); //maxlength 25
+
+        String[] districts= getResources().getStringArray(R.array.districts_tamilNadu);
+        ArrayAdapter<String> districtAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, districts);
+        String[] taluks= getResources().getStringArray(R.array.taluks_tamilNadu);
+        ArrayAdapter<String> talukAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, taluks);
+
+        mAddress2.setAdapter(talukAdapter);
+        mCity.setAdapter(districtAdapter);
 
         stateText = findViewById(R.id.identification_state);
         mState = findViewById(R.id.spinner_state);

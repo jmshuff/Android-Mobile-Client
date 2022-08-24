@@ -89,6 +89,7 @@
                 android:textFontWeight="1"
                 android:padding="10dp"
                 android:fontFamily="@font/lato_regular"
+                android:textSize="16dp"
                 android:layout_width="wrap_content"
                 android:layout_marginHorizontal="5dp"
                 android:textAlignment="gravity"/>
@@ -97,7 +98,8 @@
                 android:id="@+id/checkbox_CHO"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/i_health_worker_confirm_that_i_have_read_out_the_privacy_notice_and_consent_to_the_patient"
+                android:text="
+                @string/i_health_worker_confirm_that_i_have_read_out_the_privacy_notice_and_consent_to_the_patient"
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="5dp"
                 />
