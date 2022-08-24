@@ -2,11 +2,8 @@ package app.insightfuleye.client.activities.privacyNoticeActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -25,11 +24,10 @@ import java.util.Locale;
 import java.util.Objects;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
-
-import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
 
 public class PrivacyNotice_Activity extends AppCompatActivity implements View.OnClickListener {
     TextView privacy_textview;
@@ -76,9 +74,11 @@ public class PrivacyNotice_Activity extends AppCompatActivity implements View.On
         try {
             JSONObject obj = null;
             if (hasLicense) {
-                obj = new JSONObject(Objects.requireNonNullElse(
-                        FileUtils.readFileRoot(AppConstants.CONFIG_FILE_NAME, this),
-                        String.valueOf(FileUtils.encodeJSON(this, AppConstants.CONFIG_FILE_NAME)))); //Load the config file
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    obj = new JSONObject(Objects.requireNonNullElse(
+                            FileUtils.readFileRoot(AppConstants.CONFIG_FILE_NAME, this),
+                            String.valueOf(FileUtils.encodeJSON(this, AppConstants.CONFIG_FILE_NAME)))); //Load the config file
+                }
 
             } else {
                 obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(this, AppConstants.CONFIG_FILE_NAME)));
@@ -115,7 +115,16 @@ public class PrivacyNotice_Activity extends AppCompatActivity implements View.On
                     privacy_textview.setText(privacy_string);
                 }
 
-            } else {
+            } else if(current.toString().equals("ta")){
+                String privacy_string = obj.getString("privacyNoticeText_Tamil");
+                if (privacy_string.isEmpty()) {
+                    privacy_string = obj.getString("privacyNoticeText");
+                    privacy_textview.setText(privacy_string);
+                } else {
+                    privacy_textview.setText(privacy_string);
+                }
+            }
+            else {
                 String privacy_string = obj.getString("privacyNoticeText");
                 privacy_textview.setText(privacy_string);
             }

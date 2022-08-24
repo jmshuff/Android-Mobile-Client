@@ -90,7 +90,6 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
         this._mCallingClass = callingClass;
         this._mListener = _mListener;
         this.isAssociateSym = isAssociateSym;
-
     }
 
     PhysicalExam physicalExam;

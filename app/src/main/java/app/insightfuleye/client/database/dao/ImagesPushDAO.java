@@ -214,7 +214,7 @@ public class ImagesPushDAO {
 
                         @Override
                         public void onError(Throwable e) {
-                            Logger.logD(TAG, "Onerror " + e.getMessage());
+                            Logger.logD(TAG, "Onerror Azure" + e.getMessage());
 //                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", IntelehealthApplication.getAppContext());
                         }
 
@@ -335,7 +335,7 @@ public class ImagesPushDAO {
 
                             @Override
                             public void onError(Throwable e) {
-                                Logger.logD(TAG, "Onerror " + e.getMessage());
+                                Logger.logD(TAG, "Onerror Azure2" + e.getMessage());
 //                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", IntelehealthApplication.getAppContext());
                             }
 

@@ -62,6 +62,7 @@ public class imageDisplayAdapter extends RecyclerView.Adapter<imageDisplayAdapte
         String imagePath=imagesList.get(position).getImagePath();
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
         holder.imageView.setImageBitmap(bitmap);
+        Log.d("imageListLength", String.valueOf(imagesList.size()));
 
         holder.deleteImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +96,13 @@ public class imageDisplayAdapter extends RecyclerView.Adapter<imageDisplayAdapte
         holder.downloadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                downloadImage(imagesList.get(position).getImagePath());
+                File file = new File(imagesList.get(position).getImagePath());
+                if (file.exists()){
+                    downloadImage(imagesList.get(position).getImagePath());
+                }
+                else{
+                    Toast.makeText(context, "No image available", Toast.LENGTH_LONG);
+                }
             }
         });
 

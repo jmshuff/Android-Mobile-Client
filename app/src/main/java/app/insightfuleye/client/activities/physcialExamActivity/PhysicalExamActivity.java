@@ -63,6 +63,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -137,7 +138,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     String mgender;
     String mAge;
     ScrollingPagerIndicator recyclerViewIndicator;
-    ArrayList<imageDisplay> imageList;
+    ArrayList<imageDisplay> imageList = new ArrayList<>();
 
     ArrayList<String> nodeHeaders = new ArrayList<>();
     int complaintSize;
@@ -194,7 +195,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
         //select exams
         selectedExamsList = new ArrayList<>();
-        imageList = new ArrayList<>();
         Intent intent = this.getIntent(); // The intent was passed to the activity
         if (intent != null) {
             patientUuid = intent.getStringExtra("patientUuid");
@@ -615,6 +615,16 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
     @Override
     public void onChildListClickEvent(int groupPosition, int childPos, int physExamPos, String type) {
+        if (!imageList.isEmpty()){
+            for(Iterator<imageDisplay> itr = imageList.iterator();itr.hasNext();) {
+                imageDisplay img = itr.next();
+                File file = new File(img.getImagePath());
+                if (!file.exists()) {
+                    itr.remove();
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        }
 
         Node question = physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).getOption(childPos);
 
@@ -717,12 +727,18 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     //Node.handleQuestion(question, this, adapter, filePath.toString(), imageName);
                     manageCameraPermissions(imageName);
 
-/*                    for (imageDisplay temp : imageList) {
-                        File file = new File(temp.getImagePath());
-                        if (!file.exists()) {
-                            imageList.remove(temp);
+                    if (!imageList.isEmpty()){
+                        for(Iterator<imageDisplay> itr = imageList.iterator();itr.hasNext();) {
+                            imageDisplay img = itr.next();
+                            File file = new File(img.getImagePath());
+                            if (!file.exists()) {
+                                itr.remove();
+                            }
                         }
-                    }*/ //JS 082122
+                        adapter.notifyDataSetChanged();
+                    }
+
+
                     imageDisplay imageInfo = new imageDisplay(AppConstants.IMAGE_PATH + imageName + ".jpg", physExamPos);
                     imageList.add(imageInfo);
 
