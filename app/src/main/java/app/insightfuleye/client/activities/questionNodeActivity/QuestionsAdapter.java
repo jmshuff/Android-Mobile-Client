@@ -24,6 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.collect.ImmutableList;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -172,7 +173,9 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
                 Log.d("makeimagelist", imageInfo.getImagePath() + " pos: " + imageInfo.getPosition());
 
                 if (imageInfo.getPosition()==position){
-                    imageDisplayList.add(imageInfo);
+                    File temp=new File(imageInfo.getImagePath());
+                    if (temp.exists())
+                        imageDisplayList.add(imageInfo);
                 }
             }
             imageDisplayAdapter=new imageDisplayAdapter(imageDisplayList);

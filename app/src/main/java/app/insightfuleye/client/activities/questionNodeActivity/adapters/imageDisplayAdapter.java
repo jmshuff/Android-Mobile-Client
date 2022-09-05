@@ -60,9 +60,13 @@ public class imageDisplayAdapter extends RecyclerView.Adapter<imageDisplayAdapte
     @Override
     public void onBindViewHolder(@NonNull imageDisplayAdapter.MyViewHolder holder, int position) {
         String imagePath=imagesList.get(position).getImagePath();
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-        holder.imageView.setImageBitmap(bitmap);
-        Log.d("imageListLength", String.valueOf(imagesList.size()));
+        File file=new File(imagePath);
+        if (file.exists()){
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            holder.imageView.setImageBitmap(bitmap);
+            Log.d("imageListLength", String.valueOf(imagesList.size()));
+        }
+
 
         holder.deleteImage.setOnClickListener(new View.OnClickListener() {
             @Override

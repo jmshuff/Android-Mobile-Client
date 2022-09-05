@@ -711,11 +711,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     physicalExamMap.getExamNode(physExamPos).getOption(groupPosition).setSelected(true);
                     if (!filePath.exists()) {
                         boolean res = filePath.mkdirs();
-                        Log.i("RES>", "" + filePath + " -> " + res);
+                        //Log.i("RES>", "" + filePath + " -> " + res);
                     }
                     imageName = UUID.randomUUID().toString();
-                    Log.d("azureimagename", imageName);
-                    Log.d("Text", physicalExamMap.getExamNode(physExamPos).getText().toLowerCase());
+//                    Log.d("azureimagename", imageName);
+//                    Log.d("Text", physicalExamMap.getExamNode(physExamPos).getText().toLowerCase());
                     if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("right")) {
                         azureType = "right";
                     } else if (physicalExamMap.getExamNode(physExamPos).getText().toLowerCase().contains("left")) {
@@ -1052,7 +1052,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 } catch (DAOException e) {
                     e.printStackTrace();
                 }
-                //Test, code to print list of queded images for testing
+               /* //Test, code to print list of queded images for testing
                 ImagesDAO imagesDAO = new ImagesDAO();
                 List<azureResults> azureQueue = new ArrayList<>();
                 try {
@@ -1060,7 +1060,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                     Log.d("AzureQueue", azureQueue.toString());
                 } catch (DAOException e) {
                     e.printStackTrace();
-                }
+                }*/
                 adapter.notifyDataSetChanged();
             }
 
@@ -1380,7 +1380,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
     }
 
     public void openCameraNative(String imageName) {
-        String imagePath = AppConstants.IMAGE_PATH + imageName + ".jpg";
         File file = new File(AppConstants.IMAGE_PATH + imageName + ".jpg");
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

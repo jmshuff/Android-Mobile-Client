@@ -63,7 +63,7 @@
             android:label="@string/title_activity_physical_exam"
             android:parentActivityName="app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity"
             android:screenOrientation="portrait"
-            android:configChanges="uiMode"
+            android:configChanges="uiMode|orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustNothing" />
         <activity
