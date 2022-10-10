@@ -238,14 +238,20 @@ public class ImagesPushDAO {
                     @Override
                     public void onComplete() {
                         Logger.logD(TAG, "success");
-/*                        try {
-                            List<azureResults> azureQueue;
+                        List<azureResults> azureQueue = null;
+                        try {
                             azureQueue=imagesDAO.getAzureImageQueue();
-                            Log.d("AzureQueue", azureQueue.toString());
-                            Log.d(TAG, "complete");
-                        } catch (Exception e) {
+                        } catch (DAOException e) {
                             e.printStackTrace();
-                        }*/
+                        }
+                        for (azureResults q: azureQueue){
+                            try {
+                                imagesDAO.removeAzureSynced(q.getImagePath());
+                            } catch (DAOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
                 });
 
@@ -359,12 +365,7 @@ public class ImagesPushDAO {
                     @Override
                     public void onNext(@NonNull ResponseBody responseBody) {
                         Log.d(TAG, "azure success");
-                        //Remove request from database and delete file
-/*                        try {
-                            imagesDAO.removeAzureSynced(p.getImagePath());
-                        } catch (DAOException e) {
-                            e.printStackTrace();
-                        }*/
+
                     }
 
                     @Override
@@ -376,14 +377,20 @@ public class ImagesPushDAO {
                     @Override
                     public void onComplete() {
                         Logger.logD(TAG, "success");
-/*                        try {
-                            List<azureResults> azureQueue;
+                        Logger.logD(TAG, "success");
+                        List<azureResults> azureQueue = null;
+                        try {
                             azureQueue=imagesDAO.getAzureImageQueue();
-                            Log.d("AzureQueue", azureQueue.toString());
-                            Log.d(TAG, "complete");
-                        } catch (Exception e) {
+                        } catch (DAOException e) {
                             e.printStackTrace();
-                        }*/
+                        }
+                        for (azureResults q: azureQueue){
+                            try {
+                                imagesDAO.removeAzureSynced(q.getImagePath());
+                            } catch (DAOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 });
 
