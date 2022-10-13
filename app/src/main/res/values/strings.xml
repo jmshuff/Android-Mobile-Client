@@ -27,8 +27,8 @@
     <string name="db_last_name">last_name</string>
     <string name="db_dob">date_of_birth</string>
     <string name="db_phone_number">phone_number</string>
-    <string name="db_address_line1">taluk</string>
-    <string name="db_address_line2">district</string>
+    <string name="db_address_line1">address1</string>
+    <string name="db_address_line2">address2</string>
     <string name="db_city">city_village</string>
     <string name="db_state">state_province</string>
     <string name="db_postal_code">postal_code</string>
@@ -80,8 +80,8 @@
     <string name="identification_screen_prompt_first_name">First name *</string>
     <string name="identification_screen_prompt_middle_name">Middle name</string>
     <string name="identification_screen_prompt_last_name">Last name *</string>
-    <string name="identification_screen_prompt_address">Village</string>
-    <string name="identification_screen_prompt_address2">Taluk</string>
+    <string name="identification_screen_prompt_address">Address 1</string>
+    <string name="identification_screen_prompt_address2">Address 2</string>
     <string name="identification_screen_prompt_phone_number">Phone number *</string>
     <string name="admin_password_dialog_heading">Enter Admin Password</string>
     <string name="identification_screen_prompt_gender">Gender *</string>
@@ -89,11 +89,11 @@
     <string name="identification_screen_checkbox_female">Female</string>
     <string name="identification_screen_prompt_birthday">Date of birth*</string>
     <string name="identification_screen_prompt_age">Age *</string>
-    <string name="identification_screen_prompt_city">District</string>
+    <string name="identification_screen_prompt_city">City/Village</string>
     <string name="identification_screen_prompt_state">State *</string>
     <string name="identification_screen_prompt_caste">Caste</string>
     <string name="identification_screen_prompt_economic_status">Economic status</string>
-    <string name="identification_screen_prompt_eyecampid">OP #</string>
+    <string name="identification_screen_prompt_eyecampid">MRN</string>
     <string name="identification_screen_prompt_education">Education level</string>
     <string name="identification_screen_prompt_country">Country *</string>
     <string name="identification_screen_prompt_postal_code">Postal code</string>

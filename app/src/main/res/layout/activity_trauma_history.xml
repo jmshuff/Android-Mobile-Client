@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="app.insightfuleye.client.activities.identificationActivity.IdentificationActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="io.intelehealth.client.activities.identification_activity.IdentificationActivity"
+        tools:showIn="@layout/activity_identification">
+
+        <ScrollView
+            android:id="@+id/identification_scrollView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:fillViewport="false">
+
+            <LinearLayout
+                android:id="@+id/layout_identification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="How many days back did the trauma occur?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+            
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="What was the mode of injury?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+            
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Did you apply any OTC medications?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+            
+                <RadioGroup
+                    android:id="@+id/radioGrp_otc"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true">
+            
+                    <RadioButton
+                        android:id="@+id/otc_yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawablePadding="10dp"
+                        android:fontFamily="@font/lato_regular"
+                        android:text="@string/generic_yes"
+                        android:textSize="@dimen/card_content_sub_text_size" />
+            
+                    <RadioButton
+                        android:id="@+id/otc_no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawablePadding="10dp"
+                        android:fontFamily="@font/lato_regular"
+                        android:text="@string/generic_no"
+                        android:textSize="@dimen/card_content_sub_text_size"
+                        />
+            
+                </RadioGroup>
+            
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="What type of medication?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+            
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="How many times was it applied?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+            
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Have you applied traditional eye medicine (TEM)?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+            
+                <RadioGroup
+                    android:id="@+id/radioGrp_traditional"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true">
+            
+                    <RadioButton
+                        android:id="@+id/traditional_yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawablePadding="10dp"
+                        android:fontFamily="@font/lato_regular"
+                        android:text="@string/generic_yes"
+                        android:textSize="@dimen/card_content_sub_text_size" />
+            
+                    <RadioButton
+                        android:id="@+id/traditional_no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawablePadding="10dp"
+                        android:fontFamily="@font/lato_regular"
+                        android:text="@string/generic_no"
+                        android:textSize="@dimen/card_content_sub_text_size"
+                        />
+            
+                </RadioGroup>
+            
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="What was the medicine?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+            
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="How many times was it applied?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Did you consult any doctor?"
+                    android:fontFamily="@font/lato_regular"
+                    android:textSize="18sp"/>
+            
+                <RadioGroup
+                    android:id="@+id/radioGrp_drConsult"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true">
+            
+                    <RadioButton
+                        android:id="@+id/doctor_yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawablePadding="10dp"
+                        android:fontFamily="@font/lato_regular"
+                        android:text="@string/generic_yes"
+                        android:textSize="@dimen/card_content_sub_text_size" />
+            
+                    <RadioButton
+                        android:id="@+id/doctor_no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawablePadding="10dp"
+                        android:fontFamily="@font/lato_regular"
+                        android:text="@string/generic_no"
+                        android:textSize="@dimen/card_content_sub_text_size"
+                        />
+            
+                </RadioGroup>
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+
+</LinearLayout>
