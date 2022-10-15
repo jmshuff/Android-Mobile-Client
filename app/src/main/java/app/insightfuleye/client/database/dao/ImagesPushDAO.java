@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -146,6 +147,18 @@ public class ImagesPushDAO {
 //        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
         return true;
     }
+    @NonNull
+    private RequestBody createPartFromString(String description){
+        if(description!=null) return RequestBody.create(MediaType.parse("text/plain"), description);
+        else return RequestBody.create(MediaType.parse("text/plain"), "");
+    }
+
+    @NonNull
+    private MultipartBody.Part createFilePart(String partName, String imagePath){
+        File file = new File(AppConstants.IMAGE_PATH + imagePath);
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"),file);
+        return MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+    }
 
 
     public boolean azureImagePush() throws DAOException {
@@ -163,60 +176,39 @@ public class ImagesPushDAO {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
 
-        MultipartBody.Part[] eyeImageParts= new MultipartBody.Part[imageQueue.size()];
-        ArrayList<String> patientIds= new ArrayList<>();
-        ArrayList<String> visitIds = new ArrayList<>();
-        ArrayList<String> creatorIds= new ArrayList<>();
-        ArrayList<String> types= new ArrayList<>();
-        ArrayList<String> phs= new ArrayList<>();
-        ArrayList<String> vas= new ArrayList<>();
-        ArrayList<String> complaintList= new ArrayList<>();
-        ArrayList<String> sexes= new ArrayList<>();
-        ArrayList<String> ages= new ArrayList<>();
+        List<MultipartBody.Part> eyeImageParts= new ArrayList<>();
+        Map<String, RequestBody> partMap = new HashMap<>();
 
-        int i = 0;
-        for (azureResults p : imageQueue) {
+        for (int i=0; i<imageQueue.size(); i++) {
             //pass it like this
-            File file = null;
-            file = new File(AppConstants.IMAGE_PATH + p.getImagePath());
-            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            // MultipartBody.Part is used to send also the actual file name
-            eyeImageParts[i] = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-            patientIds.add(p.getPatientId());
-            visitIds.add(p.getVisitId());
-            creatorIds.add(p.getChwName());
-            types.add(p.getLeftRight());
-            if (p.getLeftRight() == "right") {
-                phs.add(p.getPinholeRight());
-                vas.add(p.getVARight());
-                complaintList.add(p.getComplaintsRight().toString());
-            } else {
-                phs.add(p.getPinholeLeft());
-                vas.add(p.getVALeft());
-                complaintList.add(p.getComplaintsLeft().toString());
+            azureResults p = imageQueue.get(i);
+            eyeImageParts.add(createFilePart("file", p.getImagePath()));
+            partMap.put("visitId[" + i + "]", createPartFromString(p.getVisitId()));
+            partMap.put("patientId[" + i + "]", createPartFromString(p.getPatientId()));
+            partMap.put("creatorId[" + i + "]", createPartFromString(p.getChwName()));
+            partMap.put("type[" + i + "]", createPartFromString(p.getLeftRight()));
+            partMap.put("age[" + i + "]", createPartFromString(p.getAge()));
+            partMap.put("sex[" + i + "]", createPartFromString(p.getSex()));
+            if(p.getLeftRight().equals("right")){
+                partMap.put("visual_acuity[" + i + "]", createPartFromString(p.getVARight()));
+                partMap.put("pinhole_acuity[" + i + "]", createPartFromString(p.getPinholeRight()));
+                partMap.put("complaints[" + i + "]", createPartFromString(p.getComplaintStrR()));
             }
-            i += 1;
+            else{
+                partMap.put("visual_acuity[" + i + "]", createPartFromString(p.getVALeft()));
+                partMap.put("pinhole_acuity[" + i + "]", createPartFromString(p.getPinholeLeft()));
+                partMap.put("complaints[" + i + "]", createPartFromString(p.getComplaintStrL()));
+            }
+
         }
-
-        RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"), creatorIds.toString());
-        RequestBody visitId= RequestBody.create(MediaType.parse("text/plain"), visitIds.toString());
-        RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), patientIds.toString());
-        RequestBody type= RequestBody.create(MediaType.parse("text/plain"), types.toString());
-
-        RequestBody sex = RequestBody.create(MediaType.parse("text/plain"), sexes.toString());
-        RequestBody age= RequestBody.create(MediaType.parse("text/plain"), ages.toString());
-        RequestBody visual_acuity = RequestBody.create(MediaType.parse("text/plain"), vas.toString());
-        RequestBody pinhole_acuity = RequestBody.create(MediaType.parse("text/plain"),phs.toString());
-        RequestBody complaints =RequestBody.create(MediaType.parse("text/plain"), complaintList.toString());
 
         Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
         AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
-        Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(eyeImageParts, creatorId, visitId, patientId, type, visual_acuity, pinhole_acuity, sex, age, complaints);
+        Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(eyeImageParts, partMap);
         //is this the right type for the observable...
         azureObservable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableObserver<ResponseBody>() {
-
 
                     @Override
                     public void onNext(@NonNull ResponseBody responseBody) {

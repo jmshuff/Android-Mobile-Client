@@ -898,7 +898,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             contentValues.put("creatorId", sessionManager.getChwname());
             contentValues.put("type", type);
             //contentValues.put("sync", "false");
-            localdb.insertWithOnConflict("tbl_azure_uploads", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            localdb.insertWithOnConflict("tbl_azure_img_uploads", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
             isInserted = true;
             localdb.setTransactionSuccessful();
         } catch (SQLiteException e) {
