@@ -952,7 +952,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setConceptuuid(UuidDictionary.volunteerComplaintRight);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
-            obsDTO.setValue(Node.getRightComplaint());
+            obsDTO.setValue(Node.getRightSympt());
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.volunteerComplaintRight));
             obsDAO.updateObs(obsDTO);
 
@@ -960,7 +960,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             obsDTO.setConceptuuid(UuidDictionary.volunteerComplaintLeft);
             obsDTO.setEncounteruuid(encounterAdultIntials);
             obsDTO.setCreator(sessionManager.getCreatorID());
-            obsDTO.setValue(Node.getLeftComplaint());
+            obsDTO.setValue(Node.getLeftSympt());
             obsDTO.setUuid(obsDAO.getObsuuid(encounterAdultIntials, UuidDictionary.volunteerComplaintLeft));
             obsDAO.updateObs(obsDTO);
 
@@ -1316,10 +1316,11 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             contentValues.put("PinholeLeft", "");
             contentValues.put("age", "");
             contentValues.put("sex", "");
-            contentValues.put("complaints", "");
+            contentValues.put("complaintsRight", Node.getRightSympt());
+            contentValues.put("complaintsLeft", Node.getLeftSympt());
 
             //contentValues.put("sync", "false");
-            localdb.insertWithOnConflict("tbl_azure_uploads", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            localdb.insertWithOnConflict("tbl_azure_img_uploads", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
             isInserted = true;
             localdb.setTransactionSuccessful();
         } catch (SQLiteException e) {
@@ -1347,7 +1348,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             contentValues.put("PinholeLeft", physicalExamMap.getPinholeLeft());
             contentValues.put("age", mAge);
             contentValues.put("sex", mGender);
-            localdb.updateWithOnConflict("tbl_azure_uploads", contentValues, "visitId = ?", new String[]{visitUuid}, SQLiteDatabase.CONFLICT_REPLACE);
+            localdb.updateWithOnConflict("tbl_azure_img_uploads", contentValues, "visitId = ?", new String[]{visitUuid}, SQLiteDatabase.CONFLICT_REPLACE);
             localdb.setTransactionSuccessful();
             isUpdated = true;
         } catch (SQLException e) {

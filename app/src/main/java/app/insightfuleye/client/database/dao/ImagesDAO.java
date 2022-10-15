@@ -336,14 +336,14 @@ public class ImagesDAO {
         ContentValues contentValues = new ContentValues();
         File file= new File(AppConstants.IMAGE_PATH + imageName);
         try {
-            String query = "Select * from tbl_azure_uploads where imageName = \'" + imageName + "\'";
+            String query = "Select * from tbl_azure_img_uploads where imageName = \'" + imageName + "\'";
             Cursor cursor = localdb.rawQuery(query, null);
             if (cursor.getCount() > 0) {
                 //while (cursor.moveToNext()) {
                     //String dbImageName = cursor.getString(cursor.getColumnIndexOrThrow("imageName"));
                     //Log.d("FileErase", dbImageName);
                     //Log.d("File erase", imageName);
-                    localdb.execSQL("DELETE from tbl_azure_uploads where imageName = \'" + imageName + "\'");
+                    localdb.execSQL("DELETE from tbl_azure_img_uploads where imageName = \'" + imageName + "\'");
                     localdb.setTransactionSuccessful();
 //                    List<azureResults> imageQueue = new ArrayList<>();
 //                    try {
@@ -533,7 +533,7 @@ public class ImagesDAO {
         localdb.beginTransaction();
         List<azureResults> azureResultList = new ArrayList<>();
         try {
-            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_azure_uploads", null);
+            Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_azure_img_uploads", null);
             if (idCursor.getCount() != 0) {
                 while (idCursor.moveToNext()) {
                     azureResults ImageQueue= new azureResults();
@@ -549,7 +549,8 @@ public class ImagesDAO {
                     ImageQueue.setPinholeLeft(idCursor.getString(idCursor.getColumnIndexOrThrow("PinholeLeft")));
                     ImageQueue.setAge(idCursor.getString(idCursor.getColumnIndexOrThrow("age")));
                     ImageQueue.setSex(idCursor.getString(idCursor.getColumnIndexOrThrow("sex")));
-                    ImageQueue.setComplaints(idCursor.getString(idCursor.getColumnIndexOrThrow("complaints")));
+                    ImageQueue.setComplaintStrR(idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight")));
+                    ImageQueue.setComplaintStrL(idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft")));
                     azureResultList.add(ImageQueue);
                 }
             }
@@ -588,7 +589,6 @@ public class ImagesDAO {
                     if (idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))!=null) ImageQueue.setDiagnosisRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisRight"))).split(","))));
                     if (idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))!=null)ImageQueue.setDiagnosisLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("diagnosisLeft"))).split(","))));
                     if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))!=null)ImageQueue.setComplaintsRight(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight"))).split(","))));
-                    if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))!=null)ImageQueue.setComplaintsLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
                     if (idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))!=null)ImageQueue.setComplaintsLeft(new ArrayList<>(Arrays.asList((idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft"))).split(","))));
                     azureResultList.add(ImageQueue);
                 }

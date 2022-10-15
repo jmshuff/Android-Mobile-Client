@@ -2,7 +2,6 @@ package app.insightfuleye.client.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class azureResults {
@@ -41,6 +40,24 @@ public class azureResults {
     private String VALeft;
     private String PinholeRight;
     private String PinholeLeft;
+    private String complaintStrR;
+    private String complaintStrL;
+
+    public String getComplaintStrR() {
+        return complaintStrR;
+    }
+
+    public void setComplaintStrR(String complaintStrR) {
+        this.complaintStrR = complaintStrR;
+    }
+
+    public String getComplaintStrL() {
+        return complaintStrL;
+    }
+
+    public void setComplaintStrL(String complaintStrL) {
+        this.complaintStrL = complaintStrL;
+    }
 
     private ArrayList<String> complaintsRight;
 
@@ -210,7 +227,7 @@ public class azureResults {
     }
 
     public String toString(){
-        return "PatientID: " + patientId + ", CreatorId: " + chwName + ", Type: " + leftRight + ", VisitID: " + visitId + ", Image Path: " + imagePath + "VARight " + VARight + "VALeft: " + VALeft + "Age: " + age + "Sex: " + sex;
+        return "PatientID: " + patientId + ", CreatorId: " + chwName + ", Type: " + leftRight + ", VisitID: " + visitId + ", Image Path: " + imagePath + "VARight " + VARight + "VALeft: " + VALeft + "Age: " + age + "Sex: " + sex + ", ComplaintsR: " + complaintStrR + ", ComplaintsL: " + complaintStrL;
     }
 
 }
