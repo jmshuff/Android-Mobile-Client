@@ -182,7 +182,9 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "age TEXT," +
             "sex TEXT," +
             "complaintsRight TEXT," +
-            "complaintsLeft TEXT" +
+            "complaintsLeft TEXT," +
+            "patHist TEXT," +
+            "famHist TEXT" +
             ")";
 
     public static final String AZURE_ADDITIONAL_DOCS= "CREATE TABLE IF NOT EXISTS tbl_azure_additional_docs(" +

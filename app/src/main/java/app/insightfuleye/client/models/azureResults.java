@@ -42,6 +42,24 @@ public class azureResults {
     private String PinholeLeft;
     private String complaintStrR;
     private String complaintStrL;
+    private String famHist;
+    private String patHist;
+
+    public String getFamHist() {
+        return famHist;
+    }
+
+    public void setFamHist(String famHist) {
+        this.famHist = famHist;
+    }
+
+    public String getPatHist() {
+        return patHist;
+    }
+
+    public void setPatHist(String patHist) {
+        this.patHist = patHist;
+    }
 
     public String getComplaintStrR() {
         return complaintStrR;
