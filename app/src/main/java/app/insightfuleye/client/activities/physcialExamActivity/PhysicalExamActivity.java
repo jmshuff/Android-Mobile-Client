@@ -1328,19 +1328,12 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             throw new DAOException(e);
         } finally {
             localdb.endTransaction();
-
         }
         return isInserted;
     }
 
     public boolean updateAzureImageDatabase() throws DAOException {
-        boolean isUpdated = false;
-        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-        localdb.beginTransaction();
-        ContentValues contentValues = new ContentValues();
-        PatientsDAO patientsDAO = new PatientsDAO();
-        String mAge = patientsDAO.fetch_age(patientUuid);
-        String mGender = patientsDAO.fetch_gender(patientUuid);
+
         String phistory="";
         String fhistory="";
 
@@ -1377,13 +1370,24 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         }
         cursor1.close();
 
+        boolean isUpdated = false;
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        PatientsDAO patientsDAO = new PatientsDAO();
+        String mAge = patientsDAO.fetch_age(patientUuid);
+        String mGender = patientsDAO.fetch_gender(patientUuid);
+
         String leftComp= Node.getRightSympt();
-        leftComp.replace("\u2022", "");
-        leftComp.replace("<br/>", "");
+        if(leftComp!=null){
+        leftComp=leftComp.replace("\u2022", "");
+        leftComp=leftComp.replace("<br/>", "");}
 
         String rightComp= Node.getRightSympt();
-        rightComp.replace("\u2022", "");
-        rightComp.replace("<br/>", "");
+        if(rightComp!=null){
+            rightComp=rightComp.replace("\u2022", "");
+            rightComp=rightComp.replace("<br/>", "");}
+
         try {
             contentValues.put("VARight", physicalExamMap.getVARight());
             contentValues.put("VALeft", physicalExamMap.getVALeft());

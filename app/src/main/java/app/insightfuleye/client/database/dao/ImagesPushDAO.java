@@ -189,6 +189,10 @@ public class ImagesPushDAO {
             partMap.put("type[" + i + "]", createPartFromString(p.getLeftRight()));
             partMap.put("age[" + i + "]", createPartFromString(p.getAge()));
             partMap.put("sex[" + i + "]", createPartFromString(p.getSex()));
+            Log.d("fhist", p.getFamHist());
+            Log.d("phist", p.getPatHist());
+            partMap.put("fam_history["+i+"]", createPartFromString(p.getFamHist()));
+            partMap.put("pat_history["+i+"]", createPartFromString(p.getPatHist()));
             if(p.getLeftRight().equals("right")){
                 partMap.put("visual_acuity[" + i + "]", createPartFromString(p.getVARight()));
                 partMap.put("pinhole_acuity[" + i + "]", createPartFromString(p.getPinholeRight()));
