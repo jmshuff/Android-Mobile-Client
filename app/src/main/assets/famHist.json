@@ -1,0 +1,32 @@
+{
+    "id":"ID_98644641",
+    "text":"Family History",
+    "display-or":"குடும்பத்தின் மருத்துவ வரலாறு.",
+    "options": [{
+        "id":"ID_779206416",
+        "text":"Family History: ",
+    "display":"Do any of your immediate family members have the following conditions?",
+    "display-or":"உங்கள் குடும்ப உறுப்பினர்களில் யாராவது பின்வரும் நிபந்தனைகளைக் கொண்டிருக்கிறார்களா?",
+    "language":"Family History",
+        "options": [{
+            "id":"ID_313117110",
+            "text":"Diabetes",
+    "language":"Diabetes",
+    "display-or":"நீரிழிவு நோய்"
+        }, {
+            "id":"ID_1061576995",
+            "text":"Glaucoma",
+    "language":"Glaucoma (Has anyone in your family use eye drops regularly for a long time?)",
+    "display-or":"கிள la கோமா"
+        }, {
+            "id":"ID_826379482",
+            "text":"No",
+    "language":"%",
+    "display-or":"இல்லை"
+        }, {
+            "id":"ID_999274511",
+            "text":"Don't know",
+    "language":"Don't know"
+        }]
+    }]
+}
