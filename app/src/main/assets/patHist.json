@@ -1,0 +1,116 @@
+{
+    "id":"ID_133044878",
+    "text":"Patient History",
+    "display-or":"நோயாளியின் மருத்துவ வரலாறு.",
+    "options": [{
+        "id":"ID_82509300",
+        "text":"Medical History",
+    "display":"Do you have any of the following conditions?",
+    "language":"Patient History",
+    "display-or":"நோயாளிக்கு, கீழே குறிப்பிட்டுள்ள பிரச்சனைகளில் ஏதேனும் உள்ளதா?",
+        "options": [{
+            "id":"ID_1080427077",
+            "text":"Asthma",
+    "language":"Asthma",
+    "display-or":"ஆஸ்துமா"
+        }, {
+            "id":"ID_408004823",
+            "text":"Cardiac Problems",
+    "language":"Cardiac Problems",
+    "display-or":"இதய பிரச்சினைகள்"
+        }, {
+            "id":"ID_395443507",
+            "text":"Diabetes",
+    "language":"%",
+    "display-or":"சர்க்கரை நோய்",
+            "options": [{
+                "id":"ID_1601127469",
+                "text":"Less than 5 years",
+    "language":"Diabetes <5 years",
+    "display-or":"5 வருடங்களுக்கும் குறைவாக"
+            }, {
+                "id":"ID_540529455",
+                "text":"5-10 years",
+    "language":"Diabetes 5-10 years",
+    "display-or":"5-10 ஆண்டுகள்"
+            }, {
+                "id":"ID_968496081",
+                "text":"More than 10 years",
+    "language":"Diabetes >10years",
+    "display-or":"10 ஆண்டுகளுக்கும் மேலாக"
+            }]
+        }, {
+            "id":"ID_1234756610",
+            "text":"Hypertension",
+    "language":"Hypertension",
+    "display-or":"உயர் இரத்த அழுத்தம்"
+        }, {
+            "id":"ID_1159370656",
+            "text":"High Cholesterol",
+    "language":"High Cholesterol",
+    "display-or":"அதிக கொழுப்பு"
+        }, {
+            "id":"ID_1872077483",
+            "text":"No",
+    "language":"%",
+    "display-or":"எந்த பிரச்சனைகளும் இல்லை"
+        }, {
+            "id":"ID_646580571",
+            "text":"Other Medical Conditions",
+    "input-type":"text",
+    "display-or":"வேறு பிரச்சனைகள்"
+        }]
+    }, {
+        "id":"ID_1197837467",
+        "text":"Surgical History",
+    "language":"Surgical History",
+    "display":"Have you previously had cataract surgery?",
+    "display-or":"கண்புரை அறுவை சிகிச்சை செய்திருக்குறீர்களா?",
+        "options": [{
+            "id":"ID_1543860127",
+            "text":"Yes, in the right eye",
+    "language":"Cataract surgery Right Eye",
+    "display-or":"ஆம்- வலது கண்"
+        }, {
+            "id":"ID_537136479",
+            "text":"Yes, in the left eye",
+    "language":"Cataract Surgery Left Eye",
+    "display-or":"ஆம்- இடது கண்"
+        }, {
+            "id":"ID_1561402129",
+            "text":"No",
+    "language":"%",
+    "display-or":"இல்லை"
+        }]
+    }, {
+        "id":"ID_779206416",
+        "text":"Family History",
+    "display":"Do any of your immediate family members have the following conditions?",
+    "display-or":"உங்கள் குடும்பத்தினருக்கு கீழே குறிப்பிட்டுள்ள நோய்கள் ஏதேனும் உள்ளதா?",
+    "language":"Family history",
+        "options": [{
+            "id":"ID_313117110",
+            "text":"Diabetes (blood sugar)",
+    "language":"Diabetes",
+    "display-or":"சர்க்கரை நோய்"
+        }, {
+            "id":"ID_1061576995",
+            "text":"Glaucoma (eye pressure)",
+    "language":"Glaucoma",
+    "display-or":"கண்நீர் அழுத்த நோய்"
+        }, {
+            "id":"ID_826379482",
+            "text":"No, family members do not have",
+    "language":"%",
+    "display-or":"குடும்பத்தினருக்கு இந்த நோய்கள் இல்லை"
+        }, {
+            "id":"ID_999274511",
+            "text":"Doesn't know family history",
+    "display-or":"குடும்பத்தினருக்கு உள்ளதா என்று தெரியாது"
+        }, {
+            "id":"ID_1625576413",
+            "text":"Doesn't know about the diseases",
+    "display-or":"நோயை பற்றி தெரியாது"
+        }]
+    }]
+}
