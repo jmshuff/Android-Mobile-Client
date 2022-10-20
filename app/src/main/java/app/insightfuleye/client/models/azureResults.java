@@ -245,7 +245,7 @@ public class azureResults {
     }
 
     public String toString(){
-        return "PatientID: " + patientId + ", CreatorId: " + chwName + ", Type: " + leftRight + ", VisitID: " + visitId + ", Image Path: " + imagePath + "VARight " + VARight + "VALeft: " + VALeft + "Age: " + age + "Sex: " + sex + ", ComplaintsR: " + complaintStrR + ", ComplaintsL: " + complaintStrL;
+        return "PatientID: " + patientId + ", CreatorId: " + chwName + ", Type: " + leftRight + ", VisitID: " + visitId + ", Image Path: " + imagePath + "VARight " + VARight + "VALeft: " + VALeft + "Age: " + age + "Sex: " + sex + ", ComplaintsR: " + complaintStrR + ", ComplaintsL: " + complaintStrL + "famHist: " + famHist + " patHist: " + patHist;
     }
 
 }

@@ -551,6 +551,8 @@ public class ImagesDAO {
                     ImageQueue.setSex(idCursor.getString(idCursor.getColumnIndexOrThrow("sex")));
                     ImageQueue.setComplaintStrR(idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsRight")));
                     ImageQueue.setComplaintStrL(idCursor.getString(idCursor.getColumnIndexOrThrow("complaintsLeft")));
+                    ImageQueue.setFamHist(idCursor.getString(idCursor.getColumnIndexOrThrow("famHist")));
+                    ImageQueue.setPatHist(idCursor.getString(idCursor.getColumnIndexOrThrow("patHist")));
                     azureResultList.add(ImageQueue);
                 }
             }
