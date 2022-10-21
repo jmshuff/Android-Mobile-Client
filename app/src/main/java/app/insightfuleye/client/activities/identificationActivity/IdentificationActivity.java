@@ -1133,6 +1133,7 @@ public class IdentificationActivity extends AppCompatActivity {
         mGenderF.setError(null);
     }
 
+
     private InputFilter inputFilter_Name = new InputFilter() { //filter input for name fields
         @Override
         public CharSequence filter(CharSequence charSequence, int i, int i1, Spanned spanned, int i2, int i3) {

@@ -21,6 +21,8 @@ public class UuidDictionary {
     public static final String RHK_MEDICAL_HISTORY_BLURB = "62bff84b-795a-45ad-aae1-80e7f5163a82";
     public static final String RHK_FAMILY_HISTORY_BLURB = "d63ae965-47fb-40e8-8f08-1f46a8a60b2b";
     public static final String FOLLOW_UP_VISIT = "e8caffd6-5d22-41c4-8d6a-bc31a44d0c86";
+    public static final String TRAUMA_HISTORY = "286f6c35-2fc2-46ab-bbf4-984acf641698";
+    public static final String OCULAR_HISTORY = "923862cb-5359-4989-ba54-f7257658dec8";
     //m added
     public static final String EMERGENCY = "ca5f5dc3-4f0b-4097-9cae-5cf2eb44a09c";
 

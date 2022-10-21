@@ -12,13 +12,6 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
@@ -37,11 +30,16 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.res.ResourcesCompat;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -57,6 +55,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.homeActivity.HomeActivity;
+import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
+import app.insightfuleye.client.activities.traumaHistoryActivity.traumaHistoryActivity;
+import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.InteleHealthDatabaseHelper;
@@ -72,15 +74,10 @@ import app.insightfuleye.client.utilities.DateAndTimeUtils;
 import app.insightfuleye.client.utilities.DownloadFilesUtils;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.Logger;
+import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.UrlModifiers;
 import app.insightfuleye.client.utilities.UuidDictionary;
-
-import app.insightfuleye.client.activities.homeActivity.HomeActivity;
-import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
-import app.insightfuleye.client.activities.complaintNodeActivity.ComplaintNodeActivity;
-import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
-import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -257,7 +254,7 @@ public class PatientDetailActivity extends AppCompatActivity {
                 // Toast.makeText(PatientDetailActivity.this,"PMH: "+phistory,Toast.LENGTH_SHORT).sƒhow();
                 // Toast.makeText(PatientDetailActivity.this,"FH: "+fhistory,Toast.LENGTH_SHORT).show();
 
-                Intent intent2 = new Intent(PatientDetailActivity.this, ComplaintNodeActivity.class);
+                Intent intent2 = new Intent(PatientDetailActivity.this, traumaHistoryActivity.class);
                 String fullName = patient_new.getFirst_name() + " " + patient_new.getLast_name();
                 intent2.putExtra("patientUuid", patientUuid);
 
