@@ -1844,8 +1844,8 @@ public class IdentificationActivity extends AppCompatActivity {
         try {
             Logger.logD(TAG, "insertpatinet ");
             boolean isPatientInserted = patientsDAO.insertPatientToDB(patientdto, uuid);
-            boolean isPatientImageInserted = imagesDAO.insertPatientProfileImages(mCurrentPhotoPath, uuid);
-
+            //boolean isPatientImageInserted = imagesDAO.insertPatientProfileImages(mCurrentPhotoPath, uuid);
+            boolean isPatientImageInserted=true;
             if (NetworkConnection.isOnline(getApplication())) {
 //                patientApiCall();
 //                frameJson();
@@ -1857,7 +1857,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 SyncDAO syncDAO = new SyncDAO();
                 ImagesPushDAO imagesPushDAO = new ImagesPushDAO();
                 boolean push = syncDAO.pushDataApi();
-                boolean pushImage = imagesPushDAO.patientProfileImagesPush();
+                //boolean pushImage = imagesPushDAO.patientProfileImagesPush();
 
 //                if (push)
 //                    AppConstants.notificationUtils.DownloadDone(getString(R.string.patient_data_upload), "" + patientdto.getFirstname() + "" + patientdto.getLastname() + "'s data upload complete.", 2, getApplication());
@@ -2424,13 +2424,14 @@ public class IdentificationActivity extends AppCompatActivity {
         try {
             Logger.logD(TAG, "update ");
             boolean isPatientUpdated = patientsDAO.updatePatientToDB(patientdto, uuid, patientAttributesDTOList);
-            boolean isPatientImageUpdated = imagesDAO.updatePatientProfileImages(mCurrentPhotoPath, uuid);
+//            boolean isPatientImageUpdated = imagesDAO.updatePatientProfileImages(mCurrentPhotoPath, uuid);
+            boolean isPatientImageUpdated=true;
 
             if (NetworkConnection.isOnline(getApplication())) {
                 SyncDAO syncDAO = new SyncDAO();
                 ImagesPushDAO imagesPushDAO = new ImagesPushDAO();
                 boolean ispush = syncDAO.pushDataApi();
-                boolean isPushImage = imagesPushDAO.patientProfileImagesPush();
+                //boolean isPushImage = imagesPushDAO.patientProfileImagesPush();
 
 //                if (ispush)
 //                    AppConstants.notificationUtils.DownloadDone(getString(R.string.patient_data_upload), "" + patientdto.getFirst_name() + "" + patientdto.getLast_name() + "'s data upload complete.", 2, getApplication());
