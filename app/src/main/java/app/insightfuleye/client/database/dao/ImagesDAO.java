@@ -196,8 +196,9 @@ public class ImagesDAO {
             localdb.endTransaction();
 
         }
-        if (isupdate == 0)
-            isUpdated = insertPatientProfileImages(imagepath, patientuuid);
+//        if (isupdate == 0)
+//            isUpdated = insertPatientProfileImages(imagepath, patientuuid);
+        isUpdated=true;
         return isUpdated;
     }
 

@@ -25,7 +25,7 @@ public class SyncUtils {
         syncDAO.pushDataApi();
         syncDAO.pullData_Background(IntelehealthApplication.getAppContext()); //only this new function duplicate
 
-        imagesPushDAO.patientProfileImagesPush();
+        //imagesPushDAO.patientProfileImagesPush();
 //        imagesPushDAO.obsImagesPush();
 
         /*
@@ -39,7 +39,7 @@ public class SyncUtils {
             @Override
             public void run() {
                 Logger.logD(TAG, "Background Image Push Started");
-                imagesPushDAO.obsImagesPush();
+                //imagesPushDAO.obsImagesPush();
                 try {
                     imagesPushDAO.azureImagePush();
                 } catch (DAOException e) {
@@ -83,7 +83,7 @@ public class SyncUtils {
             }
         }, 3000);
 
-        imagesPushDAO.patientProfileImagesPush();
+        //imagesPushDAO.patientProfileImagesPush();
 
 //        imagesPushDAO.obsImagesPush();
 
@@ -97,7 +97,7 @@ public class SyncUtils {
             @Override
             public void run() {
                 Logger.logD(TAG, "Image Push Started");
-                imagesPushDAO.obsImagesPush();
+                //imagesPushDAO.obsImagesPush();
                 try {
                     imagesPushDAO.azureImagePush();
                 } catch (DAOException e) {
