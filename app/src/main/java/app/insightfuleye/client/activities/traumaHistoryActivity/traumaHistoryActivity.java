@@ -1,6 +1,10 @@
 package app.insightfuleye.client.activities.traumaHistoryActivity;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -20,11 +24,13 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
 import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
+import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.ObsDTO;
+import app.insightfuleye.client.models.traumaHist;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.UuidDictionary;
@@ -66,6 +72,8 @@ public class traumaHistoryActivity extends AppCompatActivity {
     TextInputLayout otcFreqLayout;
     TextInputLayout temTypeLayout;
     TextInputLayout temFreqLayout;
+
+    traumaHist traumaHist= new traumaHist();
 
 
     @Override
@@ -128,6 +136,10 @@ public class traumaHistoryActivity extends AppCompatActivity {
         temTypeLayout.setVisibility(View.GONE);
         temFreqLayout.setVisibility(View.GONE);
 
+        if(intentTag.equals("edit") || intentTag.equals("return")){
+            setscreen(visitUuid);
+        }
+
         mOtcYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -180,7 +192,11 @@ public class traumaHistoryActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
-            fabClick();
+            try {
+                fabClick();
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -227,7 +243,17 @@ public class traumaHistoryActivity extends AppCompatActivity {
 
     }
 
-    private void fabClick() {
+    private void fabClick() throws DAOException {
+        traumaHist.setModeInjury(mModeInjury.getText().toString());
+        traumaHist.setTraumaOccur(mTraumaOccur.getText().toString());
+        traumaHist.setDocConsult(docConsulted);
+        traumaHist.setOtcUsed(otcUsed);
+        traumaHist.setOtcFreq(mOtcFrequency.getText().toString());
+        traumaHist.setOtcType(mOtcType.getText().toString());
+        traumaHist.setTemUsed(temUsed);
+        traumaHist.setTemType(mTemType.getText().toString());
+        traumaHist.setTemFreq(mTemFrequency.getText().toString());
+
         String tHist="";
         if(!mModeInjury.getText().toString().isEmpty()){
             tHist += Node.bullet + " Trauma: " + mModeInjury.getText().toString() + "<br/>";
@@ -259,7 +285,7 @@ public class traumaHistoryActivity extends AppCompatActivity {
         Log.d("trauma", tHist);
 
 
-        if (intentTag != null && intentTag.equals("edit")) {
+        if (intentTag != null && (intentTag.equals("edit") || intentTag.equals("return"))) {
 
             updateDb(tHist);
 
@@ -292,7 +318,7 @@ public class traumaHistoryActivity extends AppCompatActivity {
         }
     }
 
-    public boolean insertDb(String tHistory) {
+    public boolean insertDb(String tHistory) throws DAOException {
         ObsDAO obsDAO = new ObsDAO();
         ObsDTO obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.TRAUMA_HISTORY);
@@ -306,11 +332,38 @@ public class traumaHistoryActivity extends AppCompatActivity {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
 
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("patientId", patientUuid);
+            contentValues.put("visitId", visitUuid);
+            contentValues.put("modeInjury", traumaHist.getModeInjury());
+            contentValues.put("traumaOccur", traumaHist.getTraumaOccur());
+            contentValues.put("docConsult", traumaHist.isDocConsult());
+            contentValues.put("otcUsed", traumaHist.isOtcUsed());
+            contentValues.put("temUsed", traumaHist.isTemUsed());
+            contentValues.put("otcType", traumaHist.getOtcType());
+            contentValues.put("otcFreq", traumaHist.getOtcFreq());
+            contentValues.put("temType", traumaHist.getTemType());
+            contentValues.put("temFreq", traumaHist.getTemFreq());
+            //contentValues.put("sync", "false");
+            localdb.insertWithOnConflict("tbl_trauma_hist", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
         return isInserted;
 
     }
 
-    public void updateDb(String tHistory) {
+    public boolean updateDb(String tHistory) throws DAOException {
+        boolean isInserted=false;
         ObsDTO obsDTO = new ObsDTO();
         ObsDAO obsDAO = new ObsDAO();
         try {
@@ -331,7 +384,79 @@ public class traumaHistoryActivity extends AppCompatActivity {
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
+
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            contentValues.put("patientId", patientUuid);
+            contentValues.put("visitId", visitUuid);
+            contentValues.put("modeInjury", traumaHist.getModeInjury());
+            contentValues.put("traumaOccur", traumaHist.getTraumaOccur());
+            contentValues.put("docConsult", traumaHist.isDocConsult());
+            contentValues.put("otcUsed", traumaHist.isOtcUsed());
+            contentValues.put("temUsed", traumaHist.isTemUsed());
+            contentValues.put("otcType", traumaHist.getOtcType());
+            contentValues.put("otcFreq", traumaHist.getOtcFreq());
+            contentValues.put("temType", traumaHist.getTemType());
+            contentValues.put("temFreq", traumaHist.getTemFreq());
+            //contentValues.put("sync", "false");
+            localdb.updateWithOnConflict("tbl_trauma_hist", contentValues, "visitId = ?", new String[]{visitUuid}, SQLiteDatabase.CONFLICT_REPLACE);
+            isInserted = true;
+            localdb.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            isInserted = false;
+            throw new DAOException(e);
+        } finally {
+            localdb.endTransaction();
+
+        }
+        return isInserted;
     }
+
+    private void setscreen(String visitId){
+
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+
+        String patientSelection = "visitId=?";
+        String[] Args = {visitId};
+        String[] Columns = {"modeInjury", "traumaOccur", "docConsult", "otcUsed", "temUsed", "otcFreq", "otcType", "temType", "temFreq"};
+        Cursor idCursor = db.query("tbl_trauma_hist", Columns, patientSelection, Args, null, null, null);
+        if (idCursor.moveToFirst()) {
+            do {
+                traumaHist.setModeInjury(idCursor.getString(idCursor.getColumnIndexOrThrow("modeInjury")));
+                traumaHist.setDocConsult(idCursor.getString(idCursor.getColumnIndexOrThrow("docConsult"))=="true");
+                traumaHist.setTraumaOccur(idCursor.getString(idCursor.getColumnIndexOrThrow("traumaOccur")));
+                traumaHist.setOtcUsed(idCursor.getString(idCursor.getColumnIndexOrThrow("otcUsed"))=="true");
+                traumaHist.setTemUsed(idCursor.getString(idCursor.getColumnIndexOrThrow("temUsed"))=="true");
+                traumaHist.setOtcType(idCursor.getString(idCursor.getColumnIndexOrThrow("otcType")));
+                traumaHist.setOtcFreq(idCursor.getString(idCursor.getColumnIndexOrThrow("otcFreq")));
+                traumaHist.setTemType(idCursor.getString(idCursor.getColumnIndexOrThrow("temType")));
+                traumaHist.setTemFreq(idCursor.getString(idCursor.getColumnIndexOrThrow("temFreq")));
+            } while (idCursor.moveToNext());
+            idCursor.close();
+        }
+
+        mModeInjury.setText(traumaHist.getModeInjury());
+        mTraumaOccur.setText(traumaHist.getTraumaOccur());
+        mOtcType.setText(traumaHist.getOtcType());
+        mOtcFrequency.setText(traumaHist.getOtcFreq());
+        mTemFrequency.setText(traumaHist.getTemFreq());
+        mTemType.setText(traumaHist.getTemFreq());
+        if(otcUsed==true)
+            mOtcYes.setChecked(true);
+        if(otcUsed==false)
+            mOtcNo.setChecked(true);
+        if(temUsed==true)
+            mTemYes.setChecked(true);
+        if(temUsed==false)
+            mTemNo.setChecked(false);
+        if(docConsulted==true)
+            mDocYes.setChecked(true);
+        if(docConsulted==false)
+            mDocNo.setChecked(true);
+    }
+
 
 
 }

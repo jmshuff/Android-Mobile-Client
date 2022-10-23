@@ -689,6 +689,7 @@
     <string name="trauma_doc_consult">Did you consult any doctor?</string>
     <string name="trauma_description">Trauma Description</string>
     <string name="trauma_treatment_description">Treatment Description</string>
+    <string name="title_activity_follow_up">Follow Up Patients</string>
 
 
 </resources>

@@ -239,6 +239,20 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "inputString TEXT"+
             ")";
 
+    public static final String CREATE_TABLE_TRAUMA = "CREATE TABLE IF NOT EXISTS tbl_trauma_hist(" +
+            "patientId TEXT," +
+            "visitId TEXT," +
+            "modeInjury TEXT," +
+            "traumaOccur TEXT," +
+            "docConsult TEXT," +
+            "otcUsed TEXT," +
+            "otcType TEXT," +
+            "otcFreq TEXT," +
+            "temUsed TEXT," +
+            "temType TEXT," +
+            "temFreq TEXT" +
+            ")";
+
     public InteleHealthDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -311,6 +325,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_EDIT_TABLES);
         db.execSQL(CREATE_IMAGE_TABLE);
         db.execSQL(CREATE_TAMIL_TABLE);
+        db.execSQL(CREATE_TABLE_TRAUMA);
         uuidInsert(db);
         database = db;
 
