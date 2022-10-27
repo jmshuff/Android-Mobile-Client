@@ -168,7 +168,7 @@ public class followUpActivity extends AppCompatActivity implements OnMapReadyCal
         Date cDate = new Date();
         String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
 */
-        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate,  b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.openmrs_id, c.encounter_type_uuid, d.value, d.person_attribute_type_uuid " +
+        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate,  b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.openmrs_id, c.provider_uuid, c.encounter_type_uuid, d.value, d.person_attribute_type_uuid " +
                 "FROM tbl_visit a, tbl_patient b, tbl_encounter c, tbl_patient_attribute d " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND a.patientuuid = d.patientuuid " +
