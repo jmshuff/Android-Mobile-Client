@@ -58,6 +58,7 @@ import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.complaintNodeActivity.ComplaintNodeActivity;
 import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
 import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
+import app.insightfuleye.client.activities.traumaHistoryActivity.traumaHistoryActivity;
 import app.insightfuleye.client.activities.visitSummaryActivity.VisitSummaryActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
@@ -650,7 +651,27 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
                     sessionManager.setVisitSummary(patientUuid, selectedExams);
 
                     startActivity(intent);
-                } else {
+                } else if(complaintString.contains("Recent Eye Trauma")){
+                    Log.i(TAG, "fabClick: update" + insertion);
+                    updateDatabase(insertion);
+                    Intent intent = new Intent(QuestionNodeActivity.this, traumaHistoryActivity.class);
+                    intent.putExtra("patientUuid", patientUuid);
+                    intent.putExtra("visitUuid", visitUuid);
+                    intent.putExtra("encounterUuidVitals", encounterVitals);
+                    intent.putExtra("encounterUuidAdultIntial", encounterAdultIntials);
+                    intent.putExtra("EncounterAdultInitial_LatestVisit", EncounterAdultInitial_LatestVisit);
+                    intent.putExtra("state", state);
+                    intent.putExtra("name", patientName);
+                    intent.putExtra("tag", intentTag);
+
+                    Set<String> selectedExams = new LinkedHashSet<>(physicalExams);
+                    sessionManager.setVisitSummary(patientUuid, selectedExams);
+
+                    startActivity(intent);
+
+
+                }
+                else {
                     Log.i(TAG, "fabClickInsertion: " + insertion);
                     insertDb(insertion);
                     Intent intent = new Intent

@@ -58,6 +58,7 @@ import java.util.Objects;
 import app.insightfuleye.client.BuildConfig;
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.activePatientsActivity.ActivePatientActivity;
+import app.insightfuleye.client.activities.followUpActivity.followUpActivity;
 import app.insightfuleye.client.activities.identificationActivity.IdentificationActivity;
 import app.insightfuleye.client.activities.loginActivity.LoginActivity;
 import app.insightfuleye.client.activities.privacyNoticeActivity.PrivacyNotice_Activity;
@@ -108,7 +109,7 @@ public class HomeActivity extends AppCompatActivity {
     IntentFilter filter;
     Myreceiver reMyreceive;
     SyncUtils syncUtils = new SyncUtils();
-    CardView c1, c2, c3, c4, c5, c6, c7;
+    CardView c1, c2, c3, c4, c5, c6, c7, c8;
     CardView settings_card, updateProtocols_card, logout_card;
     TextView versionText;
     TextView volunteerText;
@@ -124,7 +125,7 @@ public class HomeActivity extends AppCompatActivity {
     private int versionCode = 0;
     private CompositeDisposable disposable = new CompositeDisposable();
     TextView newPatient_textview, findPatients_textview, todaysVisits_textview,
-            activeVisits_textview, videoLibrary_textview, help_textview, uploadImage_textView;
+            activeVisits_textview, videoLibrary_textview, help_textview, uploadImage_textView, followUp_textView;
     private AppUpdateManager mAppUpdateManager;
     private static final int RC_APP_UPDATE = 11;
 
@@ -171,6 +172,7 @@ public class HomeActivity extends AppCompatActivity {
         c5 = findViewById(R.id.cardview_video_libraby);
         c6 = findViewById(R.id.cardview_help_whatsapp);
         c7 = findViewById(R.id.cardview_upload_image);
+        c8= findViewById(R.id.cardview_follow_up);
         settings_card=findViewById(R.id.settings_card);
         updateProtocols_card=findViewById(R.id.updateProtocols_card);
         logout_card=findViewById(R.id.logout_card);
@@ -182,6 +184,7 @@ public class HomeActivity extends AppCompatActivity {
 
         c4.setVisibility(View.GONE);
         c6.setVisibility(View.GONE); //JS remove help button
+        c7.setVisibility(View.GONE);
 
         //card textview referrenced to fix bug of localization not working in some cases...
         newPatient_textview = findViewById(R.id.newPatient_textview);
@@ -198,8 +201,6 @@ public class HomeActivity extends AppCompatActivity {
 
         videoLibrary_textview = findViewById(R.id.videoLibrary_textview);
         videoLibrary_textview.setText(R.string.video_library);
-
-
 
         help_textview = findViewById(R.id.help_textview);
         help_textview.setText(R.string.Whatsapp_Help_Cardview);
@@ -295,6 +296,14 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, uploadImageActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        c8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, followUpActivity.class);
                 startActivity(intent);
             }
         });

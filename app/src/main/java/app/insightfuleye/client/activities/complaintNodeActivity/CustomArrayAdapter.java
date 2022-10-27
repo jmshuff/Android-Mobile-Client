@@ -51,6 +51,7 @@ public class CustomArrayAdapter extends ArrayAdapter<Node> {
         mContext = context;
         layoutResourceID = resource;
         mNodesFilter = nodes;
+        Log.d("mNodesFilter", mNodesFilter.toString());
         mNodes= ImmutableList.copyOf(mNodesFilter);
     }
 
@@ -66,7 +67,6 @@ public class CustomArrayAdapter extends ArrayAdapter<Node> {
 
         TextView textViewItem = convertView.findViewById(R.id.subquestion_text_view);
         textViewItem.setText(thisNode.findDisplay());
-
         ImageView imageView = convertView.findViewById(R.id.subquestion_image_view);
 
         if (thisNode.isSelected()) {

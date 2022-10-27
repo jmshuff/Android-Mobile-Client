@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -83,8 +84,10 @@ public class traumaHistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_trauma_history);
         setTitle("Trauma History");
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitleTextAppearance(this, R.style.ToolbarTheme);
+        toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
 /*        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

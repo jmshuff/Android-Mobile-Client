@@ -690,6 +690,8 @@
     <string name="trauma_description">Trauma Description</string>
     <string name="trauma_treatment_description">Treatment Description</string>
     <string name="title_activity_follow_up">Follow Up Patients</string>
+    <string name="visit_summary_trauma_history">Trauma History</string>
+    <string name="home_follow_up_visits">Follow Up Visits</string>
 
 
 </resources>

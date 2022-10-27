@@ -316,7 +316,6 @@ public class IdentificationActivity extends AppCompatActivity {
             longitude = 0.0;
         }
 
-
         ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_NETWORK_STATE}, 1);
 
         try {
@@ -1191,7 +1190,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 patient1.setPatient_photo(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_photo")));
                 patient1.setHealth_scheme(idCursor.getString(idCursor.getColumnIndexOrThrow("health_scheme")));
                 patient1.setEconomic_status(idCursor.getString(idCursor.getColumnIndexOrThrow("economic_status")));
-                //imagpatient1.setEyecampid(idCursor.getString(idCursor.getColumnIndexOrThrow("eyecampid")));
+
 
             } while (idCursor.moveToNext());
             idCursor.close();

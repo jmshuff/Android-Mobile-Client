@@ -137,7 +137,9 @@ public class SyncDAO {
                             ArrayList<String> encounterVisitUUID = new ArrayList<String>();
                             for (int i = 0; i < response.body().getData().getEncounterDTO().size(); i++) {
                                 if (response.body().getData().getEncounterDTO().get(i)
-                                        .getEncounterTypeUuid().equalsIgnoreCase("bd1fbfaa-f5fb-4ebd-b75c-564506fc309e")) {
+                                        .getEncounterTypeUuid().equalsIgnoreCase("bd1fbfaa-f5fb-4ebd-b75c-564506fc309e") ||
+                                        response.body().getData().getEncounterDTO().get(i)
+                                        .getEncounterTypeUuid().equalsIgnoreCase("809a1df6-8cc6-4d2c-92e7-00f7468f496e")) {
                                     encounterVisitUUID.add(response.body().getData().getEncounterDTO().get(i).getVisituuid());
                                 }
                             }

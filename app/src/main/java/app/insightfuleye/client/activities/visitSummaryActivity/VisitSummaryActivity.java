@@ -1,5 +1,6 @@
 package app.insightfuleye.client.activities.visitSummaryActivity;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -92,6 +93,7 @@ import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.activities.pastMedicalHistoryActivity.PastMedicalHistoryActivity;
 import app.insightfuleye.client.activities.patientSurveyActivity.PatientSurveyActivity;
 import app.insightfuleye.client.activities.physcialExamActivity.PhysicalExamActivity;
+import app.insightfuleye.client.activities.traumaHistoryActivity.traumaHistoryActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
@@ -150,6 +152,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
     ObsDTO complaint = new ObsDTO();
     ObsDTO famHistory = new ObsDTO();
     ObsDTO patHistory = new ObsDTO();
+    ObsDTO traumaHistory= new ObsDTO();
+    ObsDTO occularHistory = new ObsDTO();
     ObsDTO phyExam = new ObsDTO();
     //ObsDTO height = new ObsDTO(); JS
     //ObsDTO weight = new ObsDTO();
@@ -173,6 +177,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     ImageButton editPhysical;
     ImageButton editFamHist;
     ImageButton editMedHist;
+    ImageButton editTraumaHist;
     ImageButton editAddDocs;
 
     FrameLayout frameLayout_doctor;
@@ -189,6 +194,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     TextView complaintView;
     TextView famHistView;
     TextView patHistView;
+    TextView traumaHistView;
     TextView physFindingsView;
     TextView mDoctorTitle;
     TextView mDoctorName;
@@ -199,6 +205,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     //TextView tempfaren;
     //TextView tempcel;
     String medHistory;
+    String traumaHistStr;
     String baseDir;
     String filePathPhyExam;
     File obsImgdir;
@@ -219,6 +226,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     CardView followUpDateCard;
     CardView card_print, card_share;
     CardView familyHistCard;
+    CardView traumaHistCard;
 
 
     TextView diagnosisTextView;
@@ -279,6 +287,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
     String complaintTamil="";
     String patHistTamil="";
     String physExamTamil="";
+    String traumaHistTamil="";
 
    /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -503,6 +512,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         frameLayout_doctor.setVisibility(View.GONE);
         familyHistCard= findViewById(R.id.cardView_famhist);
         familyHistCard.setVisibility(View.GONE);
+        traumaHistCard=findViewById(R.id.cardView_traumahist);
+        traumaHistCard.setVisibility(View.GONE);
 
         card_print = findViewById(R.id.card_print);
         card_share = findViewById(R.id.card_share);
@@ -709,6 +720,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
         editPhysical = findViewById(R.id.imagebutton_edit_physexam);
         editFamHist = findViewById(R.id.imagebutton_edit_famhist);
         editMedHist = findViewById(R.id.imagebutton_edit_pathist);
+        editTraumaHist = findViewById(R.id.imagebutton_edit_traumahist);
         editAddDocs = findViewById(R.id.imagebutton_edit_additional_document);
         uploadButton = findViewById(R.id.button_upload);
         downloadButton = findViewById(R.id.button_download);
@@ -747,6 +759,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             editPhysical.setVisibility(View.GONE);
             editFamHist.setVisibility(View.GONE);
             editMedHist.setVisibility(View.GONE);
+            editTraumaHist.setVisibility(View.GONE);
             editAddDocs.setVisibility(View.GONE);
             uploadButton.setVisibility(View.GONE);
             invalidateOptionsMenu();
@@ -984,6 +997,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
         complaintView = findViewById(R.id.textView_content_complaint);
         famHistView = findViewById(R.id.textView_content_famhist);
         patHistView = findViewById(R.id.textView_content_pathist);
+        traumaHistView= findViewById(R.id.textView_content_traumahist);
         physFindingsView = findViewById(R.id.textView_content_physexam);
 
         /*if (isRespiratory) {
@@ -1038,7 +1052,9 @@ public class VisitSummaryActivity extends AppCompatActivity {
         if (famHistory.getValue() != null)
             famHistView.setText(Html.fromHtml(famHistory.getValue()));
         if (patHistory.getValue() != null)
-            patHistView.setText("Medical History: " + Html.fromHtml(patHistory.getValue()) + "\nFamily History: " + Html.fromHtml(famHistory.getValue()));
+            patHistView.setText("Medical History: " + Html.fromHtml(patHistory.getValue()) + "\nOccular History: " + Html.fromHtml(occularHistory.getValue()));
+        if(traumaHistory.getValue()!=null)
+            traumaHistView.setText(Html.fromHtml(traumaHistory.getValue()));
 
         getTamilDisplay();
         if(physicalDisplay!=null & physicalDisplay!="")
@@ -1053,6 +1069,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
             if (complaintTamil!= null && complaintTamil!="") complaintView.setText(Html.fromHtml(complaintTamil));
             if (patHistTamil!=null && patHistTamil!="") patHistView.setText(Html.fromHtml(patHistTamil));
             if (physExamTamil!=null && physExamTamil!="") physFindingsView.setText(Html.fromHtml(physExamTamil));
+            if(traumaHistTamil!=null && traumaHistTamil!="") traumaHistView.setText(Html.fromHtml(traumaHistTamil));
         }
 
 /*
@@ -1609,6 +1626,41 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 IntelehealthApplication.setAlertDialogCustomTheme(context, alertDialog);
             }
         });
+
+        editTraumaHist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(VisitSummaryActivity.this);
+                //AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,R.style.AlertDialogStyle);
+                alertDialogBuilder.setMessage(R.string.edit_confirmation);
+                alertDialogBuilder.setPositiveButton(R.string.generic_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent1 = new Intent(VisitSummaryActivity.this, traumaHistoryActivity.class);
+                        intent1.putExtra("patientUuid", patientUuid);
+                        intent1.putExtra("visitUuid", visitUuid);
+                        intent1.putExtra("encounterUuidVitals", encounterVitals);
+                        intent1.putExtra("encounterUuidAdultIntial", encounterUuidAdultIntial);
+                        intent1.putExtra("name", patientName);
+                        intent1.putExtra("float_ageYear_Month", float_ageYear_Month);
+                        intent1.putExtra("tag", "edit");
+                        startActivity(intent1);
+                        dialog.dismiss();
+
+                    }
+                });
+                alertDialogBuilder.setNegativeButton(R.string.generic_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.show();
+                IntelehealthApplication.setAlertDialogCustomTheme(context, alertDialog);
+            }
+        });
+
 
         editAddDocs.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -2263,6 +2315,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
         if (mFamHist == null) {
             mFamHist = "";
         }
+
+
         //mHeight = height.getValue();
         //mWeight = weight.getValue();
         //mBP = bpSys.getValue() + "/" + bpDias.getValue();
@@ -3151,6 +3205,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
      * @return void
      */
 
+    @SuppressLint("Range")
     public void queryData(String dataString) {
         String patientSelection = "uuid = ?";
         String[] patientArgs = {dataString};
@@ -3262,6 +3317,39 @@ public class VisitSummaryActivity extends AppCompatActivity {
             medHistCursor.close();
         } catch (CursorIndexOutOfBoundsException e) {
             patHistory.setValue(""); // if medical history does not exist
+        }
+
+        try {
+            String traumaHistSelection = "encounteruuid = ? AND conceptuuid = ?";
+
+            String[] medHistArgs = {encounterUuidAdultIntial, UuidDictionary.TRAUMA_HISTORY};
+
+            Cursor medHistCursor = db.query("tbl_obs", columns, traumaHistSelection, medHistArgs, null, null, null);
+            medHistCursor.moveToLast();
+            String traumaHistText = medHistCursor.getString(medHistCursor.getColumnIndexOrThrow("value"));
+            traumaHistory.setValue(traumaHistText);
+
+            if (traumaHistText != null && !traumaHistText.isEmpty()) {
+                traumaHistCard.setVisibility(View.VISIBLE);
+            }
+            medHistCursor.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+            traumaHistory.setValue(""); // if medical history does not exist
+        }
+
+        try {
+            String occularHistSelection = "encounteruuid = ? AND conceptuuid = ?";
+
+            String[] medHistArgs = {encounterUuidAdultIntial, UuidDictionary.OCULAR_HISTORY};
+
+            Cursor medHistCursor = db.query("tbl_obs", columns, occularHistSelection, medHistArgs, null, null, null);
+            medHistCursor.moveToLast();
+            String occularHistText = medHistCursor.getString(medHistCursor.getColumnIndexOrThrow("value"));
+            occularHistory.setValue(occularHistText);
+
+            medHistCursor.close();
+        } catch (CursorIndexOutOfBoundsException e) {
+            occularHistory.setValue(""); // if medical history does not exist
         }
 //vitals display code
         String visitSelection = "encounteruuid = ? AND voided!='1'";
@@ -4083,6 +4171,9 @@ public class VisitSummaryActivity extends AppCompatActivity {
                     }
                     else if (type.equals("patHistTamil")){
                         patHistTamil=inputString;
+                    }
+                    else if (type.equals("traumaHistTamil")){
+                        traumaHistTamil=inputString;
                     }
                     else if (type.equals("physExamTamil")){
                         physExamTamil=inputString;

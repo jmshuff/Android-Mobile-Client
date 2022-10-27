@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="app.insightfuleye.client.activities.identificationActivity.IdentificationActivity">
+    tools:context="app.insightfuleye.client.activities.traumaHistoryActivity.traumaHistoryActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -26,11 +26,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="io.intelehealth.client.activities.identification_activity.IdentificationActivity"
+        tools:context="app.insightfuleye.client.activities.traumaHistoryActivity.traumaHistoryActivity"
         tools:showIn="@layout/activity_trauma_history">
 
         <ScrollView
-            android:id="@+id/identification_scrollView"
+            android:id="@+id/traumaHist_scroll_view"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"

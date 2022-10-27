@@ -85,7 +85,7 @@ public class SetupActivity extends AppCompatActivity {
     Base64Utils base64Utils = new Base64Utils();
     String encoded = null;
     AlertDialog.Builder dialog;
-    String key = "aravind20212"; //JS
+    String key = "tvl2022"; //JS
     String licenseUrl = "testing.intelehealth.org"; //JS
     SessionManager sessionManager = null;
     public File base_dir;

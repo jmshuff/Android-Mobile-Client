@@ -72,6 +72,7 @@ public class Node implements Serializable {
     private String language;
     private String choiceType;
     private String inputType;
+    private String displayHeader;
     private String physicalExams;
     private List<Node> optionsList;
     private String associatedComplaint;
@@ -88,8 +89,7 @@ public class Node implements Serializable {
     static String footer;
     static String duration;
     static String patHistDB;
-    static String famHistDB;
-    static String surgHistDB;
+    static String ocularHistDB;
     private String bilateralQuestion;
 
 
@@ -180,6 +180,11 @@ public class Node implements Serializable {
             }
             if (this.display.isEmpty()) {
                 this.display = this.text;
+            }
+
+            this.displayHeader = jsonNode.optString("display-header");
+            if(this.displayHeader.isEmpty()){
+                this.displayHeader=this.text;
             }
 
             this.display_oriya = jsonNode.optString("display-or");
@@ -276,6 +281,7 @@ public class Node implements Serializable {
         //this.id = source.id;
         this.text = source.text;
         this.display = source.display;
+        this.displayHeader=source.displayHeader;
         this.display_oriya = source.display_oriya;
         this.display_cebuno = source.display_cebuno;
         this.display_tamil=source.display_tamil;
@@ -329,7 +335,7 @@ public class Node implements Serializable {
         }
 
 
-        subQuestion.setTitle(node.findDisplay());
+        subQuestion.setTitle(node.findDisplayHeader());
         ListView listView = convertView.findViewById(R.id.dialog_subquestion_list_view);
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
         listView.setClickable(true);
@@ -411,6 +417,99 @@ public class Node implements Serializable {
         } else {
             language = newText;
             //Log.d("Node", language);
+        }
+    }
+
+    public String findDisplayHeader() {
+        SessionManager sessionManager = null;
+        sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
+
+//        String locale = Locale.getDefault().getLanguage();
+        String locale = sessionManager.getCurrentLang();
+
+        switch (locale) {
+            case "en": {
+                //Log.i(TAG, "findDisplay: eng");
+                if (displayHeader != null && displayHeader.isEmpty()) {
+                    //Log.i(TAG, "findDisplay: eng txt");
+                    return text;
+                } else {
+                    //Log.i(TAG, "findDisplay: eng dis");
+                    return displayHeader;
+
+                }
+            }
+            //JS update with other languages
+            case "or": {
+                //Log.i(TAG, "findDisplay: ori");
+                if (display_oriya != null && !display_oriya.isEmpty()) {
+                    //Log.i(TAG, "findDisplay: ori dis");
+                    return display_oriya;
+                } else {
+                    if (display == null || display.isEmpty()) {
+                        //Log.i(TAG, "findDisplay: eng/o txt");
+                        return text;
+                    } else {
+                        //Log.i(TAG, "findDisplay: eng/o dis");
+                        return display;
+                    }
+                }
+
+            }
+            case "cb": {
+                //Log.i(TAG, "findDisplay: cb");
+                if (display_cebuno != null && !display_cebuno.isEmpty()) {
+                    //Log.i(TAG, "findDisplay: cb ");
+                    return display_cebuno;
+                } else {
+                    if (display == null || display.isEmpty()) {
+                        //Log.i(TAG, "findDisplay: eng/o txt");
+                        return text;
+                    } else {
+                        //Log.i(TAG, "findDisplay: eng/o dis");
+                        return display;
+                    }
+                }
+            }
+            case "hi": {
+                //Log.i(TAG, "findDisplay: cb");
+                if (display_hindi != null && !display_hindi.isEmpty()) {
+                    //Log.i(TAG, "findDisplay: cb ");
+                    return display_hindi;
+                } else {
+                    if (display == null || display.isEmpty()) {
+                        //Log.i(TAG, "findDisplay: eng/o txt");
+                        return text;
+                    } else {
+                        //Log.i(TAG, "findDisplay: eng/o dis");
+                        return display;
+                    }
+                }
+            }
+            case "ta": {
+                //Log.i(TAG, "findDisplay: ta");
+                if (display_tamil != null && !display_tamil.isEmpty()) {
+                    //Log.i(TAG, "findDisplay: cb ");
+                    return display_tamil;
+                } else {
+                    if (display == null || display.isEmpty()) {
+                        //Log.i(TAG, "findDisplay: eng/o txt");
+                        return text;
+                    } else {
+                        //Log.i(TAG, "findDisplay: eng/o dis");
+                        return display;
+                    }
+                }
+            }//JS
+            default: {
+                {
+                    if (displayHeader != null && displayHeader.isEmpty()) {
+                        return text;
+                    } else {
+                        return displayHeader;
+                    }
+                }
+            }
         }
     }
 
@@ -749,7 +848,8 @@ public class Node implements Serializable {
 
     public static void askText(final Node node, Activity context, final QuestionsAdapter adapter) {
         final MaterialAlertDialogBuilder textInput = new MaterialAlertDialogBuilder(context);
-        textInput.setTitle(R.string.question_text_input);
+        textInput.setTitle(node.findDisplayHeader());
+        //textInput.setTitle(R.string.question_text_input);
         final EditText dialogEditText = new EditText(context);
         dialogEditText.setInputType(InputType.TYPE_CLASS_TEXT);
         textInput.setView(dialogEditText);
@@ -1178,7 +1278,8 @@ public class Node implements Serializable {
                         //TODO:: Check if the language is actually what is intended to be displayed
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.setTitle(R.string.question_date_picker);
+        datePickerDialog.setTitle(node.findDisplayHeader());
+        //datePickerDialog.setTitle(R.string.question_date_picker);
         //Set Maximum date to current date because even after bday is less than current date it goes to check date is set after today
         //datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
@@ -1470,7 +1571,8 @@ public class Node implements Serializable {
 
     public static void askDuration(final Node node, Activity context, final QuestionsAdapter adapter) {
         final MaterialAlertDialogBuilder durationDialog = new MaterialAlertDialogBuilder(context);
-        durationDialog.setTitle(R.string.question_duration_picker);
+        //durationDialog.setTitle(R.string.question_duration_picker);
+        durationDialog.setTitle(node.findDisplayHeader());
         final LayoutInflater inflater = context.getLayoutInflater();
         View convertView = inflater.inflate(R.layout.dialog_2_numbers_picker, null);
         durationDialog.setView(convertView);
@@ -2114,8 +2216,7 @@ public class Node implements Serializable {
 
     public void getHistoryConcepts() {
         String patHist="";
-        String famHist="";
-        String surgHist="";
+        String ocularHist="";
         Log.d("gethistoryConcept", "enter");
 
         List<Node> mOptions = optionsList;
@@ -2126,26 +2227,21 @@ public class Node implements Serializable {
                 if (node_opt.isSelected()) {
                     Log.d("patHistGet", node_opt.getText());
                     if (node_opt.getText().toLowerCase().contains("medical history")){
-                        patHist=node_opt.formLanguage();
+                        patHist+=node_opt.formLanguage();
                         patHist.replace(" - ", ", ");
                         setPatHistDB(patHist);
                     }
-                    else if (node_opt.getText().toLowerCase().contains("surgical history")){
-                        surgHist=node_opt.formLanguage();
-                        surgHist.replace(" - ", ", ");
-                        setSurgHistDB(surgHist);
+                    else if (node_opt.getText().toLowerCase().contains("ocular history")){
+                        ocularHist+=node_opt.formLanguage();
+                        ocularHist.replace(" - ", ", ");
+                        setOcularHistDB(ocularHist);
                     }
-                    else if (node_opt.getText().toLowerCase().contains("family history")){
-                        famHist=node_opt.formLanguage();
-                        famHist.replace(" - ", ", ");
-                        setFamHistDB(famHist);
-                    }
+
                 }
             }
         }
         Log.d("patHistEye", patHist);
-        Log.d("surgHistEye", surgHist);
-        Log.d("famHistEye", famHist);
+        Log.d("ocularHistEye", ocularHist);
     }
 
 
@@ -2512,20 +2608,12 @@ public class Node implements Serializable {
         Node.patHistDB = patHistDB;
     }
 
-    public static String getFamHistDB() {
-        return famHistDB;
+    public static String getOcularHistDB() {
+        return ocularHistDB;
     }
 
-    public static void setFamHistDB(String famHistDB) {
-        Node.famHistDB = famHistDB;
-    }
-
-    public static String getSurgHistDB() {
-        return surgHistDB;
-    }
-
-    public static void setSurgHistDB(String surgHistDB) {
-        Node.surgHistDB = surgHistDB;
+    public static void setOcularHistDB(String ocularHistDB) {
+        Node.ocularHistDB = ocularHistDB;
     }
 
     public static String getLeftComplaint() {

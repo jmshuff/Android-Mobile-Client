@@ -44,6 +44,11 @@ public class UuidDictionary {
 
     public static final String TELEMEDICINE_DIAGNOSIS = "537bb20d-d09d-4f88-930b-cc45c7d662df";
     public static final String JSV_MEDICATIONS = "c38c0c50-2fd2-4ae3-b7ba-7dd25adca4ca";
+    public static final String DIAGNOSIS_RIGHT_EYE= "58cae684-1509-4fd5-b256-5ca980ec6bb4";
+    public static final String DIAGNOSIS_LEFT_EYE="1796244d-e936-4ab8-ac8a-c9bcfa476570";
+    public static final String DOCTOR_REFERRAL="3269f1ca-29ae-4b23-b5b9-9db6c1848eb9";
+    public static final String DOCTOR_REFERRAL_TIME="eb9ffedc-beab-4a3a-b4d4-32344a94214b";
+
     //    public static final String MEDICAL_ADVICE = "0308000d-77a2-46e0-a6fa-a8c1dcbc3141"; //old uuid medical advice
     public static final String MEDICAL_ADVICE = "67a050c1-35e5-451c-a4ab-fff9d57b0db1";
     public static final String REQUESTED_TESTS = "23601d71-50e6-483f-968d-aeef3031346d";
@@ -63,6 +68,7 @@ public class UuidDictionary {
     public static final String ENCOUNTER_VISIT_COMPLETE = "bd1fbfaa-f5fb-4ebd-b75c-564506fc309e";
     public static final String ENCOUNTER_PATIENT_EXIT_SURVEY = "629a9d0b-48eb-405e-953d-a5964c88dc30";
     public static final String ENCOUNTER_PHYSICAL_EXAM = "e80190f4-374f-4d1b-b52d-b315328618b7";
+    public static final String ENCOUNTER_FOLLOW_UP = "809a1df6-8cc6-4d2c-92e7-00f7468f496e";
 
     public static final String EMERGENCY_OBS = "ca5f5dc3-4f0b-4097-9cae-5cf2eb44a09c";
 

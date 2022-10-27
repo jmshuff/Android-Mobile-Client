@@ -551,7 +551,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         patientHistoryMap.getHistoryConcepts();
 
         if (patientHistoryMap.anySubSelected()) {
-            for (Node node : patientHistoryMap.getOptionsList()) {
+/*            for (Node node : patientHistoryMap.getOptionsList()) {
                 if (node.isSelected()) {
                     String patientString="";
                     patientString = node.generateBilateralLanguage();
@@ -568,7 +568,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                     toInsert = toInsert + "<br/>";
                     insertionList.add(toInsert);
                 }
-            }
+            }*/
 
             if (sessionManager.getCurrentLang().equals("ta")){
                 String patHistTamil=patientHistoryMap.generateLanguageTamil();
@@ -578,7 +578,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
         }
 
-        for (int i = 0; i < insertionList.size(); i++) {
+/*        for (int i = 0; i < insertionList.size(); i++) {
             if (i == 0) {
                 insertion = Node.bullet + insertionList.get(i);
             } else {
@@ -586,7 +586,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             }
         }
 
-        insertion = insertion.replaceAll("null.", "");
+        insertion = insertion.replaceAll("null.", "");*/
 
         List<String> imagePathList = patientHistoryMap.getImagePathList();
 
@@ -596,16 +596,16 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
             }
         }
 
-        try {
+/*        try {
             generateSelected();
         } catch (DAOException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
         if (intentTag != null && intentTag.equals("edit")) {
 
-            updateDatabase(Node.getPatHistDB()+ ", " + Node.getSurgHistDB(), Node.getFamHistDB());
+            updateDatabase(Node.getPatHistDB(), Node.getOcularHistDB());
 
             Intent intent = new Intent(PastMedicalHistoryActivity.this, VisitSummaryActivity.class);
             intent.putExtra("patientUuid", patientUuid);
@@ -627,9 +627,9 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
                 } else {
                     phistory = phistory + "";
                 }
-                insertDb(Node.getPatHistDB() + ", " + Node.getSurgHistDB(), Node.getFamHistDB());
+                insertDb(Node.getPatHistDB(), Node.getOcularHistDB());
             } else {
-                insertDb(Node.getPatHistDB() + ", " + Node.getSurgHistDB(), Node.getFamHistDB()); // new details of family history
+                insertDb(Node.getPatHistDB(), Node.getOcularHistDB());
             }
 
             flag = false;
@@ -657,7 +657,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
      * @param phistory variable of type String
      * @return long
      */
-    public boolean insertDb(String phistory, String fhistory) {
+    public boolean insertDb(String phistory, String ohistory) {
         ObsDAO obsDAO = new ObsDAO();
         ObsDTO obsDTO = new ObsDTO();
         obsDTO.setConceptuuid(UuidDictionary.RHK_MEDICAL_HISTORY_BLURB);
@@ -673,10 +673,10 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
 
         ObsDAO obsDAO1 = new ObsDAO();
         ObsDTO obsDTO1 = new ObsDTO();
-        obsDTO1.setConceptuuid(UuidDictionary.RHK_FAMILY_HISTORY_BLURB);
+        obsDTO1.setConceptuuid(UuidDictionary.OCULAR_HISTORY);
         obsDTO1.setEncounteruuid(encounterAdultIntials);
         obsDTO1.setCreator(sessionManager.getCreatorID());
-        obsDTO1.setValue(StringUtils.getValue(fhistory));
+        obsDTO1.setValue(StringUtils.getValue(ohistory));
         try {
             isInserted = obsDAO1.insertObs(obsDTO1);
         } catch (DAOException e) {
@@ -708,7 +708,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
      * @param string variable of type String
      * @return void
      */
-    private void updateDatabase(String string, String fhistory) {
+    private void updateDatabase(String string, String ohistory) {
 
         ObsDTO obsDTO = new ObsDTO();
         ObsDAO obsDAO = new ObsDAO();
@@ -728,11 +728,11 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         }
 
         try {
-            obsDTO1.setConceptuuid(UuidDictionary.RHK_FAMILY_HISTORY_BLURB);
+            obsDTO1.setConceptuuid(UuidDictionary.OCULAR_HISTORY);
             obsDTO1.setEncounteruuid(encounterAdultIntials);
             obsDTO1.setCreator(sessionManager.getCreatorID());
-            obsDTO1.setValue(fhistory);
-            obsDTO1.setUuid(obsDAO1.getObsuuid(encounterAdultIntials, UuidDictionary.RHK_FAMILY_HISTORY_BLURB));
+            obsDTO1.setValue(ohistory);
+            obsDTO1.setUuid(obsDAO1.getObsuuid(encounterAdultIntials, UuidDictionary.OCULAR_HISTORY));
 
             obsDAO1.updateObs(obsDTO1);
 
