@@ -451,6 +451,8 @@ public class VisitSummaryActivity extends AppCompatActivity {
                 physicalExams.addAll(selectedExams);
             }
         }
+        Log.d("encounterUuid", encounterUuidAdultIntial);
+        Log.d("encounterLatest", EncounterAdultInitial_LatestVisit);
         registerBroadcastReceiverDynamically();
         registerDownloadPrescription();
         if (!sessionManager.getLicenseKey().isEmpty())

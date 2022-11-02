@@ -203,9 +203,6 @@ public class PhysicalExam extends Node {
         String[] split = title.split(" : ");
         String levelOne = split[0];
         String levelTwo = split[1];
-        Log.i(TAG, "title" + title);
-        Log.i(TAG, "lvl1: "+ levelOne);
-        Log.i(TAG, "lvl2: "+ levelTwo);
         for (Node selectedNode : selectedNodes) {
             if (selectedNode.getText().equals(levelOne)) {
                 for (Node node : selectedNode.getOptionsList()) {

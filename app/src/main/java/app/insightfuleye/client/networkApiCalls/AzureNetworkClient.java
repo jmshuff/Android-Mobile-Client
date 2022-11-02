@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AzureNetworkClient {
     private static Retrofit retrofit;
-    private static String BASE_URL="https://testing.visilant.org:3006";
+    private static String BASE_URL="https://aroma.visilant.org:3006";
     public static Retrofit getRetrofit() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
         if (retrofit == null) {

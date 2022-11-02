@@ -692,6 +692,10 @@
     <string name="title_activity_follow_up">Follow Up Patients</string>
     <string name="visit_summary_trauma_history">Trauma History</string>
     <string name="home_follow_up_visits">Follow Up Visits</string>
+    <string name="header_patDet_traumaHist">Trauma history</string>
+    <string name="doctor_examination">Doctor Examination</string>
+    <string name="diagnosis_patDet">Diagnosis</string>
+    <string name="header_prescription">Prescription</string>
 
 
 </resources>

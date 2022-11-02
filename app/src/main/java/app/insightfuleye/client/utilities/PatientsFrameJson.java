@@ -175,10 +175,10 @@ public class PatientsFrameJson {
 
             encounter.setLocation(session.getLocationUuid());
 
-//          encounterList.add(encounter);
+          encounterList.add(encounter);
 
             if (speciality_row_exist_check(encounter.getVisit())){
-                encounterList.add(encounter);
+                //encounterList.add(encounter);
             }
 
         }

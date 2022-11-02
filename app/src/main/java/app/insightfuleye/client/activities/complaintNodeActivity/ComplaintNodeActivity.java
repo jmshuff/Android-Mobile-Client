@@ -38,20 +38,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.activities.questionNodeActivity.QuestionNodeActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
-import app.insightfuleye.client.database.dao.EncounterDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.utilities.FileUtils;
 import app.insightfuleye.client.utilities.SessionManager;
-import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class ComplaintNodeActivity extends AppCompatActivity {
     final String TAG = "Complaint Node Activity";
@@ -90,26 +87,8 @@ public class ComplaintNodeActivity extends AppCompatActivity {
             float_ageYear_Month = intent.getFloatExtra("float_ageYear_Month", 0);
             intentTag = intent.getStringExtra("tag");
         }
-        if (encounterAdultIntials.equalsIgnoreCase("") || encounterAdultIntials == null) {
-            encounterAdultIntials = UUID.randomUUID().toString();
-
-        }
-
-        EncounterDAO encounterDAO = new EncounterDAO();
-        encounterDTO = new EncounterDTO();
-        encounterDTO.setUuid(encounterAdultIntials);
-        encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_ADULTINITIAL"));
-        encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
-        encounterDTO.setVisituuid(visitUuid);
-        encounterDTO.setSyncd(false);
-        encounterDTO.setProvideruuid(sessionManager.getProviderID());
-        Log.d("DTO", "DTOcomp: " + encounterDTO.getProvideruuid());
-        encounterDTO.setVoided(0);
-        try {
-            encounterDAO.createEncountersToDB(encounterDTO);
-        } catch (DAOException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-        }
+        Log.d("encounterUuid", encounterAdultIntials);
+        Log.d("encounterLatest", EncounterAdultInitial_LatestVisit);
 
         setTitle(patientName + ": " + getTitle());
         super.onCreate(savedInstanceState);

@@ -36,7 +36,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -93,8 +97,8 @@ public class followUpActivity extends AppCompatActivity implements OnMapReadyCal
         totalPatientCard=findViewById(R.id.totalPatients_followUp);
         mMapView = findViewById(R.id.follow_up_map);
         db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-        String encounters= getTableAsString(db, "tbl_encounter");
-        Log.i("encounter", encounters);
+        //String encounters= getTableAsString(db, "tbl_encounter");
+        //Log.i("encounter", encounters);
         if (sessionManager.isPullSyncFinished()) {
             followUpPatientList= doQuery();
         }
@@ -314,8 +318,8 @@ public class followUpActivity extends AppCompatActivity implements OnMapReadyCal
         map.setMyLocationEnabled(true); //show your location on map
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location myLocation= locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        LatLng myLatLng = new LatLng(myLocation.getLatitude(),
-                myLocation.getLongitude()); //get your position
+        //LatLng myLatLng = new LatLng(myLocation.getLatitude(),myLocation.getLongitude()); //get your position
+        LatLng myLatLng=new LatLng(39.32666870388049,-76.62209924707038);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (Marker marker : markers) {
             builder.include(marker.getPosition()); //average positions of all markers on map
@@ -366,15 +370,34 @@ public class followUpActivity extends AppCompatActivity implements OnMapReadyCal
 
     private String downloadDiagnoses(String visitUuid, String type){
         String visitnote = "";
+        String modified_date="";
+        Date new_date=null;
         EncounterDAO encounterDAO = new EncounterDAO();
         String encounterIDSelection = "visituuid = ? ";
         String[] encounterIDArgs = {visitUuid};
         String diagnosis="";
+        String visitNoteFinal="";
         Cursor encounterCursor = db.query("tbl_encounter", null, encounterIDSelection, encounterIDArgs, null, null, null);
         if (encounterCursor != null && encounterCursor.moveToFirst()) {
             do {
                 if (encounterDAO.getEncounterTypeUuid("ENCOUNTER_VISIT_NOTE").equalsIgnoreCase(encounterCursor.getString(encounterCursor.getColumnIndexOrThrow("encounter_type_uuid")))) {
                     visitnote = encounterCursor.getString(encounterCursor.getColumnIndexOrThrow("uuid"));
+                    modified_date=encounterCursor.getString(encounterCursor.getColumnIndexOrThrow("modified_date"));
+
+                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    String newestDateStr=modified_date.split("\\.")[0];
+                    Date tempDate= null;
+                    try {
+                        tempDate = formatter.parse(newestDateStr);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if(new_date==null || tempDate.after(new_date)){
+                        new_date=tempDate;
+                        visitNoteFinal=visitnote;
+                    }
+
+
                 }
             } while (encounterCursor.moveToNext());
 
@@ -385,7 +408,7 @@ public class followUpActivity extends AppCompatActivity implements OnMapReadyCal
 
         String[] columns = {"value", " conceptuuid"};
         String visitSelection = "encounteruuid = ? and voided!='1'";
-        String[] visitArgs = {visitnote};
+        String[] visitArgs = {visitNoteFinal};
         Cursor visitCursor = db.query("tbl_obs", columns, visitSelection, visitArgs, null, null, null);
         if (visitCursor.moveToFirst()) {
             do {

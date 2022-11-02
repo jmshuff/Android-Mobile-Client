@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
 
-
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
@@ -17,19 +16,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import app.insightfuleye.client.utilities.Logger;
-import app.insightfuleye.client.utilities.NotificationID;
-import app.insightfuleye.client.utilities.PatientsFrameJson;
-import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.InteleHealthDatabaseHelper;
 import app.insightfuleye.client.models.ActivePatientModel;
+import app.insightfuleye.client.models.dto.EncounterDTO;
+import app.insightfuleye.client.models.dto.ObsDTO;
 import app.insightfuleye.client.models.dto.ResponseDTO;
 import app.insightfuleye.client.models.dto.VisitDTO;
 import app.insightfuleye.client.models.pushRequestApiCall.PushRequestApiCall;
 import app.insightfuleye.client.models.pushResponseApiCall.PushResponseApiCall;
+import app.insightfuleye.client.utilities.Logger;
+import app.insightfuleye.client.utilities.NotificationID;
+import app.insightfuleye.client.utilities.PatientsFrameJson;
+import app.insightfuleye.client.utilities.SessionManager;
+import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -342,7 +344,6 @@ public class SyncDAO {
         VisitsDAO visitsDAO = new VisitsDAO();
         EncounterDAO encounterDAO = new EncounterDAO();
 
-
         PushRequestApiCall pushRequestApiCall;
         PatientsFrameJson patientsFrameJson = new PatientsFrameJson();
         pushRequestApiCall = patientsFrameJson.frameJson();
@@ -399,7 +400,6 @@ public class SyncDAO {
                     });
             sessionManager.setPullSyncFinished(true);
         }
-
         return isSucess[0];
     }
 
@@ -442,4 +442,37 @@ public class SyncDAO {
 
         sessionManager.setLastTimeAgo(finalTime);
     }
+
+    public List<ObsDTO> getObsFollowUp(){
+        EncounterDTO encounterDTO= new EncounterDTO();
+        ObsDAO obsDAO= new ObsDAO();
+        ArrayList<String> encounters=new ArrayList<>();
+        List<ObsDTO> obsUpload = null;
+
+        String query= "SELECT uuid, encounter_type_uuid, sync "+
+                "FROM tbl_encounter "+
+                "WHERE encounter_type_uuid = \'" +UuidDictionary.ENCOUNTER_FOLLOW_UP + "\'" +
+                "AND sync=\'false\'";
+        final Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                try{
+                    encounters.add(cursor.getString(cursor.getColumnIndexOrThrow("uuid")));
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
+        for (String encounter:encounters){
+            List<ObsDTO> obsDTOList = obsDAO.obsDTOList(encounter);
+            for (ObsDTO ob: obsDTOList){
+                obsUpload.add(ob);
+            }
+        }
+
+        return obsUpload;
+    }
+
 }
