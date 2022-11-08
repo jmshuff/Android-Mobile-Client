@@ -330,77 +330,75 @@ public class PatientDetailActivity extends AppCompatActivity {
                     }
                     cursor1.close();
 
+                    if (encounterAdultIntials.equalsIgnoreCase("") || encounterAdultIntials == null) {
+                        encounterAdultIntials = UUID.randomUUID().toString();
 
-/*                    String[] cols = {"uuid", "encounter_type_uuid", "visituuid", "modified_date"};
-                    Cursor cursor = sqLiteDatabase.query("tbl_encounter", cols, "visituuid=? and encounter_type_uuid=?",// querying for PMH (Past Medical History)
-                            new String[]{visitUuid, UuidDictionary.ENCOUNTER_FOLLOW_UP},
-                            null, null, null);*/
-                    String query= "SELECT uuid, encounter_type_uuid, visituuid, modified_date, sync, voided "+
-                            "FROM tbl_encounter "+
-                            "WHERE visituuid=\'"+ visitUuid + "\' "+
-                            "AND encounter_type_uuid = \'" +UuidDictionary.ENCOUNTER_FOLLOW_UP + "\'";
-                    final Cursor cursor = db.rawQuery(query, null);
+                    }
+
+                    EncounterDAO encounterDAO = new EncounterDAO();
+                    encounterDTO = new EncounterDTO();
+                    encounterDTO.setUuid(encounterAdultIntials);
+                    encounterDTO.setEncounterTypeUuid(encounterDAO.getEncounterTypeUuid("ENCOUNTER_ADULTINITIAL"));
+                    encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
+                    encounterDTO.setVisituuid(visitUuid);
+                    encounterDTO.setSyncd(false);
+                    encounterDTO.setProvideruuid(sessionManager.getProviderID());
+                    Log.d("DTO", "DTOcomp: " + encounterDTO.getProvideruuid());
+                    encounterDTO.setVoided(0);
+                    try {
+                        encounterDAO.createEncountersToDB(encounterDTO);
+                    } catch (DAOException e) {
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    }
+
+                    try {
+                        encounterDAO.createEncountersToDB(encounterDTO);
+                    } catch (DAOException e) {
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    }
+
+                    /*String CREATOR_ID = sessionManager.getCreatorID();
+                    returning = false;
+                    sessionManager.setReturning(returning);
+
+                    String[] cols1 = {"value"};
+                    Cursor cursor = sqLiteDatabase.query("tbl_obs", cols1, "encounteruuid=? and conceptuuid=?",// querying for PMH (Past Medical History)
+                            new String[]{encounterAdultIntials, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB},
+                            null, null, null);
 
                     if (cursor.moveToFirst()) {
                         // rows present
                         do {
-                            try{
-                                // so that null data is not appended
-                                followUpVisits.add(new followUpVisit(cursor.getString(cursor.getColumnIndexOrThrow("uuid")),
-                                        cursor.getString(cursor.getColumnIndexOrThrow("modified_date")),
-                                        cursor.getString(cursor.getColumnIndexOrThrow("visituuid")))
-                                );
-                                Log.d("encounterSync", cursor.getString(cursor.getColumnIndexOrThrow("sync")));
-                                Log.d("encountervoid", cursor.getString(cursor.getColumnIndexOrThrow("voided")));
-                                Log.d("followUpVis", followUpVisits.toString());
-                            } catch (IllegalArgumentException e) {
-                                e.printStackTrace();
-                            }
+                            // so that null data is not appended
+                            phistory = phistory + cursor.getString(0);
+
                         }
                         while (cursor.moveToNext());
+                        returning = true;
+                        sessionManager.setReturning(returning);
                     }
                     cursor.close();
-                    Date newestDate = null;
-                    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    String newestDateStr=followUpVisits.get(0).getEncounterDate().split("\\.")[0]; ;
-                    visitUuid=followUpVisits.get(0).getVisitUuid();
-                    encounterAdultIntials=followUpVisits.get(0).getUuid();
-                    try {
-                        newestDate= formatter.parse(newestDateStr);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    if (followUpVisits.size()>1){
-                        for (int i=1 ; i<followUpVisits.size(); i++){
-                            String dateStr=followUpVisits.get(i).getEncounterDate().split("\\.")[0];
-                            Date date = null;
-                            try {
-                                date = formatter.parse(dateStr);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            if (date.after(newestDate)){
-                                newestDate=date;
-                                visitUuid=followUpVisits.get(i).getVisitUuid();
-                                encounterAdultIntials=followUpVisits.get(i).getUuid();
-                            }
 
-
+                    Cursor cursor2 = sqLiteDatabase.query("tbl_obs", cols, "encounteruuid=? and conceptuuid=?",// querying for FH (Family History)
+                            new String[]{encounterAdultIntials, UuidDictionary.RHK_FAMILY_HISTORY_BLURB},
+                            null, null, null);
+                    if (cursor2.moveToFirst()) {
+                        // rows present
+                        do {
+                            fhistory = fhistory + cursor2.getString(0);
                         }
-
+                        while (cursor2.moveToNext());
+                        returning = true;
+                        sessionManager.setReturning(returning);
                     }
-                    EncounterDAO encounterDAO= new EncounterDAO();
-                    try {
-                        encounterDAO.updateEncounterSync("false", encounterAdultIntials);
-                    } catch (DAOException e) {
-                        e.printStackTrace();
-                    }
-
+                    cursor2.close();
+*/
+                    // Will display data for patient as it is present in database
+                    // Toast.makeText(PatientDetailActivity.this,"PMH: "+phistory,Toast.LENGTH_SHORT).sƒhow();
+                    // Toast.makeText(PatientDetailActivity.this,"FH: "+fhistory,Toast.LENGTH_SHORT).show();
                     Intent intent2 = new Intent(PatientDetailActivity.this, ComplaintNodeActivity.class);
                     String fullName = patient_new.getFirst_name() + " " + patient_new.getLast_name();
                     intent2.putExtra("patientUuid", patientUuid);
-
-                    VisitDTO visitDTO = new VisitDTO();
 
 /*                    visitDTO.setUuid(uuid);
                     visitDTO.setPatientuuid(patient_new.getUuid());

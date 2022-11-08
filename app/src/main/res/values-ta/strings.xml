@@ -65,8 +65,8 @@
 
     //Home Screen (after login)
     <string name="title_home_screen">Home</string>
-    <string name="button_new_pt">New Patient</string>
-    <string name="button_find_pt">Find Patient</string>
+    <string name="button_new_pt">புதிய நோயாளி</string>
+    <string name="button_find_pt">நோயாளியை கண்டுஅறியவும்</string>
     <string name="button_diagnostic_tests">Diagnostic Tests</string>
     <string name="button_active_pt">Active Patients</string>
     <string name="menu_option_sync">Refresh Data</string>
@@ -256,7 +256,7 @@
     <string name="title_activity_setup">Setup</string>
 
     <string name="title_activity_camera">Camera</string>
-    <string name="title_activity_today_patient">Today\'s Visits</string>
+    <string name="title_activity_today_patient">"இன்றைய நோயாளி "</string>
     <string name="title_activity_additional_documents">Additional Documents</string>
     <string name="title_activity_video_library">Video Library</string>
     <string name="visit_summary_patient_details">Visit details</string>
@@ -341,8 +341,8 @@
     <string name="hide_text">HIDE</string>
     <string name="show_text">SHOW</string>
 
-    <string name="new_patient">New Patient</string>
-    <string name="find_patient">Find Patients</string>
+    <string name="new_patient">"புதிய நோயாளி  "</string>
+    <string name="find_patient">"நோயாளியை கண்டுஅறியவும்  "</string>
     <string name="video_library">Video Library</string>
 
     <string name="error_no_sd">This feature is only available to devices with SD cards.</string>
@@ -533,7 +533,7 @@
     <string name="no_protocols_found">No protocols found</string>
     <string name="unable_to_get_proper_response">There was a problem downloading protocols, Please contact system administrator</string>
     <string name="last_synced">Last Uploaded - </string>
-    <string name="today_visits">Today\'s Visits</string>
+    <string name="today_visits">"இன்றைய நோயாளி "</string>
     <string name="active_visits">Active Visits</string>
     <string name="day">day</string>
     <string name="hour">hour</string>
@@ -650,5 +650,16 @@
     <string name="gujarati_hello_thankyou_for_using_myteledoc_">"હેલ્લો, માયટેલીડોકનો ઉપયોગ કરવા બદલ આભાર. તમારૂં દવાનું પ્રિસ્ક્રીપ્શન મેળવવા અહીં પર ક્લિક કરો, "</string>
     <string name="gujarati_and_enter_your_patient_id">" અને તમારો પેશન્ટ ઓળખનંબર "</string>
     <string name="gujarati_end_statement">" દાખલ કરો."</string>
+    <string name="mode_of_injury">"உங்கள் கண்ணில் எவ்வாறு அடி பட்டது ? "</string>
+    <string name="trauma_occurrence">" எத்தனை நாட்களுக்கு முன்பு கண்ணில் அடி பட்டது ? "</string>
+    <string name="trauma_doc_consult">"நீங்கள் மருத்துவரிடம் பரிசோதனை செய்திர்களா ? "</string>
+    <string name="otc_meds">"நீங்கள் மருந்து கடையில் மருந்து வாங்கி பயன்படுத்தினீர்களா ? "</string>
+    <string name="tem_applied">"உங்கள் கண்ணில் ஏதேனும் நாட்டு மருந்தைப் பயன்படுத்துகிறீர்களா?  "</string>
+    <string name="tem_type">"நீங்கள் எந்த மருந்தைப் பயன்படுத்தினீர்கள்? "</string>
+    <string name="tem_frequency">"அந்த மருந்தை எத்தனை முறை பயன்படுத்தினார்கள் ? "</string>
+    <string name="otc_frequency">"அந்த மருந்தை எத்தனை முறை பயன்படுத்தினார்கள் ? "</string>
+    <string name="otc_type">"நீங்கள் எந்த மருந்தைப் பயன்படுத்தினீர்கள்? "</string>
+    <string name="title_activity_follow_up">"மறுபரிசோதனை "</string>
+    <string name="home_follow_up_visits">"மறுபரிசோதனை "</string>
 
 </resources>

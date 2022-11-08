@@ -683,7 +683,7 @@
     <string name="otc_meds">Did you apply any OTC medications?</string>
     <string name="otc_type">What type of medication?</string>
     <string name="otc_frequency">How many times was it applied?</string>
-    <string name="tem_applied">Have you applied traditional eye medicine?</string>
+    <string name="tem_applied">Did you apply traditional eye medicine?</string>
     <string name="tem_type">What type of medication?</string>
     <string name="tem_frequency">How many times was it applied?</string>
     <string name="trauma_doc_consult">Did you consult any doctor?</string>

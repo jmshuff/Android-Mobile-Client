@@ -36,6 +36,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,9 +59,10 @@ import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.models.dto.VisitDTO;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
-import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
+//import app.insightfuleye.client.utilities.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class followUpActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
     private static final String TAG = followUpActivity.class.getSimpleName();
@@ -166,12 +169,15 @@ public class followUpActivity extends AppCompatActivity implements OnMapReadyCal
         return tableString;
     }
 
+/*
     private List<FollowUpPatientModel> doQuery() {
         List<FollowUpPatientModel> followUpPatientList = new ArrayList<>();
+*/
 /*
         Date cDate = new Date();
         String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
-*/
+*//*
+
         String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate,  b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.openmrs_id, c.provider_uuid, c.encounter_type_uuid, d.value, d.person_attribute_type_uuid " +
                 "FROM tbl_visit a, tbl_patient b, tbl_encounter c, tbl_patient_attribute d " +
                 "WHERE a.patientuuid = b.uuid " +
@@ -223,9 +229,102 @@ public class followUpActivity extends AppCompatActivity implements OnMapReadyCal
             followUpPatientAdapter mFollowUpPatientAdapter = new followUpPatientAdapter(followUpPatientList, followUpActivity.this, listPatientUUID);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(followUpActivity.this);
             mFollowUpPatientList.setLayoutManager(linearLayoutManager);
-           /* mfollowUpPatientList.addItemDecoration(new
+           */
+/* mfollowUpPatientList.addItemDecoration(new
                     DividerItemDecoration(TodayPatientActivity.this,
+                    DividerItemDecoration.VERTICAL));*//*
+
+            mFollowUpPatientList.setAdapter(mFollowUpPatientAdapter);
+        }
+
+        int totalVisits=followUpPatientList.size();
+        Log.d("Number of visits: ", String.valueOf(totalVisits));
+        totalPatients.setText(String.valueOf(totalVisits));
+        return followUpPatientList;
+    }
+*/
+
+    private List<FollowUpPatientModel> doQuery() {
+        List<FollowUpPatientModel> followUpPatientList = new ArrayList<>();
+        Date cDate = new Date();
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
+        List<String> encountersFollowUp = new ArrayList<>();
+        String queryMax = "SELECT a.uuid, a.patientuuid, b.encounter_type_uuid, b.visituuid, b.modified_date, "+
+                "MAX(b.modified_date) "+
+                "FROM tbl_visit a, tbl_encounter b "+
+                "WHERE a.uuid=b.visituuid "+
+                "GROUP BY a.uuid";
+        final Cursor cursorMax=db.rawQuery(queryMax, null);
+        if(cursorMax!=null){
+            if(cursorMax.moveToFirst()){
+                do{
+                    try{
+                        if(cursorMax.getString(cursorMax.getColumnIndexOrThrow("encounter_type_uuid")).equals(UuidDictionary.ENCOUNTER_FOLLOW_UP)){
+                            encountersFollowUp.add("\'" + cursorMax.getString(cursorMax.getColumnIndexOrThrow("uuid")) + "\'");
+                        }
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
+                }while (cursorMax.moveToNext());
+            }
+
+        }
+        Log.d("encountersFollowup", String.valueOf(encountersFollowUp.size()));
+        String encounterStr=encountersFollowUp.toString();
+        encounterStr=encounterStr.substring(1, encounterStr.length()-1);
+
+
+        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.openmrs_id, c.value, c.person_attribute_type_uuid " +
+                "FROM tbl_visit a, tbl_patient b, tbl_patient_attribute c " +
+                "WHERE a.patientuuid = b.uuid " +
+                "AND a.patientuuid = c.patientuuid " +
+                "AND a.uuid IN (" + StringUtils.join(encountersFollowUp, ", ")+")" +
+                "AND c.person_attribute_type_uuid='f4af0ef3-579c-448a-8157-750283409122' "+
+                //"AND a.startdate LIKE '" + currentDate + "T%' " +
+                "GROUP BY a.uuid ORDER BY a.patientuuid ASC";
+        Logger.logD(TAG, query);
+        final Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    try {
+                        followUpPatientList.add(new FollowUpPatientModel(
+                                cursor.getString(cursor.getColumnIndexOrThrow("uuid")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("startdate")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("enddate")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("first_name")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("middle_name")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("last_name")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("date_of_birth")),
+                                app.insightfuleye.client.utilities.StringUtils.mobileNumberEmpty(phoneNumber(cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")))),
+                                cursor.getString(cursor.getColumnIndexOrThrow("sync")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("value")),
+                                downloadDiagnoses(cursor.getString(cursor.getColumnIndexOrThrow("uuid")), "right"),
+                                downloadDiagnoses(cursor.getString(cursor.getColumnIndexOrThrow("uuid")), "left")
+                                )
+                        );
+                    } catch (DAOException e) {
+                        e.printStackTrace();
+                    }
+                } while (cursor.moveToNext());
+            }
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        if (!followUpPatientList.isEmpty()) {
+
+            followUpPatientAdapter mFollowUpPatientAdapter = new followUpPatientAdapter(followUpPatientList, followUpActivity.this, listPatientUUID);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(followUpActivity.this);
+            mFollowUpPatientList.setLayoutManager(linearLayoutManager);
+            /*mfollowUpPatientList.addItemDecoration(new
+         DividerItemDecoration(TodayPatientActivity.this,
                     DividerItemDecoration.VERTICAL));*/
+
             mFollowUpPatientList.setAdapter(mFollowUpPatientAdapter);
         }
 
@@ -318,8 +417,8 @@ public class followUpActivity extends AppCompatActivity implements OnMapReadyCal
         map.setMyLocationEnabled(true); //show your location on map
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location myLocation= locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        //LatLng myLatLng = new LatLng(myLocation.getLatitude(),myLocation.getLongitude()); //get your position
-        LatLng myLatLng=new LatLng(39.32666870388049,-76.62209924707038);
+        LatLng myLatLng = new LatLng(myLocation.getLatitude(),myLocation.getLongitude()); //get your position
+        //LatLng myLatLng=new LatLng(39.32666870388049,-76.62209924707038);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (Marker marker : markers) {
             builder.include(marker.getPosition()); //average positions of all markers on map

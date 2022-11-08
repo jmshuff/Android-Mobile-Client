@@ -12,7 +12,6 @@ public class FollowUpPatientModel {
     String date_of_birth;
     String phone_number;
     String sync;
-    String provider_uuid;
     String location;
     String rightEyeDiagnosis;
     String leftEyeDiagnosis;
@@ -33,7 +32,7 @@ public class FollowUpPatientModel {
         this.leftEyeDiagnosis = leftEyeDiagnosis;
     }
 
-    public FollowUpPatientModel(String uuid, String patientuuid, String startdate, String enddate, String openmrs_id, String first_name, String middle_name, String last_name, String date_of_birth, String phone_number, String sync, String provider_uuid, String location, String rightEyeDiagnosis, String leftEyeDiagnosis) {
+    public FollowUpPatientModel(String uuid, String patientuuid, String startdate, String enddate, String openmrs_id, String first_name, String middle_name, String last_name, String date_of_birth, String phone_number, String sync, String location, String rightEyeDiagnosis, String leftEyeDiagnosis) {
         this.uuid = uuid;
         this.patientuuid = patientuuid;
         this.startdate = startdate;
@@ -45,7 +44,6 @@ public class FollowUpPatientModel {
         this.date_of_birth = date_of_birth;
         this.phone_number = phone_number;
         this.sync = sync;
-        this.provider_uuid=provider_uuid;
         this.location=location;
         this.rightEyeDiagnosis=rightEyeDiagnosis;
         this.leftEyeDiagnosis=leftEyeDiagnosis;
@@ -139,14 +137,6 @@ public class FollowUpPatientModel {
         this.sync = sync;
     }
 
-    public String getProvider_uuid() {
-        return provider_uuid;
-    }
-
-    public void setProvider_uuid(String provider_uuid) {
-        this.provider_uuid = provider_uuid;
-    }
-
     public String getLocation() {
         return location;
     }
@@ -169,7 +159,6 @@ public class FollowUpPatientModel {
                 ", date_of_birth='" + date_of_birth + '\'' +
                 ", phone_number='" + phone_number + '\'' +
                 ", sync='" + sync + '\'' +
-                ", provider_uuid='" + provider_uuid + '\'' +
                 ", location='" + location + '\'' +
                 ", rightEyeDiagnosis='" + rightEyeDiagnosis + '\'' +
                 ", leftEyeDiagnosis='" + leftEyeDiagnosis + '\'' +
