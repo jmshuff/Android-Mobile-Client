@@ -80,7 +80,11 @@ public class PrivacyNotice_Activity extends AppCompatActivity implements View.On
                             String.valueOf(FileUtils.encodeJSON(this, AppConstants.CONFIG_FILE_NAME)))); //Load the config file
                 }
 
-            } else {
+            }
+            else {
+                obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(this, AppConstants.CONFIG_FILE_NAME)));
+            }
+            if(obj==null){
                 obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(this, AppConstants.CONFIG_FILE_NAME)));
             }
 

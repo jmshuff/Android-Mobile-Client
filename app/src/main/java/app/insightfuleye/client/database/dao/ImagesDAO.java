@@ -528,11 +528,11 @@ public class ImagesDAO {
 
 
 
-    public List<azureResults> getAzureImageQueue() throws DAOException {
+    public ArrayList<azureResults> getAzureImageQueue() throws DAOException {
         //get unsynced images from local storage
         SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         localdb.beginTransaction();
-        List<azureResults> azureResultList = new ArrayList<>();
+        ArrayList<azureResults> azureResultList = new ArrayList<>();
         try {
             Cursor idCursor = localdb.rawQuery("SELECT * FROM tbl_azure_img_uploads", null);
             if (idCursor.getCount() != 0) {

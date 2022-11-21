@@ -27,7 +27,9 @@ import java.util.ArrayList;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.models.imageDisplay;
+import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class imageDisplayAdapter extends RecyclerView.Adapter<imageDisplayAdapter.MyViewHolder> {
 
@@ -79,6 +81,13 @@ public class imageDisplayAdapter extends RecyclerView.Adapter<imageDisplayAdapte
                     public void onClick(DialogInterface dialog, int which) {
                         File file= new File(imagesList.get(position).getImagePath());
                         if (file.exists()) file.delete();
+                        ImagesDAO imagesDAO=new ImagesDAO();
+                        String[] imageName=imagesList.get(position).getImagePath().split("/");
+                        try {
+                            imagesDAO.removeAzureSynced(imageName[imageName.length-1]);
+                        } catch (DAOException e) {
+                            e.printStackTrace();
+                        }
                         imagesList.remove(position);
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, imagesList.size());

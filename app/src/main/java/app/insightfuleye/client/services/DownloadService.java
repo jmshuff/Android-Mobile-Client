@@ -3,11 +3,9 @@ package app.insightfuleye.client.services;
 import android.app.IntentService;
 import android.content.Intent;
 
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -18,14 +16,14 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import app.insightfuleye.client.utilities.Logger;
-import app.insightfuleye.client.utilities.SessionManager;
-import app.insightfuleye.client.utilities.UrlModifiers;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.models.download.Download;
+import app.insightfuleye.client.utilities.Logger;
+import app.insightfuleye.client.utilities.SessionManager;
+import app.insightfuleye.client.utilities.UrlModifiers;
 import app.insightfuleye.client.utilities.exception.DAOException;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -69,6 +67,7 @@ public class DownloadService extends IntentService {
         if (imageObsList.size() == 0) {
 //            AppConstants.notificationUtils.DownloadDone("Download", "No Images to Download", 4, IntelehealthApplication.getAppContext());
         }
+        final int[] test = {0};
         for (int i = 0; i < imageObsList.size(); i++) {
             url = urlModifiers.obsImageUrl(imageObsList.get(i));
             Observable<ResponseBody> downloadobs = AppConstants.apiInterface.OBS_IMAGE_DOWNLOAD(url, "Basic " + sessionManager.getEncoded());
@@ -95,6 +94,7 @@ public class DownloadService extends IntentService {
                         @Override
                         public void onComplete() {
                             Logger.logD(TAG, "oncomplete");
+                            test[0] +=1;
 
                         }
                     });

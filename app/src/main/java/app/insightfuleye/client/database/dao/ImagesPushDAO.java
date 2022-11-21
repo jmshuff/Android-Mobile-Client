@@ -168,92 +168,101 @@ public class ImagesPushDAO {
         String encoded = sessionManager.getEncoded();
         Retrofit retrofit = AzureNetworkClient.getRetrofit();
         ImagesDAO imagesDAO = new ImagesDAO();
-        List<azureResults> imageQueue = new ArrayList<>();
+        ArrayList<azureResults> imageQueue = new ArrayList<>();
         try {
             imageQueue = imagesDAO.getAzureImageQueue();
             Log.e(TAG, imageQueue.toString());
         } catch (DAOException e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
+        Log.d("imageQueueSize", String.valueOf(imageQueue.size()));
+        int queueSize=imageQueue.size();
+        int fileCount=0;
 
-        List<MultipartBody.Part> eyeImageParts= new ArrayList<>();
-        Map<String, RequestBody> partMap = new HashMap<>();
-
-        for (int i=0; i<imageQueue.size(); i++) {
-            //pass it like this
-            azureResults p = imageQueue.get(i);
-            eyeImageParts.add(createFilePart("file", p.getImagePath()));
-            partMap.put("visitId[" + i + "]", createPartFromString(p.getVisitId()));
-            partMap.put("patientId[" + i + "]", createPartFromString(p.getPatientId()));
-            partMap.put("creatorId[" + i + "]", createPartFromString(p.getChwName()));
-            partMap.put("type[" + i + "]", createPartFromString(p.getLeftRight()));
-            partMap.put("age[" + i + "]", createPartFromString(p.getAge()));
-            partMap.put("sex[" + i + "]", createPartFromString(p.getSex()));
-            Log.d("fhist", p.getFamHist());
-            Log.d("phist", p.getPatHist());
-            partMap.put("fam_history["+i+"]", createPartFromString(p.getFamHist()));
-            partMap.put("pat_history["+i+"]", createPartFromString(p.getPatHist()));
-            if(p.getLeftRight().equals("right")){
-                partMap.put("visual_acuity[" + i + "]", createPartFromString(p.getVARight()));
-                partMap.put("pinhole_acuity[" + i + "]", createPartFromString(p.getPinholeRight()));
-                partMap.put("complaints[" + i + "]", createPartFromString(p.getComplaintStrR()));
+        while(queueSize>0){
+            List<MultipartBody.Part> eyeImageParts= new ArrayList<>();
+            Map<String, RequestBody> partMap = new HashMap<>();
+            int fileNum=10;
+            if (queueSize<fileNum)
+                fileNum=queueSize;
+            for (int i=0; i<fileNum; i++) {
+                //pass it like this
+                azureResults p = imageQueue.get(fileCount);
+                File file= new File(AppConstants.IMAGE_PATH + p.getImagePath());
+                Log.d("filepath",file.getAbsolutePath());
+                if(file.isFile()){
+                    eyeImageParts.add(createFilePart("file", p.getImagePath()));
+                    partMap.put("visitId[" + i + "]", createPartFromString(p.getVisitId()));
+                    partMap.put("patientId[" + i + "]", createPartFromString(p.getPatientId()));
+                    partMap.put("creatorId[" + i + "]", createPartFromString(p.getChwName()));
+                    partMap.put("type[" + i + "]", createPartFromString(p.getLeftRight()));
+                    partMap.put("age[" + i + "]", createPartFromString(p.getAge()));
+                    partMap.put("sex[" + i + "]", createPartFromString(p.getSex()));
+                    if(p.getLeftRight().equals("right")){
+                        partMap.put("visual_acuity[" + i + "]", createPartFromString(p.getVARight()));
+                        partMap.put("pinhole_acuity[" + i + "]", createPartFromString(p.getPinholeRight()));
+                        partMap.put("complaints[" + i + "]", createPartFromString(p.getComplaintStrR()));
+                    }
+                    else{
+                        partMap.put("visual_acuity[" + i + "]", createPartFromString(p.getVALeft()));
+                        partMap.put("pinhole_acuity[" + i + "]", createPartFromString(p.getPinholeLeft()));
+                        partMap.put("complaints[" + i + "]", createPartFromString(p.getComplaintStrL()));
+                    }
+                }
+                fileCount= fileCount+1;
             }
-            else{
-                partMap.put("visual_acuity[" + i + "]", createPartFromString(p.getVALeft()));
-                partMap.put("pinhole_acuity[" + i + "]", createPartFromString(p.getPinholeLeft()));
-                partMap.put("complaints[" + i + "]", createPartFromString(p.getComplaintStrL()));
-            }
 
-        }
+            Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
+            AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
+            Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(eyeImageParts, partMap);
+            //is this the right type for the observable...
+            int finalFileNum = fileNum;
+            azureObservable.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DisposableObserver<ResponseBody>() {
 
-        Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
-        AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
-        Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(eyeImageParts, partMap);
-        //is this the right type for the observable...
-        azureObservable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<ResponseBody>() {
-
-                    @Override
-                    public void onNext(@NonNull ResponseBody responseBody) {
-                        Log.d(TAG, "azure success");
-                        //Remove request from database and delete file
+                        @Override
+                        public void onNext(@NonNull ResponseBody responseBody) {
+                            Log.d(TAG, "azure success next");
+                            //Remove request from database and delete file
 /*                        try {
                             imagesDAO.removeAzureSynced(p.getImagePath());
                         } catch (DAOException e) {
                             e.printStackTrace();
                         }*/
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Logger.logD(TAG, "Onerror Azure" + e.getMessage());
-//                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", IntelehealthApplication.getAppContext());
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Logger.logD(TAG, "success");
-                        List<azureResults> azureQueue = null;
-                        try {
-                            azureQueue=imagesDAO.getAzureImageQueue();
-                        } catch (DAOException e) {
-                            e.printStackTrace();
                         }
-                        for (azureResults q: azureQueue){
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Logger.logD(TAG, "Onerror Azure" + e.getMessage());
+//                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", IntelehealthApplication.getAppContext());
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Logger.logD(TAG, "Azure success");
+                            ArrayList<azureResults> azureQueue = new ArrayList<>();
                             try {
-                                imagesDAO.removeAzureSynced(q.getImagePath());
+                                azureQueue=imagesDAO.getAzureImageQueue();
                             } catch (DAOException e) {
                                 e.printStackTrace();
                             }
+                            for (int i = 0; i< finalFileNum; i++){
+                                azureResults q=azureQueue.get(i);
+
+                                try {
+                                    imagesDAO.removeAzureSynced(q.getImagePath());
+                                } catch (DAOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
+                    });
 
-                    }
-                });
-
-        sessionManager.setPushSyncFinished(true);
+            queueSize=queueSize-fileNum;
+        }
 //        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
-
+        sessionManager.setPushSyncFinished(true);
         return true;
     }
 

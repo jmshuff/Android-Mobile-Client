@@ -79,7 +79,6 @@ import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.InteleHealthDatabaseHelper;
 import app.insightfuleye.client.database.dao.EncounterDAO;
 import app.insightfuleye.client.database.dao.ImagesDAO;
-import app.insightfuleye.client.database.dao.ImagesPushDAO;
 import app.insightfuleye.client.database.dao.ObsDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
@@ -522,11 +521,12 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
 
             List<String> imagePathList = physicalExamMap.getImagePathList();
 
-            if (imagePathList != null) {
+/*            if (imagePathList != null) {
                 for (String imagePath : imagePathList) {
                     updateImageDatabase();
                 }
-            }
+            }*/
+            //JS commented out because we are not pushing images to OpenMRS
 
             try {
                 generateSelected();
@@ -545,13 +545,6 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             try {
                 azureQueue = imagesDAO.getAzureImageQueue();
                 Log.d("AzureQueue", azureQueue.toString());
-            } catch (DAOException e) {
-                e.printStackTrace();
-            }
-            //upload all images to Azure
-            ImagesPushDAO imagesPushDAO = new ImagesPushDAO();
-            try {
-                imagesPushDAO.azureImagePush();
             } catch (DAOException e) {
                 e.printStackTrace();
             }
@@ -1053,6 +1046,14 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
                 } catch (DAOException e) {
                     e.printStackTrace();
                 }
+                ImagesDAO imagesDAO= new ImagesDAO();
+                ArrayList<azureResults> queue=new ArrayList();
+                try {
+                    queue=imagesDAO.getAzureImageQueue();
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
+                Log.d("queueSize", String.valueOf(queue.size()));
                /* //Test, code to print list of queded images for testing
                 ImagesDAO imagesDAO = new ImagesDAO();
                 List<azureResults> azureQueue = new ArrayList<>();
