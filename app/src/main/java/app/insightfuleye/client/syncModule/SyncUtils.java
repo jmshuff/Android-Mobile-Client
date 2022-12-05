@@ -40,11 +40,11 @@ public class SyncUtils {
             public void run() {
                 Logger.logD(TAG, "Background Image Push Started");
                 //imagesPushDAO.obsImagesPush();
-                try {
+/*                try {
                     imagesPushDAO.azureImagePush();
                 } catch (DAOException e) {
                     e.printStackTrace();
-                }
+                }*/
                 Logger.logD(TAG, "Background Image Pull ended");
             }
         }, 3000);

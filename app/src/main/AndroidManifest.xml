@@ -26,6 +26,7 @@
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
+    <uses-feature android:name="android.hardware.camera.raw" android:required="false" />
 
     <application
         android:name="app.insightfuleye.client.app.IntelehealthApplication"
@@ -38,7 +39,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:hasFragileUserData="true">
 
         <activity
             android:name="app.insightfuleye.client.activities.privacyNoticeActivity.PrivacyNotice_Activity"

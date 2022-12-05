@@ -677,7 +677,9 @@
     <string name="download_button_caps">DOWNLOAD</string>
     <string name="delete_confirmation">Are you sure you want to delete this image?</string>
     <string name="edit_confirmation">Are you sure you want to edit this information?</string>
-
+    <string name="imagesQueueSize">\"Images to Upload: \"</string>
+    <string name="imageUploadFailed">Image Upload Failed</string>
+    <string name="imageUploadSuccess">Image Upload Success!</string>
 
 
 </resources>

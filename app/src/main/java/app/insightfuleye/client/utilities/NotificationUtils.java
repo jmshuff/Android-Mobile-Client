@@ -83,6 +83,28 @@ public class NotificationUtils {
 
     }
 
+    public void imageUploading(String title, String text, int notificationId, Context context, int totalImages, int uploadedImages) {
+        this.context = context;
+        NotificationManager mNotifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mNotifyManager.cancel(mId);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            String channelid = String.valueOf(notificationId);
+            NotificationChannel mChannel = new NotificationChannel(channelid, channelName, importance);
+            mNotifyManager.createNotificationChannel(mChannel);
+        }
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId);
+        mBuilder.setContentTitle(title)
+                .setContentText(text)
+                .setSmallIcon(R.drawable.ic_cloud_upload)
+                .setProgress(totalImages, uploadedImages, false);
+        mNotifyManager.notify(notificationId, mBuilder.build());
+
+    }
+
     public void clearAllNotifications(Context context) {
 
         this.context = context;

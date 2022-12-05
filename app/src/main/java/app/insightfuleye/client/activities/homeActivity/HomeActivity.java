@@ -313,7 +313,7 @@ public class HomeActivity extends AppCompatActivity {
 //                AppConstants.notificationUtils.showNotifications(getString(R.string.sync), getString(R.string.syncInProgress), 1, context);
 
                 if (isNetworkConnected()) {
-                    Toast.makeText(context, getString(R.string.syncInProgress), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, getString(R.string.syncInProgress), Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(context, context.getString(R.string.failed_synced), Toast.LENGTH_LONG).show();
                 }
