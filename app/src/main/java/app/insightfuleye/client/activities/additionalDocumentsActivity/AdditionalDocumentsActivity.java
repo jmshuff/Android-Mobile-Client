@@ -2,21 +2,19 @@ package app.insightfuleye.client.activities.additionalDocumentsActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,13 +22,12 @@ import java.util.List;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.models.DocumentObject;
-import app.insightfuleye.client.utilities.UuidDictionary;
-
-import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
 import app.insightfuleye.client.utilities.StringUtils;
+import app.insightfuleye.client.utilities.UuidDictionary;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class AdditionalDocumentsActivity extends AppCompatActivity {
