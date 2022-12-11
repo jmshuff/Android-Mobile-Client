@@ -1,0 +1,76 @@
+{
+    "id":"ID_1851599251",
+    "text":"Initial visit",
+    "options": [{
+        "id":"ID_1957174010",
+        "text":"Complaints:",
+    "display":"Do you have any of these symptoms?",
+    "display-or":"உங்களுக்கு பின்வரும் அறிகுறிகள் ஏதேனும் உள்ளதா?",
+    "bilateral":"true",
+        "options": [{
+            "id":"ID_161621329",
+            "text":"Blurry Vision"
+        }, {
+            "id":"ID_615473083",
+            "text":"Redness",
+    "display-or":"கண் சிவப்பாக உள்ளது"
+        }, {
+            "id":"ID_1029517096",
+            "text":"Eye Pain or Irritation",
+    "language":"Eye pain",
+    "display-or":"கண் வலி அல்லது எரிச்சல்"
+        }, {
+            "id":"ID_654659056",
+            "text":"Foreign Body Sensation"
+        }, {
+            "id":"ID_1588113165",
+            "text":"Watery eye",
+    "display-or":"கண்ணில் நீர் வடிகின்றது",
+    "language":"Watery eye"
+        }, {
+            "id":"ID_1041738217",
+            "text":"Discharge"
+        }, {
+            "id":"ID_806663062",
+            "text":"Recent Eye Trauma",
+    "display-or":"கண்ணில் அடிபட்டுள்ளது"
+        }, {
+            "id":"ID_374291235",
+            "text":"Other Symptom",
+    "input-type":"text",
+    "display-or":"வேறு பிரச்சனைகள்"
+        }]
+    }, {
+        "id":"ID_1695512600",
+        "text":"Symptom duration:",
+    "display":"When did your symptoms start?",
+    "display-or":"எவ்வளவு நாளாக உங்களுக்கு இந்த அறிகுறிகள் இருக்கின்றன?",
+    "language":"Symptom duration:",
+        "options": [{
+            "id":"ID_1262970632",
+            "text":"Within the last 3 days",
+    "display-or":"சில நாட்களாக",
+    "language":"<3 days"
+        }, {
+            "id":"ID_462273844",
+            "text":"Within the last 1 week",
+    "display-or":"1 வாரமாக"
+        }, {
+            "id":"ID_1204742268",
+            "text":"Within the last 1 month",
+    "display-or":"1 மாதமாக"
+        }, {
+            "id":"ID_1218245972",
+            "text":"1-6 months",
+    "display-or":"1 - 6 மாதங்களாக"
+        }, {
+            "id":"ID_942202219",
+            "text":"6-12 months",
+    "display-or":"6 - 12 மாதங்களாக"
+        }, {
+            "id":"ID_393243330",
+            "text":"1 year or more",
+    "display-or":"1 வருடத்திற்கும் மேலாக"
+        }]
+    }]
+}
