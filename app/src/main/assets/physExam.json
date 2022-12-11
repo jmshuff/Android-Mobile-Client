@@ -1,0 +1,213 @@
+{
+    "id":"ID_897767153",
+    "text":"Physical Exam",
+    "options": [{
+        "id":"7hrmfqn0krat7sjobfh9rjr5i0",
+        "text":"General exams",
+    "language":"General Exams:",
+    "display-or":"கண் பரிசோதனை",
+        "options": [{
+            "id":"ID_328527107",
+            "text":"Glasses",
+    "language":"%",
+            "options": [{
+                "id":"ID_574572613",
+                "text":"Patients should wear their glasses for visual acuity exam. Is the patient wearing glasses? ",
+    "language":"%",
+    "job-aid-type":"image",
+    "job-aid-file":"glasses",
+    "choice-type":"single",
+    "display-or":"நோயாளி கண் கண்ணாடி  பயன்படுத்துகின்றாரா?",
+                "options": [{
+                    "id":"ID_1993441619",
+                    "text":"Patient is wearing glasses",
+    "language":"%",
+    "display-or":"ஆம்"
+                }, {
+                    "id":"ID_918259235",
+                    "text":"Patient does not use glasses",
+    "language":"%",
+    "display-or":"இல்லை"
+                }]
+            }]
+        }, {
+            "id":"ID_1806810129",
+            "text":"Visual Acuity",
+    "language":"%",
+            "options": [{
+                "id":"ID_1629255652",
+                "text":"Visual acuity chart: Cover one eye. What is the smallest line the patient can read with the other eye?",
+    "language":"%",
+    "display-or":"ஒரு கண்ணை மூடி, மற்ற கண்ணுக்கு தெரியும் சிறிய வரிசையை படிக்கவும",
+    "job-aid-type":"image",
+    "job-aid-file":"varight",
+    "bilateral":"true",
+    "choice-type":"single",
+                "options": [{
+                    "id":"ID_645495503",
+                    "text":" 6/60",
+    "language":"6/60"
+                }, {
+                    "id":"ID_187733003",
+                    "text":"6/36",
+    "language":"6/36"
+                }, {
+                    "id":"ID_1700051741",
+                    "text":"6/24",
+    "language":"6/24"
+                }, {
+                    "id":"ID_1397107237",
+                    "text":"6/18",
+    "language":"6/18"
+                }, {
+                    "id":"ID_1318113516",
+                    "text":"6/12",
+    "language":"6/12"
+                }, {
+                    "id":"ID_652539971",
+                    "text":"6/9",
+    "language":"6/9"
+                }, {
+                    "id":"ID_1148345737",
+                    "text":"6/6",
+    "language":"6/6"
+                }, {
+                    "id":"ID_495160773",
+                    "text":"Finger counts",
+    "language":"Finger counts",
+    "display-or":"விரல்களின் எண்ணிக்கை தெரிகின்றது"
+                }, {
+                    "id":"ID_250638437",
+                    "text":"Hand movements",
+    "language":"Hand movements",
+    "display-or":"கை அசைவது தெரிகின்றது"
+                }, {
+                    "id":"ID_46105988",
+                    "text":"Light Perception Only",
+    "language":"Light Perception Only",
+    "display-or":"வெளிச்சம் தெரிகின்றது"
+                }, {
+                    "id":"ID_1415904280",
+                    "text":"No Light Perception",
+    "language":"No Light Perception",
+    "display-or":"வெளிச்சம் எதுவும் தெரியவில்லை"
+                }]
+            }]
+        }, {
+            "id":"ID_1599440508",
+            "text":"Pinhole",
+    "language":"%",
+            "options": [{
+                "id":"ID_408537553",
+                "text":"Pinhole Exam: Have patient cover the one eye and look through pinhole with the other eye. What is the smallest line the patient can read?",
+    "language":"%",
+    "display-or":"பின்ஹோல் சோதனை: ஒரு கண்ணை மூடி, மற்றொரு கண்ணால் பின்ஹோல் வழியாக பார்க்கவும். உங்கள் கண்ணுக்கு தெரியும் சிறிய வரிசையை படிக்கவும்",
+    "bilateral":"true",
+    "job-aid-type":"image",
+    "job-aid-file":"pinhole",
+    "choice-type":"single",
+                "options": [{
+                    "id":"ID_534124315",
+                    "text":"No pinhole.",
+    "language":"No pinhole"
+                }, {
+                    "id":"ID_1926030110",
+                    "text":"6/60",
+    "language":"6/60"
+                }, {
+                    "id":"ID_1729024059",
+                    "text":"6/36",
+    "language":"6/36"
+                }, {
+                    "id":"ID_914654533",
+                    "text":"6/24",
+    "language":"6/24"
+                }, {
+                    "id":"ID_502606275",
+                    "text":"6/18",
+    "language":"6/18"
+                }, {
+                    "id":"ID_1189437442",
+                    "text":"6/12",
+    "language":"6/12"
+                }, {
+                    "id":"ID_1268166959",
+                    "text":"6/9",
+    "language":"6/9"
+                }, {
+                    "id":"ID_1734464468",
+                    "text":" 6/6",
+    "language":"6/6"
+                }]
+            }]
+        }, {
+            "id":"ID_668499978",
+            "text":"Image upload right",
+    "language":"%",
+            "options": [{
+                "id":"ID_453937367",
+                "text":"Right Eye Image",
+    "language":"%",
+    "display":"1. Sit directly across from patient\n2. Turn on LEDs\n3. Push scope against patient’s face\n4. Make sure pupil is centered and image is focused",
+    "display-or":"நோயாளிக்கு முன் அமர்ந்து, கருவியை கண்ணின் மீது நன்றாக பொருத்தி, தெளிவான புகைப்படத்தை எடுக்கவும்",
+                "options": [{
+                    "id":"ID_161214082",
+                    "text":"Right Eye [click to take picture]",
+    "input-type":"camera",
+    "language":"%",
+    "display-or":"வலது கண் [படம் எடுக்க இதை கிளிக் செய்யவும்]"
+                }, {
+                    "id":"ID_674119795",
+                    "text":"Could not capture photo",
+    "display-or":"படம் எடுக்க முடியவில்லை"
+                }]
+            }]
+        }, {
+            "id":"ID_196039146",
+            "text":"Image upload left",
+    "language":"%",
+            "options": [{
+                "id":"ID_401925078",
+                "text":"Left Eye Image",
+    "display":"1. Sit directly across from patient\n2. Turn on LEDs\n3. Push scope against patient’s face\n4. Make sure pupil is centered and image is focused",
+    "language":"%",
+    "display-or":"இடது கண் [படம் எடுக்க இதை கிளிக் செய்யவும்]",
+                "options": [{
+                    "id":"ID_1798722903",
+                    "text":"Left Eye [click to take picture]",
+    "input-type":"camera",
+    "language":"%",
+    "display-or":"இடது கண் [படம் எடுக்க இதை கிளிக் செய்யவும்]"
+                }, {
+                    "id":"ID_398113307",
+                    "text":"Could not capture photo",
+    "display-or":"படம் எடுக்க முடியவில்லை"
+                }]
+            }]
+        }, {
+            "id":"ID_1344616196",
+            "text":"Referral",
+    "language":"%",
+            "options": [{
+                "id":"ID_1136377462",
+                "text":"Do you think this patient needs a urgent referral? Examples of patients needing referral are above.",
+    "language":"Refer:",
+    "display-or":"இந்த நோயளிக்கி அவசர சிகிச்சை தேவை என்று நினைகிண்றீர்களா?",
+    "job-aid-type":"image",
+    "job-aid-file":"urgentreferral",
+    "choice-type":"single",
+                "options": [{
+                    "id":"ID_1299819479",
+                    "text":"Yes",
+    "language":"Yes",
+    "display-or":"ஆம்"
+                }, {
+                    "id":"ID_1311451496",
+                    "text":"No",
+    "language":"No",
+    "display-or":"இல்லை"
+                }]
+            }]
+        }]
+    }]
+}

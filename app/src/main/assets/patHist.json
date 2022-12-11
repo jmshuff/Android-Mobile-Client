@@ -1,0 +1,120 @@
+{
+    "id":"ID_133044878",
+    "text":"Patient History",
+    "display-or":"நோயாளியின் மருத்துவ வரலாறு.",
+    "options": [{
+        "id":"ID_82509300",
+        "text":"Medical History",
+    "display":"Do you have any of the following conditions?",
+    "language":"%",
+    "display-or":"பின்வரும் நிபந்தனைகள் ஏதேனும் உண்டா?",
+        "options": [{
+            "id":"ID_1080427077",
+            "text":"No",
+    "language":"%"
+        }, {
+            "id":"ID_346057433",
+            "text":"Asthma",
+    "language":"Asthma",
+    "display-or":"ஆஸ்துமா"
+        }, {
+            "id":"ID_408004823",
+            "text":"Cardiac Problems",
+    "language":"Cardiac Problems",
+    "display-or":"இதய பிரச்சினைகள்"
+        }, {
+            "id":"ID_395443507",
+            "text":"Diabetes",
+    "language":"%",
+    "display-or":"சர்க்கரை நோய்",
+    "display-header":"How long have you had diabetes?",
+            "options": [{
+                "id":"ID_1601127469",
+                "text":"Less than 5 years",
+    "language":"Diabetes for less than 5 years",
+    "display-or":"5 வருடங்களுக்கும் குறைவானது"
+            }, {
+                "id":"ID_540529455",
+                "text":"5-10 years",
+    "language":"Diabetes for 5-10 years",
+    "display-or":"5-10 ஆண்டுகள்"
+            }, {
+                "id":"ID_968496081",
+                "text":"More than 10 years",
+    "language":"Diabetes 5-10 years",
+    "display-or":"10 ஆண்டுகளுக்கும் மேலாக"
+            }]
+        }, {
+            "id":"ID_1234756610",
+            "text":"Hypertension",
+    "language":"Hypertension",
+    "display-or":"உயர் இரத்த அழுத்தம்"
+        }, {
+            "id":"ID_1159370656",
+            "text":"High Cholesterol",
+    "language":"High Cholesterol",
+    "display-or":"அதிக கொழுப்பு"
+        }, {
+            "id":"ID_646580571",
+            "text":"Other Medical Conditions",
+    "input-type":"text",
+    "display-or":"பிற மருத்துவ நிலைமைகள்"
+        }]
+    }, {
+        "id":"ID_1197837467",
+        "text":"Ocular History",
+    "language":"%",
+    "display":"Have you previously had ocular surgery?",
+    "bilateral":"true",
+        "options": [{
+            "id":"ID_212282233",
+            "text":"No",
+    "language":"%"
+        }, {
+            "id":"ID_1569121287",
+            "text":"Cataract surgery",
+    "display-header":"When did you have surgery?",
+    "input-type":"date"
+        }, {
+            "id":"ID_1369953033",
+            "text":"LASIK surgery",
+    "display-header":"When did you have surgery?",
+    "input-type":"date"
+        }, {
+            "id":"ID_644671745",
+            "text":"Corneal transplant",
+    "display-header":"When did you have surgery?",
+    "input-type":"date"
+        }, {
+            "id":"ID_1752620676",
+            "text":"Glaucoma surgery",
+    "display-header":"When did you have surgery?",
+    "input-type":"date"
+        }, {
+            "id":"ID_502476688",
+            "text":"Retinal surgery",
+    "display-header":"When did you have surgery?",
+    "input-type":"date"
+        }, {
+            "id":"ID_866221057",
+            "text":"Other",
+    "input-type":"text",
+    "display-header":"Which surgery?"
+        }]
+    }, {
+        "id":"ID_794909070",
+        "text":"Ocular History",
+    "language":"%",
+    "display":"Are you using topical eye medication?",
+        "options": [{
+            "id":"ID_1144362238",
+            "text":"No",
+    "language":"%"
+        }, {
+            "id":"ID_38547158",
+            "text":"Yes",
+    "display-header":"Which medication?",
+    "input-type":"text"
+        }]
+    }]
+}
