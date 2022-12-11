@@ -85,30 +85,6 @@ public class CameraActivity extends AppCompatActivity {
     public static final int TAKE_IMAGE_RIGHT=207;
     public static final int TAKE_IMAGE_LEFT=208;
     /**
-     * Camera state: Showing camera preview.
-     */
-    private static final int STATE_PREVIEW = 0;
-
-    /**
-     * Camera state: Waiting for the focus to be locked.
-     */
-    private static final int STATE_WAITING_LOCK = 1;
-
-    /**
-     * Camera state: Waiting for the exposure to be precapture state.
-     */
-    private static final int STATE_WAITING_PRECAPTURE = 2;
-
-    /**
-     * Camera state: Waiting for the exposure state to be something other than precapture.
-     */
-    private static final int STATE_WAITING_NON_PRECAPTURE = 3;
-
-    /**
-     * Camera state: Picture was taken.
-     */
-    private static final int STATE_PICTURE_TAKEN = 4;
-    /**
      * Bundle key used for the {@link String} setting custom Image Name
      * for the file generated
      */
@@ -123,11 +99,9 @@ public class CameraActivity extends AppCompatActivity {
      * message before starting the camera.
      */
     public static final String SHOW_DIALOG_MESSAGE = "DEFAULT_DLG";
-    private int mState = STATE_PREVIEW;
 
     private final String TAG = CameraActivity.class.getSimpleName();
     private String cameraId;
-    private CameraView mCameraView;
     private AutoFitTextureView textureView;
     private FloatingActionButton takePictureBtn;
     private Handler mBackgroundHandler;
@@ -139,17 +113,6 @@ public class CameraActivity extends AppCompatActivity {
     private Size previewSize;
 
     private ImageReader imageReader;
-
-    /**
-     * Max preview width that is guaranteed by Camera2 API
-     */
-    private static final int MAX_PREVIEW_WIDTH = 1920;
-
-    /**
-     * Max preview height that is guaranteed by Camera2 API
-     */
-    private static final int MAX_PREVIEW_HEIGHT = 1080;
-
     //Pass Custom File Name Using intent.putExtra(CameraActivity.SET_IMAGE_NAME, "Image Name");
     private String mImageName = null;
     //Pass Dialog Message Using intent.putExtra(CameraActivity.SET_IMAGE_NAME, "Dialog Message");
@@ -312,14 +275,7 @@ public class CameraActivity extends AppCompatActivity {
                         return;
                     }
                     // When the session is ready, we start displaying the preview.
-                    cameraCaptureSessions = cameraCaptureSession;
-                    //updatePreview();
-                    try {
-                        cameraCaptureSessions.setRepeatingRequest(previewBuilder.build(), null, mBackgroundHandler);
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
-                    }
-
+                    updatePreview();
                 }
 
                 @Override
@@ -366,6 +322,36 @@ public class CameraActivity extends AppCompatActivity {
         return optimalSize;
     }
 
+    private Size getOptimalCaptureSize(Size[] sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.05;
+        double targetRatio = (double) w / h;
+        if (sizes == null) return null;
+
+        Size optimalSize = null;
+        int maxSize=0;
+
+        // Try to find an size match aspect ratio and the max size
+        for (Size size : sizes) {
+            double ratio = (double) size.getWidth() / size.getHeight();
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (size.getHeight()> maxSize) {
+                optimalSize = size;
+                maxSize=size.getHeight();
+            }
+        }
+
+        // Cannot find the one match the aspect ratio, ignore the requirement and just get the biggest size
+        if (optimalSize == null) {
+            for (Size size : sizes) {
+                if (size.getHeight()> maxSize) {
+                    optimalSize = size;
+                    maxSize=size.getHeight();
+                }
+            }
+        }
+        return optimalSize;
+    }
+
     protected void takePicture() {
         if (null == cameraDevice) {
             Log.e(TAG, "cameraDevice is null");
@@ -378,20 +364,22 @@ public class CameraActivity extends AppCompatActivity {
             if (characteristics != null) {
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
             }
-            Size previewSize=getOptimalPreviewSize(jpegSizes, 480, 640);
-            int width = 640;
-            int height = 480;
-            if (jpegSizes != null && 0 < jpegSizes.length) {
-                width = jpegSizes[0].getWidth();
-                height = jpegSizes[0].getHeight();
+            Size captureSize;
+            if(isDimensionSwapped(characteristics)){
+                captureSize=getOptimalCaptureSize(jpegSizes, 4,3);
             }
-            ImageReader reader = ImageReader.newInstance(previewSize.getWidth(), previewSize.getHeight(), ImageFormat.JPEG, 1);
+            else{
+                captureSize=getOptimalCaptureSize(jpegSizes, 3, 4);
+            }
+
+            ImageReader reader = ImageReader.newInstance(captureSize.getWidth(), captureSize.getHeight(), ImageFormat.JPEG, 1);
             List<Surface> outputSurfaces = new ArrayList<Surface>(2);
             outputSurfaces.add(reader.getSurface());
             outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
             final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(reader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+
             // Orientation
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
@@ -469,14 +457,15 @@ public class CameraActivity extends AppCompatActivity {
             if (characteristics != null) {
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
             }
-            int width = 640;
-            int height = 480;
-            if (jpegSizes != null && 0 < jpegSizes.length) {
-                width = jpegSizes[0].getWidth();
-                height = jpegSizes[0].getHeight();
-            }
 
-            ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
+            Size captureSize;
+            if(isDimensionSwapped(characteristics)){
+                captureSize=getOptimalCaptureSize(jpegSizes, 4,3);
+            }
+            else{
+                captureSize=getOptimalCaptureSize(jpegSizes, 3, 4);
+            }
+            ImageReader reader = ImageReader.newInstance(captureSize.getWidth(), captureSize.getHeight(), ImageFormat.JPEG, 1);
             List<Surface> outputSurfaces = new ArrayList<Surface>(2);
             outputSurfaces.add(reader.getSurface());
             outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
@@ -487,17 +476,16 @@ public class CameraActivity extends AppCompatActivity {
             float minimumLens = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
             captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens);
-
-
             List<CaptureRequest> captureList = new ArrayList<CaptureRequest>();
 
-            for (int i=0;i<4;i++) {
+            int numOfImages=4;
+            for (int i=0; i<numOfImages; i++) {
                 captureBuilder.addTarget(reader.getSurface());
                 captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens+i*1);
                 captureList.add(captureBuilder.build());
             }
 
-//            mCaptureSession.stopRepeating();
+            //mCaptureSession.stopRepeating();
 //            mCaptureSession.captureBurst(captureList, cameraCaptureCallback, null);
 //            mPreviewRequestBuilder.removeTarget(mImageReader.getSurface());
 
@@ -668,7 +656,6 @@ public class CameraActivity extends AppCompatActivity {
         if (null == cameraDevice) {
             Log.e(TAG, "updatePreview error, return");
         }
-
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         CameraCharacteristics characteristics = null;
         try {
