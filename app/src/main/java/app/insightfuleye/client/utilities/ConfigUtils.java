@@ -38,6 +38,9 @@ public class ConfigUtils {
             }
             else
             { obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(context, AppConstants.CONFIG_FILE_NAME))); }
+            if(obj == null){
+                obj = new JSONObject(String.valueOf(FileUtils.encodeJSON(context, AppConstants.CONFIG_FILE_NAME)));
+            }
 
         } catch (JSONException e) {
             Logger.logE(TAG, "Exception", e);
