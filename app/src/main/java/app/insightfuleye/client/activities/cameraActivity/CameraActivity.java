@@ -30,6 +30,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ExifInterface;
 import android.media.Image;
 import android.media.ImageReader;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -62,14 +63,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.utilities.StringUtils;
+import app.insightfuleye.client.utilities.UuidGenerator;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -82,8 +88,8 @@ public class CameraActivity extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     public static final int TAKE_IMAGE = 205;
-    public static final int TAKE_IMAGE_RIGHT=207;
-    public static final int TAKE_IMAGE_LEFT=208;
+    public static final int TAKE_IMAGE_RIGHT = 207;
+    public static final int TAKE_IMAGE_LEFT = 208;
     /**
      * Bundle key used for the {@link String} setting custom Image Name
      * for the file generated
@@ -106,6 +112,7 @@ public class CameraActivity extends AppCompatActivity {
     private FloatingActionButton takePictureBtn;
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
+    Context context = CameraActivity.this;
 
     protected CameraCaptureSession cameraCaptureSessions;
     protected CaptureRequest captureRequest;
@@ -119,7 +126,7 @@ public class CameraActivity extends AppCompatActivity {
     private String mDialogMessage = null;
     //Pass Custom File Path Using intent.putExtra(CameraActivitgy.SET_IMAGE_PATH, "Image Path");
     private String mFilePath = null;
-    private boolean fabClickFlag=true;
+    private boolean fabClickFlag = true;
     protected CameraDevice cameraDevice;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -193,17 +200,20 @@ public class CameraActivity extends AppCompatActivity {
                     }
                     int[] capabilities = characteristics
                             .get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
-                    boolean isManualFocusSupported=false;
-                    for(int cap: capabilities){
-                        if (cap==CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR){
-                            isManualFocusSupported=true;
+                    boolean isManualFocusSupported = false;
+                    for (int cap : capabilities) {
+                        if (cap == CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR) {
+                            isManualFocusSupported = true;
                             break;
                         }
                     }
-                    if (isManualFocusSupported){
+                    if (isManualFocusSupported) {
+                        Log.d("manualFocus", "true");
                         takePictureBurst();
-                    }
-                    else{
+                        //takePicture();
+                        //captureStillImage();
+                    } else {
+                        Log.d("manualFocus", "false");
                         takePicture();
                     }
                 }
@@ -260,6 +270,7 @@ public class CameraActivity extends AppCompatActivity {
 
     protected void createCameraPreview() {
         try {
+            Log.d("createCameraPreview", "enter");
             SurfaceTexture texture = textureView.getSurfaceTexture();
             assert texture != null;
             texture.setDefaultBufferSize(previewSize.getHeight(), previewSize.getWidth());
@@ -275,7 +286,13 @@ public class CameraActivity extends AppCompatActivity {
                         return;
                     }
                     // When the session is ready, we start displaying the preview.
-                    updatePreview();
+                    //updatePreview();
+                    cameraCaptureSessions = cameraCaptureSession;
+                    try {
+                        cameraCaptureSessions.setRepeatingRequest(previewBuilder.build(), null, mBackgroundHandler);
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -328,24 +345,24 @@ public class CameraActivity extends AppCompatActivity {
         if (sizes == null) return null;
 
         Size optimalSize = null;
-        int maxSize=0;
+        int maxSize = 0;
 
         // Try to find an size match aspect ratio and the max size
         for (Size size : sizes) {
             double ratio = (double) size.getWidth() / size.getHeight();
             if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (size.getHeight()> maxSize) {
+            if (size.getHeight() > maxSize) {
                 optimalSize = size;
-                maxSize=size.getHeight();
+                maxSize = size.getHeight();
             }
         }
 
         // Cannot find the one match the aspect ratio, ignore the requirement and just get the biggest size
         if (optimalSize == null) {
             for (Size size : sizes) {
-                if (size.getHeight()> maxSize) {
+                if (size.getHeight() > maxSize) {
                     optimalSize = size;
-                    maxSize=size.getHeight();
+                    maxSize = size.getHeight();
                 }
             }
         }
@@ -365,17 +382,17 @@ public class CameraActivity extends AppCompatActivity {
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
             }
             Size captureSize;
-            if(isDimensionSwapped(characteristics)){
-                captureSize=getOptimalCaptureSize(jpegSizes, 4,3);
-            }
-            else{
-                captureSize=getOptimalCaptureSize(jpegSizes, 3, 4);
+            if (isDimensionSwapped(characteristics)) {
+                captureSize = getOptimalCaptureSize(jpegSizes, 4, 3);
+            } else {
+                captureSize = getOptimalCaptureSize(jpegSizes, 3, 4);
             }
 
             ImageReader reader = ImageReader.newInstance(captureSize.getWidth(), captureSize.getHeight(), ImageFormat.JPEG, 1);
             List<Surface> outputSurfaces = new ArrayList<Surface>(2);
             outputSurfaces.add(reader.getSurface());
             outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
+            Log.d("imageSurface", "imageReader surface: " + reader.getSurface().toString());
             final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(reader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
@@ -383,10 +400,14 @@ public class CameraActivity extends AppCompatActivity {
             // Orientation
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
-            final File file = new File(Environment.getExternalStorageDirectory() + "/pic.jpg");
+
+            //Test
+
+            final File file = new File(AppConstants.IMAGE_PATH + "/pic.jpg");
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
+                    Log.d("readerListener", "enter");
                     Image image = null;
                     try {
                         image = reader.acquireLatestImage();
@@ -406,15 +427,44 @@ public class CameraActivity extends AppCompatActivity {
                 }
 
                 private void save(byte[] bytes) throws IOException {
-                    OutputStream output = null;
+                    String DIR_NAME = "AROMA Photos";
+                    File direct =
+                            new File(Environment
+                                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                                    .getAbsolutePath() + "/" + DIR_NAME + "/");
+
+
+                    //Bitmap bitmap = BitmapFactory.decodeFile(String.valueOf(file));
+
+                    FileOutputStream outputStream = null;
+
+                    direct.mkdirs();
+                    File file = Environment.getExternalStorageDirectory();
+                    String filename = String.format("%d.png", System.currentTimeMillis());
+                    File outFile = new File(direct, filename);
+
                     try {
-                        output = new FileOutputStream(file);
-                        output.write(bytes);
-                    } finally {
-                        if (null != output) {
-                            output.close();
-                        }
+                        outputStream = new FileOutputStream(outFile);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                    outputStream.write(bytes);
+                    //bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+                    try {
+                        outputStream.flush();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        outputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    Uri contentUri = Uri.fromFile(outFile);
+                    mediaScanIntent.setData(contentUri);
+                    context.sendBroadcast(mediaScanIntent);
                 }
             };
             reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
@@ -445,7 +495,8 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    protected void takePictureBurst(){
+
+    protected void takePictureBurst() {
         if (null == cameraDevice) {
             Log.e(TAG, "cameraDevice is null");
             return;
@@ -457,49 +508,73 @@ public class CameraActivity extends AppCompatActivity {
             if (characteristics != null) {
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
             }
-
             Size captureSize;
-            if(isDimensionSwapped(characteristics)){
-                captureSize=getOptimalCaptureSize(jpegSizes, 4,3);
+            if (isDimensionSwapped(characteristics)) {
+                captureSize = getOptimalCaptureSize(jpegSizes, 4, 3);
+            } else {
+                captureSize = getOptimalCaptureSize(jpegSizes, 3, 4);
             }
-            else{
-                captureSize=getOptimalCaptureSize(jpegSizes, 3, 4);
-            }
-            ImageReader reader = ImageReader.newInstance(captureSize.getWidth(), captureSize.getHeight(), ImageFormat.JPEG, 1);
+
+            ImageReader reader = ImageReader.newInstance(captureSize.getWidth(), captureSize.getHeight(), ImageFormat.JPEG, 4);
             List<Surface> outputSurfaces = new ArrayList<Surface>(2);
             outputSurfaces.add(reader.getSurface());
             outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
+            Log.d("imageSurface", "imageReader surface: " + reader.getSurface().toString());
             final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(reader.getSurface());
-            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);//controls auto-exposure, auto-white-balance, auto-focus
-            //question: can I later set AF to off?
-            float minimumLens = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
-            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
-            captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens);
-            List<CaptureRequest> captureList = new ArrayList<CaptureRequest>();
-
-            int numOfImages=4;
-            for (int i=0; i<numOfImages; i++) {
-                captureBuilder.addTarget(reader.getSurface());
-                captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens+i*1);
-                captureList.add(captureBuilder.build());
-            }
-
-            //mCaptureSession.stopRepeating();
-//            mCaptureSession.captureBurst(captureList, cameraCaptureCallback, null);
-//            mPreviewRequestBuilder.removeTarget(mImageReader.getSurface());
-
+            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 
             // Orientation
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
-            final File file = new File(Environment.getExternalStorageDirectory() + "/pic.jpg");
+
+            List<CaptureRequest> captureRequestList = new ArrayList<>();
+
+            int numOfImages = 4;
+            float minimumLens = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
+            float maxLens = characteristics.get(CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE);
+            captureBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, 10);
+            captureRequestList.add(captureBuilder.build());
+            captureBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, 100);
+            captureRequestList.add(captureBuilder.build());
+            //Log.d("minLens", String.valueOf(minimumLens));
+            //Log.d("maxLens", String.valueOf(maxLens));
+
+/*
+            for (int i = 0; i < numOfImages; i++) {
+                //captureBuilder.addTarget(reader.getSurface());
+                Log.d("lens distance", String.valueOf(minimumLens + i));
+                captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens - i*3);
+                captureRequestList.add(captureBuilder.build());
+            }
+*/
+
+            cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(CameraCaptureSession session) {
+                    try {
+                        session.stopRepeating();
+                        session.captureBurst(captureRequestList, null, mBackgroundHandler);
+                        createCameraPreview();
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onConfigureFailed(CameraCaptureSession session) {
+                }
+            }, mBackgroundHandler);
+
+
+            //final File file = new File(AppConstants.IMAGE_PATH + "/pic.jpg");
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
+                    Log.d("readerListener", "enter");
                     Image image = null;
                     try {
-                        image = reader.acquireLatestImage();
+                        image = reader.acquireNextImage();
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
@@ -516,15 +591,40 @@ public class CameraActivity extends AppCompatActivity {
                 }
 
                 private void save(byte[] bytes) throws IOException {
-                    OutputStream output = null;
+                    String DIR_NAME = "AROMA Photos";
+                    File direct =
+                            new File(Environment
+                                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                                    .getAbsolutePath() + "/" + DIR_NAME + "/");
+
+                    FileOutputStream outputStream = null;
+
+                    direct.mkdirs();
+                    String filename = String.format("%d.png", System.currentTimeMillis());
+                    File outFile = new File(direct, filename);
+
                     try {
-                        output = new FileOutputStream(file);
-                        output.write(bytes);
-                    } finally {
-                        if (null != output) {
-                            output.close();
-                        }
+                        outputStream = new FileOutputStream(outFile);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                    outputStream.write(bytes);
+                    //bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+                    try {
+                        outputStream.flush();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        outputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    Uri contentUri = Uri.fromFile(outFile);
+                    mediaScanIntent.setData(contentUri);
+                    context.sendBroadcast(mediaScanIntent);
                 }
             };
             reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
@@ -532,29 +632,16 @@ public class CameraActivity extends AppCompatActivity {
                 @Override
                 public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(CameraActivity.this, "Saved:" + file, Toast.LENGTH_SHORT).show();
-                    createCameraPreview();
+                    Toast.makeText(CameraActivity.this, "Saved:", Toast.LENGTH_SHORT).show();
+                    //createCameraPreview();
                 }
             };
-            cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
-                @Override
-                public void onConfigured(CameraCaptureSession session) {
-                    try {
-                        session.capture(captureBuilder.build(), captureListener, mBackgroundHandler);
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
 
-                @Override
-                public void onConfigureFailed(CameraCaptureSession session) {
-                }
-            }, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
-
     }
+
 
     @NeedsPermission(Manifest.permission.CAMERA)
     void openCamera() {
@@ -567,7 +654,7 @@ public class CameraActivity extends AppCompatActivity {
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assert map != null;
 
-            boolean swappedDimensions=isDimensionSwapped(characteristics);
+            boolean swappedDimensions = isDimensionSwapped(characteristics);
 
 //            Point displaySize = new Point();
 //            this.getWindowManager().getDefaultDisplay().getSize(displaySize);
@@ -592,18 +679,17 @@ public class CameraActivity extends AppCompatActivity {
 //            }
 
             Size[] previewSizes = map.getOutputSizes(SurfaceTexture.class);
-            if(swappedDimensions){
-               previewSize=getOptimalPreviewSize(previewSizes, 640, 480);
-            }
-            else{
-                previewSize=getOptimalPreviewSize(previewSizes, 480, 640);
+            if (swappedDimensions) {
+                previewSize = getOptimalPreviewSize(previewSizes, 640, 480);
+            } else {
+                previewSize = getOptimalPreviewSize(previewSizes, 480, 640);
             }
             Log.d("optimalPreview", previewSize.getWidth() + " " + previewSize.getHeight());
 
             // We fit the aspect ratio of TextureView to the size of preview we picked.
             //int orientation = getResources().getConfiguration().orientation;
             //if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if(swappedDimensions){
+            if (swappedDimensions) {
                 Log.d("orientation", "landscape");
                 textureView.setAspectRatio(
                         previewSize.getHeight(), previewSize.getWidth());
@@ -627,7 +713,7 @@ public class CameraActivity extends AppCompatActivity {
         Log.e(TAG, "openCamera X");
     }
 
-    private boolean isDimensionSwapped(CameraCharacteristics characteristics){
+    private boolean isDimensionSwapped(CameraCharacteristics characteristics) {
         int displayRotation = this.getWindowManager().getDefaultDisplay().getRotation();
         //noinspection ConstantConditions
         int mSensorOrientation;
@@ -667,6 +753,9 @@ public class CameraActivity extends AppCompatActivity {
         previewBuilder.set(CaptureRequest.CONTROL_AF_MODE, CameraMetadata.CONTROL_AF_MODE_OFF);
         float minimumLens = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
         previewBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens);
+        Log.d("isNullPreview", String.valueOf(previewBuilder.build() == null));
+        Log.d("isNullHandler", String.valueOf(mBackgroundHandler == null));
+
         try {
             cameraCaptureSessions.setRepeatingRequest(previewBuilder.build(), null, mBackgroundHandler);
         } catch (CameraAccessException e) {
@@ -852,8 +941,6 @@ public class CameraActivity extends AppCompatActivity {
     }
 
 
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -976,4 +1063,5 @@ public class CameraActivity extends AppCompatActivity {
         }
         textureView.setTransform(matrix);
     }
+
 }
