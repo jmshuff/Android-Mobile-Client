@@ -6,17 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -52,7 +49,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.cameraview.CameraView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -63,19 +59,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.IntStream;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
-import app.insightfuleye.client.utilities.StringUtils;
-import app.insightfuleye.client.utilities.UuidGenerator;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -118,6 +108,9 @@ public class CameraActivity extends AppCompatActivity {
     protected CaptureRequest captureRequest;
     protected CaptureRequest.Builder previewBuilder;
     private Size previewSize;
+    public CameraCharacteristics characteristics;
+    public CameraManager manager;
+    public CameraFeatures camera_features= new CameraFeatures();
 
     private ImageReader imageReader;
     //Pass Custom File Name Using intent.putExtra(CameraActivity.SET_IMAGE_NAME, "Image Name");
@@ -136,6 +129,32 @@ public class CameraActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
+
+    /**
+     * Camera state: Showing camera preview.
+     */
+    private static final int STATE_PREVIEW = 0;
+
+    /**
+     * Camera state: Waiting for the focus to be locked.
+     */
+    private static final int STATE_WAITING_LOCK = 1;
+
+    /**
+     * Camera state: Waiting for the exposure to be precapture state.
+     */
+    private static final int STATE_WAITING_PRECAPTURE = 2;
+
+    /**
+     * Camera state: Waiting for the exposure state to be something other than precapture.
+     */
+    private static final int STATE_WAITING_NON_PRECAPTURE = 3;
+
+    /**
+     * Camera state: Picture was taken.
+     */
+    private static final int STATE_PICTURE_TAKEN = 4;
+    private int mState = STATE_PREVIEW;
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -191,13 +210,6 @@ public class CameraActivity extends AppCompatActivity {
             takePictureBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-                    CameraCharacteristics characteristics = null;
-                    try {
-                        characteristics = manager.getCameraCharacteristics(cameraId);
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
-                    }
                     int[] capabilities = characteristics
                             .get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
                     boolean isManualFocusSupported = false;
@@ -209,17 +221,120 @@ public class CameraActivity extends AppCompatActivity {
                     }
                     if (isManualFocusSupported) {
                         Log.d("manualFocus", "true");
-                        takePictureBurst();
+                        runPrecaptureSequence();
+                        //takePictureBurst();
                         //takePicture();
-                        //captureStillImage();
                     } else {
                         Log.d("manualFocus", "false");
-                        takePicture();
+                        //takePicture();
+                        runPrecaptureSequence();
                     }
                 }
             });
         }
     }
+
+    public CameraFeatures getCameraFeatures(){
+        Float minimum_focus_distance=characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);//maybenullonsomedevices
+        if(minimum_focus_distance!=null){
+            camera_features.minimum_focus_distance=minimum_focus_distance;
+        }
+        else{
+            camera_features.minimum_focus_distance=0.0f;
+        }
+
+
+        int [] supported_focus_modes = characteristics.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES); // Android format
+        camera_features.supported_focus_values = convertFocusModesToValues(supported_focus_modes, camera_features.minimum_focus_distance); // convert to our format (also resorts)
+        if( camera_features.supported_focus_values != null && camera_features.supported_focus_values.contains("focus_mode_manual2") ) {
+            camera_features.supports_focus_bracketing = true;
+        }
+        /*if( camera_features.supported_focus_values != null ) {
+            // prefer continuous focus mode
+            if( camera_features.supported_focus_values.contains("focus_mode_continuous_picture") ) {
+                //initial focus is used to set the focus setting used in preview mode
+                initial_focus_mode = "focus_mode_continuous_picture";
+            }
+            else {
+                // just go with the first one
+                initial_focus_mode = camera_features.supported_focus_values.get(0);
+            }
+        }
+        else {
+            initial_focus_mode = null;
+        }*/
+        return camera_features;
+    }
+
+    private CameraCaptureSession.CaptureCallback mCaptureCallback
+            = new CameraCaptureSession.CaptureCallback() {
+
+        private void process(CaptureResult result) {
+            switch (mState) {
+                case STATE_PREVIEW: {
+                    // We have nothing to do when the camera preview is working normally.
+                    break;
+                }
+                case STATE_WAITING_LOCK: {
+                    Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
+                    if (afState == null) {
+                        takePictureBurst();
+                    } else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||
+                            CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
+                        // CONTROL_AE_STATE can be null on some devices
+                        Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                        if (aeState == null ||
+                                aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
+                            mState = STATE_PICTURE_TAKEN;
+                            takePicture();
+                        } else {
+                            runPrecaptureSequence();
+                        }
+                    }
+                    break;
+                }
+                case STATE_WAITING_PRECAPTURE: {
+                    // CONTROL_AE_STATE can be null on some devices
+                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                    if (aeState == null ||
+                            aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
+                            aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
+                        mState = STATE_WAITING_NON_PRECAPTURE;
+                    }
+                    if (aeState == null ||
+                            aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
+                        mState = STATE_PICTURE_TAKEN;
+                        takePictureBurst();
+                    }
+                    break;
+                }
+                case STATE_WAITING_NON_PRECAPTURE: {
+                    // CONTROL_AE_STATE can be null on some devices
+                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                    if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
+                        mState = STATE_PICTURE_TAKEN;
+                        takePictureBurst();
+                    }
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public void onCaptureProgressed(@NonNull CameraCaptureSession session,
+                                        @NonNull CaptureRequest request,
+                                        @NonNull CaptureResult partialResult) {
+            process(partialResult);
+        }
+
+        @Override
+        public void onCaptureCompleted(@NonNull CameraCaptureSession session,
+                                       @NonNull CaptureRequest request,
+                                       @NonNull TotalCaptureResult result) {
+            process(result);
+        }
+
+    };
 
     private final CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
@@ -227,6 +342,7 @@ public class CameraActivity extends AppCompatActivity {
             //This is called when the camera is open
             Log.e(TAG, "onOpened");
             cameraDevice = camera;
+            getCameraFeatures();
             createCameraPreview();
         }
 
@@ -289,7 +405,7 @@ public class CameraActivity extends AppCompatActivity {
                     //updatePreview();
                     cameraCaptureSessions = cameraCaptureSession;
                     try {
-                        cameraCaptureSessions.setRepeatingRequest(previewBuilder.build(), null, mBackgroundHandler);
+                        cameraCaptureSessions.setRepeatingRequest(previewBuilder.build(), mCaptureCallback, mBackgroundHandler); //capture callback was null, JS changed
                     } catch (CameraAccessException e) {
                         e.printStackTrace();
                     }
@@ -369,14 +485,26 @@ public class CameraActivity extends AppCompatActivity {
         return optimalSize;
     }
 
+    private void runPrecaptureSequence() {
+        try {
+            // This is how to tell the camera to trigger.
+            previewBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
+                    CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+            // Tell #mCaptureCallback to wait for the precapture sequence to be set.
+            mState = STATE_WAITING_PRECAPTURE;
+            cameraCaptureSessions.capture(previewBuilder.build(), mCaptureCallback,
+                    mBackgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected void takePicture() {
         if (null == cameraDevice) {
             Log.e(TAG, "cameraDevice is null");
             return;
         }
-        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
             Size[] jpegSizes = null;
             if (characteristics != null) {
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
@@ -501,9 +629,7 @@ public class CameraActivity extends AppCompatActivity {
             Log.e(TAG, "cameraDevice is null");
             return;
         }
-        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
             Size[] jpegSizes = null;
             if (characteristics != null) {
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
@@ -522,7 +648,9 @@ public class CameraActivity extends AppCompatActivity {
             Log.d("imageSurface", "imageReader surface: " + reader.getSurface().toString());
             final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(reader.getSurface());
-            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+            //captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AE_MODE_ON);
+            //captureBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CameraMetadata.CONTROL_AWB_MODE_AUTO);
+            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CameraMetadata.CONTROL_AF_MODE_OFF);
 
             // Orientation
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
@@ -533,21 +661,20 @@ public class CameraActivity extends AppCompatActivity {
             int numOfImages = 4;
             float minimumLens = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
             float maxLens = characteristics.get(CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE);
-            captureBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, 10);
-            captureRequestList.add(captureBuilder.build());
-            captureBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, 100);
-            captureRequestList.add(captureBuilder.build());
-            //Log.d("minLens", String.valueOf(minimumLens));
-            //Log.d("maxLens", String.valueOf(maxLens));
+            captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens);
+            //captureRequestList.add(captureBuilder.build());
+            captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, maxLens);
+            //captureRequestList.add(captureBuilder.build());
+            Log.d("minLens", String.valueOf(minimumLens));
+            Log.d("maxLens", String.valueOf(maxLens));
 
-/*
             for (int i = 0; i < numOfImages; i++) {
                 //captureBuilder.addTarget(reader.getSurface());
-                Log.d("lens distance", String.valueOf(minimumLens + i));
-                captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens - i*3);
+                float increment= (minimumLens-maxLens)/(numOfImages-1);
+                Log.d("lens distance", String.valueOf(minimumLens-i*increment));
+                captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens-i*increment);
                 captureRequestList.add(captureBuilder.build());
             }
-*/
 
             cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
                 @Override
@@ -555,6 +682,7 @@ public class CameraActivity extends AppCompatActivity {
                     try {
                         session.stopRepeating();
                         session.captureBurst(captureRequestList, null, mBackgroundHandler);
+                        //session.capture(captureBuilder.build(), null, mBackgroundHandler);
                         createCameraPreview();
                     } catch (CameraAccessException e) {
                         e.printStackTrace();
@@ -575,8 +703,15 @@ public class CameraActivity extends AppCompatActivity {
                     Image image = null;
                     try {
                         image = reader.acquireNextImage();
+//                        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+//                        byte[] bytes = new byte[buffer.capacity()];
+//                        buffer.get(bytes);
+                        List<byte []> single_burst_complete_images = null;
+                        boolean call_takePhotoPartial = false;
+                        boolean call_takePhotoCompleted = false;
+
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-                        byte[] bytes = new byte[buffer.capacity()];
+                        byte [] bytes = new byte[buffer.remaining()];
                         buffer.get(bytes);
                         save(bytes);
                     } catch (FileNotFoundException e) {
@@ -645,12 +780,12 @@ public class CameraActivity extends AppCompatActivity {
 
     @NeedsPermission(Manifest.permission.CAMERA)
     void openCamera() {
-        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         Log.e(TAG, "is camera open");
         try {
 
             cameraId = manager.getCameraIdList()[0]; //TO DO- add get rear facing camera
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assert map != null;
 
@@ -742,13 +877,7 @@ public class CameraActivity extends AppCompatActivity {
         if (null == cameraDevice) {
             Log.e(TAG, "updatePreview error, return");
         }
-        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        CameraCharacteristics characteristics = null;
-        try {
-            characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
+
         previewBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
         previewBuilder.set(CaptureRequest.CONTROL_AF_MODE, CameraMetadata.CONTROL_AF_MODE_OFF);
         float minimumLens = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
@@ -1062,6 +1191,95 @@ public class CameraActivity extends AppCompatActivity {
             matrix.postRotate(180, centerX, centerY);
         }
         textureView.setTransform(matrix);
+    }
+
+    private List<String> convertFocusModesToValues(int [] supported_focus_modes_arr, float minimum_focus_distance) {
+        if( supported_focus_modes_arr.length == 0 ) {
+            return null;
+        }
+        List<Integer> supported_focus_modes = new ArrayList<>();
+        for(Integer supported_focus_mode : supported_focus_modes_arr)
+            supported_focus_modes.add(supported_focus_mode);
+        List<String> output_modes = new ArrayList<>();
+        // also resort as well as converting
+        if( supported_focus_modes.contains(CaptureRequest.CONTROL_AF_MODE_AUTO) ) {
+            output_modes.add("focus_mode_auto");
+            Log.d(TAG, " supports focus_mode_auto");
+        }
+        if( supported_focus_modes.contains(CaptureRequest.CONTROL_AF_MODE_MACRO) ) {
+            output_modes.add("focus_mode_macro");
+            Log.d(TAG, " supports focus_mode_macro");
+        }
+        if( supported_focus_modes.contains(CaptureRequest.CONTROL_AF_MODE_AUTO) ) {
+            output_modes.add("focus_mode_locked");
+            Log.d(TAG, " supports focus_mode_locked");
+        }
+        if( supported_focus_modes.contains(CaptureRequest.CONTROL_AF_MODE_OFF) ) {
+            output_modes.add("focus_mode_infinity");
+            Log.d(TAG, " supports focus_mode_infinity");
+
+            if( minimum_focus_distance > 0.0f ) {
+                output_modes.add("focus_mode_manual2");
+                    Log.d(TAG, " supports focus_mode_manual2");
+            }
+        }
+        if( supported_focus_modes.contains(CaptureRequest.CONTROL_AF_MODE_EDOF) ) {
+            output_modes.add("focus_mode_edof");
+                Log.d(TAG, " supports focus_mode_edof");
+        }
+        if( supported_focus_modes.contains(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE) ) {
+            output_modes.add("focus_mode_continuous_picture");
+                Log.d(TAG, " supports focus_mode_continuous_picture");
+        }
+        if( supported_focus_modes.contains(CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO) ) {
+            output_modes.add("focus_mode_continuous_video");
+                Log.d(TAG, " supports focus_mode_continuous_video");
+        }
+        return output_modes;
+    }
+
+    public static class CameraFeatures {
+        public boolean is_zoom_supported;
+        public int max_zoom;
+        public List<Integer> zoom_ratios;
+        public boolean supports_face_detection;
+        public List<Size> picture_sizes;
+        public List<Size> video_sizes;
+        public List<Size> video_sizes_high_speed; // may be null if high speed not supported
+        public List<Size> preview_sizes;
+        public List<Integer> supported_extensions; // if non-null, list of supported camera vendor extensions, see https://developer.android.com/reference/android/hardware/camera2/CameraExtensionCharacteristics
+        public List<String> supported_flash_values;
+        public List<String> supported_focus_values;
+        public float [] apertures; // may be null if not supported, else will have at least 2 values
+        public int max_num_focus_areas;
+        public float minimum_focus_distance;
+        public boolean is_exposure_lock_supported;
+        public boolean is_white_balance_lock_supported;
+        public boolean is_optical_stabilization_supported;
+        public boolean is_video_stabilization_supported;
+        public boolean is_photo_video_recording_supported;
+        public boolean supports_white_balance_temperature;
+        public int min_temperature;
+        public int max_temperature;
+        public boolean supports_iso_range;
+        public int min_iso;
+        public int max_iso;
+        public boolean supports_exposure_time;
+        public long min_exposure_time;
+        public long max_exposure_time;
+        public int min_exposure;
+        public int max_exposure;
+        public float exposure_step;
+        public boolean can_disable_shutter_sound;
+        public int tonemap_max_curve_points;
+        public boolean supports_tonemap_curve;
+        public boolean supports_expo_bracketing; // whether setBurstTye(BURSTTYPE_EXPO) can be used
+        public int max_expo_bracketing_n_images;
+        public boolean supports_focus_bracketing; // whether setBurstTye(BURSTTYPE_FOCUS) can be used
+        public boolean supports_burst; // whether setBurstTye(BURSTTYPE_NORMAL) can be used
+        public boolean supports_raw;
+        public float view_angle_x; // horizontal angle of view in degrees (when unzoomed)
+        public float view_angle_y; // vertical angle of view in degrees (when unzoomed)
     }
 
 }
