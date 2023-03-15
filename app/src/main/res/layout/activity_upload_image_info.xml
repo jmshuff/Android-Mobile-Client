@@ -71,12 +71,19 @@
                         android:layout_marginStart="5dp"
                         android:fontFamily="@font/lato_bold"
                         android:text="@string/personal_information"
-                        android:textSize="@dimen/card_content_text_size"
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"/>
+                        android:textSize="@dimen/card_content_text_size" />
 
                 </LinearLayout>
 
+<!--                <TextView
+                    android:id="@+id/visilantId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="42dp"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/lato_bold"
+                    android:text="@string/visilant_id"
+                    android:textSize="16sp"></TextView>-->
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardview1"
@@ -242,7 +249,7 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <LinearLayout
+                <!--<LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
@@ -440,7 +447,7 @@
 
                     </LinearLayout>
 
-                </androidx.cardview.widget.CardView>
+                </androidx.cardview.widget.CardView>-->
 
 
                 <LinearLayout

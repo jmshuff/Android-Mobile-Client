@@ -20,6 +20,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
+import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
@@ -33,6 +34,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Menu;
@@ -52,6 +54,8 @@ import androidx.core.app.ActivityCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
+import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -221,13 +225,14 @@ public class CameraActivity extends AppCompatActivity {
                     }
                     if (isManualFocusSupported) {
                         Log.d("manualFocus", "true");
-                        runPrecaptureSequence();
-                        //takePictureBurst();
+                        //runPrecaptureSequence();
+                        takePictureBurst();
                         //takePicture();
                     } else {
                         Log.d("manualFocus", "false");
                         //takePicture();
-                        runPrecaptureSequence();
+                        //runPrecaptureSequence();
+                        takePictureBurst();
                     }
                 }
             });
@@ -248,6 +253,7 @@ public class CameraActivity extends AppCompatActivity {
         camera_features.supported_focus_values = convertFocusModesToValues(supported_focus_modes, camera_features.minimum_focus_distance); // convert to our format (also resorts)
         if( camera_features.supported_focus_values != null && camera_features.supported_focus_values.contains("focus_mode_manual2") ) {
             camera_features.supports_focus_bracketing = true;
+            Log.d("supportsFocusBracketing", "true");
         }
         /*if( camera_features.supported_focus_values != null ) {
             // prefer continuous focus mode
@@ -467,7 +473,7 @@ public class CameraActivity extends AppCompatActivity {
         for (Size size : sizes) {
             double ratio = (double) size.getWidth() / size.getHeight();
             if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (size.getHeight() > maxSize) {
+            if (size.getHeight() > maxSize && size.getHeight()<2000) {
                 optimalSize = size;
                 maxSize = size.getHeight();
             }
@@ -555,7 +561,7 @@ public class CameraActivity extends AppCompatActivity {
                 }
 
                 private void save(byte[] bytes) throws IOException {
-                    String DIR_NAME = "AROMA Photos";
+                    String DIR_NAME = "AROMA Photos3";
                     File direct =
                             new File(Environment
                                     .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
@@ -658,31 +664,81 @@ public class CameraActivity extends AppCompatActivity {
 
             List<CaptureRequest> captureRequestList = new ArrayList<>();
 
-            int numOfImages = 4;
-            float minimumLens = characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
+            int numOfImages = 3;
+            float minimumLens=characteristics.get(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
             float maxLens = characteristics.get(CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE);
-            captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens);
-            //captureRequestList.add(captureBuilder.build());
-            captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, maxLens);
-            //captureRequestList.add(captureBuilder.build());
             Log.d("minLens", String.valueOf(minimumLens));
             Log.d("maxLens", String.valueOf(maxLens));
 
-            for (int i = 0; i < numOfImages; i++) {
+            Range<Long> exposureRange = characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE);
+            Long minExposure=exposureRange.getLower();
+            Long maxExposure=exposureRange.getUpper();
+            Log.d("minExposure", String.valueOf(minExposure));
+            Log.d("maxExposure", String.valueOf(maxExposure));
+            Long exposureInc= (maxExposure-minExposure)/numOfImages-1;
+
+/*            for (int i = 0; i < numOfImages; i++) {
                 //captureBuilder.addTarget(reader.getSurface());
-                float increment= (minimumLens-maxLens)/(numOfImages-1);
+                float increment= (minimumLens-maxLens*2)/(numOfImages-1);
                 Log.d("lens distance", String.valueOf(minimumLens-i*increment));
                 captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, minimumLens-i*increment);
                 captureRequestList.add(captureBuilder.build());
+            }*/
+
+
+            for (int i = 0; i<numOfImages; i++){
+                captureBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, minExposure+exposureInc*i);
+                captureRequestList.add(captureBuilder.build());
             }
+
+            CameraCaptureSession.CaptureCallback burstCallback= new CameraCaptureSession.CaptureCallback() {
+                @Override
+                public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
+                    Log.d("captureComplete", "true");
+                    super.onCaptureCompleted(session, request, result);
+//                    if (!OpenCVLoader.initDebug())
+//                        Log.e("OpenCV", "Unable to load OpenCV!");
+//                    else
+//                        Log.d("OpenCV", "OpenCV loaded Successfully!");
+//
+//                    String DIR_NAME = "AROMA Photos3";
+//                    FocusStacking stack = new FocusStacking(Environment
+//                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+//                            .getAbsolutePath() + "/" + DIR_NAME + "/", String.valueOf(System.currentTimeMillis()));
+//                    stack.fill();
+//                    stack.focus_stack();
+                }
+
+                @Override
+                public void onCaptureSequenceCompleted(@NonNull CameraCaptureSession session, int sequenceId, long frameNumber) {
+                    super.onCaptureSequenceCompleted(session, sequenceId, frameNumber);
+                    Log.d("captureSequenceComplete", "true");
+                    if (!OpenCVLoader.initDebug())
+                        Log.e("OpenCV", "Unable to load OpenCV!");
+                    else
+                        Log.d("OpenCV", "OpenCV loaded Successfully!");
+
+                    String DIR_NAME = "AROMA Photos3";
+                    FocusStacking stack = new FocusStacking(Environment
+                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                            .getAbsolutePath() + "/" + DIR_NAME + "/", String.valueOf(System.currentTimeMillis()));
+                    stack.fill();
+                    stack.focus_stack();
+                }
+
+                @Override
+                public void onCaptureFailed(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull CaptureFailure failure) {
+                    super.onCaptureFailed(session, request, failure);
+                }
+
+            };
 
             cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(CameraCaptureSession session) {
                     try {
                         session.stopRepeating();
-                        session.captureBurst(captureRequestList, null, mBackgroundHandler);
-                        //session.capture(captureBuilder.build(), null, mBackgroundHandler);
+                        session.captureBurst(captureRequestList, burstCallback, mBackgroundHandler);
                         createCameraPreview();
                     } catch (CameraAccessException e) {
                         e.printStackTrace();
@@ -693,6 +749,7 @@ public class CameraActivity extends AppCompatActivity {
                 public void onConfigureFailed(CameraCaptureSession session) {
                 }
             }, mBackgroundHandler);
+
 
 
             //final File file = new File(AppConstants.IMAGE_PATH + "/pic.jpg");
@@ -726,7 +783,7 @@ public class CameraActivity extends AppCompatActivity {
                 }
 
                 private void save(byte[] bytes) throws IOException {
-                    String DIR_NAME = "AROMA Photos";
+                    String DIR_NAME = "AROMA Photos3";
                     File direct =
                             new File(Environment
                                     .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)

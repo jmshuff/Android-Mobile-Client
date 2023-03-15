@@ -680,6 +680,7 @@
     <string name="imagesQueueSize">\"Images to Upload: \"</string>
     <string name="imageUploadFailed">Image Upload Failed</string>
     <string name="imageUploadSuccess">Image Upload Success!</string>
+    <string name="visilant_id">Visilant Id: ###</string>
 
 
 </resources>
