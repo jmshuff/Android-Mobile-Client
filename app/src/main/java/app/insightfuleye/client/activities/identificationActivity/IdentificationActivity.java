@@ -505,9 +505,9 @@ public class IdentificationActivity extends AppCompatActivity {
         mAddress2.setText(patient1.getAddress2());
         mCity.setText(patient1.getCity_village());
         mPostal.setText(patient1.getPostal_code());
-        mRelationship.setText(patient1.getSdw());
-        mOccupation.setText(patient1.getOccupation());
-        eyeCampID.setText(patient1.getEyecampid());
+        //mRelationship.setText(patient1.getSdw());
+        //mOccupation.setText(patient1.getOccupation());
+        //eyeCampID.setText(patient1.getEyecampid());
         //helath_scheme...
         Log.d("Health_scheme", "Scheme: " + patient1.getHealth_scheme());
         if (patient1.getHealth_scheme() != null && !patient1.getHealth_scheme().isEmpty()) {
@@ -529,8 +529,8 @@ public class IdentificationActivity extends AppCompatActivity {
             none_checkbox.setChecked(false);
         }
 
-        if (patient1.getPatient_photo() != null && !patient1.getPatient_photo().trim().isEmpty())
-            mImageView.setImageBitmap(BitmapFactory.decodeFile(patient1.getPatient_photo()));
+        //if (patient1.getPatient_photo() != null && !patient1.getPatient_photo().trim().isEmpty())
+        //    mImageView.setImageBitmap(BitmapFactory.decodeFile(patient1.getPatient_photo()));
 
         Resources res = getResources();
         ArrayAdapter<CharSequence> countryAdapter = ArrayAdapter.createFromResource(this,
@@ -602,7 +602,7 @@ public class IdentificationActivity extends AppCompatActivity {
             // setting country according database
             mCountry.setSelection(countryAdapter.getPosition(String.valueOf(patient1.getCountry())));
 
-            if (patient1.getEducation_level().equals(getString(R.string.not_provided)))
+/*            if (patient1.getEducation_level().equals(getString(R.string.not_provided)))
                 mEducation.setSelection(0);
             else
                 mEducation.setSelection(educationAdapter != null ? educationAdapter.getPosition(patient1.getEducation_level()) : 0);
@@ -619,7 +619,7 @@ public class IdentificationActivity extends AppCompatActivity {
             if (patient1.getCaste().equals(getString(R.string.not_provided)))
                 mCaste.setSelection(0);
             else
-                mCaste.setSelection(casteAdapter.getPosition(patient1.getCaste()));
+                mCaste.setSelection(casteAdapter.getPosition(patient1.getCaste()));*/
         } else {
             mCountry.setSelection(countryAdapter.getPosition(country1));
         }
@@ -1185,11 +1185,11 @@ public class IdentificationActivity extends AppCompatActivity {
                 patient1.setCountry(idCursor.getString(idCursor.getColumnIndexOrThrow("country")));
                 patient1.setPhone_number(idCursor.getString(idCursor.getColumnIndexOrThrow("phone_number")));
                 patient1.setGender(idCursor.getString(idCursor.getColumnIndexOrThrow("gender")));
-                patient1.setSdw(idCursor.getString(idCursor.getColumnIndexOrThrow("sdw")));
-                patient1.setOccupation(idCursor.getString(idCursor.getColumnIndexOrThrow("occupation")));
-                patient1.setPatient_photo(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_photo")));
+                //patient1.setSdw(idCursor.getString(idCursor.getColumnIndexOrThrow("sdw")));
+                //patient1.setOccupation(idCursor.getString(idCursor.getColumnIndexOrThrow("occupation")));
+                //patient1.setPatient_photo(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_photo")));
                 patient1.setHealth_scheme(idCursor.getString(idCursor.getColumnIndexOrThrow("health_scheme")));
-                patient1.setEconomic_status(idCursor.getString(idCursor.getColumnIndexOrThrow("economic_status")));
+                //patient1.setEconomic_status(idCursor.getString(idCursor.getColumnIndexOrThrow("economic_status")));
                 //imagpatient1.setEyecampid(idCursor.getString(idCursor.getColumnIndexOrThrow("eyecampid")));
 
             } while (idCursor.moveToNext());
@@ -1208,13 +1208,13 @@ public class IdentificationActivity extends AppCompatActivity {
                     FirebaseCrashlytics.getInstance().recordException(e);
                 }
 
-                if (name.equalsIgnoreCase("caste")) {
-                    patient1.setCaste(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
-                }
+//                if (name.equalsIgnoreCase("caste")) {
+//                    patient1.setCaste(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
+//                }
                 if (name.equalsIgnoreCase("Telephone Number")) {
                     patient1.setPhone_number(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
-                if (name.equalsIgnoreCase("Education Level")) {
+/*                if (name.equalsIgnoreCase("Education Level")) {
                     patient1.setEducation_level(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
                 if (name.equalsIgnoreCase("Economic Status")) {
@@ -1228,7 +1228,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 }
                 if (name.equalsIgnoreCase("Son/wife/daughter")) {
                     patient1.setSdw(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
-                }
+                }*/
                 if(name.equalsIgnoreCase("Health Scheme Card")){
                     patient1.setHealth_scheme(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
@@ -1749,7 +1749,7 @@ public class IdentificationActivity extends AppCompatActivity {
         patientdto.setCityvillage(StringUtils.getValue(mCity.getText().toString()));
         patientdto.setPostalcode(StringUtils.getValue(mPostal.getText().toString()));
         patientdto.setCountry("India");
-        patientdto.setPatientPhoto(mCurrentPhotoPath);
+        //patientdto.setPatientPhoto(mCurrentPhotoPath);
         patientdto.setEconomic(String.valueOf(latitude)+ ", " + String.valueOf(longitude));
         patientdto.setStateprovince("TamilNadu");
 
@@ -2339,8 +2339,8 @@ public class IdentificationActivity extends AppCompatActivity {
         patientdto.setCity_village(StringUtils.getValue(mCity.getText().toString()));
         patientdto.setPostal_code(StringUtils.getValue(mPostal.getText().toString()));
         patientdto.setCountry(StringUtils.getValue(mCountry.getSelectedItem().toString()));
-        patientdto.setPatient_photo(mCurrentPhotoPath);
-        patientdto.setEconomic_status(String.valueOf(latitude) + ", " + String.valueOf(longitude));
+        //patientdto.setPatient_photo(mCurrentPhotoPath);
+        //patientdto.setEconomic_status(String.valueOf(latitude) + ", " + String.valueOf(longitude));
 //                patientdto.setEconomic(StringUtils.getValue(m));
         patientdto.setState_province(StringUtils.getValue(patientdto.getState_province()));
         patientAttributesDTO = new PatientAttributesDTO();

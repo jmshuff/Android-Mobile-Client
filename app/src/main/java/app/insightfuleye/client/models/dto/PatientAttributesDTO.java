@@ -12,10 +12,10 @@ public class PatientAttributesDTO {
     @SerializedName("value")
     @Expose
     private String value;
-    @SerializedName("person_attribute_type_uuid")
+    @SerializedName("patient_attribute_type_id")
     @Expose
     private String personAttributeTypeUuid;
-    @SerializedName("patientuuid")
+    @SerializedName("patient_uuid")
     @Expose
     private String patientuuid;
 

@@ -11,22 +11,22 @@ public class PatientDTO {
     @SerializedName("uuid")
     @Expose
     private String uuid;
-    @SerializedName("openmrs_id")
+    @SerializedName("visilant_id")
     @Expose
-    private String openmrsId;
-    @SerializedName("firstname")
+    private String visilantId;
+    @SerializedName("first_name")
     @Expose
     private String firstname;
-    @SerializedName("middlename")
+    @SerializedName("middle_name")
     @Expose
     private String middlename;
-    @SerializedName("lastname")
+    @SerializedName("last_name")
     @Expose
     private String lastname;
-    @SerializedName("dateofbirth")
+    @SerializedName("date_of_birth")
     @Expose
     private String dateofbirth;
-    @SerializedName("phonenumber")
+    @SerializedName("phone_number")
     @Expose
     private String phonenumber;
     @SerializedName("address2")
@@ -35,13 +35,13 @@ public class PatientDTO {
     @SerializedName("address1")
     @Expose
     private String address1;
-    @SerializedName("cityvillage")
+    @SerializedName("city_village")
     @Expose
     private String cityvillage;
-    @SerializedName("stateprovince")
+    @SerializedName("state_province")
     @Expose
     private String stateprovince;
-    @SerializedName("postalcode")
+    @SerializedName("postal_code")
     @Expose
     private String postalcode;
     @SerializedName("country")
@@ -56,18 +56,13 @@ public class PatientDTO {
     @SerializedName("gender")
     @Expose
     private String gender;
-    @SerializedName("eyecampid")
+    @SerializedName("abha_number")
     @Expose
-    private String eyecampid;
+    private String abhaNumber;
 
-
-
-    private String patientPhoto;
 
     private List<PatientAttributesDTO> patientAttributesDTOList;
-    @SerializedName("dead")
-    @Expose
-    private Integer dead;
+
     @SerializedName("syncd")
     @Expose
     private Boolean syncd;
@@ -80,12 +75,12 @@ public class PatientDTO {
         this.uuid = uuid;
     }
 
-    public String getOpenmrsId() {
-        return openmrsId;
+    public String getVisilantId() {
+        return visilantId;
     }
 
-    public void setOpenmrsId(String openmrsId) {
-        this.openmrsId = openmrsId;
+    public void setVisilantId(String openmrsId) {
+        this.visilantId = openmrsId;
     }
 
     public String getFirstname() {
@@ -184,13 +179,6 @@ public class PatientDTO {
         this.gender = gender;
     }
 
-    public Integer getDead() {
-        return dead;
-    }
-
-    public void setDead(Integer dead) {
-        this.dead = dead;
-    }
 
     public Boolean getSyncd() {
         return syncd;
@@ -216,13 +204,6 @@ public class PatientDTO {
         this.economic = economic;
     }
 
-    public String getEyecampid() {
-        return eyecampid;
-    }
-
-    public void setEyecampid(String eyecampid) {
-        this.eyecampid = eyecampid;
-    }
 
 
     public List<PatientAttributesDTO> getPatientAttributesDTOList() {
@@ -234,11 +215,11 @@ public class PatientDTO {
         this.patientAttributesDTOList = patientAttributesDTOList;
     }
 
-    public String getPatientPhoto() {
-        return patientPhoto;
+    public String getAbhaNumber() {
+        return abhaNumber;
     }
 
-    public void setPatientPhoto(String patientPhoto) {
-        this.patientPhoto = patientPhoto;
+    public void setAbhaNumber(String abhaNumber) {
+        this.abhaNumber = abhaNumber;
     }
 }

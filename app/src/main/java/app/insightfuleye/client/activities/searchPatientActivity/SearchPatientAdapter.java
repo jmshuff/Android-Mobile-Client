@@ -40,7 +40,7 @@ public class SearchPatientAdapter extends RecyclerView.Adapter<SearchPatientAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SearchPatientAdapter.Myholder holder, int position) {
+    public void onBindViewHolder(@NonNull Myholder holder, int position) {
         final PatientDTO patinet = patients.get(position);
         if (patinet != null) {
             //int age = DateAndTimeUtils.getAge(patinet.getDateofbirth(),context);
@@ -49,9 +49,9 @@ public class SearchPatientAdapter extends RecyclerView.Adapter<SearchPatientAdap
             //String dob = DateAndTimeUtils.SimpleDatetoLongDate(patinet.getDateofbirth());
             String body = context.getString(R.string.identification_screen_prompt_age) + "" + age;
 
-            if(patinet.getOpenmrsId() != null)
+            if(patinet.getVisilantId() != null)
                 holder.headTextView.setText(patinet.getFirstname() + " " + patinet.getLastname()
-                    + ", " + patinet.getOpenmrsId());
+                    + ", " + patinet.getVisilantId());
             else
                 holder.headTextView.setText(patinet.getFirstname() + " " + patinet.getLastname());
 

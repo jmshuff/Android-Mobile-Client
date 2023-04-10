@@ -4,7 +4,7 @@ import android.util.Log;
 
 public class Patient {
     private String uuid;
-    private String openmrs_id;
+    private String visilant_id;
     private String first_name;
     private String middle_name;
     private String last_name;
@@ -17,15 +17,8 @@ public class Patient {
     private String postal_code;
     private String country; // ISO 3166-1 alpha-2
     private String gender;
-    private String patient_photo;
-    private String sdw;
-    private String occupation;
-    private String economic_status;
-    private String education_level;
-    private String caste;
-    private String emergency;
     private String health_scheme;
-    private String eyecampid;
+    private String abha_number;
 
     public String getUuid() {
         return uuid;
@@ -35,12 +28,12 @@ public class Patient {
         this.uuid = uuid;
     }
 
-    public String getOpenmrs_id() {
-        return openmrs_id;
+    public String getVisilant_id() {
+        return visilant_id;
     }
 
-    public void setOpenmrs_id(String openmrs_id) {
-        this.openmrs_id = openmrs_id;
+    public void setVisilant_id(String openmrs_id) {
+        this.visilant_id = visilant_id;
     }
 
     public String getFirst_name() {
@@ -139,75 +132,18 @@ public class Patient {
         this.gender = gender;
     }
 
-    public String getPatient_photo() {
-        return patient_photo;
-    }
-
-    public void setPatient_photo(String patient_photo) {
-        this.patient_photo = patient_photo;
-    }
-
-    public String getSdw() {
-        return sdw;
-    }
-
-    public void setSdw(String sdw) {
-        this.sdw = sdw;
-    }
-
-    public String getOccupation() {
-        return occupation;
-    }
-
-    public void setOccupation(String occupation) {
-        this.occupation = occupation;
-    }
-
-    public String getEconomic_status() {
-        return economic_status;
-    }
-
-    public void setEconomic_status(String economic_status) {
-        this.economic_status = economic_status;
-        Log.i("GPS", "GPS Status set");
-    }
-
-    public String getEducation_level() {
-        return education_level;
-    }
-
-    public void setEducation_level(String education_level) {
-        this.education_level = education_level;
-    }
-
-    public String getCaste() {
-        return caste;
-    }
-
-    public void setCaste(String caste) {
-        this.caste = caste;
-    }
-
-    public String getEyecampid() {
-        return eyecampid;
-    }
-
-    public void setEyecampid(String eyecampid) {
-        this.eyecampid = eyecampid;
-    }
-
-    public String getEmergency() {
-        return emergency;
-    }
-
-    public void setEmergency(String emergency) {
-        this.emergency = emergency;
-    }
-
     public String getHealth_scheme() {
         return health_scheme;
     }
     public void setHealth_scheme(String health_scheme) {
         this.health_scheme = health_scheme;
+    }
+
+    public String getAbha_number() {
+        return abha_number;
+    }
+
+    public void setAbha_number(String abha_number) {
+        this.abha_number = abha_number;
     }
 }

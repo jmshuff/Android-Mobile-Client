@@ -1,14 +1,14 @@
 package app.insightfuleye.client.networkApiCalls;
 
 
+import android.location.Location;
+
 import app.insightfuleye.client.models.CheckAppUpdateRes;
 import app.insightfuleye.client.models.DownloadMindMapRes;
-import app.insightfuleye.client.models.Location;
 import app.insightfuleye.client.models.ObsImageModel.ObsJsonResponse;
 import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
 import app.insightfuleye.client.models.Results;
 import app.insightfuleye.client.models.dto.ResponseDTO;
-import app.insightfuleye.client.models.loginModel.LoginModel;
 import app.insightfuleye.client.models.loginProviderModel.LoginProviderModel;
 import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
 import app.insightfuleye.client.models.pushRequestApiCall.PushRequestApiCall;
@@ -32,8 +32,6 @@ import retrofit2.http.Url;
 public interface ApiInterface {
 
 
-    @GET("location?tag=Login%20Location")
-    Observable<Results<Location>> LOCATION_OBSERVABLE(@Query("v") String representation);
 
 
     @DELETE
@@ -45,9 +43,7 @@ public interface ApiInterface {
     Call<ResponseDTO> RESPONSE_DTO_CALL(@Url String url,
                                         @Header("Authorization") String authHeader);
 
-    @GET
-    Observable<LoginModel> LOGIN_MODEL_OBSERVABLE(@Url String url,
-                                                  @Header("Authorization") String authHeader);
+
 
     @GET
     Observable<LoginProviderModel> LOGIN_PROVIDER_MODEL_OBSERVABLE(@Url String url,

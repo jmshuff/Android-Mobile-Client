@@ -14,18 +14,30 @@ public class Person {
     @SerializedName("gender")
     @Expose
     private String gender;
-    @SerializedName("names")
+    @SerializedName("first_name")
     @Expose
-    private List<Name> names = null;
+    private String firstName = null;
+    @SerializedName("last_name")
+    @Expose
+    private String lastName=null;
     @SerializedName("birthdate")
     @Expose
     private String birthdate;
+    @SerializedName("person_type_id")
+    @Expose
+    private String personTypeId;
+    @SerializedName("location_id")
+    @Expose
+    private String locationId;
+
     @SerializedName("attributes")
     @Expose
     private List<Attribute> attributes = null;
     @SerializedName("addresses")
     @Expose
     private List<Address> addresses = null;
+    @Expose
+    private List<Name> names=null;
 
     public String getUuid() {
         return uuid;
@@ -43,12 +55,20 @@ public class Person {
         this.gender = gender;
     }
 
-    public List<Name> getNames() {
-        return names;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setNames(List<Name> names) {
-        this.names = names;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getBirthdate() {
@@ -59,6 +79,23 @@ public class Person {
         this.birthdate = birthdate;
     }
 
+    public String getPersonTypeId() {
+        return personTypeId;
+    }
+
+    public void setPersonTypeId(String personTypeId) {
+        this.personTypeId = personTypeId;
+    }
+
+    public String getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
+    }
+
+    //JS need to edit
     public List<Attribute> getAttributes() {
         return attributes;
     }
@@ -75,4 +112,11 @@ public class Person {
         this.addresses = addresses;
     }
 
+    public List<Name> getNames() {
+        return names;
+    }
+
+    public void setNames(List<Name> names) {
+        this.names = names;
+    }
 }

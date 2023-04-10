@@ -55,7 +55,7 @@ public class SyncDAO {
         LocationDAO locationDAO = new LocationDAO();
         ProviderDAO providerDAO = new ProviderDAO();
         VisitAttributeListDAO visitAttributeListDAO = new VisitAttributeListDAO();
-        ProviderAttributeLIstDAO providerAttributeLIstDAO = new ProviderAttributeLIstDAO();
+        //ProviderAttributeLIstDAO providerAttributeLIstDAO = new ProviderAttributeLIstDAO();
         try {
             Logger.logD(TAG, "pull sync started");
 
@@ -65,10 +65,10 @@ public class SyncDAO {
             visitsDAO.insertVisit(responseDTO.getData().getVisitDTO());
             encounterDAO.insertEncounter(responseDTO.getData().getEncounterDTO());
             obsDAO.insertObsTemp(responseDTO.getData().getObsDTO());
-            locationDAO.insertLocations(responseDTO.getData().getLocationDTO());
+            //locationDAO.insertLocations(responseDTO.getData().getLocationDTO());
             providerDAO.insertProviders(responseDTO.getData().getProviderlist());
-            providerAttributeLIstDAO.insertProvidersAttributeList
-                    (responseDTO.getData().getProviderAttributeList());
+            //providerAttributeLIstDAO.insertProvidersAttributeList
+            //        (responseDTO.getData().getProviderAttributeList());
             visitAttributeListDAO.insertProvidersAttributeList(responseDTO.getData().getVisitAttributeList());
 //            visitsDAO.insertVisitAttribToDB(responseDTO.getData().getVisitAttributeList())
 
@@ -362,7 +362,7 @@ public class SyncDAO {
                             Logger.logD(TAG, "success" + pushResponseApiCall);
                             for (int i = 0; i < pushResponseApiCall.getData().getPatientlist().size(); i++) {
                                 try {
-                                    patientsDAO.updateOpemmrsId(pushResponseApiCall.getData().getPatientlist().get(i).getOpenmrsId(), pushResponseApiCall.getData().getPatientlist().get(i).getSyncd().toString(), pushResponseApiCall.getData().getPatientlist().get(i).getUuid());
+                                    patientsDAO.updateVisilantLd(pushResponseApiCall.getData().getPatientlist().get(i).getOpenmrsId(), pushResponseApiCall.getData().getPatientlist().get(i).getSyncd().toString(), pushResponseApiCall.getData().getPatientlist().get(i).getUuid());
                                     Log.d("SYNC", "ProvUUDI" + pushResponseApiCall.getData().getPatientlist().get(i).getUuid());
                                 } catch (DAOException e) {
                                     FirebaseCrashlytics.getInstance().recordException(e);

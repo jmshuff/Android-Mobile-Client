@@ -1,5 +1,6 @@
 package app.insightfuleye.client.activities.loginActivity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -38,11 +39,16 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
 import app.insightfuleye.client.R;
+import app.insightfuleye.client.activities.setupActivity.SetupActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
-import app.insightfuleye.client.models.loginModel.LoginModel;
+import app.insightfuleye.client.models.loginModel.PostSignIn;
+import app.insightfuleye.client.models.loginModel.Signin;
 import app.insightfuleye.client.models.loginProviderModel.LoginProviderModel;
+import app.insightfuleye.client.networkApiCalls.Api;
+import app.insightfuleye.client.networkApiCalls.ApiClient;
 import app.insightfuleye.client.utilities.Base64Utils;
+import app.insightfuleye.client.utilities.DialogUtils;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.OfflineLogin;
 import app.insightfuleye.client.utilities.SessionManager;
@@ -55,6 +61,7 @@ import app.insightfuleye.client.utilities.NetworkConnection;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -281,139 +288,90 @@ public class LoginActivity extends AppCompatActivity {
      * Depending on server's response, user may or may not have successful login.
      * This class also uses SharedPreferences to store session ID
      */
-    public void UserLoginTask(String mEmail, String mPassword) {
+    public void UserLoginTask(String USERNAME, String PASSWORD) {
 
-        String urlString = urlModifiers.loginUrl(sessionManager.getServerUrl());
-        Logger.logD(TAG, "username and password" + mEmail + mPassword);
-        encoded = base64Utils.encoded(mEmail, mPassword);
-        sessionManager.setEncoded(encoded);
-        cpd.show();
+        ProgressDialog progress;
+        Logger.logD(TAG, "username and password" + USERNAME + PASSWORD);
+        progress = new ProgressDialog(LoginActivity.this, R.style.AlertDialogStyle);
+        ;//SetupActivity.this);
+        progress.setTitle(getString(R.string.please_wait_progress));
+        progress.setMessage(getString(R.string.logging_in));
+        progress.show();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        Observable<LoginModel> loginModelObservable = AppConstants.apiInterface.LOGIN_MODEL_OBSERVABLE(urlString, "Basic " + encoded);
-        loginModelObservable.subscribe(new Observer<LoginModel>() {
+        Api api = ApiClient.createService(Api.class);
+        PostSignIn postSignIn=new PostSignIn(USERNAME, PASSWORD);
+        Observable<Signin> loginModelObservable = api.signIn(postSignIn);
+        loginModelObservable.subscribe(new Observer<Signin>() {
             @Override
             public void onSubscribe(Disposable d) {
 
             }
-
             @Override
-            public void onNext(LoginModel loginModel) {
-                int responsCode = loginModel.hashCode();
-                Boolean authencated = loginModel.getAuthenticated();
-                Gson gson = new Gson();
-                Logger.logD(TAG, "success" + gson.toJson(loginModel));
-                sessionManager.setChwname(loginModel.getUser().getDisplay());
-                sessionManager.setCreatorID(loginModel.getUser().getUuid());
-                Log.d("SESSOO","SESSOO_creator: "+loginModel.getUser().getUuid());
-                sessionManager.setSessionID(loginModel.getSessionId());
-                Log.d("SESSOO","SESSOO: "+sessionManager.getSessionID());
-                sessionManager.setProviderID(loginModel.getUser().getPerson().getUuid());
-                Log.d("SESSOO","SESSOO_PROVIDER: "+loginModel.getUser().getPerson().getUuid());
-                Log.d("SESSOO","SESSOO_PROVIDER_session: "+sessionManager.getProviderID());
+            public void onNext(@NonNull Signin signin) {
+                Boolean authencated = signin.getSuccess();
+                if(authencated){
+                    sessionManager.setChwname(signin.getData().getUser().getUsername());
+                    sessionManager.setCreatorID(signin.getData().getUser().getId());
+                    sessionManager.setProviderID(signin.getData().getUser().getPersonId());
+                    SQLiteDatabase sqLiteDatabase = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+                    Log.d("authToken", signin.getData().getToken());
+                    //SQLiteDatabase read_db = AppConstants.inteleHealthDatabaseHelper.getReadableDatabase();
 
-                UrlModifiers urlModifiers = new UrlModifiers();
-                String url = urlModifiers.loginUrlProvider(sessionManager.getServerUrl(), loginModel.getUser().getUuid());
-                if (authencated) {
-                    Observable<LoginProviderModel> loginProviderModelObservable = AppConstants.apiInterface.LOGIN_PROVIDER_MODEL_OBSERVABLE(url, "Basic " + encoded);
-                    loginProviderModelObservable
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new DisposableObserver<LoginProviderModel>() {
-                                @Override
-                                public void onNext(LoginProviderModel loginProviderModel) {
-                                    if (loginProviderModel.getResults().size() != 0) {
-                                        for (int i = 0; i < loginProviderModel.getResults().size(); i++) {
-                                            Log.i(TAG, "doInBackground: " + loginProviderModel.getResults().get(i).getUuid());
-                                            sessionManager.setProviderID(loginProviderModel.getResults().get(i).getUuid());
+                    sqLiteDatabase.beginTransaction();
+                    //read_db.beginTransaction();
+                    ContentValues values = new ContentValues();
 
-                                            provider_url_uuid = loginProviderModel.getResults().get(i).getUuid();
-//                                                success = true;
-                                          /*  final Account account = new Account(mEmail, "io.intelehealth.openmrs");
-                                            manager.addAccountExplicitly(account, mPassword, null);
-                                            Log.d("MANAGER", "MANAGER " + account);*/
-                                            //offlineLogin.invalidateLoginCredentials();
+                    String random_salt = getSalt_DATA();
+
+                    //String random_salt = stringEncryption.getRandomSaltString();
+                    Log.d("salt", "salt: " + random_salt);
+                    //Salt_Getter_Setter salt_getter_setter = new Salt_Getter_Setter();
+                    //salt_getter_setter.setSalt(random`_salt);
 
 
+                    String hash_password = null;
+                    try {
+                        //hash_email = StringEncryption.convertToSHA256(random_salt + mEmail);
+                        hash_password = StringEncryption.convertToSHA256(random_salt + PASSWORD);
+                    } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    }
 
+                    try {
+                        values.put("username", USERNAME);
+                        values.put("password", hash_password);
+                        values.put("creator_uuid_cred", sessionManager.getCreatorID());
+                        values.put("chwname", signin.getData().getUser().getUsername());
+                        values.put("provider_uuid_cred", sessionManager.getProviderID());
+                        createdRecordsCount = sqLiteDatabase.insertWithOnConflict("tbl_user_credentials", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                        sqLiteDatabase.setTransactionSuccessful();
 
-                                        }
-                                    }
-                                    SQLiteDatabase sqLiteDatabase = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-                                    //SQLiteDatabase read_db = AppConstants.inteleHealthDatabaseHelper.getReadableDatabase();
+                        Logger.logD("values", "values" + values);
+                        Logger.logD("created user credentials", "create user records" + createdRecordsCount);
+                    } catch (SQLException e) {
+                        Log.d("SQL", "SQL user credentials: " + e);
+                    } finally {
+                        sqLiteDatabase.endTransaction();
+                    }
 
-                                    sqLiteDatabase.beginTransaction();
-                                    //read_db.beginTransaction();
-                                    ContentValues values = new ContentValues();
-
-                                    //StringEncryption stringEncryption = new StringEncryption();
-                                    String random_salt = getSalt_DATA();
-
-                                    //String random_salt = stringEncryption.getRandomSaltString();
-                                    Log.d("salt", "salt: " + random_salt);
-                                    //Salt_Getter_Setter salt_getter_setter = new Salt_Getter_Setter();
-                                    //salt_getter_setter.setSalt(random`_salt);
-
-
-                                    String hash_password = null;
-                                    try {
-                                        //hash_email = StringEncryption.convertToSHA256(random_salt + mEmail);
-                                        hash_password = StringEncryption.convertToSHA256(random_salt + mPassword);
-                                    } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-                                        FirebaseCrashlytics.getInstance().recordException(e);
-                                    }
-
-                                    try {
-                                        values.put("username", mEmail);
-                                        values.put("password", hash_password);
-                                        values.put("creator_uuid_cred", loginModel.getUser().getUuid());
-                                        values.put("chwname",loginModel.getUser().getDisplay());
-                                        values.put("provider_uuid_cred", sessionManager.getProviderID());
-                                        createdRecordsCount = sqLiteDatabase.insertWithOnConflict("tbl_user_credentials", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-                                        sqLiteDatabase.setTransactionSuccessful();
-
-                                        Logger.logD("values", "values" + values);
-                                        Logger.logD("created user credentials", "create user records" + createdRecordsCount);
-                                    } catch (SQLException e) {
-                                        Log.d("SQL", "SQL user credentials: " + e);
-                                    } finally {
-                                        sqLiteDatabase.endTransaction();
-                                    }
-
-
-                                    // offlineLogin.setUpOfflineLogin(mEmail, mPassword);
-                                    cpd.dismiss();
-                                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                                    intent.putExtra("login", true);
-//                startJobDispatcherService(LoginActivity.this);
-                                    startActivity(intent);
-                                    finish();
-                                  //  showProgress(false);
-
-                                    sessionManager.setReturningUser(true);
-                                    sessionManager.setLogout(false);
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    Logger.logD(TAG, "handle provider error" + e.getMessage());
-                                    cpd.dismiss();
-                                }
-
-                                @Override
-                                public void onComplete() {
-
-                                }
-                            });
+                    Log.i(TAG, "onPostExecute: Parse init");
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    intent.putExtra("setup", true);
+                    startActivity(intent);
+                    finish();
+                    progress.dismiss();
                 }
             }
 
             @Override
             public void onError(Throwable e) {
                 Logger.logD(TAG, "Login Failure" + e.getMessage());
-                cpd.dismiss();
-                Toast.makeText(LoginActivity.this, getString(R.string.error_incorrect_password), Toast.LENGTH_SHORT).show();
-
+                progress.dismiss();
+                DialogUtils dialogUtils = new DialogUtils();
+                dialogUtils.showerrorDialog(LoginActivity.this, "Error Login", getString(R.string.error_incorrect_password), "ok");
+                mUsernameView.requestFocus();
+                mPasswordView.requestFocus();
             }
 
             @Override
@@ -421,6 +379,7 @@ public class LoginActivity extends AppCompatActivity {
                 Logger.logD(TAG, "completed");
             }
         });
+
 
     }
 

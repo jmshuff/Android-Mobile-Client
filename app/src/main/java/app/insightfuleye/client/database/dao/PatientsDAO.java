@@ -1,5 +1,6 @@
 package app.insightfuleye.client.database.dao;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -55,11 +56,12 @@ public class PatientsDAO {
         ContentValues values = new ContentValues();
         try {
             values.put("uuid", patient.getUuid());
-            values.put("openmrs_id", patient.getOpenmrsId());
+            values.put("visilant_id", patient.getVisilantId());
             values.put("first_name", patient.getFirstname());
             values.put("middle_name", patient.getMiddlename());
             values.put("last_name", patient.getLastname());
             values.put("address1", patient.getAddress1());
+            values.put("address2", patient.getAddress2());
             values.put("country", patient.getCountry());
             values.put("date_of_birth", DateAndTimeUtils.formatDateFromOnetoAnother(patient.getDateofbirth(), "MMM dd, yyyy hh:mm:ss a", "yyyy-MM-dd"));
             values.put("gender", patient.getGender());
@@ -67,8 +69,8 @@ public class PatientsDAO {
             values.put("state_province", patient.getStateprovince());
             values.put("city_village", patient.getCityvillage());
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("dead", patient.getDead());
             values.put("sync", patient.getSyncd());
+            values.put("abha_number", patient.getAbhaNumber());
             createdRecordsCount = db.insertWithOnConflict("tbl_patient", null, values, SQLiteDatabase.CONFLICT_REPLACE);
         } catch (SQLException e) {
             isCreated = false;
@@ -90,7 +92,7 @@ public class PatientsDAO {
 
             Logger.logD("create", "create has to happen");
             values.put("uuid", uuid);
-            values.put("openmrs_id", patientDTO.getOpenmrsId());
+            values.put("visilant_id", patientDTO.getVisilantId());
             values.put("first_name", patientDTO.getFirstname());
             values.put("middle_name", patientDTO.getMiddlename());
             values.put("last_name", patientDTO.getLastname());
@@ -104,8 +106,7 @@ public class PatientsDAO {
             values.put("city_village", patientDTO.getCityvillage());
             values.put("state_province", patientDTO.getStateprovince());
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("patient_photo", patientDTO.getPatientPhoto());
-            values.put("dead", patientDTO.getDead());
+            values.put("abha_number", patientDTO.getAbhaNumber());
             values.put("sync", false);
             patientAttributesList = patientDTO.getPatientAttributesDTOList();
             if (patientAttributesList != null)
@@ -137,7 +138,7 @@ public class PatientsDAO {
 
             Logger.logD("create", "create has to happen");
             values.put("uuid", uuid);
-            values.put("openmrs_id", patientDTO.getOpenmrs_id());
+            values.put("visilant_id", patientDTO.getVisilant_id());
             values.put("first_name", patientDTO.getFirst_name());
             values.put("middle_name", patientDTO.getMiddle_name());
             values.put("last_name", patientDTO.getLast_name());
@@ -151,10 +152,8 @@ public class PatientsDAO {
             values.put("city_village", patientDTO.getCity_village());
             values.put("state_province", patientDTO.getState_province());
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
-            values.put("patient_photo", patientDTO.getPatient_photo());
-            values.put("dead", false);
             values.put("sync", false);
-
+            values.put("abha_number", patientDTO.getAbha_number());
             insertPatientAttributes(patientAttributesDTOS, db);
             Logger.logD("pulldata", "datadumper" + values);
             createdRecordsCount1 = db.update("tbl_patient", values, whereclause, new String[]{uuid});
@@ -195,6 +194,7 @@ public class PatientsDAO {
         return isInserted;
     }
 
+    @SuppressLint("Range")
     public List<Attribute> getPatientAttributes(String patientuuid) throws DAOException {
         List<Attribute> patientAttributesList = new ArrayList<>();
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
@@ -206,7 +206,7 @@ public class PatientsDAO {
             if (cursor.moveToFirst()) {
                 while (!cursor.isAfterLast()) {
                     attribute = new Attribute();
-                    attribute.setAttributeType(cursor.getString(cursor.getColumnIndex("person_attribute_type_uuid")));
+                    attribute.setAttributeType(cursor.getString(cursor.getColumnIndex("patient_attribute_type_uuid")));
                     attribute.setValue(cursor.getString(cursor.getColumnIndex("value")));
                     patientAttributesList.add(attribute);
                     cursor.moveToNext();
@@ -223,6 +223,7 @@ public class PatientsDAO {
         return patientAttributesList;
     }
 
+    @SuppressLint("Range")
     public String getAttributesName(String attributeuuid) throws DAOException {
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         db.beginTransaction();
@@ -326,16 +327,16 @@ public class PatientsDAO {
         }
     }
 
-    public boolean updateOpemmrsId(String openmrsId, String synced, String uuid) throws DAOException {
+    public boolean updateVisilantLd(String visilantId, String synced, String uuid) throws DAOException {
         boolean isUpdated = true;
-        Logger.logD("patinetdao", "updateopenmrs " + uuid + openmrsId + synced);
+        Logger.logD("patinetdao", "updateVisilant " + uuid + visilantId + synced);
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         db.beginTransaction();
         ContentValues values = new ContentValues();
         String whereclause = "uuid=?";
         String[] whereargs = {uuid};
         try {
-            values.put("openmrs_id", openmrsId);
+            values.put("visilant_id", visilantId);
             values.put("sync", synced);
             values.put("uuid", uuid);
             int i = db.update("tbl_patient", values, whereclause, whereargs);
@@ -366,7 +367,7 @@ public class PatientsDAO {
                 while (idCursor.moveToNext()) {
                     patientDTO = new PatientDTO();
                     patientDTO.setUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("uuid")));
-                    patientDTO.setOpenmrsId(idCursor.getString(idCursor.getColumnIndexOrThrow("openmrs_id")));
+                    patientDTO.setVisilantId(idCursor.getString(idCursor.getColumnIndexOrThrow("visilant_id")));
                     patientDTO.setFirstname(idCursor.getString(idCursor.getColumnIndexOrThrow("first_name")));
                     patientDTO.setLastname(idCursor.getString(idCursor.getColumnIndexOrThrow("last_name")));
                     patientDTO.setMiddlename(idCursor.getString(idCursor.getColumnIndexOrThrow("middle_name")));
@@ -379,6 +380,7 @@ public class PatientsDAO {
                     patientDTO.setAddress1(idCursor.getString(idCursor.getColumnIndexOrThrow("address1")));
                     patientDTO.setAddress2(idCursor.getString(idCursor.getColumnIndexOrThrow("address2")));
                     patientDTO.setPostalcode(idCursor.getString(idCursor.getColumnIndexOrThrow("postal_code")));
+                    patientDTO.setAbhaNumber(idCursor.getString(idCursor.getColumnIndexOrThrow("abha_number")));
                     patientDTOList.add(patientDTO);
                 }
             }
@@ -423,15 +425,15 @@ public class PatientsDAO {
         return isUpdated;
     }
 
-    public String getOpenmrsId(String patientuuid) throws DAOException {
+    public String getVisilantId(String patientuuid) throws DAOException {
         String id = "";
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         db.beginTransaction();
         try {
-            Cursor cursor = db.rawQuery("SELECT openmrs_id FROM tbl_patient where uuid = ? COLLATE NOCASE", new String[]{patientuuid});
+            Cursor cursor = db.rawQuery("SELECT visilant_id FROM tbl_patient where uuid = ? COLLATE NOCASE", new String[]{patientuuid});
             if (cursor.getCount() != 0) {
                 while (cursor.moveToNext()) {
-                    id = cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id"));
+                    id = cursor.getString(cursor.getColumnIndexOrThrow("visilant_id"));
                 }
             }
             cursor.close();

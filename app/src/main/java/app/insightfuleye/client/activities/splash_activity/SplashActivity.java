@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Locale;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.IntroActivity.IntroActivity;
 import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.activities.loginActivity.LoginActivity;
+import app.insightfuleye.client.activities.setupActivity.SetupActivity;
 import app.insightfuleye.client.dataMigration.SmoothUpgrade;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.SessionManager;
@@ -38,7 +38,7 @@ public class SplashActivity extends AppCompatActivity {
 
        // startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
         String appLanguage = sessionManager.getAppLanguage();
-
+        sessionManager.setNewSession(true);
 
         if (!appLanguage.equalsIgnoreCase("")) {
             Locale locale = new Locale(appLanguage);
@@ -131,7 +131,7 @@ public class SplashActivity extends AppCompatActivity {
 
         } else {
             Logger.logD(LOG_TAG, "Starting setup");
-            Intent intent = new Intent(this, IntroActivity.class);
+            Intent intent = new Intent(this, SetupActivity.class);
             startActivity(intent);
             finish();
         }

@@ -1,20 +1,9 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public License,
- * v. 2.0. If a copy of the MPL was not distributed with this file, You can
- * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
- * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- *
- * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
- * graphic logo is a trademark of OpenMRS Inc.
- */
-package app.insightfuleye.client.models;
+package app.insightfuleye.client.models.loginModel;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
-public class Results<T> implements Serializable {
+public class Signin {
     @SerializedName("success")
     @Expose
     private Boolean success;
@@ -26,23 +15,21 @@ public class Results<T> implements Serializable {
     private String date;
     @SerializedName("data")
     @Expose
-    private app.insightfuleye.client.models.Data data;
+    private Data data;
 
     /**
      * No args constructor for use in serialization
-     *
      */
-    public Results() {
+    public Signin() {
     }
 
     /**
-     *
      * @param date
      * @param data
      * @param success
      * @param version
      */
-    public Results(Boolean success, String version, String date, app.insightfuleye.client.models.Data data) {
+    public Signin(Boolean success, String version, String date, Data data) {
         super();
         this.success = success;
         this.version = version;
@@ -74,11 +61,11 @@ public class Results<T> implements Serializable {
         this.date = date;
     }
 
-    public app.insightfuleye.client.models.Data getData() {
+    public Data getData() {
         return data;
     }
 
-    public void setLocation(Data data) {
+    public void setData(Data data) {
         this.data = data;
     }
 }

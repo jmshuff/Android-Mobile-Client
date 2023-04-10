@@ -13,6 +13,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
@@ -51,7 +52,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -67,9 +70,11 @@ import app.insightfuleye.client.activities.todayPatientActivity.TodayPatientActi
 import app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.database.dao.LocationDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.models.CheckAppUpdateRes;
 import app.insightfuleye.client.models.DownloadMindMapRes;
+import app.insightfuleye.client.models.dto.LocationDTO;
 import app.insightfuleye.client.networkApiCalls.ApiClient;
 import app.insightfuleye.client.networkApiCalls.ApiInterface;
 import app.insightfuleye.client.syncModule.SyncUtils;
@@ -80,6 +85,7 @@ import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.OfflineLogin;
 import app.insightfuleye.client.utilities.SessionManager;
+import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.widget.materialprogressbar.CustomProgressDialog;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -127,6 +133,7 @@ public class HomeActivity extends AppCompatActivity {
             activeVisits_textview, videoLibrary_textview, help_textview, uploadImage_textView;
     private AppUpdateManager mAppUpdateManager;
     private static final int RC_APP_UPDATE = 11;
+    List<LocationDTO> locationDTOList= null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +145,6 @@ public class HomeActivity extends AppCompatActivity {
         toolbar.setTitleTextAppearance(this, R.style.ToolbarTheme);
         toolbar.setTitleTextColor(Color.WHITE);
 
-       
 
         String language = sessionManager.getAppLanguage();
         if (!language.equalsIgnoreCase("")) {
@@ -171,13 +177,13 @@ public class HomeActivity extends AppCompatActivity {
         c5 = findViewById(R.id.cardview_video_libraby);
         c6 = findViewById(R.id.cardview_help_whatsapp);
         c7 = findViewById(R.id.cardview_upload_image);
-        settings_card=findViewById(R.id.settings_card);
-        updateProtocols_card=findViewById(R.id.updateProtocols_card);
-        logout_card=findViewById(R.id.logout_card);
-        versionText=findViewById(R.id.versionCode);
+        settings_card = findViewById(R.id.settings_card);
+        updateProtocols_card = findViewById(R.id.updateProtocols_card);
+        logout_card = findViewById(R.id.logout_card);
+        versionText = findViewById(R.id.versionCode);
         versionText.setText("Version: " + BuildConfig.VERSION_NAME);
 
-        volunteerText=findViewById(R.id.volunteerName);
+        volunteerText = findViewById(R.id.volunteerName);
         volunteerText.setText("Hello, " + sessionManager.getChwname().substring(0, 1).toUpperCase() + sessionManager.getChwname().substring(1) + "!");
 
         c4.setVisibility(View.GONE);
@@ -200,11 +206,44 @@ public class HomeActivity extends AppCompatActivity {
         videoLibrary_textview.setText(R.string.video_library);
 
 
-
         help_textview = findViewById(R.id.help_textview);
         help_textview.setText(R.string.Whatsapp_Help_Cardview);
-        PatientsDAO patientsDAO= new PatientsDAO();
+        PatientsDAO patientsDAO = new PatientsDAO();
         patientsDAO.getAllAttribute();
+
+        if (sessionManager.isNewSession()) {
+            //check for updates
+            mAppUpdateManager = AppUpdateManagerFactory.create(this);
+
+            mAppUpdateManager.registerListener(installStateUpdatedListener);
+
+            mAppUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
+
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                        && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/)) {
+
+                    try {
+                        mAppUpdateManager.startUpdateFlowForResult(
+                                appUpdateInfo, AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/, HomeActivity.this, RC_APP_UPDATE);
+
+                    } catch (IntentSender.SendIntentException e) {
+                        e.printStackTrace();
+                    }
+
+                } else if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                    //CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
+                    popupSnackbarForCompleteUpdate();
+                } else {
+                    Log.e(TAG, "checkForAppUpdateAvailability: something else");
+                }
+            });
+
+            //get location
+            inputLocation();
+
+            //set new session is false
+            sessionManager.setNewSession(false);
+        }
 
 
         manualSyncButton.setText(R.string.refresh);
@@ -224,30 +263,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        mAppUpdateManager = AppUpdateManagerFactory.create(this);
-
-        mAppUpdateManager.registerListener(installStateUpdatedListener);
-
-        mAppUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
-
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/)) {
-
-                try {
-                    mAppUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo, AppUpdateType.FLEXIBLE /*AppUpdateType.IMMEDIATE*/, HomeActivity.this, RC_APP_UPDATE);
-
-                } catch (IntentSender.SendIntentException e) {
-                    e.printStackTrace();
-                }
-
-            } else if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-                //CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
-                popupSnackbarForCompleteUpdate();
-            } else {
-                Log.e(TAG, "checkForAppUpdateAvailability: something else");
-            }
-        });
 
         c1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -358,16 +373,16 @@ public class HomeActivity extends AppCompatActivity {
 
         showProgressbar();
 
-        settings_card.setOnClickListener(new View.OnClickListener(){
+        settings_card.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View V){
+            public void onClick(View V) {
                 settings();
             }
         });
 
-        updateProtocols_card.setOnClickListener(new View.OnClickListener(){
+        updateProtocols_card.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View V){
+            public void onClick(View V) {
                 if (NetworkConnection.isOnline(HomeActivity.this)) {
 
                     if (!sessionManager.getLicenseKey().isEmpty()) {
@@ -495,7 +510,7 @@ public class HomeActivity extends AppCompatActivity {
                         Snackbar.LENGTH_INDEFINITE);
 
         snackbar.setAction("Install", view -> {
-            if (mAppUpdateManager != null){
+            if (mAppUpdateManager != null) {
                 mAppUpdateManager.completeUpdate();
             }
         });
@@ -504,7 +519,7 @@ public class HomeActivity extends AppCompatActivity {
         snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
         snackbar.show();
     }
-    
+
     //function for handling the video library feature...
     private void videoLibrary() {
         if (!sessionManager.getLicenseKey().isEmpty())
@@ -1015,5 +1030,49 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    private void inputLocation(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+        alertDialog.setIcon(R.drawable.svg_location);
+
+        // title of the alert dialog
+        alertDialog.setTitle(R.string.get_location_instruction);
+
+        // list of the items to be displayed to the user in the
+        // form of list so that user can select the item from
+        if (locationDTOList==null || locationDTOList.isEmpty()){
+            LocationDAO locationDAO= new LocationDAO();
+            try {
+                locationDTOList= locationDAO.getLocationsDb();
+                System.out.println("# of location s" + locationDTOList.size());
+            } catch (DAOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        final String[] listItems = new String[]{};
+        for (LocationDTO l : locationDTOList){
+            System.out.println(l.getName());
+            listItems[listItems.length]=l.getName();
+        }
+        // the function setSingleChoiceItems is the function which
+        // builds the alert dialog with the single item selection
+        final int[] checkedItem = {-1};
+
+        alertDialog.setSingleChoiceItems(listItems, checkedItem[0], (dialog, which) -> {
+            // update the selected item which is selected by the user so that it should be selected
+            // when user opens the dialog next time and pass the instance to setSingleChoiceItems method
+            checkedItem[0] = which;
+            dialog.dismiss();});
+
+        alertDialog.setPositiveButton("Ok", (dialog, which) -> {
+
+        });
+        // create and build the AlertDialog instance with the AlertDialog builder instance
+        AlertDialog customAlertDialog = alertDialog.create();
+
+        // show the alert dialog when the button is clicked
+        customAlertDialog.show();
+
+    }
 
 }

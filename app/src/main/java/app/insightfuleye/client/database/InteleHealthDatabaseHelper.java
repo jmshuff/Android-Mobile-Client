@@ -17,6 +17,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CREATE_ENCOUNTER_MAIN = "CREATE TABLE IF NOT EXISTS tbl_encounter (" +
             "uuid TEXT PRIMARY KEY," +
+            "patient_uuid TEXT," +
             "visituuid TEXT," +
             "encounter_time TEXT," +
             "provider_uuid TEXT," +
@@ -27,14 +28,6 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "privacynotice_value TEXT" +
             ")";
 
-    public static final String CREATE_DR_SPECIALITY =
-            "CREATE TABLE IF NOT EXISTS tbl_dr_speciality (" +
-                    "uuid TEXT PRIMARY KEY," +
-                    "provideruuid TEXT," +
-                    "attributetypeuuid TEXT," +
-                    "value TEXT UNIQUE," +
-                    "voided TEXT" +
-                    ")";
 
     //visit attributes tables
     public static final String CREATE_VISIT_ATTRIBUTES =
@@ -59,7 +52,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String CREATE_PATIENT_MAIN = "CREATE TABLE IF NOT EXISTS tbl_patient(" +
             "uuid TEXT PRIMARY KEY," +
-            "openmrs_id TEXT," +
+            "visilant_id TEXT," +
             "first_name TEXT," +
             "middle_name TEXT," +
             "last_name TEXT," +
@@ -73,23 +66,24 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "country TEXT," +
             "gender TEXT," +
             "sdw TEXT," +
-            "occupation TEXT," +
-            "patient_photo TEXT," +
-            "economic_status TEXT," +
-            "education_status TEXT," +
-            "caste TEXT," +
             "health_scheme TEXT," +
-            "dead Text," +
             "modified_date TEXT," +
             "voided TEXT DEFAULT '0'," +
-            "sync TEXT DEFAULT 'false' ," +
-            "eyecampid TEXT" +
+            "sync TEXT DEFAULT 'false'," +
+            "abha_number TEXT" +
+            ")";
+
+
+    public static final String CREATE_PATIENT_IDENTIFIER = "CREATE TABLE IF NOT EXISTS tbl_patient_identifier (" +
+            "patient_uuid PRIMARY KEY," +
+            "identifier_type_uuid TEXT," +
+            "identifier_value TEXT" +
             ")";
 
     public static final String CREATE_ATTRIB_MAIN = "CREATE TABLE IF NOT EXISTS tbl_patient_attribute (" +
             "uuid TEXT PRIMARY KEY," +
             "value TEXT," +
-            "person_attribute_type_uuid TEXT ," +
+            "patient_attribute_type_uuid TEXT ," +
             "patientuuid TEXT," +
             "modified_date TEXT," +
             "voided TEXT DEFAULT '0'," +
@@ -112,7 +106,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
 
 
     public static final String CREATE_OBS_MAIN = "CREATE TABLE IF NOT EXISTS tbl_obs (" +
-            "uuid TEXT PRIMARY KEY ," +
+            "uuid TEXT PRIMARY KEY," +
             "encounteruuid TEXT," +
             "conceptuuid TEXT," +
             "value TEXT," +
@@ -136,11 +130,11 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
     public static final String CREATE_LOCATION = "CREATE TABLE IF NOT EXISTS tbl_location (" +
             "name TEXT," +
             "locationuuid TEXT PRIMARY KEY," +
-            "retired integer(10)," +
             "modified_date TEXT," +
             "voided TEXT DEFAULT '0'," +
             "sync TEXT DEFAULT 'false' " +
             ")";
+
     public static final String CREATE_PROVIDER = "CREATE TABLE IF NOT EXISTS tbl_provider (" +
             "uuid TEXT PRIMARY KEY," +
             "identifier TEXT," +
@@ -283,14 +277,13 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('a86ac96e-2e07-47a7-8e72-8216a1a75bfd','VISIT_TELEMEDICINE')");
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('78284507-fb71-4354-9b34-046ab205e18f','RATING')");
             db.execSQL("INSERT OR REPLACE INTO tbl_uuid_dictionary (uuid,name) VALUES('36d207d6-bee7-4b3e-9196-7d053c6eddce','COMMENTS')");
-
-
         }
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_PATIENT_MAIN);
+        db.execSQL(CREATE_PATIENT_IDENTIFIER);
         db.execSQL(CREATE_ATTRIB_MAIN);
         db.execSQL(CREATE_ENCOUNTER_MAIN);
         db.execSQL(CREATE_IMAGE_RECORDS);
@@ -302,7 +295,6 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_PROVIDER);
         db.execSQL(CREATE_UUID_DICTIONARY);
         db.execSQL(CREATE_USER_CREDENTIALS);
-        db.execSQL(CREATE_DR_SPECIALITY);
         db.execSQL(CREATE_VISIT_ATTRIBUTES);
         db.execSQL(drop_azure);
         db.execSQL(AZURE_UPLOADS);

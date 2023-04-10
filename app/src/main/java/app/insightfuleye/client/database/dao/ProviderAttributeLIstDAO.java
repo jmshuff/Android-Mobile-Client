@@ -24,6 +24,7 @@ import app.insightfuleye.client.utilities.exception.DAOException;
 public class ProviderAttributeLIstDAO {
     private long createdRecordsCount = 0;
 
+/*
     public boolean insertProvidersAttributeList(List<ProviderAttributeListDTO> providerAttributeListDTOS)
             throws DAOException {
 
@@ -45,48 +46,8 @@ public class ProviderAttributeLIstDAO {
 
         return isInserted;
     }
+*/
 
-    private boolean createProvidersAttributeList(ProviderAttributeListDTO attributeListDTO, SQLiteDatabase db) throws DAOException {
-        boolean isCreated = true;
-        ContentValues values = new ContentValues();
-
-        try{
-            values.put("uuid", attributeListDTO.getUuid());
-            values.put("provideruuid", attributeListDTO.getProvideruuid());
-            values.put("attributetypeuuid", attributeListDTO.getAttributetypeuuid());
-            values.put("value", attributeListDTO.getValue());
-            values.put("voided", attributeListDTO.getVoided());
-
-            if(attributeListDTO.getVoided() == 0 &&
-            attributeListDTO.getAttributetypeuuid().equalsIgnoreCase("ed1715f5-93e2-404e-b3c9-2a2d9600f062"))
-            {
-                createdRecordsCount = db.insertWithOnConflict("tbl_dr_speciality", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-
-                if(createdRecordsCount != -1)
-                {
-                    Log.d("SPECI", "SIZEXXX: " + createdRecordsCount);
-                }
-                else
-                {
-                    Log.d("SPECI", "SIZEXXX: " + createdRecordsCount);
-                }
-
-            }
-
-
-        }
-        catch (SQLException e)
-        {
-            isCreated = false;
-            throw new DAOException(e.getMessage(), e);
-        }
-        finally
-        {
-
-        }
-
-        return isCreated;
-    }
 
     public List<String> getAllValues() {
         List<String> listDTOArrayList = new ArrayList<>();

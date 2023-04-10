@@ -288,10 +288,10 @@ public class SearchPatientActivity extends AppCompatActivity {
             if (searchCursor.moveToFirst()) {
                 do {
                     PatientDTO model = new PatientDTO();
-                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("visilant_id")));
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
-                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("visilant_id")));
                     model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")));
                     model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
                     model.setPhonenumber(StringUtils.mobileNumberEmpty(phoneNumber(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")))));
@@ -434,10 +434,10 @@ public class SearchPatientActivity extends AppCompatActivity {
             if (searchCursor.moveToFirst()) {
                 do {
                     PatientDTO model = new PatientDTO();
-                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
-                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
                     model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
                     model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")));
                     model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
@@ -467,10 +467,10 @@ public class SearchPatientActivity extends AppCompatActivity {
             if (searchCursor.moveToFirst()) {
                 do {
                     PatientDTO model = new PatientDTO();
-                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
-                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
                     model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
                     model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("patientuuid")));
                     model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
@@ -501,7 +501,7 @@ public class SearchPatientActivity extends AppCompatActivity {
             if (searchCursor.moveToFirst()) {
                 do {
                     PatientDTO model = new PatientDTO();
-                    model.setOpenmrsId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
                     model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
@@ -534,7 +534,7 @@ public class SearchPatientActivity extends AppCompatActivity {
                     if (cursor.moveToFirst()) {
                         do {
                             PatientDTO model = new PatientDTO();
-                            model.setOpenmrsId(cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")));
+                            model.setVisilantId(cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")));
                             model.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow("first_name")));
                             model.setLastname(cursor.getString(cursor.getColumnIndexOrThrow("last_name")));
                             model.setMiddlename(cursor.getString(cursor.getColumnIndexOrThrow("middle_name")));
@@ -588,7 +588,7 @@ public class SearchPatientActivity extends AppCompatActivity {
                     if (cursor.moveToFirst()) {
                         do {
                             PatientDTO model = new PatientDTO();
-                            model.setOpenmrsId(cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")));
+                            model.setVisilantId(cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")));
                             model.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow("first_name")));
                             model.setLastname(cursor.getString(cursor.getColumnIndexOrThrow("last_name")));
                             model.setMiddlename(cursor.getString(cursor.getColumnIndexOrThrow("middle_name")));

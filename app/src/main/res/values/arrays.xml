@@ -789,4 +789,19 @@
         <item>@color/dot_dark_screen4</item>
     </array>
 
+    <array name="hospital_locations">
+        <item></item>
+        <item>Aravind PDY</item>
+        <item>Aravind TVL</item>
+        <item>Dev</item>
+        <item>SCEH</item>
+    </array>
+
+    <array name="base_urls">
+        <item>https://testing.visilant.org</item>
+        <item>https://tvl.visilant.org</item>
+        <item>https://devapi.visilant.org</item>
+        <item>https://sceh.visilant.org</item>
+    </array>
+
 </resources>

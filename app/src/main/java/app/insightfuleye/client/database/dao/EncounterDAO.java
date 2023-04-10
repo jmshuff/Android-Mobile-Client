@@ -55,6 +55,7 @@ public class EncounterDAO {
         try {
 
             values.put("uuid", encounter.getUuid());
+            values.put("patient_uuid", encounter.getPatientuuid());
             values.put("visituuid", encounter.getVisituuid());
             values.put("encounter_type_uuid", encounter.getEncounterTypeUuid());
             values.put("provider_uuid", encounter.getProvideruuid());
@@ -81,6 +82,7 @@ public class EncounterDAO {
         try {
 
             values.put("uuid", encounter.getUuid());
+            values.put("patient_uuid", encounter.getPatientuuid());
             values.put("visituuid", encounter.getVisituuid());
             values.put("encounter_time", encounter.getEncounterTime());
             values.put("encounter_type_uuid", encounter.getEncounterTypeUuid());
@@ -129,6 +131,7 @@ public class EncounterDAO {
             while (idCursor.moveToNext()) {
                 encounterDTO = new EncounterDTO();
                 encounterDTO.setUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("uuid")));
+                encounterDTO.setPatientuuid(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_uuid")));
                 encounterDTO.setVisituuid(idCursor.getString(idCursor.getColumnIndexOrThrow("visituuid")));
                 encounterDTO.setEncounterTypeUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("encounter_type_uuid")));
                 encounterDTO.setProvideruuid(idCursor.getString(idCursor.getColumnIndexOrThrow("provider_uuid")));
@@ -159,6 +162,7 @@ public class EncounterDAO {
             while (idCursor.moveToNext()) {
                 encounterDTO = new EncounterDTO();
                 encounterDTO.setUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("uuid")));
+                encounterDTO.setPatientuuid(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_uuid")));
                 encounterDTO.setVisituuid(idCursor.getString(idCursor.getColumnIndexOrThrow("visituuid")));
                 encounterDTO.setEncounterTypeUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("encounter_type_uuid")));
                 encounterDTO.setProvideruuid(idCursor.getString(idCursor.getColumnIndexOrThrow("provider_uuid")));

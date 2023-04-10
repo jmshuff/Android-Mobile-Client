@@ -9,12 +9,26 @@ public class LocationDTO {
     @SerializedName("name")
     @Expose
     private String name;
-    @SerializedName("locationuuid")
+    @SerializedName("id")
     @Expose
     private String locationuuid;
-    @SerializedName("retired")
+    @SerializedName("deleted_at")
     @Expose
-    private Integer retired;
+    private String locationDeleted;
+    @SerializedName("created_at")
+    @Expose
+    private String locationCreated;
+    @SerializedName("updated_at")
+    private String locationUpdated;
+    @SerializedName("created_by")
+    @Expose
+    private String locationCreatedBy;
+    @SerializedName("modified_by")
+    @Expose
+    private String locationModifiedBy;
+    @SerializedName("description")
+    @Expose
+    private String locationDescription;
 
     public String getName() {
         return name;
@@ -31,14 +45,4 @@ public class LocationDTO {
     public void setLocationuuid(String locationuuid) {
         this.locationuuid = locationuuid;
     }
-
-    public Integer getRetired() {
-        return retired;
-    }
-
-    public void setRetired(Integer retired) {
-        this.retired = retired;
-    }
-
-
 }

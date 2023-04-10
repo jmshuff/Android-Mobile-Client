@@ -8,6 +8,9 @@ public class EncounterDTO {
     @SerializedName("uuid")
     @Expose
     private String uuid;
+    @SerializedName("patient_uuid")
+    @Expose
+    private String patientuuid;
     @SerializedName("visituuid")
     @Expose
     private String visituuid;
@@ -94,5 +97,13 @@ public class EncounterDTO {
 
     public void setPrivacynotice_value(String privacynotice_value) {
         this.privacynotice_value = privacynotice_value;
+    }
+
+    public String getPatientuuid() {
+        return patientuuid;
+    }
+
+    public void setPatientuuid(String patientuuid) {
+        this.patientuuid = patientuuid;
     }
 }

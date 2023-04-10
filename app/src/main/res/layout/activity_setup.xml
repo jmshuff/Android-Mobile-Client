@@ -41,92 +41,20 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cardview1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        app:cardCornerRadius="10sp"
-                        android:layout_marginTop="15dp"
-                        app:cardElevation="5sp"
-                        app:cardPreventCornerOverlap="false"
-                        >
+                    <ImageView
+                        android:layout_width="300dp"
+                        android:layout_height="200dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginBottom="15dp"
+                        android:src="@drawable/ic_welcome_intro_svg" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:ems="10"
-                                android:includeFontPadding="false"
-                                android:text="@string/which_server_would_you_like_to_connect_to"
-                                android:textSize="16sp"
-                                android:fontFamily="@font/lato_bold"/>
-
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:paddingTop="5dp">
-
-                                <EditText
-                                    android:id="@+id/editText_URL"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:hint="@string/enter_url"
-                                    android:textSize="14sp"
-                                    android:fontFamily="@font/lato_regular"
-                                    android:inputType="textUri" />
-                            </com.google.android.material.textfield.TextInputLayout>
-
-                            <Space
-                                android:layout_width="match_parent"
-                                android:layout_height="10dp" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:ems="10"
-                                android:includeFontPadding="false"
-                                android:textSize="16sp"
-                                android:text="@string/choose_a_location_to_login"
-                               android:fontFamily="@font/lato_bold" />
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:layout_marginBottom="5dp">
-
-                                <Spinner
-                                    android:id="@+id/spinner_location"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:nextFocusForward="@+id/demoMindmap" />
-                            </com.google.android.material.textfield.TextInputLayout>
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                    android:id="@+id/cardview3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
-                    app:cardCornerRadius="10sp"
-                    android:layout_marginTop="15dp"
-                    app:cardElevation="5sp"
-                    app:cardPreventCornerOverlap="false"
-                    >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="10dp">
+                    android:padding="25dp">
 
                     <TextView
                         android:id="@+id/textView2"
@@ -134,9 +62,36 @@
                         android:layout_height="wrap_content"
                         android:ems="10"
                         android:includeFontPadding="false"
-                        android:textSize="16sp"
-                        android:text="@string/please_enter_your_username_and_password"
-                        android:fontFamily="@font/lato_bold" />
+                        android:textSize="28sp"
+                        android:text="@string/setup_login"
+                        android:fontFamily="@font/lato_bold"
+                        android:textStyle="bold"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/ac_hospital_location"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:hint="@string/setup_hospital_location"
+                            android:drawableLeft="@drawable/ic_hospital_24"
+                            android:drawablePadding="5dp"
+                            android:imeOptions="actionNext"
+                            android:singleLine="true"
+                            android:textSize="14sp"
+                            android:drawableRight="@drawable/ic__arrow_drop_down_24"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <Spinner
+                        android:id="@+id/spinner_location"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@android:color/transparent"
+                        android:spinnerMode="dialog" />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
@@ -152,6 +107,8 @@
                             android:maxLines="1"
                             android:textSize="14sp"
                             android:fontFamily="@font/lato_regular"
+                            android:drawableLeft="@drawable/ic_email_24"
+                            android:drawablePadding="5dp"
                             android:nextFocusForward="@id/password" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -170,32 +127,14 @@
                             android:maxLines="1"
                             android:singleLine="true"
                             android:textSize="14sp"
+                            android:drawablePadding="5dp"
+                            android:drawableLeft="@drawable/ic_baseline_lock_24"
                             android:fontFamily="@font/lato_regular"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:visibility="gone"
-                        android:layout_height="wrap_content">
-
-                        <EditText
-                            android:id="@+id/admin_password"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/prompt_admin_password"
-                            android:imeActionLabel="@string/action_sign_in_short"
-                            android:imeOptions="actionUnspecified"
-                            android:inputType="textPassword"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:textSize="14sp"
-                            android:fontFamily="@font/lato_regular"/>
-
-                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
-                </androidx.cardview.widget.CardView>
 
                     <!--<Space
                         android:layout_width="match_parent"

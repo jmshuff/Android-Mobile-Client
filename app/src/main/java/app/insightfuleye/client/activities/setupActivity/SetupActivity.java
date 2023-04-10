@@ -11,15 +11,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Patterns;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.webkit.URLUtil;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,27 +29,38 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.activities.homeActivity.HomeActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.database.dao.LocationDAO;
+import app.insightfuleye.client.models.Data;
 import app.insightfuleye.client.models.DownloadMindMapRes;
-import app.insightfuleye.client.models.Location;
 import app.insightfuleye.client.models.Results;
-import app.insightfuleye.client.models.loginModel.LoginModel;
-import app.insightfuleye.client.models.loginProviderModel.LoginProviderModel;
+import app.insightfuleye.client.models.dto.LocationDTO;
+import app.insightfuleye.client.models.loginModel.PostSignIn;
+import app.insightfuleye.client.models.loginModel.Signin;
+import app.insightfuleye.client.networkApiCalls.Api;
 import app.insightfuleye.client.networkApiCalls.ApiClient;
 import app.insightfuleye.client.networkApiCalls.ApiInterface;
-import app.insightfuleye.client.utilities.AdminPassword;
 import app.insightfuleye.client.utilities.Base64Utils;
 import app.insightfuleye.client.utilities.DialogUtils;
 import app.insightfuleye.client.utilities.DownloadMindMaps;
@@ -62,10 +69,12 @@ import app.insightfuleye.client.utilities.NetworkConnection;
 import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.StringEncryption;
 import app.insightfuleye.client.utilities.UrlModifiers;
+import app.insightfuleye.client.utilities.exception.DAOException;
 import app.insightfuleye.client.widget.materialprogressbar.CustomProgressDialog;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -75,7 +84,6 @@ public class SetupActivity extends AppCompatActivity {
 
     private static final String TAG = SetupActivity.class.getSimpleName();
     private boolean isLocationFetched;
-    String BASE_URL = "";
     private static final int PERMISSION_ALL = 1;
     private long createdRecordsCount = 0;
     ProgressDialog mProgressDialog;
@@ -91,14 +99,14 @@ public class SetupActivity extends AppCompatActivity {
     public File base_dir;
     public String[] FILES;
     //        private TestSetup mAuthTask = null;
-    private List<Location> mLocations = new ArrayList<>();
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private EditText mAdminPasswordView;
-    private EditText mUrlField;
     private Button mLoginButton;
-    private Spinner mDropdownLocation;
     private TextView mAndroidIdTextView;
+    private String hospitalLocation;
+    private String[] hospitalLocations;
+    private Spinner spinner;
+    private String mUrlString;
     //private RadioButton r1;
     //private RadioButton r2;
     final Handler mHandler = new Handler();
@@ -135,7 +143,6 @@ public class SetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (NetworkConnection.isOnline(v.getContext())) {
-                    //JS
                     attemptLogin();
                 } else {
                     Toast.makeText(context, getString(R.string.mindmap_internect_connection), Toast.LENGTH_SHORT).show();
@@ -148,81 +155,54 @@ public class SetupActivity extends AppCompatActivity {
 
         mPasswordView = findViewById(R.id.password);
 
-        mAdminPasswordView = findViewById(R.id.admin_password);
-
-        Button submitButton = findViewById(R.id.setup_submit_button);
-
-        mUrlField = findViewById(R.id.editText_URL);
-        mDropdownLocation = findViewById(R.id.spinner_location);
-        mAdminPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.admin_password || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
 
         mAndroidIdTextView = findViewById(R.id.textView_Aid);
         String deviceID = "Device Id: " + IntelehealthApplication.getAndroidId();
         mAndroidIdTextView.setText(deviceID);
 
-        submitButton.setOnClickListener(new View.OnClickListener() {
+        DialogUtils dialogUtils = new DialogUtils();
+        dialogUtils.showOkDialog(this, getString(R.string.generic_warning), getString(R.string.setup_internet), getString(R.string.generic_ok));
+        hospitalLocations = getResources().getStringArray(R.array.hospital_locations);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, hospitalLocations);
+        spinner = findViewById(R.id.spinner_location);
+        spinner.setAdapter(locationAdapter);
+        EditText editLocation = findViewById(R.id.ac_hospital_location);
+        editLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                attemptLogin();
-                //progressBar.setVisibility(View.VISIBLE);
-                //progressBar.setProgress(0);
+            public void onClick(View v) {
+                spinner.performClick();
+                System.out.println("spinnerclicked");
+            }
+        });
+
+        editLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    spinner.performClick();
+                    System.out.println("spinnerclicked");
+                }
 
             }
         });
-        DialogUtils dialogUtils = new DialogUtils();
-        dialogUtils.showOkDialog(this, getString(R.string.generic_warning), getString(R.string.setup_internet), getString(R.string.generic_ok));
 
-        mUrlField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                isLocationFetched = false;
-                LocationArrayAdapter adapter = new LocationArrayAdapter(SetupActivity.this, new ArrayList<String>());
-                mDropdownLocation.setAdapter(adapter);
-            }
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                editLocation.setText(parent.getItemAtPosition(position).toString());
 
-            @Override
-            public void afterTextChanged(Editable s) {
-
-                mHandler.removeCallbacksAndMessages(null);
-                mHandler.postDelayed(userStoppedTyping, 1500); // 1.5 second
-
-
-            }
-
-            Runnable userStoppedTyping = new Runnable() {
-
-                @Override
-                public void run() {
-                    // user didn't typed for 1.5 seconds, do whatever you want
-                    if (!mUrlField.getText().toString().trim().isEmpty() && mUrlField.getText().toString().length() >= 12) {
-                        if (Patterns.WEB_URL.matcher(mUrlField.getText().toString()).matches()) {
-                            String BASE_URL = "https://" + mUrlField.getText().toString() + "/openmrs/ws/rest/v1/";
-                            if (URLUtil.isValidUrl(BASE_URL) && !isLocationFetched) {
-                                getLocationFromServer(BASE_URL);
-                                //licenseUrl= mUrlField.getText().toString();
-                                //sessionManager.setMindMapServerUrl(licenseUrl);
-                                //getMindmapDownloadURL("https://" + licenseUrl + ":3004/", key);
-                            }else
-                                Toast.makeText(SetupActivity.this, getString(R.string.url_invalid), Toast.LENGTH_SHORT).show();
-                        }
-                    }
+                hospitalLocation = hospitalLocations[spinner.getSelectedItemPosition()];
+                if (hospitalLocation != null & !hospitalLocation.isEmpty()) {
+                    //String urlString = mUrlField.getText().toString();
+                    mUrlString = getResources().getStringArray(R.array.base_urls)[spinner.getSelectedItemPosition() - 1];
                 }
-            };
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
         });
 
         showProgressbar();
@@ -238,17 +218,13 @@ public class SetupActivity extends AppCompatActivity {
 //            return;
 //        }
 
-
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
-        mAdminPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-        String admin_password = mAdminPasswordView.getText().toString();
-
 
         boolean cancel = false;
         View focusView = null;
@@ -257,12 +233,6 @@ public class SetupActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
-            cancel = true;
-        }
-
-        if (!TextUtils.isEmpty(admin_password) && !isPasswordValid(admin_password)) {
-            mAdminPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mAdminPasswordView;
             cancel = true;
         }
 
@@ -276,15 +246,10 @@ public class SetupActivity extends AppCompatActivity {
             focusView = mEmailView;
 
         }
-        Location location = null;
-
-        if (mDropdownLocation.getSelectedItemPosition() <= 0) {
-            cancel = true;
+        if (spinner.getSelectedItemPosition() <= 0) {
             Toast.makeText(SetupActivity.this, getString(R.string.error_location_not_selected), Toast.LENGTH_LONG);
-        } else {
-            location = mLocations.get(mDropdownLocation.getSelectedItemPosition() - 1);
+            cancel=true;
         }
-
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -293,12 +258,8 @@ public class SetupActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            if (location != null) {
-                Log.i(TAG, location.getDisplay());
-                String urlString = mUrlField.getText().toString();
-                TestSetup(urlString, email, password, admin_password, location);
-                Log.d(TAG, "attempting setup");
-            }
+            TestSetup(mUrlString, email, password);
+            Log.d(TAG, "attempting setup");
         }
     }
 
@@ -320,73 +281,10 @@ public class SetupActivity extends AppCompatActivity {
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
-    }
-
-    /**
-     * Parse locations fetched through api and provide the appropriate dropdown.
-     *
-     * @param url string of url.
-     */
-    private void getLocationFromServer(String url) {
-        ApiClient.changeApiBaseUrl(url);
-        ApiInterface apiService = ApiClient.createService(ApiInterface.class);
-        try {
-            Observable<Results<Location>> resultsObservable = apiService.LOCATION_OBSERVABLE(null);
-            resultsObservable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableObserver<Results<Location>>() {
-                        @Override
-                        public void onNext(Results<Location> locationResults) {
-                            if (locationResults.getResults() != null) {
-                                Results<Location> locationList = locationResults;
-                                mLocations = locationList.getResults();
-                                List<String> items = getLocationStringList(locationList.getResults());
-                                LocationArrayAdapter adapter = new LocationArrayAdapter(SetupActivity.this, items);
-                                mDropdownLocation.setAdapter(adapter);
-                                isLocationFetched = true;
-                            } else {
-                                isLocationFetched = false;
-                                Toast.makeText(SetupActivity.this, getString(R.string.error_location_not_fetched), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            isLocationFetched = false;
-                            Toast.makeText(SetupActivity.this, getString(R.string.error_location_not_fetched), Toast.LENGTH_SHORT).show();
-
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
-        } catch (IllegalArgumentException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-            mUrlField.setError(getString(R.string.url_invalid));
-        }
-
+        return password.length() > 0;
     }
 
 
-    /**
-     * Returns list of locations.
-     *
-     * @param locationList a list of type {@link Location}.
-     * @return list of type string.
-     * @see Location
-     */
-    private List<String> getLocationStringList(List<Location> locationList) {
-        List<String> list = new ArrayList<String>();
-        list.add(getString(R.string.login_location_select));
-        for (int i = 0; i < locationList.size(); i++) {
-            list.add(locationList.get(i).getDisplay());
-        }
-        return list;
-    }
 
    /* public void onRadioClick(View v) {
 
@@ -423,15 +321,12 @@ public class SetupActivity extends AppCompatActivity {
      * If successful cretes a new {@link Account}
      * If unsuccessful details are saved in SharedPreferences.
      */
-    public void TestSetup(String CLEAN_URL, String USERNAME, String PASSWORD, String ADMIN_PASSWORD, Location location) {
+    public void TestSetup(String CLEAN_URL, String USERNAME, String PASSWORD) {
+        sessionManager.setServerUrl(CLEAN_URL);
+        sessionManager.setBaseUrl(CLEAN_URL);
 
         ProgressDialog progress;
-
-        String urlString = urlModifiers.loginUrl(CLEAN_URL);
-        Logger.logD(TAG, "usernaem and password" + USERNAME + PASSWORD);
-        encoded = base64Utils.encoded(USERNAME, PASSWORD);
-        sessionManager.setEncoded(encoded);
-
+        Logger.logD(TAG, "username and password" + USERNAME + PASSWORD);
         progress = new ProgressDialog(SetupActivity.this, R.style.AlertDialogStyle);
         ;//SetupActivity.this);
         progress.setTitle(getString(R.string.please_wait_progress));
@@ -439,133 +334,75 @@ public class SetupActivity extends AppCompatActivity {
         progress.show();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        Observable<LoginModel> loginModelObservable = AppConstants.apiInterface.LOGIN_MODEL_OBSERVABLE(urlString, "Basic " + encoded);
-        loginModelObservable.subscribe(new Observer<LoginModel>() {
+        ApiClient.changeApiBaseUrl(CLEAN_URL);
+        Api api = ApiClient.createService(Api.class);
+        Log.d("baseUrl", ApiClient.getApiBaseUrl());
+        PostSignIn postSignIn = new PostSignIn(USERNAME, PASSWORD);
+        Observable<Signin> loginModelObservable = api.signIn(postSignIn);
+        loginModelObservable.subscribe(new Observer<Signin>() {
             @Override
             public void onSubscribe(Disposable d) {
 
             }
 
             @Override
-            public void onNext(LoginModel loginModel) {
-                Boolean authencated = loginModel.getAuthenticated();
-                Gson gson = new Gson();
-                sessionManager.setChwname(loginModel.getUser().getDisplay());
-                sessionManager.setCreatorID(loginModel.getUser().getUuid());
-                sessionManager.setSessionID(loginModel.getSessionId());
-                sessionManager.setProviderID(loginModel.getUser().getPerson().getUuid());
-                UrlModifiers urlModifiers = new UrlModifiers();
-                String url = urlModifiers.loginUrlProvider(CLEAN_URL, loginModel.getUser().getUuid());
+            public void onNext(@NonNull Signin signin) {
+                Log.d("signin", String.valueOf(signin.getSuccess()));
+                Boolean authencated = signin.getSuccess();
                 if (authencated) {
-                    Observable<LoginProviderModel> loginProviderModelObservable = AppConstants.apiInterface.LOGIN_PROVIDER_MODEL_OBSERVABLE(url, "Basic " + encoded);
-                    loginProviderModelObservable
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new DisposableObserver<LoginProviderModel>() {
-                                @Override
-                                public void onNext(LoginProviderModel loginProviderModel) {
-                                    if (loginProviderModel.getResults().size() != 0) {
-                                        for (int i = 0; i < loginProviderModel.getResults().size(); i++) {
-                                            Log.i(TAG, "doInBackground: " + loginProviderModel.getResults().get(i).getUuid());
-                                            sessionManager.setProviderID(loginProviderModel.getResults().get(i).getUuid());
-//                                                responsecode = 200;
-                                          /*  final Account account = new Account(USERNAME, "io.intelehealth.openmrs");
-                                            manager.addAccountExplicitly(account, PASSWORD, null);*/
+                    sessionManager.setSetupComplete(true);
+                    sessionManager.setChwname(signin.getData().getUser().getUsername());
+                    sessionManager.setCreatorID(signin.getData().getUser().getId());
+                    sessionManager.setProviderID(signin.getData().getUser().getPersonId());
+                    sessionManager.setAuthToken(signin.getData().getToken());
+                    sessionManager.setRefreshToken(signin.getData().getRefreshToken());
+                    SQLiteDatabase sqLiteDatabase = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+                    //SQLiteDatabase read_db = AppConstants.inteleHealthDatabaseHelper.getReadableDatabase();
 
-                                            sessionManager.setLocationName(location.getDisplay());
-                                            sessionManager.setLocationUuid(location.getUuid());
-                                            sessionManager.setLocationDescription(location.getDescription());
-                                            sessionManager.setServerUrl(CLEAN_URL);
-                                            sessionManager.setServerUrlRest(BASE_URL);
-                                            sessionManager.setServerUrlBase("https://" + CLEAN_URL + "/openmrs");
-                                            sessionManager.setBaseUrl(BASE_URL);
-                                            sessionManager.setSetupComplete(true);
+                    sqLiteDatabase.beginTransaction();
+                    //read_db.beginTransaction();
+                    ContentValues values = new ContentValues();
 
-                                            // OfflineLogin.getOfflineLogin().setUpOfflineLogin(USERNAME, PASSWORD);
-                                            AdminPassword.getAdminPassword().setUp(ADMIN_PASSWORD);
+                    String random_salt = getSalt_DATA();
 
-                                            //Parse.initialize(new Parse.Configuration.Builder(getApplicationContext())
-                                            //        .applicationId(AppConstants.IMAGE_APP_ID)
-                                            //        .server("http://" + CLEAN_URL + ":1337/parse/")
-                                            //       .build()
-                                            //);
-
-                                            SQLiteDatabase sqLiteDatabase = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-                                            //SQLiteDatabase read_db = AppConstants.inteleHealthDatabaseHelper.getReadableDatabase();
-
-                                            sqLiteDatabase.beginTransaction();
-                                            //read_db.beginTransaction();
-                                            ContentValues values = new ContentValues();
-
-                                            //StringEncryption stringEncryption = new StringEncryption();
-                                            String random_salt = getSalt_DATA();
-
-                                            //String random_salt = stringEncryption.getRandomSaltString();
-                                            Log.d("salt", "salt: " + random_salt);
-                                            //Salt_Getter_Setter salt_getter_setter = new Salt_Getter_Setter();
-                                            //salt_getter_setter.setSalt(random`_salt);
+                    //String random_salt = stringEncryption.getRandomSaltString();
+                    Log.d("salt", "salt: " + random_salt);
+                    //Salt_Getter_Setter salt_getter_setter = new Salt_Getter_Setter();
+                    //salt_getter_setter.setSalt(random`_salt);
 
 
-                                            String hash_password = null;
-                                            try {
-                                                //hash_email = StringEncryption.convertToSHA256(random_salt + mEmail);
-                                                hash_password = StringEncryption.convertToSHA256(random_salt + PASSWORD);
-                                            } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-                                                FirebaseCrashlytics.getInstance().recordException(e);
-                                            }
+                    String hash_password = null;
+                    try {
+                        //hash_email = StringEncryption.convertToSHA256(random_salt + mEmail);
+                        hash_password = StringEncryption.convertToSHA256(random_salt + PASSWORD);
+                    } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                    }
 
-                                            try {
-                                                values.put("username", USERNAME);
-                                                values.put("password", hash_password);
-                                                values.put("creator_uuid_cred", loginModel.getUser().getUuid());
-                                                values.put("chwname", loginModel.getUser().getDisplay());
-                                                values.put("provider_uuid_cred", sessionManager.getProviderID());
-                                                createdRecordsCount = sqLiteDatabase.insertWithOnConflict("tbl_user_credentials", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-                                                sqLiteDatabase.setTransactionSuccessful();
+                    try {
+                        values.put("username", USERNAME);
+                        values.put("password", hash_password);
+                        values.put("creator_uuid_cred", sessionManager.getCreatorID());
+                        values.put("chwname", signin.getData().getUser().getUsername());
+                        values.put("provider_uuid_cred", sessionManager.getProviderID());
+                        createdRecordsCount = sqLiteDatabase.insertWithOnConflict("tbl_user_credentials", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                        sqLiteDatabase.setTransactionSuccessful();
 
-                                                Logger.logD("values", "values" + values);
-                                                Logger.logD("created user credentials", "create user records" + createdRecordsCount);
-                                            } catch (SQLException e) {
-                                                Log.d("SQL", "SQL user credentials: " + e);
-                                            } finally {
-                                                sqLiteDatabase.endTransaction();
-                                            }
+                        Logger.logD("values", "values" + values);
+                        Logger.logD("created user credentials", "create user records" + createdRecordsCount);
+                    } catch (SQLException e) {
+                        Log.d("SQL", "SQL user credentials: " + e);
+                    } finally {
+                        sqLiteDatabase.endTransaction();
+                    }
 
-                                            Log.i(TAG, "onPostExecute: Parse init");
-                                            Intent intent = new Intent(SetupActivity.this, HomeActivity.class);
-                                            intent.putExtra("setup", true);
-                                            startActivity(intent);
-                                            finish();
-                                            /*if (r2.isChecked()) {
-                                                if (!sessionManager.getLicenseKey().isEmpty()) {
-                                                    sessionManager.setTriggerNoti("no");
-                                                    startActivity(intent);
-                                                    finish();
-                                                } else {
-                                                    Toast.makeText(SetupActivity.this, R.string.please_enter_valid_license_key, Toast.LENGTH_LONG).show();
-                                                }
-                                            } else {
-                                                sessionManager.setTriggerNoti("no");
-                                                startActivity(intent);
-                                                finish();
-                                            }*/
-                                            progress.dismiss();
-                                        }
-                                    }
-
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    Logger.logD(TAG, "handle provider error" + e.getMessage());
-                                    progress.dismiss();
-                                }
-
-                                @Override
-                                public void onComplete() {
-
-                                }
-                            });
+                    getLocationFromServer();
+                    Log.i(TAG, "onPostExecute: Parse init");
+                    Intent intent = new Intent(SetupActivity.this, HomeActivity.class);
+                    intent.putExtra("setup", true);
+                    startActivity(intent);
+                    finish();
+                    progress.dismiss();
                 }
             }
 
@@ -614,7 +451,6 @@ public class SetupActivity extends AppCompatActivity {
             }
         }
         return salt;
-
     }
 
     private void getMindmapDownloadURL(String url, String key) {
@@ -663,7 +499,6 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void checkExistingMindMaps() {
-
         //Check is there any existing mindmaps are present, if yes then delete.
 
         File engines = new File(context.getFilesDir().getAbsolutePath(), "/Engines");
@@ -700,6 +535,57 @@ public class SetupActivity extends AppCompatActivity {
         //Start downloading mindmaps
         mTask.execute(mindmapURL, context.getFilesDir().getAbsolutePath() + "/mindmaps.zip");
         Log.e("DOWNLOAD", "isSTARTED");
+    }
+    private void getLocationFromServer() {
+        System.out.println("getLocation");
+        if(mUrlString!=null){
+            ApiClient.changeApiBaseUrl(mUrlString);
+        }
+        Api apiService = ApiClient.createService(Api.class);
+        try {
+            Observable<Results<Data<List<LocationDTO>>>> resultsObservable = apiService.getLocations();
+            resultsObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DisposableObserver<Results<Data<List<LocationDTO>>>>() {
+                        @Override
+                        public void onNext(Results<Data<List<LocationDTO>>> locationResults) {
+                            if (locationResults.getData() != null) {
+                                //LocationDTO locationDTO= locationResults.getData().getRows().get(0);
+
+                                List<LocationDTO> items = locationResults.getData().getRows();
+                                System.out.println("# of locations server " + items.size());
+
+                                ArrayList<LocationDTO> insertList = new ArrayList<>();
+
+                                LocationDAO locationDAO = new LocationDAO();
+                                try {
+                                    locationDAO.insertLocations(items);
+                                } catch (DAOException e) {
+                                    e.printStackTrace();
+                                }
+                                isLocationFetched = true;
+                            } else {
+                                isLocationFetched = false;
+                                Toast.makeText(SetupActivity.this, getString(R.string.error_location_not_fetched), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            isLocationFetched = false;
+                            Toast.makeText(SetupActivity.this, getString(R.string.error_location_not_fetched), Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        } catch (IllegalArgumentException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
 
     }
 }

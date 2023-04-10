@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.Date;
 import java.util.Set;
 
 public class SessionManager {
@@ -50,6 +51,9 @@ public class SessionManager {
     private static final String OFFLINE_OPENMRSID = "OFFLINE_OPENMRSID";
     private static final String CURRENT_LANG = "CURRENT_LANG";
     private static final String IS_LOGOUT = "IS_LOGOUT";
+    private static final String AUTH_TOKEN = "authToken";
+    private static final String REFRESH_TOKEN= "refreshToken";
+    private static final String NEW_SESSION= "newSession";
     // LogCat tag
     private static String TAG = SessionManager.class.getSimpleName();
     // Shared Preferences
@@ -450,5 +454,29 @@ public class SessionManager {
         editor.commit();
     }
 
+    public String getAuthToken() {
+        return pref.getString(AUTH_TOKEN, "");
+    }
 
+    public String getRefreshToken() {
+        return pref.getString(REFRESH_TOKEN, "");
+    }
+
+    public void setAuthToken(String token) {
+        editor.putString(AUTH_TOKEN, token);
+        editor.commit();
+    }
+
+    public void setRefreshToken(String token) {
+        editor.putString(REFRESH_TOKEN, token);
+        editor.commit();
+    }
+    public boolean isNewSession() {
+        return pref.getBoolean(NEW_SESSION, true);
+    }
+
+    public void setNewSession(Boolean newSession) {
+        editor.putBoolean(NEW_SESSION, newSession);
+        editor.commit();
+    }
 }
