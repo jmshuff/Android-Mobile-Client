@@ -206,7 +206,7 @@ public class PatientsDAO {
             if (cursor.moveToFirst()) {
                 while (!cursor.isAfterLast()) {
                     attribute = new Attribute();
-                    attribute.setAttributeType(cursor.getString(cursor.getColumnIndex("patient_attribute_type_uuid")));
+                    attribute.setAttributeType(cursor.getString(cursor.getColumnIndex("person_attribute_type_uuid")));
                     attribute.setValue(cursor.getString(cursor.getColumnIndex("value")));
                     patientAttributesList.add(attribute);
                     cursor.moveToNext();

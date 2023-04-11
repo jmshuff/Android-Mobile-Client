@@ -32,7 +32,7 @@ public class Patient {
         return visilant_id;
     }
 
-    public void setVisilant_id(String openmrs_id) {
+    public void setVisilant_id(String visilant_id) {
         this.visilant_id = visilant_id;
     }
 

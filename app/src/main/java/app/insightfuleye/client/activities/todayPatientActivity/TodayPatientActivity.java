@@ -162,7 +162,7 @@ public class TodayPatientActivity extends AppCompatActivity {
         List<TodayPatientModel> todayPatientList = new ArrayList<>();
         Date cDate = new Date();
         String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
-        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, c.provider_uuid,  b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.openmrs_id " +
+        String query = "SELECT a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, c.provider_uuid,  b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.visilant_id " +
                 "FROM tbl_visit a, tbl_patient b, tbl_encounter c " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND a.startdate LIKE '" + currentDate + "T%' " +
@@ -180,7 +180,7 @@ public class TodayPatientActivity extends AppCompatActivity {
                                 cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("startdate")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("enddate")),
-                                cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("visilant_id")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("first_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("middle_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("last_name")),
@@ -396,7 +396,7 @@ public class TodayPatientActivity extends AppCompatActivity {
         List<TodayPatientModel> todayPatientList = new ArrayList<>();
         Date cDate = new Date();
         String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(cDate);
-        String query = "SELECT  distinct a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.openmrs_id " +
+        String query = "SELECT  distinct a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.visilant_id " +
                 "FROM tbl_visit a, tbl_patient b, tbl_encounter c " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND c.visituuid=a.uuid and c.provider_uuid in ('" + StringUtils.convertUsingStringBuilder(providersuuids) + "')  " +
@@ -414,7 +414,7 @@ public class TodayPatientActivity extends AppCompatActivity {
                                 cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("startdate")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("enddate")),
-                                cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("visilant_id")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("first_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("middle_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("last_name")),

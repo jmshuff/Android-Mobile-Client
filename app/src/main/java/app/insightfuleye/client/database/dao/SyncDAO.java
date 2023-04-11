@@ -307,7 +307,7 @@ public class SyncDAO {
     private void getPatients(List<ActivePatientModel> activePatientList) {
 
         String query =
-                "SELECT   a.uuid, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.openmrs_id  " +
+                "SELECT   a.uuid, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.visilant_id  " +
                         "FROM tbl_visit a, tbl_patient b " +
                         "WHERE a.patientuuid = b.uuid " +
                         "AND a.enddate is NULL OR a.enddate='' GROUP BY a.uuid ORDER BY a.startdate ASC";
@@ -320,7 +320,7 @@ public class SyncDAO {
                             cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")),
                             cursor.getString(cursor.getColumnIndexOrThrow("startdate")),
                             cursor.getString(cursor.getColumnIndexOrThrow("enddate")),
-                            cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")),
+                            cursor.getString(cursor.getColumnIndexOrThrow("visilant_id")),
                             cursor.getString(cursor.getColumnIndexOrThrow("first_name")),
                             cursor.getString(cursor.getColumnIndexOrThrow("middle_name")),
                             cursor.getString(cursor.getColumnIndexOrThrow("last_name")),
@@ -339,7 +339,6 @@ public class SyncDAO {
         PatientsDAO patientsDAO = new PatientsDAO();
         VisitsDAO visitsDAO = new VisitsDAO();
         EncounterDAO encounterDAO = new EncounterDAO();
-
 
         PushRequestApiCall pushRequestApiCall;
         PatientsFrameJson patientsFrameJson = new PatientsFrameJson();

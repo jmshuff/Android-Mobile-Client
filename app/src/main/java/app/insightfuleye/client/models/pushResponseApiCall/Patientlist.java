@@ -9,7 +9,7 @@ public class Patientlist {
     @SerializedName("uuid")
     @Expose
     private String uuid;
-    @SerializedName("openmrs_id")
+    @SerializedName("visilant_id")
     @Expose
     private String openmrsId;
     @SerializedName("dead")

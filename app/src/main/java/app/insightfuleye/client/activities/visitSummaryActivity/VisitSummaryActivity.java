@@ -816,13 +816,13 @@ public class VisitSummaryActivity extends AppCompatActivity {
                         String patientSelection = "uuid = ?";
                         String[] patientArgs = {String.valueOf(patient.getUuid())};
                         String table = "tbl_patient";
-                        String[] columnsToReturn = {"openmrs_id"};
+                        String[] columnsToReturn = {"visilant_id"};
                         final Cursor idCursor = db.query(table, columnsToReturn, patientSelection, patientArgs, null, null, null);
 
 
                         if (idCursor.moveToFirst()) {
                             do {
-                                patient.setVisilant_id(idCursor.getString(idCursor.getColumnIndex("openmrs_id")));
+                                patient.setVisilant_id(idCursor.getString(idCursor.getColumnIndex("visilant_id")));
                             } while (idCursor.moveToNext());
                         }
                         idCursor.close();
@@ -3156,7 +3156,7 @@ public class VisitSummaryActivity extends AppCompatActivity {
         String[] patientArgs = {dataString};
 
         String table = "tbl_patient";
-        String[] columnsToReturn = {"openmrs_id", "first_name", "middle_name", "last_name",
+        String[] columnsToReturn = {"visilant_id", "first_name", "middle_name", "last_name",
                 "date_of_birth", "address1", "address2", "city_village", "state_province", "country",
                 "postal_code", "phone_number", "gender", "sdw", "occupation", "patient_photo"};
         final Cursor idCursor = db.query(table, columnsToReturn, patientSelection, patientArgs, null, null, null);

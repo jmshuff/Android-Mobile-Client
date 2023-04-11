@@ -15,23 +15,18 @@ import app.insightfuleye.client.models.dto.LocationDTO;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class LocationDAO {
-
-
-    long createdRecordsCount = 0;
+    private long createdRecordsCount = 0;
 
     public boolean insertLocations(List<LocationDTO> locationDTOS) throws DAOException {
-        System.out.println("trying to insert locations");
-        System.out.println(locationDTOS.size());
-
         boolean isInserted = true;
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-        db.beginTransaction();
         try {
-            for (int i = 0; i < locationDTOS.size(); i++) {
-                System.out.println("createLocation");
-                boolean isCreated= createLocation(locationDTOS.get(i), db);
+            db.beginTransaction();
+            for (LocationDTO location : locationDTOS) {
+                boolean isCreated= createLocation(location, db);
                 Log.d("LocationCreated", String.valueOf(isCreated));
             }
+            db.setTransactionSuccessful();
         } catch (SQLException e){
             isInserted=false;
             throw new DAOException(e.getMessage(), e);
@@ -48,13 +43,14 @@ public class LocationDAO {
             System.out.println(location.getName());
             values.put("name", location.getName());
             values.put("locationuuid", location.getLocationuuid());
-            values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
+            values.put("modified_date", String.valueOf(AppConstants.dateAndTimeUtils.currentDateTime()));
             values.put("sync", "TRUE");
             Log.d("VALUES:","VALUES: "+values);
 
             createdRecordsCount = db.insertWithOnConflict("tbl_location", null, values, SQLiteDatabase.CONFLICT_REPLACE);
         } catch (SQLException e) {
             isCreated = false;
+            Log.e("createLocation", e.getMessage());
             throw new DAOException(e.getMessage(), e);
         } finally {
         }

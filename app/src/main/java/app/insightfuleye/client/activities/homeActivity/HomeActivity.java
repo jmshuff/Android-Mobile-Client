@@ -66,6 +66,7 @@ import app.insightfuleye.client.activities.loginActivity.LoginActivity;
 import app.insightfuleye.client.activities.privacyNoticeActivity.PrivacyNotice_Activity;
 import app.insightfuleye.client.activities.searchPatientActivity.SearchPatientActivity;
 import app.insightfuleye.client.activities.settingsActivity.SettingsActivity;
+import app.insightfuleye.client.activities.setupActivity.SetupActivity;
 import app.insightfuleye.client.activities.todayPatientActivity.TodayPatientActivity;
 import app.insightfuleye.client.activities.uploadImageActivity.uploadImageActivity;
 import app.insightfuleye.client.app.AppConstants;
@@ -73,8 +74,11 @@ import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.LocationDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.models.CheckAppUpdateRes;
+import app.insightfuleye.client.models.Data;
 import app.insightfuleye.client.models.DownloadMindMapRes;
+import app.insightfuleye.client.models.Results;
 import app.insightfuleye.client.models.dto.LocationDTO;
+import app.insightfuleye.client.networkApiCalls.Api;
 import app.insightfuleye.client.networkApiCalls.ApiClient;
 import app.insightfuleye.client.networkApiCalls.ApiInterface;
 import app.insightfuleye.client.syncModule.SyncUtils;
@@ -1036,6 +1040,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // title of the alert dialog
         alertDialog.setTitle(R.string.get_location_instruction);
+        alertDialog.setCancelable(false);
 
         // list of the items to be displayed to the user in the
         // form of list so that user can select the item from
@@ -1049,11 +1054,11 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
-        final String[] listItems = new String[]{};
-        for (LocationDTO l : locationDTOList){
-            System.out.println(l.getName());
-            listItems[listItems.length]=l.getName();
+        String[] listItems = new String[locationDTOList.size()];
+        for(int i=0; i<listItems.length; i++){
+            listItems[i]=locationDTOList.get(i).getName();
         }
+
         // the function setSingleChoiceItems is the function which
         // builds the alert dialog with the single item selection
         final int[] checkedItem = {-1};
@@ -1062,10 +1067,12 @@ public class HomeActivity extends AppCompatActivity {
             // update the selected item which is selected by the user so that it should be selected
             // when user opens the dialog next time and pass the instance to setSingleChoiceItems method
             checkedItem[0] = which;
-            dialog.dismiss();});
+            });
 
         alertDialog.setPositiveButton("Ok", (dialog, which) -> {
-
+            sessionManager.setLocationName(locationDTOList.get(checkedItem[0]).getName());
+            sessionManager.setLocationUuid(locationDTOList.get(checkedItem[0]).getLocationuuid());
+            dialog.dismiss();
         });
         // create and build the AlertDialog instance with the AlertDialog builder instance
         AlertDialog customAlertDialog = alertDialog.create();

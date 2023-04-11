@@ -3,6 +3,8 @@ package app.insightfuleye.client.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import app.insightfuleye.client.utilities.SessionManager;
@@ -83,7 +85,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
     public static final String CREATE_ATTRIB_MAIN = "CREATE TABLE IF NOT EXISTS tbl_patient_attribute (" +
             "uuid TEXT PRIMARY KEY," +
             "value TEXT," +
-            "patient_attribute_type_uuid TEXT ," +
+            "person_attribute_type_uuid TEXT ," +
             "patientuuid TEXT," +
             "modified_date TEXT," +
             "voided TEXT DEFAULT '0'," +
@@ -282,6 +284,7 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d("Creating Database", "true");
         db.execSQL(CREATE_PATIENT_MAIN);
         db.execSQL(CREATE_PATIENT_IDENTIFIER);
         db.execSQL(CREATE_ATTRIB_MAIN);

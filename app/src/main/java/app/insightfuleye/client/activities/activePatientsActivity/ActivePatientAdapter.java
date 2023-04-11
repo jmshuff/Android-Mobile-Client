@@ -52,9 +52,9 @@ public class ActivePatientAdapter extends RecyclerView.Adapter<ActivePatientAdap
     public void onBindViewHolder(ActivePatientViewHolder holder, int position) {
         final ActivePatientModel activePatientModel = activePatientModels.get(position);
         String header;
-        if (activePatientModel.getOpenmrs_id() != null) {
+        if (activePatientModel.getVisilant_id() != null) {
             header = String.format("%s %s, %s", activePatientModel.getFirst_name(),
-                    activePatientModel.getLast_name(), activePatientModel.getOpenmrs_id());
+                    activePatientModel.getLast_name(), activePatientModel.getVisilant_id());
 
 //            holder.getTv_not_uploaded().setVisibility(View.GONE);
         } else {

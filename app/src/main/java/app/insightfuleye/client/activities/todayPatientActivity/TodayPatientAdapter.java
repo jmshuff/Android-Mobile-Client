@@ -49,9 +49,9 @@ public class TodayPatientAdapter extends RecyclerView.Adapter<TodayPatientAdapte
     public void onBindViewHolder(TodayPatientViewHolder holder, int position) {
         final TodayPatientModel todayPatientModel = todayPatientModelList.get(position);
         String header;
-        if (todayPatientModel.getOpenmrs_id() != null) {
+        if (todayPatientModel.getVisilant_id() != null) {
             header = String.format("%s %s, %s", todayPatientModel.getFirst_name(),
-                    todayPatientModel.getLast_name(), todayPatientModel.getOpenmrs_id());
+                    todayPatientModel.getLast_name(), todayPatientModel.getVisilant_id());
         } else {
             header = String.format("%s %s", todayPatientModel.getFirst_name(),
                     todayPatientModel.getLast_name());

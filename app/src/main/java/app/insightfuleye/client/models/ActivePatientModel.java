@@ -7,7 +7,7 @@ public class ActivePatientModel {
     String patientuuid;
     String startdate;
     String enddate;
-    String openmrs_id;
+    String visilant_id;
     String first_name;
     String middle_name;
     String last_name;
@@ -15,12 +15,12 @@ public class ActivePatientModel {
     String phone_number;
     String sync;
 
-    public ActivePatientModel(String uuid, String patientuuid, String startdate, String enddate, String openmrs_id, String first_name, String middle_name, String last_name, String date_of_birth, String phone_number, String sync) {
+    public ActivePatientModel(String uuid, String patientuuid, String startdate, String enddate, String visilant_id, String first_name, String middle_name, String last_name, String date_of_birth, String phone_number, String sync) {
         this.uuid = uuid;
         this.patientuuid = patientuuid;
         this.startdate = startdate;
         this.enddate = enddate;
-        this.openmrs_id = openmrs_id;
+        this.visilant_id = visilant_id;
         this.first_name = first_name;
         this.middle_name = middle_name;
         this.last_name = last_name;
@@ -101,12 +101,12 @@ public class ActivePatientModel {
         this.middle_name = middle_name;
     }
 
-    public String getOpenmrs_id() {
-        return openmrs_id;
+    public String getVisilant_id() {
+        return visilant_id;
     }
 
-    public void setOpenmrs_id(String openmrs_id) {
-        this.openmrs_id = openmrs_id;
+    public void setVisilant_id(String visilant_id) {
+        this.visilant_id = visilant_id;
     }
 
     public String getSync() {

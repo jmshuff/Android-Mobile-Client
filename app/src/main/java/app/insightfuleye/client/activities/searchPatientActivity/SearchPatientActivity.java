@@ -429,15 +429,15 @@ public class SearchPatientActivity extends AppCompatActivity {
         List<PatientDTO> modelList = new ArrayList<PatientDTO>();
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWritableDatabase();
         String table = "tbl_patient";
-        final Cursor searchCursor = db.rawQuery("SELECT * FROM " + table + " WHERE first_name LIKE " + "'%" + search + "%' OR middle_name LIKE '%" + search + "%' OR last_name LIKE '%" + search + "%' OR (first_name || middle_name) LIKE '%" + search + "%' OR (middle_name || last_name) LIKE '%" + search + "%' OR (first_name || last_name) LIKE '%" + search + "%' OR openmrs_id LIKE '%" + search + "%' " + "ORDER BY first_name ASC", null);
+        final Cursor searchCursor = db.rawQuery("SELECT * FROM " + table + " WHERE first_name LIKE " + "'%" + search + "%' OR middle_name LIKE '%" + search + "%' OR last_name LIKE '%" + search + "%' OR (first_name || middle_name) LIKE '%" + search + "%' OR (middle_name || last_name) LIKE '%" + search + "%' OR (first_name || last_name) LIKE '%" + search + "%' OR visilant_id LIKE '%" + search + "%' " + "ORDER BY first_name ASC", null);
         try {
             if (searchCursor.moveToFirst()) {
                 do {
                     PatientDTO model = new PatientDTO();
-                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("visilant_id")));
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
-                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("visilant_id")));
                     model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
                     model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("uuid")));
                     model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
@@ -456,7 +456,7 @@ public class SearchPatientActivity extends AppCompatActivity {
         List<PatientDTO> modelList = new ArrayList<PatientDTO>();
         String dateFromSearch= getDateFromSearch();
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWritableDatabase();
-        String query = "SELECT distinct a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.openmrs_id "+
+        String query = "SELECT distinct a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.visilant_id "+
                 "FROM tbl_visit a, tbl_patient b " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND a.startdate LIKE \'" + dateFromSearch + "T%\' " +
@@ -467,10 +467,10 @@ public class SearchPatientActivity extends AppCompatActivity {
             if (searchCursor.moveToFirst()) {
                 do {
                     PatientDTO model = new PatientDTO();
-                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("visilant_id")));
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
-                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("visilant_id")));
                     model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
                     model.setUuid(searchCursor.getString(searchCursor.getColumnIndexOrThrow("patientuuid")));
                     model.setDateofbirth(searchCursor.getString(searchCursor.getColumnIndexOrThrow("date_of_birth")));
@@ -490,7 +490,7 @@ public class SearchPatientActivity extends AppCompatActivity {
         String dateToSearch= getDateToSearch();
         String dateFromSearch= getDateFromSearch();
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWritableDatabase();
-        String query = "SELECT distinct a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.openmrs_id "+
+        String query = "SELECT distinct a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth, b.visilant_id "+
                 "FROM tbl_visit a, tbl_patient b " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND a.startdate BETWEEN \'" + dateFromSearch + "\' AND \'" + dateToSearch + "\' " +
@@ -501,7 +501,7 @@ public class SearchPatientActivity extends AppCompatActivity {
             if (searchCursor.moveToFirst()) {
                 do {
                     PatientDTO model = new PatientDTO();
-                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("openmrs_id")));
+                    model.setVisilantId(searchCursor.getString(searchCursor.getColumnIndexOrThrow("visilant_id")));
                     model.setFirstname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("first_name")));
                     model.setLastname(searchCursor.getString(searchCursor.getColumnIndexOrThrow("last_name")));
                     model.setMiddlename(searchCursor.getString(searchCursor.getColumnIndexOrThrow("middle_name")));
@@ -522,7 +522,7 @@ public class SearchPatientActivity extends AppCompatActivity {
         if (querytext == null) {
             List<PatientDTO> modelListwihtoutQuery = new ArrayList<PatientDTO>();
             String query =
-                    "select b.openmrs_id,b.first_name,b.last_name,b.middle_name,b.uuid,b.date_of_birth from tbl_visit a, tbl_patient b, tbl_encounter c WHERE a.patientuuid = b.uuid  AND c.visituuid=a.uuid and c.provider_uuid in " +
+                    "select b.visilant_id,b.first_name,b.last_name,b.middle_name,b.uuid,b.date_of_birth from tbl_visit a, tbl_patient b, tbl_encounter c WHERE a.patientuuid = b.uuid  AND c.visituuid=a.uuid and c.provider_uuid in " +
                             "('" + StringUtils.convertUsingStringBuilder(providersuuids) + "')  " +
                             "group by a.uuid order by b.uuid ASC";
             Logger.logD(TAG, query);
@@ -534,7 +534,7 @@ public class SearchPatientActivity extends AppCompatActivity {
                     if (cursor.moveToFirst()) {
                         do {
                             PatientDTO model = new PatientDTO();
-                            model.setVisilantId(cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")));
+                            model.setVisilantId(cursor.getString(cursor.getColumnIndexOrThrow("visilant_id")));
                             model.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow("first_name")));
                             model.setLastname(cursor.getString(cursor.getColumnIndexOrThrow("last_name")));
                             model.setMiddlename(cursor.getString(cursor.getColumnIndexOrThrow("middle_name")));
@@ -571,11 +571,11 @@ public class SearchPatientActivity extends AppCompatActivity {
             String search = querytext.trim().replaceAll("\\s", "");
             List<PatientDTO> modelList = new ArrayList<PatientDTO>();
             String query =
-                    "select   b.openmrs_id,b.firstname,b.last_name,b.middle_name,b.uuid,b.date_of_birth  from tbl_visit a, tbl_patient b, tbl_encounter c WHERE" +
+                    "select   b.visilant_id,b.firstname,b.last_name,b.middle_name,b.uuid,b.date_of_birth  from tbl_visit a, tbl_patient b, tbl_encounter c WHERE" +
                             "first_name LIKE " + "'%" + search +
                             "%' OR middle_name LIKE '%" + search +
                             "%' OR last_name LIKE '%" + search +
-                            "%' OR openmrs_id LIKE '%" + search +
+                            "%' OR visilant_id LIKE '%" + search +
                             "%' " +
                             "AND a.provider_uuid in ('" + StringUtils.convertUsingStringBuilder(providersuuids) + "')  " +
                             "AND  a.patientuuid = b.uuid  AND c.visituuid=a.uuid " +
@@ -588,7 +588,7 @@ public class SearchPatientActivity extends AppCompatActivity {
                     if (cursor.moveToFirst()) {
                         do {
                             PatientDTO model = new PatientDTO();
-                            model.setVisilantId(cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")));
+                            model.setVisilantId(cursor.getString(cursor.getColumnIndexOrThrow("visilant_id")));
                             model.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow("first_name")));
                             model.setLastname(cursor.getString(cursor.getColumnIndexOrThrow("last_name")));
                             model.setMiddlename(cursor.getString(cursor.getColumnIndexOrThrow("middle_name")));

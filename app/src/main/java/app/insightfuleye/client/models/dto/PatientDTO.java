@@ -79,8 +79,8 @@ public class PatientDTO {
         return visilantId;
     }
 
-    public void setVisilantId(String openmrsId) {
-        this.visilantId = openmrsId;
+    public void setVisilantId(String visilantId) {
+        this.visilantId = visilantId;
     }
 
     public String getFirstname() {

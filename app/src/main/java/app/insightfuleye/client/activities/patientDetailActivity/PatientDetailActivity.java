@@ -323,15 +323,14 @@ public class PatientDetailActivity extends AppCompatActivity {
 
         String patientSelection = "uuid = ?";
         String[] patientArgs = {dataString};
-        String[] patientColumns = {"uuid", "openmrs_id", "first_name", "middle_name", "last_name",
+        String[] patientColumns = {"uuid", "visilant_id", "first_name", "middle_name", "last_name",
                 "date_of_birth", "address1", "address2", "city_village", "state_province",
-                "postal_code", "country", "phone_number", "gender", "sdw",
-                "patient_photo"};
+                "postal_code", "country", "phone_number", "gender", "sdw"};
         Cursor idCursor = db.query("tbl_patient", patientColumns, patientSelection, patientArgs, null, null, null);
         if (idCursor.moveToFirst()) {
             do {
                 patient_new.setUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("uuid")));
-                patient_new.setVisilant_id(idCursor.getString(idCursor.getColumnIndexOrThrow("openmrs_id")));
+                patient_new.setVisilant_id(idCursor.getString(idCursor.getColumnIndexOrThrow("visilant_id")));
                 patient_new.setFirst_name(idCursor.getString(idCursor.getColumnIndexOrThrow("first_name")));
                 patient_new.setMiddle_name(idCursor.getString(idCursor.getColumnIndexOrThrow("middle_name")));
                 patient_new.setLast_name(idCursor.getString(idCursor.getColumnIndexOrThrow("last_name")));

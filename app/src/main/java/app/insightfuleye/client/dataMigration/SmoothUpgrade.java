@@ -123,7 +123,7 @@ public class SmoothUpgrade {
         Gson gson = new Gson();
         String uuid = "";
         try {
-            Cursor cursor = myDataBase.rawQuery("Select * from patient where openmrs_id IS NULL OR openmrs_id =''", null);
+            Cursor cursor = myDataBase.rawQuery("Select * from patient where visilant_id IS NULL OR visilant_id =''", null);
             if (cursor != null) {
                 cursor.moveToFirst();
                 while (!cursor.isAfterLast()) {

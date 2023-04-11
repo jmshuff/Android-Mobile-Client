@@ -145,7 +145,7 @@ public class ActivePatientActivity extends AppCompatActivity {
     private void doQuery() {
         List<ActivePatientModel> activePatientList = new ArrayList<>();
         Date cDate = new Date();
-        String query = "SELECT   a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.openmrs_id  " +
+        String query = "SELECT   a.uuid, a.sync, a.patientuuid, a.startdate, a.enddate, b.first_name, b.middle_name, b.last_name, b.date_of_birth,b.visilant_id  " +
                 "FROM tbl_visit a, tbl_patient b " +
                 "WHERE a.patientuuid = b.uuid " +
                 "AND a.enddate is NULL OR a.enddate='' GROUP BY a.uuid ORDER BY a.startdate ASC";
@@ -160,7 +160,7 @@ public class ActivePatientActivity extends AppCompatActivity {
                                 cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("startdate")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("enddate")),
-                                cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("visilant_id")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("first_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("middle_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("last_name")),
@@ -333,7 +333,7 @@ public class ActivePatientActivity extends AppCompatActivity {
 
     private void doQueryWithProviders(List<String> providersuuids) {
         List<ActivePatientModel> activePatientList = new ArrayList<>();
-        String query = "select  distinct a.uuid, a.sync, c.uuid AS patientuuid,a.startdate AS startdate,a.enddate AS enddate, c.first_name,c.middle_name,c.last_name,c.openmrs_id,c.date_of_birth " +
+        String query = "select  distinct a.uuid, a.sync, c.uuid AS patientuuid,a.startdate AS startdate,a.enddate AS enddate, c.first_name,c.middle_name,c.last_name,c.visilant_id,c.date_of_birth " +
                 "from tbl_visit a,tbl_encounter b ,tbl_patient c " +
                 "where b.visituuid=a.uuid and b.provider_uuid in ('" + StringUtils.convertUsingStringBuilder(providersuuids) + "')  " +
                 "and a.patientuuid=c.uuid and (a.enddate is null OR a.enddate='')  order by a.startdate ASC";
@@ -349,7 +349,7 @@ public class ActivePatientActivity extends AppCompatActivity {
                                 cursor.getString(cursor.getColumnIndexOrThrow("patientuuid")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("startdate")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("enddate")),
-                                cursor.getString(cursor.getColumnIndexOrThrow("openmrs_id")),
+                                cursor.getString(cursor.getColumnIndexOrThrow("visilant_id")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("first_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("middle_name")),
                                 cursor.getString(cursor.getColumnIndexOrThrow("last_name")),
