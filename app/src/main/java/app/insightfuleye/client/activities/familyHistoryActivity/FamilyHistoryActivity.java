@@ -241,7 +241,7 @@ public class FamilyHistoryActivity extends AppCompatActivity implements Question
 
         setTitle(patientName + ": " + getTitle());
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_upload);
         family_history_recyclerView = findViewById(R.id.family_history_recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false);
         family_history_recyclerView.setLayoutManager(linearLayoutManager);

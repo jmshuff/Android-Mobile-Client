@@ -8,16 +8,16 @@ import java.util.List;
 
 public class PushRequestApiCall {
 
-    @SerializedName("persons")
+    @SerializedName("person")
     @Expose
     private List<Person> persons = null;
-    @SerializedName("patients")
+    @SerializedName("patient")
     @Expose
     private List<Patient> patients = null;
     @SerializedName("visits")
     @Expose
     private List<Visit> visits = null;
-    @SerializedName("encounters")
+    @SerializedName("encounter")
     @Expose
     private List<Encounter> encounters = null;
 

@@ -124,7 +124,7 @@ public class EncounterDAO {
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         db.beginTransaction();
         //Distinct keyword is used to remove all duplicate records.
-        Cursor idCursor = db.rawQuery("SELECT distinct a.uuid,a.visituuid,a.encounter_type_uuid,a.provider_uuid,a.encounter_time,a.voided,a.privacynotice_value FROM tbl_encounter a,tbl_obs b WHERE (a.sync = ? OR a.sync=?) AND a.uuid = b.encounteruuid AND b.sync='false' AND b.voided='0' ", new String[]{"false", "0"});
+        Cursor idCursor = db.rawQuery("SELECT distinct a.uuid,a.visituuid,a.encounter_type_uuid,a.provider_uuid,a.encounter_time,a.voided,a.privacynotice_value,a.patient_uuid FROM tbl_encounter a,tbl_obs b WHERE (a.sync = ? OR a.sync=?) AND a.uuid = b.encounteruuid AND b.sync='false' AND b.voided='0' ", new String[]{"false", "0"});
         EncounterDTO encounterDTO = new EncounterDTO();
         Log.d("RAINBOW: ","RAINBOW: "+idCursor.getCount());
         if (idCursor.getCount() != 0) {
@@ -311,5 +311,50 @@ public class EncounterDAO {
         return isUpdated;
     }
 
+    public String getEncounterUuidByVisit(String visitUuid){
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWritableDatabase();
+        db.beginTransaction();
+        Cursor idCursor = db.rawQuery("SELECT uuid FROM tbl_encounter where visituuid = ? and encounter_type_uuid = ?", new String[]{visitUuid, UuidDictionary.ENCOUNTER_ADULTINITIAL});
+        String encounterUuid = "";
+        if (idCursor.getCount() != 0) {
+            while (idCursor.moveToNext()) {
+                encounterUuid = idCursor.getString(idCursor.getColumnIndexOrThrow("uuid"));
+            }
+        }
+        idCursor.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
 
+        return encounterUuid;
+    }
+
+    public void removeEncounterAndObs(String encounterUuid) throws DAOException {
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            String query = "Select * from tbl_encounter where uuid = \'" + encounterUuid + "\'";
+            Cursor cursor = localdb.rawQuery(query, null);
+            if (cursor.getCount() > 0) {
+                localdb.execSQL("DELETE from tbl_encounter where uuid = \'" + encounterUuid + "\'");
+                localdb.setTransactionSuccessful();
+            }
+
+            String query1 = "Select * from tbl_obs where encounteruuid = \'" + encounterUuid + "\'";
+            Cursor cursor1 = localdb.rawQuery(query1, null);
+            if (cursor1.getCount() > 0) {
+                while (cursor1.moveToNext()) {
+                    localdb.execSQL("DELETE from tbl_obs where encounteruuid = \'" + encounterUuid + "\'");
+                    localdb.setTransactionSuccessful();
+                }
+            }
+        }
+        catch (SQLException e){
+            throw new DAOException(e);
+        }
+        finally {
+            localdb.endTransaction();
+        }
+    }
 }

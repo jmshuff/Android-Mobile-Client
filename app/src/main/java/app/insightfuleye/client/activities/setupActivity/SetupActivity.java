@@ -338,6 +338,8 @@ public class SetupActivity extends AppCompatActivity {
         Api api = ApiClient.createService(Api.class);
         Log.d("baseUrl", ApiClient.getApiBaseUrl());
         PostSignIn postSignIn = new PostSignIn(USERNAME, PASSWORD);
+
+
         Observable<Signin> loginModelObservable = api.signIn(postSignIn);
         loginModelObservable.subscribe(new Observer<Signin>() {
             @Override
@@ -396,7 +398,15 @@ public class SetupActivity extends AppCompatActivity {
                         sqLiteDatabase.endTransaction();
                     }
 
-                    getLocationFromServer();
+                    synchronized(this){
+                        getLocationFromServer();
+                    }
+/*                    try {
+                        wait(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }*/
+
                     Log.i(TAG, "onPostExecute: Parse init");
                     Intent intent = new Intent(SetupActivity.this, HomeActivity.class);
                     intent.putExtra("setup", true);
@@ -408,7 +418,7 @@ public class SetupActivity extends AppCompatActivity {
 
             @Override
             public void onError(Throwable e) {
-                Logger.logD(TAG, "Login Failure" + e.getMessage());
+
                 progress.dismiss();
                 DialogUtils dialogUtils = new DialogUtils();
                 dialogUtils.showerrorDialog(SetupActivity.this, "Error Login", getString(R.string.error_incorrect_password), "ok");

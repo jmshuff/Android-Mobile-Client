@@ -127,7 +127,7 @@ public class ComplaintNodeActivity extends AppCompatActivity {
         list_recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_upload);
         assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -15,14 +15,15 @@ import java.util.List;
 
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
-import app.insightfuleye.client.models.Patient;
 import app.insightfuleye.client.models.dto.PatientAttributeTypeMasterDTO;
 import app.insightfuleye.client.models.dto.PatientAttributesDTO;
 import app.insightfuleye.client.models.dto.PatientDTO;
 import app.insightfuleye.client.models.pushRequestApiCall.Attribute;
+import app.insightfuleye.client.models.pushRequestApiCall.Patient;
 import app.insightfuleye.client.services.MyIntentService;
 import app.insightfuleye.client.utilities.DateAndTimeUtils;
 import app.insightfuleye.client.utilities.Logger;
+import app.insightfuleye.client.utilities.SessionManager;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
 public class PatientsDAO {
@@ -34,6 +35,7 @@ public class PatientsDAO {
 
         boolean isInserted = true;
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        SessionManager sessionManager=new SessionManager(IntelehealthApplication.getAppContext());
         ContentValues values = new ContentValues();
         db.beginTransaction();
         try {
@@ -71,6 +73,9 @@ public class PatientsDAO {
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
             values.put("sync", patient.getSyncd());
             values.put("abha_number", patient.getAbhaNumber());
+            values.put("location_id", patient.getLocationId());
+            values.put("patient_identifier", patient.getPatientIdentifier());
+            values.put("patient_identifer_type", patient.getPatientIdentiferType());
             createdRecordsCount = db.insertWithOnConflict("tbl_patient", null, values, SQLiteDatabase.CONFLICT_REPLACE);
         } catch (SQLException e) {
             isCreated = false;
@@ -107,6 +112,9 @@ public class PatientsDAO {
             values.put("state_province", patientDTO.getStateprovince());
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
             values.put("abha_number", patientDTO.getAbhaNumber());
+            values.put("location_id", patientDTO.getLocationId());
+            values.put("patient_identifier", patientDTO.getPatientIdentifier());
+            values.put("patient_identifer_type", patientDTO.getPatientIdentiferType());
             values.put("sync", false);
             patientAttributesList = patientDTO.getPatientAttributesDTOList();
             if (patientAttributesList != null)
@@ -126,7 +134,7 @@ public class PatientsDAO {
 
     }
 
-    public boolean updatePatientToDB(Patient patientDTO, String uuid, List<PatientAttributesDTO> patientAttributesDTOS) throws DAOException {
+    public boolean updatePatientToDB(PatientDTO patientDTO, String uuid, List<PatientAttributesDTO> patientAttributesDTOS) throws DAOException {
         boolean isCreated = true;
         long createdRecordsCount1 = 0;
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
@@ -138,23 +146,25 @@ public class PatientsDAO {
 
             Logger.logD("create", "create has to happen");
             values.put("uuid", uuid);
-            values.put("visilant_id", patientDTO.getVisilant_id());
-            values.put("first_name", patientDTO.getFirst_name());
-            values.put("middle_name", patientDTO.getMiddle_name());
-            values.put("last_name", patientDTO.getLast_name());
-            values.put("phone_number", patientDTO.getPhone_number());
+            values.put("visilant_id", patientDTO.getVisilantId());
+            values.put("first_name", patientDTO.getFirstname());
+            values.put("middle_name", patientDTO.getMiddlename());
+            values.put("last_name", patientDTO.getLastname());
+            values.put("phone_number", patientDTO.getPhonenumber());
             values.put("address1", patientDTO.getAddress1());
             values.put("address2", patientDTO.getAddress2());
             values.put("country", patientDTO.getCountry());
-            values.put("date_of_birth", patientDTO.getDate_of_birth());
+            values.put("date_of_birth", patientDTO.getDateofbirth());
             values.put("gender", patientDTO.getGender());
-            values.put("postal_code", patientDTO.getPostal_code());
-            values.put("city_village", patientDTO.getCity_village());
-            values.put("state_province", patientDTO.getState_province());
+            values.put("postal_code", patientDTO.getPostalcode());
+            values.put("city_village", patientDTO.getCityvillage());
+            values.put("state_province", patientDTO.getStateprovince());
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
             values.put("sync", false);
-            values.put("abha_number", patientDTO.getAbha_number());
-            insertPatientAttributes(patientAttributesDTOS, db);
+            values.put("abha_number", patientDTO.getAbhaNumber());
+            values.put("patient_identifier", patientDTO.getPatientIdentifier());
+            if(patientAttributesDTOS!=null)
+                insertPatientAttributes(patientAttributesDTOS, db);
             Logger.logD("pulldata", "datadumper" + values);
             createdRecordsCount1 = db.update("tbl_patient", values, whereclause, new String[]{uuid});
             db.setTransactionSuccessful();
@@ -485,6 +495,75 @@ public class PatientsDAO {
         return age;
     }
 
+    public String generateVisilantId(){
+        List<PatientDTO> patientDTOList = new ArrayList<>();
+        SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        db.beginTransaction();
+        int numericId=0;
+        try {
+            //consider just looking at the most recent entries instead of searching all
+            Cursor idCursor = db.rawQuery("SELECT visilant_id FROM tbl_patient", null);
+            if (idCursor.getCount() != 0) {
+                while (idCursor.moveToNext()) {
+                    String visilantId=idCursor.getString(idCursor.getColumnIndexOrThrow("visilant_id"));
+                    if(visilantId!=null && visilantId.length()>2){
+                        try{
+                            int temp= Integer.parseInt(visilantId.substring(2));
+                            if(temp>numericId)
+                                numericId=temp;
+                        } catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            idCursor.close();
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        } finally {
+            db.endTransaction();
+        }
 
+        SessionManager sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
+        String finalVisilantId= sessionManager.getCreatorID().substring(0, 2) + String.format("%04d", numericId+1);
+        return finalVisilantId;
+    }
+
+    public void removePatient(String patientUuid) throws DAOException {
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            String query = "Select * from tbl_patient where uuid = \'" + patientUuid + "\'";
+            Cursor cursor = localdb.rawQuery(query, null);
+            if (cursor.getCount() > 0) {
+                //while (cursor.moveToNext()) {
+                //String dbImageName = cursor.getString(cursor.getColumnIndexOrThrow("imageName"));
+                //Log.d("FileErase", dbImageName);
+                //Log.d("File erase", imageName);
+                localdb.execSQL("DELETE from tbl_patient where uuid = \'" + patientUuid + "\'");
+                localdb.setTransactionSuccessful();
+//                    List<azureResults> imageQueue = new ArrayList<>();
+//                    try {
+//                        imageQueue = getAzureImageQueue();
+//                        Log.e(TAG, imageQueue.toString());
+//                    } catch (DAOException e) {
+//                        FirebaseCrashlytics.getInstance().recordException(e);
+//                    }
+
+                //if (file.exists()) {
+                //      file.delete();
+                //  }
+                //}
+            }
+        }
+        catch (SQLException e){
+            throw new DAOException(e);
+        }
+        finally {
+            localdb.endTransaction();
+        }
+    }
 
 }

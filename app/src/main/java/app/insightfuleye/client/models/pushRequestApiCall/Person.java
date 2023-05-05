@@ -8,51 +8,75 @@ import java.util.List;
 
 public class Person {
 
-    @SerializedName("uuid")
+    @SerializedName("id")
     @Expose
-    private String uuid;
+    private String id;
+    @SerializedName("first_name")
+    @Expose
+    private String firstName;
+    @SerializedName("middle_name")
+    @Expose
+    private String middleName;
+    @SerializedName("last_name")
+    @Expose
+    private String lastName;
     @SerializedName("gender")
     @Expose
     private String gender;
-    @SerializedName("first_name")
-    @Expose
-    private String firstName = null;
-    @SerializedName("last_name")
-    @Expose
-    private String lastName=null;
     @SerializedName("birthdate")
     @Expose
     private String birthdate;
-    @SerializedName("person_type_id")
-    @Expose
-    private String personTypeId;
     @SerializedName("location_id")
     @Expose
     private String locationId;
+    @SerializedName("person_type_id")
+    @Expose
+    private String personTypeId;
+    @SerializedName("patient")
+    @Expose
+    private Patient patient;
+    @SerializedName("person_address")
+    @Expose
+    private Address address;
 
-    @SerializedName("attributes")
-    @Expose
-    private List<Attribute> attributes = null;
-    @SerializedName("addresses")
-    @Expose
-    private List<Address> addresses = null;
-    @Expose
-    private List<Name> names=null;
-
-    public String getUuid() {
-        return uuid;
+    /**
+     * No args constructor for use in serialization
+     *
+     */
+    public Person() {
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
+    /**
+     *
+     * @param firstName
+     * @param lastName
+     * @param birthdate
+     * @param personTypeId
+     * @param gender
+     * @param locationId
+     * @param patient
+     * @param middleName
+     * @param id
+     */
+    public Person(String id, String firstName, String middleName, String lastName, String gender, String birthdate, String locationId, String personTypeId, Patient patient) {
+        super();
+        this.id = id;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
         this.gender = gender;
+        this.birthdate = birthdate;
+        this.locationId = locationId;
+        this.personTypeId = personTypeId;
+        this.patient = patient;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -63,12 +87,28 @@ public class Person {
         this.firstName = firstName;
     }
 
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
     public String getLastName() {
         return lastName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getBirthdate() {
@@ -79,14 +119,6 @@ public class Person {
         this.birthdate = birthdate;
     }
 
-    public String getPersonTypeId() {
-        return personTypeId;
-    }
-
-    public void setPersonTypeId(String personTypeId) {
-        this.personTypeId = personTypeId;
-    }
-
     public String getLocationId() {
         return locationId;
     }
@@ -95,28 +127,27 @@ public class Person {
         this.locationId = locationId;
     }
 
-    //JS need to edit
-    public List<Attribute> getAttributes() {
-        return attributes;
+    public String getPersonTypeId() {
+        return personTypeId;
     }
 
-    public void setAttributes(List<Attribute> attributes) {
-        this.attributes = attributes;
+    public void setPersonTypeId(String personTypeId) {
+        this.personTypeId = personTypeId;
     }
 
-    public List<Address> getAddresses() {
-        return addresses;
+    public Patient getPatient() {
+        return patient;
     }
 
-    public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
-    public List<Name> getNames() {
-        return names;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setNames(List<Name> names) {
-        this.names = names;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }

@@ -272,7 +272,7 @@ public class PastMedicalHistoryActivity extends AppCompatActivity implements Que
         pastMedical_recyclerView.setItemAnimator(new DefaultItemAnimator());
         PagerSnapHelper helper = new PagerSnapHelper();
         helper.attachToRecyclerView(pastMedical_recyclerView);
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_upload);
         assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

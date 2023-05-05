@@ -10,31 +10,23 @@ public class UuidDictionary {
     //Concepts
     public static final String CURRENT_COMPLAINT = "3edb0e09-9135-481e-b8f0-07a26fa9a5ce";
     public static final String PHYSICAL_EXAMINATION = "e1761e85-9b50-48ae-8c4d-e6b7eeeba084";
-    public static final String HEIGHT = "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    public static final String WEIGHT = "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    public static final String PULSE = "5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    public static final String SYSTOLIC_BP = "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    public static final String DIASTOLIC_BP = "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    public static final String TEMPERATURE = "5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    public static final String RESPIRATORY = "5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    public static final String SPO2 = "5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    public static final String RHK_MEDICAL_HISTORY_BLURB = "62bff84b-795a-45ad-aae1-80e7f5163a82";
+    public static final String RHK_MEDICAL_HISTORY_BLURB = "ff386a14-432d-403e-a13a-dffa24b5452b";
     public static final String RHK_FAMILY_HISTORY_BLURB = "d63ae965-47fb-40e8-8f08-1f46a8a60b2b";
     public static final String FOLLOW_UP_VISIT = "e8caffd6-5d22-41c4-8d6a-bc31a44d0c86";
     //m added
     public static final String EMERGENCY = "ca5f5dc3-4f0b-4097-9cae-5cf2eb44a09c";
 
     //physical exam JS
-    public static final String VARight = "4765816f-dffe-42d4-bef2-7eaba8e191b6";
-    public static final String VALeft = "bc4744da-8e42-48f2-a061-de0ea13c02ad";
-    public static final String PinholeRight = "50492e1a-db2c-438f-bd9b-f8b7c68920f8";
-    public static final String PinholeLeft = "e7f1a349-8bb3-44a2-9d6a-260fffd01e7b";
+    public static final String VARight = "529c2adb-91d2-4916-944b-1237755a8540";
+    public static final String VALeft = "a1ebc13a-7f43-4510-809a-135cbc1fc445";
+    public static final String PinholeRight = "096e00f0-08a7-4f22-9fc4-8341ac391825";
+    public static final String PinholeLeft = "f452f28b-5578-4550-bcd7-6b2f4b06a51b";
     public static final String VolunteerReferral = "f83b9e96-8247-4354-9ba6-1196e3b56500";
     public static final String VolunteerDiagnosisRight = "d33cecbf-03b8-47ca-8ef7-771343c31d40";
     public static final String VolunteerDiagnosisLeft = "44535c45-d3b4-4190-b423-b21e28633c02";
     public static final String VolunteerReferralLocation= "413a81ab-35a7-4660-8a66-9f29dd33e2bf";
-    public static final String volunteerComplaintLeft = "4ebf037e-ffbb-44d9-a643-fe5802829c5f";
-    public static final String volunteerComplaintRight= "d2e32fc7-024e-4366-964a-d142c0f2174b";
+    public static final String volunteerComplaintLeft = "80573476-815f-412c-87de-c26f5d366c96";
+    public static final String volunteerComplaintRight= "08c18f4e-1e97-43be-a106-1b12debce911";
 
 /*    public static final String surgicalHistoryEye= "2d502a81-cefe-4c3c-b893-d0babd834e4b";
     public static final String patientEyeHistory= "bff42ffc-f818-40ab-a3f8-f1c4e4c0bc28";
@@ -55,14 +47,12 @@ public class UuidDictionary {
     public static final String OCCUPATION = "5fe2ef6f-bbf7-45df-a6ea-a284aee82ddc";
 
     //Encounter Types
-    public static final String ENCOUNTER_ADULTINITIAL = "8d5b27bc-c2cc-11de-8d13-0010c6dffd0f";
-    public static final String ENCOUNTER_VITALS = "67a71486-1a54-468f-ac3e-7091a9a79584";
-    public static final String ENCOUNTER_VISIT_NOTE = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
-    public static final String ENCOUNTER_VISIT_COMPLETE = "bd1fbfaa-f5fb-4ebd-b75c-564506fc309e";
-    public static final String ENCOUNTER_PATIENT_EXIT_SURVEY = "629a9d0b-48eb-405e-953d-a5964c88dc30";
-    public static final String ENCOUNTER_PHYSICAL_EXAM = "e80190f4-374f-4d1b-b52d-b315328618b7";
+    public static final String ENCOUNTER_ADULTINITIAL = "0484fb21-d714-4154-8898-84aea9c1d75c";
+    public static final String ENCOUNTER_HOSPITAL_IMAGING = "d94488f5-eeee-4531-935d-174b17bc04ee";
+    public static final String ENCOUNTER_VISIT_NOTE = "351aa45f-ede4-4221-9368-434d1c1f63db";
+    public static final String ENCOUNTER_VISIT_COMPLETE = "8a62ea5a-3531-4149-bb54-4a740c87767e";
 
-    public static final String EMERGENCY_OBS = "ca5f5dc3-4f0b-4097-9cae-5cf2eb44a09c";
+    public static final String EMERGENCY_OBS = "82c2a15d-f388-42a5-8b8c-fa479f9dd8d4";
 
     //Patient Identifier Type
     public static final String IDENTIFIER_OPENMRS_ID = "05a29f94-c0ed-11e2-94be-8c13b969e334";
@@ -78,7 +68,7 @@ public class UuidDictionary {
     public static final String ATTRIBUTE_EYE_CAMP_ID = "00784346-7f86-43ea-a40b-608d6deacfab";
 
     //Visit Types
-    public static final String VISIT_TELEMEDICINE = "a86ac96e-2e07-47a7-8e72-8216a1a75bfd";
+    public static final String VISIT_TELEMEDICINE = "b204531e-d28f-43e3-a9e4-43f1cc9aa1bd";
 
     //Survey Types
     public static final String RATING = "78284507-fb71-4354-9b34-046ab205e18f";

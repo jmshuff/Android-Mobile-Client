@@ -796,7 +796,6 @@
                             android:layout_weight="1"
                             android:padding="8dp"
                             android:id="@+id/right_eye_complaints">
-
                             <CheckBox android:id="@+id/checkbox_blurry_close_r"
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
@@ -839,7 +838,13 @@
                                 android:fontFamily="@font/lato_bold"
                                 android:textSize="14sp"
                                 android:onClick="onComplaintRightClicked"/>
-
+                            <CheckBox android:id="@+id/checkbox_no_complaints_r"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/no_complaints"
+                                android:fontFamily="@font/lato_bold"
+                                android:textSize="14sp"
+                                android:onClick="onComplaintRightClicked"/>
 
                         </LinearLayout>
 
@@ -850,6 +855,7 @@
                             android:layout_weight="1"
                             android:padding="8dp"
                             android:id="@+id/left_eye_complaints">
+
                             <CheckBox android:id="@+id/checkbox_blurry_close_l"
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
@@ -892,6 +898,13 @@
                                 android:fontFamily="@font/lato_bold"
                                 android:textSize="14sp"
                                 android:onClick="onComplaintLeftClicked"/>
+                            <CheckBox android:id="@+id/checkbox_no_complaints_l"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/no_complaints"
+                                android:fontFamily="@font/lato_bold"
+                                android:textSize="14sp"
+                                android:onClick="onComplaintLeftClicked"/>
 
 
 
@@ -930,7 +943,7 @@
 
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fab"
+                    android:id="@+id/fab_upload"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|end"

@@ -23,7 +23,7 @@ public class SyncUtils {
         ImagesPushDAO imagesPushDAO = new ImagesPushDAO();
 
         syncDAO.pushDataApi();
-        syncDAO.pullData_Background(IntelehealthApplication.getAppContext()); //only this new function duplicate
+      //  syncDAO.pullData_Background(IntelehealthApplication.getAppContext()); //only this new function duplicate
 
         //imagesPushDAO.patientProfileImagesPush();
 //        imagesPushDAO.obsImagesPush();
@@ -39,18 +39,15 @@ public class SyncUtils {
             @Override
             public void run() {
                 Logger.logD(TAG, "Background Image Push Started");
-                //imagesPushDAO.obsImagesPush();
-/*                try {
-                    imagesPushDAO.azureImagePush();
+                try {
+                    imagesPushDAO.imagePost();
                 } catch (DAOException e) {
                     e.printStackTrace();
-                }*/
+                }
                 Logger.logD(TAG, "Background Image Pull ended");
             }
         }, 3000);
 
-
-        imagesPushDAO.deleteObsImage();
 
         NotificationUtils notificationUtils = new NotificationUtils();
         notificationUtils.clearAllNotifications(IntelehealthApplication.getAppContext());
@@ -78,7 +75,7 @@ public class SyncUtils {
             @Override
             public void run() {
                 Logger.logD(TAG, "Pull Started");
-                syncDAO.pullData(IntelehealthApplication.getAppContext(), fromActivity);
+                //syncDAO.pullData(IntelehealthApplication.getAppContext(), fromActivity);
                 Logger.logD(TAG, "Pull ended");
             }
         }, 3000);
@@ -99,15 +96,13 @@ public class SyncUtils {
                 Logger.logD(TAG, "Image Push Started");
                 //imagesPushDAO.obsImagesPush();
                 try {
-                    imagesPushDAO.azureImagePush();
+                    imagesPushDAO.imagePost();
                 } catch (DAOException e) {
                     e.printStackTrace();
                 }
                 Logger.logD(TAG, "Image Pull ended");
             }
         }, 3000);
-
-        imagesPushDAO.deleteObsImage();
 
 
         WorkManager.getInstance()

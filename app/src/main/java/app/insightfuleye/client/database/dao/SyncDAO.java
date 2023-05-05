@@ -17,6 +17,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import app.insightfuleye.client.models.Data;
+import app.insightfuleye.client.models.Results;
+import app.insightfuleye.client.models.pushRequestApiCall.Encounter;
+import app.insightfuleye.client.models.pushRequestApiCall.Patient;
+import app.insightfuleye.client.models.pushRequestApiCall.Person;
+import app.insightfuleye.client.models.pushRequestApiCall.Visit;
+import app.insightfuleye.client.networkApiCalls.Api;
+import app.insightfuleye.client.networkApiCalls.ApiClient;
 import app.insightfuleye.client.utilities.Logger;
 import app.insightfuleye.client.utilities.NotificationID;
 import app.insightfuleye.client.utilities.PatientsFrameJson;
@@ -31,8 +39,12 @@ import app.insightfuleye.client.models.dto.VisitDTO;
 import app.insightfuleye.client.models.pushRequestApiCall.PushRequestApiCall;
 import app.insightfuleye.client.models.pushResponseApiCall.PushResponseApiCall;
 import app.insightfuleye.client.utilities.exception.DAOException;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
@@ -340,18 +352,143 @@ public class SyncDAO {
         VisitsDAO visitsDAO = new VisitsDAO();
         EncounterDAO encounterDAO = new EncounterDAO();
 
-        PushRequestApiCall pushRequestApiCall;
         PatientsFrameJson patientsFrameJson = new PatientsFrameJson();
-        pushRequestApiCall = patientsFrameJson.frameJson();
+        ArrayList<Person> patientRequestApiCall = patientsFrameJson.frameJsonPerson();
+        ArrayList<Visit> visitRequestApiCall= patientsFrameJson.frameJsonVisit();
+        ArrayList<Encounter> encounterRequestApiCall= patientsFrameJson.frameJsonEncounter();
+
         final boolean[] isSucess = {true};
         String encoded = sessionManager.getEncoded();
         Gson gson = new Gson();
-        Logger.logD(TAG, "push request model" + gson.toJson(pushRequestApiCall));
-        Log.e(TAG, "push request model" + gson.toJson(pushRequestApiCall));
-        String url = "https://" + sessionManager.getServerUrl() + "/EMR-Middleware/webapi/push/pushdata";
-//        String url = "http://" + sessionManager.getServerUrl() + "/pushdata";
+        Logger.logD(TAG, "push request model" + gson.toJson(patientRequestApiCall));
+        Log.e(TAG, "push request model" + gson.toJson(encounterRequestApiCall));
+
 //        push only happen if any one data exists.
-        if (!pushRequestApiCall.getVisits().isEmpty() || !pushRequestApiCall.getPersons().isEmpty() || !pushRequestApiCall.getPatients().isEmpty() || !pushRequestApiCall.getEncounters().isEmpty()) {
+
+        if(patientRequestApiCall!=null && patientRequestApiCall.size()>0){
+            //TODO add for loop
+            for(int i=0; i<patientRequestApiCall.size(); i++) {
+                Api api = ApiClient.createService(Api.class);
+                Observable<Results<Data>> patientResponseApiObservable = api.postPatients(patientRequestApiCall.get(i));
+                int finalI = i;
+                patientResponseApiObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<Results<Data>>() {
+                            @Override
+                            public void onNext(@NonNull Results<Data> dataResults) {
+                                if (dataResults.getSuccess() == true) {
+                                    try {
+                                        //TODO add uuid and visilantid??
+                                        patientsDAO.updateVisilantLd("", "true", patientRequestApiCall.get(finalI).getId());
+                                    } catch (DAOException e) {
+                                        FirebaseCrashlytics.getInstance().recordException(e);
+                                    }
+                                } else {
+                                    isSucess[0] = false;
+
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                sessionManager.setSyncFinished(false);
+                                isSucess[0] = false;
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                sessionManager.setSyncFinished(true);
+                                isSucess[0] = true;
+
+                            }
+                        });
+            }
+        }
+        if(visitRequestApiCall.size()>0 && visitRequestApiCall!=null){
+            //TODO add for loop
+            for(int i=0; i<visitRequestApiCall.size();i++) {
+                Api api = ApiClient.createService(Api.class);
+                Observable<Results<Data>> visitResponseApiObservable = api.postVisits(visitRequestApiCall.get(i));
+                int finalI = i;
+                visitResponseApiObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<Results<Data>>() {
+                            @Override
+                            public void onNext(@NonNull Results<Data> dataResults) {
+                                if (dataResults.getSuccess() == true) {
+                                    try {
+                                        visitsDAO.updateVisitSync(visitRequestApiCall.get(finalI).getId(), "true");
+                                    } catch (DAOException e) {
+                                        FirebaseCrashlytics.getInstance().recordException(e);
+                                    }
+                                } else {
+                                    isSucess[0] = false;
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                sessionManager.setSyncFinished(false);
+                                isSucess[0] = false;
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                sessionManager.setSyncFinished(true);
+                                isSucess[0] = true;
+
+                            }
+                        });
+            }
+        }
+
+        if(encounterRequestApiCall!=null && encounterRequestApiCall.size()>0){
+            //TODO add for loop
+            for(int i=0; i<encounterRequestApiCall.size(); i++) {
+                Api api = ApiClient.createService(Api.class);
+                Observable<Results<Data>> encounterResponseApiObservable = api.postEncounters(encounterRequestApiCall.get(i));
+                int finalI = i;
+                encounterResponseApiObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<Results<Data>>() {
+                            @Override
+                            public void onNext(@NonNull Results<Data> dataResults) {
+                                if (dataResults.getSuccess()) {
+                                    //TODO add uuid
+                                    try {
+                                        encounterDAO.updateEncounterSync("true", encounterRequestApiCall.get(finalI).getId());
+                                    } catch (DAOException e) {
+                                        FirebaseCrashlytics.getInstance().recordException(e);
+                                    }
+
+                                } else {
+                                    isSucess[0] = false;
+                                }
+
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                isSucess[0] = false;
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                sessionManager.setSyncFinished(true);
+                                isSucess[0] = true;
+
+                            }
+                        });
+            }
+            sessionManager.setPullSyncFinished(true);
+
+        }
+
+/*        if (!pushRequestApiCall.getVisits().isEmpty() || !pushRequestApiCall.getPersons().isEmpty() || !pushRequestApiCall.getPatients().isEmpty() || !pushRequestApiCall.getEncounters().isEmpty()) {
             Single<PushResponseApiCall> pushResponseApiCallObservable = AppConstants.apiInterface.PUSH_RESPONSE_API_CALL_OBSERVABLE(url, "Basic " + encoded, pushRequestApiCall);
             pushResponseApiCallObservable.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -395,8 +532,7 @@ public class SyncDAO {
                         }
                     });
             sessionManager.setPullSyncFinished(true);
-        }
-
+        }*/
         return isSucess[0];
     }
 

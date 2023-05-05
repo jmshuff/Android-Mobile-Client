@@ -65,9 +65,10 @@ import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.database.dao.VisitsDAO;
 import app.insightfuleye.client.knowledgeEngine.Node;
-import app.insightfuleye.client.models.Patient;
 import app.insightfuleye.client.models.dto.EncounterDTO;
+import app.insightfuleye.client.models.dto.PatientDTO;
 import app.insightfuleye.client.models.dto.VisitDTO;
+import app.insightfuleye.client.models.pushRequestApiCall.Patient;
 import app.insightfuleye.client.utilities.DateAndTimeUtils;
 import app.insightfuleye.client.utilities.DownloadFilesUtils;
 import app.insightfuleye.client.utilities.FileUtils;
@@ -98,7 +99,7 @@ public class PatientDetailActivity extends AppCompatActivity {
     String profileImage = "";
     String profileImage1 = "";
     SessionManager sessionManager = null;
-    Patient patient_new = new Patient();
+    PatientDTO patient_new = new PatientDTO();
 
     EncounterDTO encounterDTO = new EncounterDTO();
     PatientsDAO patientsDAO = new PatientsDAO();
@@ -258,7 +259,7 @@ public class PatientDetailActivity extends AppCompatActivity {
                 // Toast.makeText(PatientDetailActivity.this,"FH: "+fhistory,Toast.LENGTH_SHORT).show();
 
                 Intent intent2 = new Intent(PatientDetailActivity.this, ComplaintNodeActivity.class);
-                String fullName = patient_new.getFirst_name() + " " + patient_new.getLast_name();
+                String fullName = patient_new.getFirstname() + " " + patient_new.getLastname();
                 intent2.putExtra("patientUuid", patientUuid);
 
                 VisitDTO visitDTO = new VisitDTO();
@@ -330,18 +331,18 @@ public class PatientDetailActivity extends AppCompatActivity {
         if (idCursor.moveToFirst()) {
             do {
                 patient_new.setUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("uuid")));
-                patient_new.setVisilant_id(idCursor.getString(idCursor.getColumnIndexOrThrow("visilant_id")));
-                patient_new.setFirst_name(idCursor.getString(idCursor.getColumnIndexOrThrow("first_name")));
-                patient_new.setMiddle_name(idCursor.getString(idCursor.getColumnIndexOrThrow("middle_name")));
-                patient_new.setLast_name(idCursor.getString(idCursor.getColumnIndexOrThrow("last_name")));
-                patient_new.setDate_of_birth(idCursor.getString(idCursor.getColumnIndexOrThrow("date_of_birth")));
+                patient_new.setVisilantId(idCursor.getString(idCursor.getColumnIndexOrThrow("visilant_id")));
+                patient_new.setFirstname(idCursor.getString(idCursor.getColumnIndexOrThrow("first_name")));
+                patient_new.setMiddlename(idCursor.getString(idCursor.getColumnIndexOrThrow("middle_name")));
+                patient_new.setLastname(idCursor.getString(idCursor.getColumnIndexOrThrow("last_name")));
+                patient_new.setDateofbirth(idCursor.getString(idCursor.getColumnIndexOrThrow("date_of_birth")));
                 patient_new.setAddress1(idCursor.getString(idCursor.getColumnIndexOrThrow("address1")));
                 patient_new.setAddress2(idCursor.getString(idCursor.getColumnIndexOrThrow("address2")));
-                patient_new.setCity_village(idCursor.getString(idCursor.getColumnIndexOrThrow("city_village")));
-                patient_new.setState_province(idCursor.getString(idCursor.getColumnIndexOrThrow("state_province")));
-                patient_new.setPostal_code(idCursor.getString(idCursor.getColumnIndexOrThrow("postal_code")));
+                patient_new.setCityvillage(idCursor.getString(idCursor.getColumnIndexOrThrow("city_village")));
+                patient_new.setStateprovince(idCursor.getString(idCursor.getColumnIndexOrThrow("state_province")));
+                patient_new.setPostalcode(idCursor.getString(idCursor.getColumnIndexOrThrow("postal_code")));
                 patient_new.setCountry(idCursor.getString(idCursor.getColumnIndexOrThrow("country")));
-                patient_new.setPhone_number(idCursor.getString(idCursor.getColumnIndexOrThrow("phone_number")));
+                patient_new.setPhonenumber(idCursor.getString(idCursor.getColumnIndexOrThrow("phone_number")));
                 patient_new.setGender(idCursor.getString(idCursor.getColumnIndexOrThrow("gender")));
                 //patient_new.setPatient_photo(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_photo")));
             } while (idCursor.moveToNext());
@@ -363,10 +364,10 @@ public class PatientDetailActivity extends AppCompatActivity {
 
 
                 if (name.equalsIgnoreCase("Health Scheme Card")) {
-                    patient_new.setHealth_scheme(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
+                    patient_new.setHealthScheme(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
                 if (name.equalsIgnoreCase("Telephone Number")) {
-                    patient_new.setPhone_number(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
+                    patient_new.setPhonenumber(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
 /*                if (name.equalsIgnoreCase("Education Level")) {
                     patient_new.setEducation_level(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
@@ -468,19 +469,14 @@ public class PatientDetailActivity extends AppCompatActivity {
         }
 
 //changing patient to patient_new object
-        if (patient_new.getMiddle_name() == null) {
-            patientName = patient_new.getFirst_name() + " " + patient_new.getLast_name();
+        if (patient_new.getMiddlename() == null) {
+            patientName = patient_new.getFirstname() + " " + patient_new.getLastname();
         } else {
-            patientName = patient_new.getFirst_name() + " " + patient_new.getMiddle_name() + " " + patient_new.getLast_name();
+            patientName = patient_new.getFirstname() + " " + patient_new.getMiddlename() + " " + patient_new.getLastname();
         }
 
 //        setTitle(patientName);
         patinetName.setText(patientName);
-        try {
-            profileImage = imagesDAO.getPatientProfileChangeTime(patientUuid);
-        } catch (DAOException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-        }
 /*        if (patient_new.getPatient_photo() == null || patient_new.getPatient_photo().equalsIgnoreCase("")) {
             if (NetworkConnection.isOnline(getApplication())) {
                 profilePicDownloaded();
@@ -503,8 +499,8 @@ public class PatientDetailActivity extends AppCompatActivity {
                 .skipMemoryCache(true)
                 .into(photoView);*/
 
-        if (patient_new.getVisilant_id() != null && !patient_new.getVisilant_id().isEmpty()) {
-            idView.setText(patient_new.getVisilant_id());
+        if (patient_new.getVisilantId() != null && !patient_new.getVisilantId().isEmpty()) {
+            idView.setText(patient_new.getVisilantId());
 //            sessionManager.setOfllineOpenMRSID(patient_new.getOpenmrs_id());
         } else {
             idView.setText(getString(R.string.patient_not_registered));
@@ -520,17 +516,17 @@ public class PatientDetailActivity extends AppCompatActivity {
 //        }
 
 
-        setTitle(patient_new.getVisilant_id());
+        setTitle(patient_new.getVisilantId());
         //String id = idView.toString();
         //Log.d("IDEA","IDEA"+id);
 
 
-        String age = DateAndTimeUtils.getAgeInYearMonth(patient_new.getDate_of_birth(), context);
+        String age = DateAndTimeUtils.getAgeInYearMonth(patient_new.getDateofbirth(), context);
         ageView.setText(age);
-        float_ageYear_Month = DateAndTimeUtils.getFloat_Age_Year_Month(patient_new.getDate_of_birth());
+        float_ageYear_Month = DateAndTimeUtils.getFloat_Age_Year_Month(patient_new.getDateofbirth());
 
 
-        String dob = DateAndTimeUtils.getFormatedDateOfBirthAsView(patient_new.getDate_of_birth());
+        String dob = DateAndTimeUtils.getFormatedDateOfBirthAsView(patient_new.getDateofbirth());
         dobView.setText(dob);
         if (patient_new.getAddress1() == null || patient_new.getAddress1().equals("")) {
             addr1View.setVisibility(View.GONE);
@@ -543,31 +539,31 @@ public class PatientDetailActivity extends AppCompatActivity {
             addr2View.setText(patient_new.getAddress2());
         }
         String city_village;
-        if (patient_new.getCity_village() != null) {
-            city_village = patient_new.getCity_village().trim();
+        if (patient_new.getCityvillage() != null) {
+            city_village = patient_new.getCityvillage().trim();
         } else {
             city_village = "";
         }
 
-        if (patient_new.getPostal_code() != null) {
+        if (patient_new.getPostalcode() != null) {
             String addrFinalLine;
-            if (!patient_new.getPostal_code().equalsIgnoreCase("")) {
+            if (!patient_new.getPostalcode().equalsIgnoreCase("")) {
                 addrFinalLine = String.format("%s, %s, %s, %s",
-                        city_village, patient_new.getState_province(),
-                        patient_new.getPostal_code(), patient_new.getCountry());
+                        city_village, patient_new.getStateprovince(),
+                        patient_new.getPostalcode(), patient_new.getCountry());
             } else {
                 addrFinalLine = String.format("%s, %s, %s",
-                        city_village, patient_new.getState_province(),
+                        city_village, patient_new.getStateprovince(),
                         patient_new.getCountry());
             }
             addrFinalView.setText(addrFinalLine);
         }
 
-        phoneView.setText(patient_new.getPhone_number());
+        phoneView.setText(patient_new.getPhonenumber());
         //education_statusView.setText(patient_new.getEducation_level());
         //economic_statusView.setText(patient_new.getEconomic_status());
         //casteView.setText(patient_new.getCaste());
-        healthSchemeView.setText(patient_new.getHealth_scheme());
+        healthSchemeView.setText(patient_new.getHealthScheme());
 
 //
 /*        if (patient_new.getSdw() != null && !patient_new.getSdw().equals("")) {
@@ -668,18 +664,6 @@ public class PatientDetailActivity extends AppCompatActivity {
                                     .skipMemoryCache(true)
                                     .into(photoView);
                         }
-                        ImagesDAO imagesDAO = new ImagesDAO();
-                        boolean isImageDownloaded = false;
-                        try {
-                            isImageDownloaded = imagesDAO.insertPatientProfileImages(AppConstants.IMAGE_PATH + patientUuid + ".jpg", patientUuid);
-                        } catch (DAOException e) {
-                            FirebaseCrashlytics.getInstance().recordException(e);
-                        }
-//                        if (isImageDownloaded)
-//                            AppConstants.notificationUtils.DownloadDone(getString(R.string.patient_image_download_notifi), "" + patient_new.getFirst_name() + "" + patient_new.getLast_name() + "'s Image Download Incomplete.", 4, getApplication());
-//                        else
-//                            AppConstants.notificationUtils.DownloadDone(getString(R.string.patient_image_download_notifi), "" + patient_new.getFirst_name() + "" + patient_new.getLast_name() + "'s Image Download Incomplete.", 4, getApplication());
-
 
                     }
                 });

@@ -289,7 +289,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.Chip
             tvQuestion = itemView.findViewById(R.id.tv_complaintQuestion);
             rvChips = itemView.findViewById(R.id.rv_chips);
             rvImages=itemView.findViewById(R.id.rv_image_display);
-            fab = itemView.findViewById(R.id.fab);
+            fab = itemView.findViewById(R.id.fab_upload);
             physical_exam_text_view = itemView.findViewById(R.id.physical_exam_text_view);
             physical_exam_image_view = itemView.findViewById(R.id.physical_exam_image_view);
             llBody=itemView.findViewById(R.id.LL_body);

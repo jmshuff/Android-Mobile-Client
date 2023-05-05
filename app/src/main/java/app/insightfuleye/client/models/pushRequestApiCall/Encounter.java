@@ -8,72 +8,89 @@ import java.util.List;
 
 public class Encounter {
 
-    @SerializedName("uuid")
+    @SerializedName("id")
     @Expose
-    private String uuid;
-    @SerializedName("encounterDatetime")
+    private String id;
+    @SerializedName("encounter_type_id")
     @Expose
-    private String encounterDatetime;
-    @SerializedName("patient")
+    private String encounterTypeId;
+    @SerializedName("creator_id")
     @Expose
-    private String patient;
-    @SerializedName("encounterType")
+    private String creatorId;
+    @SerializedName("patient_id")
     @Expose
-    private String encounterType;
-    @SerializedName("visit")
+    private String patientId;
+    @SerializedName("visit_id")
     @Expose
-    private String visit;
+    private String visitId;
     @SerializedName("obs")
     @Expose
-    private List<Ob> obs = null;
-    @SerializedName("encounterProviders")
-    @Expose
-    private List<EncounterProvider> encounterProviders = null;
-    @SerializedName("location")
-    @Expose
-    private String location;
-    @SerializedName("voided")
-    @Expose
-    private Integer voided;
+    private List<Ob> obs;
 
-    public String getUuid() {
-        return uuid;
+    /**
+     * No args constructor for use in serialization
+     *
+     */
+    public Encounter() {
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    /**
+     *
+     * @param encounterTypeId
+     * @param obs
+     * @param visitId
+     * @param patientId
+     * @param creatorId
+     * @param id
+     */
+    public Encounter(String id, String encounterTypeId, String creatorId, String patientId, String visitId, List<Ob> obs) {
+        super();
+        this.id = id;
+        this.encounterTypeId = encounterTypeId;
+        this.creatorId = creatorId;
+        this.patientId = patientId;
+        this.visitId = visitId;
+        this.obs = obs;
     }
 
-    public String getEncounterDatetime() {
-        return encounterDatetime;
+    public String getId() {
+        return id;
     }
 
-    public void setEncounterDatetime(String encounterDatetime) {
-        this.encounterDatetime = encounterDatetime;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getPatient() {
-        return patient;
+    public String getEncounterTypeId() {
+        return encounterTypeId;
     }
 
-    public void setPatient(String patient) {
-        this.patient = patient;
+    public void setEncounterTypeId(String encounterTypeId) {
+        this.encounterTypeId = encounterTypeId;
     }
 
-    public String getEncounterType() {
-        return encounterType;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setEncounterType(String encounterType) {
-        this.encounterType = encounterType;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
-    public String getVisit() {
-        return visit;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setVisit(String visit) {
-        this.visit = visit;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getVisitId() {
+        return visitId;
+    }
+
+    public void setVisitId(String visitId) {
+        this.visitId = visitId;
     }
 
     public List<Ob> getObs() {
@@ -84,27 +101,4 @@ public class Encounter {
         this.obs = obs;
     }
 
-    public List<EncounterProvider> getEncounterProviders() {
-        return encounterProviders;
-    }
-
-    public void setEncounterProviders(List<EncounterProvider> encounterProviders) {
-        this.encounterProviders = encounterProviders;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public Integer getVoided() {
-        return voided;
-    }
-
-    public void setVoided(Integer voided) {
-        this.voided = voided;
-    }
 }

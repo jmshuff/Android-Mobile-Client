@@ -193,7 +193,7 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
 
         // questionListView = findViewById(R.id.complaint_question_expandable_list_view);
 
-        fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab_upload);
         assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -895,7 +895,6 @@ public class QuestionNodeActivity extends AppCompatActivity implements Questions
             contentValues.put("imageName", imageName);
             contentValues.put("patientId", patientUuid);
             contentValues.put("visitId", visitUuid);
-            contentValues.put("creatorId", sessionManager.getChwname());
             contentValues.put("type", type);
             //contentValues.put("sync", "false");
             localdb.insertWithOnConflict("tbl_azure_img_uploads", null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);

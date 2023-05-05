@@ -242,9 +242,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
 
-            //get location
-            inputLocation();
-
             //set new session is false
             sessionManager.setNewSession(false);
         }
@@ -365,6 +362,7 @@ public class HomeActivity extends AppCompatActivity {
                     //Your Code ...
                     sessionManager.setFirstTimeLaunched(false);
                     sessionManager.setMigration(true);
+                    inputLocation();
                 }
             }.start();
 
@@ -373,6 +371,7 @@ public class HomeActivity extends AppCompatActivity {
 
         if (sessionManager.isReturningUser()) {
             syncUtils.syncForeground("");
+            inputLocation();
         }
 
         showProgressbar();
@@ -1070,9 +1069,13 @@ public class HomeActivity extends AppCompatActivity {
             });
 
         alertDialog.setPositiveButton("Ok", (dialog, which) -> {
-            sessionManager.setLocationName(locationDTOList.get(checkedItem[0]).getName());
-            sessionManager.setLocationUuid(locationDTOList.get(checkedItem[0]).getLocationuuid());
-            dialog.dismiss();
+            if(checkedItem.length>0 && locationDTOList.size()>0){
+                sessionManager.setLocationName(locationDTOList.get(checkedItem[0]).getName());
+                sessionManager.setLocationUuid(locationDTOList.get(checkedItem[0]).getLocationuuid());
+                dialog.dismiss();}
+            else{
+                dialog.dismiss();
+            }
         });
         // create and build the AlertDialog instance with the AlertDialog builder instance
         AlertDialog customAlertDialog = alertDialog.create();

@@ -533,12 +533,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             } catch (DAOException e) {
                 e.printStackTrace();
             }
-            //update azure database
-            try {
-                updateAzureImageDatabase();
-            } catch (DAOException e) {
-                e.printStackTrace();
-            }
+
             //Print Queue
             ImagesDAO imagesDAO = new ImagesDAO();
             List<azureResults> azureQueue = new ArrayList<>();
@@ -1310,14 +1305,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
             contentValues.put("imageName", imageName);
             contentValues.put("patientId", patientUuid);
             contentValues.put("visitId", visitUuid);
-            contentValues.put("creatorId", sessionManager.getChwname());
             contentValues.put("type", type);
-            contentValues.put("VARight", "");
-            contentValues.put("VALeft", "");
-            contentValues.put("PinholeRight", "");
-            contentValues.put("PinholeLeft", "");
-            contentValues.put("age", "");
-            contentValues.put("sex", "");
 
 
             //contentValues.put("sync", "false");
@@ -1333,85 +1321,7 @@ public class PhysicalExamActivity extends AppCompatActivity implements Questions
         return isInserted;
     }
 
-    public boolean updateAzureImageDatabase() throws DAOException {
 
-        String phistory="";
-        String fhistory="";
-
-        InteleHealthDatabaseHelper mDatabaseHelper = new InteleHealthDatabaseHelper(PhysicalExamActivity.this);
-        SQLiteDatabase sqLiteDatabase = mDatabaseHelper.getReadableDatabase();
-
-        String CREATOR_ID = sessionManager.getCreatorID();
-
-        String[] cols = {"value"};
-        Cursor cursor = sqLiteDatabase.query("tbl_obs", cols, "encounteruuid=? and conceptuuid=?",// querying for PMH (Past Medical History)
-                new String[]{encounterAdultIntials, UuidDictionary.RHK_MEDICAL_HISTORY_BLURB},
-                null, null, null);
-
-        if (cursor.moveToFirst()) {
-            // rows present
-            do {
-                // so that null data is not appended
-                phistory = phistory + cursor.getString(0);
-
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-
-        Cursor cursor1 = sqLiteDatabase.query("tbl_obs", cols, "encounteruuid=? and conceptuuid=?",// querying for FH (Family History)
-                new String[]{encounterAdultIntials, UuidDictionary.RHK_FAMILY_HISTORY_BLURB},
-                null, null, null);
-        if (cursor1.moveToFirst()) {
-            // rows present
-            do {
-                fhistory = fhistory + cursor1.getString(0);
-            }
-            while (cursor1.moveToNext());
-        }
-        cursor1.close();
-
-        boolean isUpdated = false;
-        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-        localdb.beginTransaction();
-        ContentValues contentValues = new ContentValues();
-        PatientsDAO patientsDAO = new PatientsDAO();
-        String mAge = patientsDAO.fetch_age(patientUuid);
-        String mGender = patientsDAO.fetch_gender(patientUuid);
-
-        String leftComp= Node.getRightSympt();
-        if(leftComp!=null){
-        leftComp=leftComp.replace("\u2022", "");
-        leftComp=leftComp.replace("<br/>", "");}
-
-        String rightComp= Node.getRightSympt();
-        if(rightComp!=null){
-            rightComp=rightComp.replace("\u2022", "");
-            rightComp=rightComp.replace("<br/>", "");}
-
-        try {
-            contentValues.put("VARight", physicalExamMap.getVARight());
-            contentValues.put("VALeft", physicalExamMap.getVALeft());
-            contentValues.put("PinholeRight", physicalExamMap.getPinholeRight());
-            contentValues.put("PinholeLeft", physicalExamMap.getPinholeLeft());
-            contentValues.put("age", mAge);
-            contentValues.put("sex", mGender);
-            contentValues.put("patHist", phistory);
-            contentValues.put("famHist", fhistory);
-            contentValues.put("complaintsRight", rightComp);
-            contentValues.put("complaintsLeft", leftComp);
-
-            localdb.updateWithOnConflict("tbl_azure_img_uploads", contentValues, "visitId = ?", new String[]{visitUuid}, SQLiteDatabase.CONFLICT_REPLACE);
-            localdb.setTransactionSuccessful();
-            isUpdated = true;
-        } catch (SQLException e) {
-            isUpdated = false;
-            throw new DAOException(e);
-        } finally {
-            localdb.endTransaction();
-        }
-        return isUpdated;
-    }
 
     public void manageCameraPermissions(String imageName) {
 

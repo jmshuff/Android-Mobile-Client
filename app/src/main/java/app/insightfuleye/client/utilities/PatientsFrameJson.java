@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import app.insightfuleye.client.models.pushRequestApiCall.EncounterProvider;
 import app.insightfuleye.client.models.pushRequestApiCall.Identifier;
 import app.insightfuleye.client.models.pushRequestApiCall.Name;
 import app.insightfuleye.client.models.pushRequestApiCall.Ob;
+import app.insightfuleye.client.models.pushRequestApiCall.ObsString;
 import app.insightfuleye.client.models.pushRequestApiCall.Patient;
 import app.insightfuleye.client.models.pushRequestApiCall.Person;
 import app.insightfuleye.client.models.pushRequestApiCall.PushRequestApiCall;
@@ -40,11 +42,12 @@ public class PatientsFrameJson {
     private VisitsDAO visitsDAO = new VisitsDAO();
     private EncounterDAO encounterDAO = new EncounterDAO();
     private ObsDAO obsDAO = new ObsDAO();
+    UuidGenerator uuidGenerator = new UuidGenerator();
 
-    public PushRequestApiCall frameJson() {
+/*    public PushRequestApiCall frameJson() {
         session = new SessionManager(IntelehealthApplication.getAppContext());
 
-        PushRequestApiCall pushRequestApiCall = new PushRequestApiCall();
+        //PushRequestApiCall pushRequestApiCall = new PushRequestApiCall();
 
         List<PatientDTO> patientDTOList = null;
         try {
@@ -66,14 +69,11 @@ public class PatientsFrameJson {
                 person.setBirthdate(patientDTOList.get(i).getDateofbirth());
                 person.setGender(patientDTOList.get(i).getGender());
                 person.setUuid(patientDTOList.get(i).getUuid());
+                person.setFirstName(patientDTOList.get(i).getFirstname());
+                person.setLastName(patientDTOList.get(i).getLastname());
+                person.setLocationId(session.getLocationUuid());
+                person.setPersonTypeId("52deed97-364d-4ba3-8faf-7673d89f235a");
                 personList.add(person);
-
-                List<Name> nameList = new ArrayList<>();
-                Name name = new Name();
-                name.setFamilyName(patientDTOList.get(i).getLastname());
-                name.setGivenName(patientDTOList.get(i).getFirstname());
-                name.setMiddleName(patientDTOList.get(i).getMiddlename());
-                nameList.add(name);
 
                 List<Address> addressList = new ArrayList<>();
                 Address address = new Address();
@@ -85,7 +85,6 @@ public class PatientsFrameJson {
                 address.setStateProvince(patientDTOList.get(i).getStateprovince());
                 addressList.add(address);
 
-
                 List<Attribute> attributeList = new ArrayList<>();
                 attributeList.clear();
                 try {
@@ -94,63 +93,45 @@ public class PatientsFrameJson {
                     FirebaseCrashlytics.getInstance().recordException(e);
                 }
 
-
-                person.setNames(nameList);
                 person.setAddresses(addressList);
                 person.setAttributes(attributeList);
                 Patient patient = new Patient();
 
-                patient.setPerson(patientDTOList.get(i).getUuid());
-
-                List<Identifier> identifierList = new ArrayList<>();
-                Identifier identifier = new Identifier();
-                identifier.setIdentifierType("05a29f94-c0ed-11e2-94be-8c13b969e334");
-                identifier.setLocation(session.getLocationUuid());
-                identifier.setPreferred(true);
-                identifierList.add(identifier);
-
-                patient.setIdentifiers(identifierList);
+                patient.setPersonId(patientDTOList.get(i).getUuid());
+                patient.setAbhaNo(patientDTOList.get(i).getAbhaNumber());
+                patient.setPatientIdentifier(patientDTOList.get(i).getPatientIdentifier());
+                patient.setPatientIdentifierType(patientDTOList.get(i).getPatientIdentiferType());
                 patientList.add(patient);
-
-
             }
         }
         for (VisitDTO visitDTO : visitDTOList) {
             Visit visit = new Visit();
             visit.setLocation(visitDTO.getLocationuuid());
             visit.setPatient(visitDTO.getPatientuuid());
-            visit.setStartDatetime(visitDTO.getStartdate());
             visit.setUuid(visitDTO.getUuid());
-            visit.setVisitType(visitDTO.getVisitTypeUuid());
-            visit.setStopDatetime(visitDTO.getEnddate());
-            visit.setAttributes(visitDTO.getAttributes());
-//          visitList.add(visit);
+            visit.setPatient(visitDTO.getPatientuuid());
+            //visit.setStartDatetime(visitDTO.getStartdate());
+            //visit.setVisitType(visitDTO.getVisitTypeUuid());
+            //visit.setStopDatetime(visitDTO.getEnddate());
+            //visit.setAttributes(visitDTO.getAttributes());
+            visitList.add(visit);
 
-            if (visitDTO.getAttributes().size() > 0) {
-                visitList.add(visit);
-            }
+//            if (visitDTO.getAttributes().size() > 0) {
+//                visitList.add(visit);
+//            }
 
         }
 
         for (EncounterDTO encounterDTO : encounterDTOList) {
             Encounter encounter = new Encounter();
 
-            encounter = new Encounter();
             encounter.setUuid(encounterDTO.getUuid());
-            encounter.setEncounterDatetime(encounterDTO.getEncounterTime());//visit start time
+            //encounter.setEncounterDatetime(encounterDTO.getEncounterTime());//visit start time
             encounter.setEncounterType(encounterDTO.getEncounterTypeUuid());//right know it is static
             encounter.setPatient(visitsDAO.patientUuidByViistUuid(encounterDTO.getVisituuid()));
             encounter.setVisit(encounterDTO.getVisituuid());
-            encounter.setVoided(encounterDTO.getVoided());
-
-            List<EncounterProvider> encounterProviderList = new ArrayList<>();
-            EncounterProvider encounterProvider = new EncounterProvider();
-            encounterProvider.setEncounterRole("73bbb069-9781-4afc-a9d1-54b6b2270e04");
-          //  encounterProvider.setProvider(session.getProviderID());
-            encounterProvider.setProvider(encounterDTO.getProvideruuid());
-            Log.d("DTO","DTO:frame "+ encounterProvider.getProvider());
-            encounterProviderList.add(encounterProvider);
-            encounter.setEncounterProviders(encounterProviderList);
+            encounter.setEncounterProviders(encounterDTO.getProvideruuid());
+            encounter.setLocation(session.getLocationUuid());
 
             if (!encounterDTO.getEncounterTypeUuid().equalsIgnoreCase(UuidDictionary.EMERGENCY)) {
                 List<Ob> obsList = new ArrayList<>();
@@ -173,16 +154,12 @@ public class PatientsFrameJson {
                 encounter.setObs(obsList);
             }
 
-            encounter.setLocation(session.getLocationUuid());
 
 //          encounterList.add(encounter);
 
-            if (speciality_row_exist_check(encounter.getVisit())){
-                encounterList.add(encounter);
-            }
+            encounterList.add(encounter);
 
         }
-
 
 
         pushRequestApiCall.setPatients(patientList);
@@ -194,6 +171,142 @@ public class PatientsFrameJson {
 
 
         return pushRequestApiCall;
+    }*/
+
+    public ArrayList<Person> frameJsonPerson() {
+        session = new SessionManager(IntelehealthApplication.getAppContext());
+        ArrayList<Person> personRequestCallApi = new ArrayList<>();
+        List<PatientDTO> patientDTOList = null;
+        try {
+            patientDTOList = patientsDAO.unsyncedPatients();
+        } catch (DAOException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+        if (patientDTOList != null) {
+            for (int i = 0; i < patientDTOList.size(); i++) {
+
+                Person person = new Person();
+                person.setBirthdate(patientDTOList.get(i).getDateofbirth());
+                String gender= (patientDTOList.get(i).getGender()=="M") ? "male" : "female";
+                person.setGender(gender);
+                person.setId(generateUuid()); //random uuid for person
+                person.setFirstName(patientDTOList.get(i).getFirstname());
+                person.setLastName(patientDTOList.get(i).getLastname());
+                person.setLocationId(session.getLocationUuid());
+                person.setPersonTypeId("52deed97-364d-4ba3-8faf-7673d89f235a");
+
+                Address address = new Address();
+                address.setAddress1(patientDTOList.get(i).getAddress1());
+                address.setAddress2(patientDTOList.get(i).getAddress2());
+                address.setCityVillage(patientDTOList.get(i).getCityvillage());
+                address.setCountry(patientDTOList.get(i).getCountry());
+                address.setPostalCode(patientDTOList.get(i).getPostalcode());
+                address.setStateProvince(patientDTOList.get(i).getStateprovince());
+                //person.setAddress(address);
+
+                List<Attribute> attributeList = new ArrayList<>();
+                attributeList.clear();
+                try {
+                    attributeList = patientsDAO.getPatientAttributes(patientDTOList.get(i).getUuid());
+                } catch (DAOException e) {
+                    FirebaseCrashlytics.getInstance().recordException(e);
+                }
+
+                //person.setAttributes(attributeList);
+                //TODO add patient attributes
+                Patient patient = new Patient();
+
+                patient.setId(patientDTOList.get(i).getUuid()); //patientId comes from table
+//                patient.setAbhaNo(patientDTOList.get(i).getAbhaNumber());
+//                patient.setPatientIdentifier(patientDTOList.get(i).getPatientIdentifier());
+//                patient.setPatientIdentifierTypeId(patientDTOList.get(i).getPatientIdentiferType());
+                patient.setAbhaNo("ABHA001");
+                patient.setPatientIdentifier(patientDTOList.get(i).getVisilantId());
+                patient.setPatientIdentifierTypeId("1c416bfb-ea5b-44bd-b183-ffd1cde2b661");
+                person.setPatient(patient);
+
+                personRequestCallApi.add(person);
+            }
+        }
+        return personRequestCallApi;
+    }
+
+    public ArrayList<Visit> frameJsonVisit() {
+        session = new SessionManager(IntelehealthApplication.getAppContext());
+        ArrayList<Visit> visitRequestCallApi = new ArrayList<>();
+
+        List<VisitDTO> visitDTOList = null;
+        visitDTOList = visitsDAO.unsyncedVisits();
+
+        //get unsynced visits
+        //get unsynced encounters. If encounter is already in visit list, skip
+        //get unsynced obs. If ob is already in visit list, skip
+
+        for (VisitDTO visitDTO : visitDTOList) {
+            Visit visit = new Visit();
+            visit.setLocationId(visitDTO.getLocationuuid());
+            visit.setPatientId(visitDTO.getPatientuuid());
+            visit.setId(visitDTO.getUuid());
+            visit.setCreatorId(visitDTO.getCreatoruuid());
+            visit.setVisitTypeId(visitDTO.getVisitTypeUuid());
+            //visit.setStartDatetime(visitDTO.getStartdate());
+            //visit.setVisitType(visitDTO.getVisitTypeUuid());
+            //visit.setStopDatetime(visitDTO.getEnddate());
+            //visit.setAttributes(visitDTO.getAttributes());
+
+//            if (visitDTO.getAttributes().size() > 0) {
+//                visitList.add(visit);
+//            }
+            visitRequestCallApi.add(visit);
+
+        }
+        return visitRequestCallApi;
+    }
+
+    public ArrayList<Encounter> frameJsonEncounter(){
+        session = new SessionManager(IntelehealthApplication.getAppContext());
+        ArrayList<Encounter> encounterRequestCallApi = new ArrayList<>();
+
+        List<EncounterDTO> encounterDTOList = null;
+        encounterDTOList = encounterDAO.unsyncedEncounters();
+
+
+        for (EncounterDTO encounterDTO : encounterDTOList) {
+            Encounter encounter = new Encounter();
+
+            encounter.setId(encounterDTO.getUuid());
+            //encounter.setEncounterDatetime(encounterDTO.getEncounterTime());//visit start time
+            encounter.setEncounterTypeId(encounterDTO.getEncounterTypeUuid());//right know it is static
+            encounter.setPatientId(encounterDTO.getPatientuuid());
+            encounter.setVisitId(encounterDTO.getVisituuid());
+            encounter.setCreatorId(encounterDTO.getProvideruuid());
+
+            if (!encounterDTO.getEncounterTypeUuid().equalsIgnoreCase(UuidDictionary.EMERGENCY)) {
+                List<Ob> obsList = new ArrayList<>();
+                List<ObsDTO> obsDTOList = obsDAO.obsDTOList(encounterDTO.getUuid());
+                for (ObsDTO obs : obsDTOList) {
+                    if (obs != null && obs.getValue() != null) {
+                        if (!obs.getValue().isEmpty()) {
+                            Ob ob = new Ob();
+                            ObsString obsString = new ObsString();
+                            //Do not set obs uuid in case of emergency encounter type .Some error occuring in open MRS if passed
+
+                            ob.setId(obs.getUuid());
+                            ob.setConceptId(obs.getConceptuuid());
+                            ob.setVisitId(encounterDTO.getVisituuid());
+                            ob.setPatientId(encounterDTO.getPatientuuid());
+                            ob.setConceptId(obs.getConceptuuid());
+                            obsString.setValue(obs.getValue());
+                            obsList.add(ob);
+                        }
+                    }
+                }
+                encounter.setObs(obsList);
+            }
+            encounterRequestCallApi.add(encounter);
+
+        }
+        return encounterRequestCallApi;
     }
 
     /**
@@ -217,5 +330,10 @@ public class PatientsFrameJson {
         db.endTransaction();
 
         return isExists;
+    }
+
+    public String generateUuid() {
+        String uuid = uuidGenerator.UuidGenerator();
+        return uuid;
     }
 }

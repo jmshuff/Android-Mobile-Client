@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteException;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -449,4 +450,39 @@ public class VisitsDAO {
         return isDownloaded;
     }
 
+    public void removeVisit(String visitUuid) throws DAOException {
+        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
+        localdb.beginTransaction();
+        ContentValues contentValues = new ContentValues();
+        try {
+            String query = "Select * from tbl_visit where uuid = \'" + visitUuid + "\'";
+            Cursor cursor = localdb.rawQuery(query, null);
+            if (cursor.getCount() > 0) {
+                //while (cursor.moveToNext()) {
+                //String dbImageName = cursor.getString(cursor.getColumnIndexOrThrow("imageName"));
+                //Log.d("FileErase", dbImageName);
+                //Log.d("File erase", imageName);
+                localdb.execSQL("DELETE from tbl_visit where uuid = \'" + visitUuid + "\'");
+                localdb.setTransactionSuccessful();
+//                    List<azureResults> imageQueue = new ArrayList<>();
+//                    try {
+//                        imageQueue = getAzureImageQueue();
+//                        Log.e(TAG, imageQueue.toString());
+//                    } catch (DAOException e) {
+//                        FirebaseCrashlytics.getInstance().recordException(e);
+//                    }
+
+                //if (file.exists()) {
+                //      file.delete();
+                //  }
+                //}
+            }
+        }
+        catch (SQLException e){
+            throw new DAOException(e);
+        }
+        finally {
+            localdb.endTransaction();
+        }
+    }
 }

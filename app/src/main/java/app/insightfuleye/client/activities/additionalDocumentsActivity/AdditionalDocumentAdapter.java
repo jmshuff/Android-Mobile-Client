@@ -105,11 +105,6 @@ public class AdditionalDocumentAdapter extends RecyclerView.Adapter<AdditionalDo
                 notifyItemRangeChanged(position, documentList.size());
                 String imageName = holder.getDocumentNameTextView().getText().toString();
 
-                try {
-                    imagesDAO.deleteImageFromDatabase(StringUtils.getFileNameWithoutExtensionString(imageName));
-                } catch (DAOException e) {
-                    FirebaseCrashlytics.getInstance().recordException(e);
-                }
             }
         });
     }

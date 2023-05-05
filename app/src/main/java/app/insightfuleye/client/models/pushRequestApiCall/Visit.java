@@ -10,92 +10,94 @@ import app.insightfuleye.client.models.dto.VisitAttribute_Speciality;
 
 public class Visit {
 
-    @SerializedName("uuid")
+    @SerializedName("id")
     @Expose
-    private String uuid;
-    @SerializedName("startDatetime")
+    private String id;
+    @SerializedName("visit_type_id")
     @Expose
-    private String startDatetime;
-    @SerializedName("stopDatetime")
+    private String visitTypeId;
+    @SerializedName("location_id")
     @Expose
-    private String stopDatetime;
-    @SerializedName("visitType")
+    private String locationId;
+    @SerializedName("creator_id")
     @Expose
-    private String visitType;
-    @SerializedName("patient")
+    private String creatorId;
+    @SerializedName("encounter")
     @Expose
-    private String patient;
-    @SerializedName("location")
+    private List<Encounter> encounter;
+    @SerializedName("patient_id")
     @Expose
-    private String location;
-    @SerializedName("attributes")
-    @Expose
-    private List<VisitAttribute_Speciality> attributes = null;
-//    @SerializedName("attributes")
-//    @Expose
-//    private List<Attribute> attributes = null;
+    private String patientId;
 
-    public String getUuid() {
-        return uuid;
+    /**
+     * No args constructor for use in serialization
+     *
+     */
+    public Visit() {
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    /**
+     *
+     * @param locationId
+     * @param creatorId
+     * @param visitTypeId
+     * @param id
+     * @param encounter
+     */
+    public Visit(String id, String visitTypeId, String locationId, String creatorId, List<Encounter> encounter) {
+        super();
+        this.id = id;
+        this.visitTypeId = visitTypeId;
+        this.locationId = locationId;
+        this.creatorId = creatorId;
+        this.encounter = encounter;
     }
 
-    public String getStartDatetime() {
-        return startDatetime;
+    public String getId() {
+        return id;
     }
 
-    public void setStartDatetime(String startDatetime) {
-        this.startDatetime = startDatetime;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getVisitType() {
-        return visitType;
+    public String getVisitTypeId() {
+        return visitTypeId;
     }
 
-    public void setVisitType(String visitType) {
-        this.visitType = visitType;
+    public void setVisitTypeId(String visitTypeId) {
+        this.visitTypeId = visitTypeId;
     }
 
-    public String getPatient() {
-        return patient;
+    public String getLocationId() {
+        return locationId;
     }
 
-    public void setPatient(String patient) {
-        this.patient = patient;
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
     }
 
-    public String getLocation() {
-        return location;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
-    public String getStopDatetime() {
-        return stopDatetime;
+    public List<Encounter> getEncounter() {
+        return encounter;
     }
 
-    public void setStopDatetime(String stopDatetime) {
-        this.stopDatetime = stopDatetime;
+    public void setEncounter(List<Encounter> encounter) {
+        this.encounter = encounter;
     }
 
-    public List<VisitAttribute_Speciality> getAttributes() {
-        return attributes;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setAttributes(List<VisitAttribute_Speciality> attributes) {
-        this.attributes = attributes;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
-
-//    public List<Attribute> getAttributes() {
-//        return attributes;
-//    }
-//
-//    public void setAttributes(List<Attribute> attributes) {
-//        this.attributes = attributes;
-//    }
 }

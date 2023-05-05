@@ -1,8 +1,6 @@
 package app.insightfuleye.client.database.dao;
 
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.Toast;
@@ -24,11 +22,9 @@ import java.util.UUID;
 import app.insightfuleye.client.R;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
-import app.insightfuleye.client.models.ObsImageModel.ObsJsonResponse;
-import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
 import app.insightfuleye.client.models.azureResults;
-import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
-import app.insightfuleye.client.models.uploadImage;
+import app.insightfuleye.client.networkApiCalls.Api;
+import app.insightfuleye.client.networkApiCalls.ApiClient;
 import app.insightfuleye.client.networkApiCalls.AzureNetworkClient;
 import app.insightfuleye.client.networkApiCalls.AzureUploadAPI;
 import app.insightfuleye.client.utilities.Logger;
@@ -58,105 +54,6 @@ public class ImagesPushDAO {
     private NotificationManager mNotifyManager;
     private NotificationCompat.Builder mBuilder;
 
-
-
-    public boolean patientProfileImagesPush() {
-        sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
-        String encoded = sessionManager.getEncoded();
-        Gson gson = new Gson();
-        UrlModifiers urlModifiers = new UrlModifiers();
-        ImagesDAO imagesDAO = new ImagesDAO();
-        String url = urlModifiers.setPatientProfileImageUrl();
-        List<PatientProfile> patientProfiles = new ArrayList<>();
-        try {
-            patientProfiles = imagesDAO.getPatientProfileUnsyncedImages();
-        } catch (DAOException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-        }
-        for (PatientProfile p : patientProfiles) {
-            Single<ResponseBody> personProfilePicUpload = AppConstants.apiInterface.PERSON_PROFILE_PIC_UPLOAD(url, "Basic " + encoded, p);
-            personProfilePicUpload.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableSingleObserver<ResponseBody>() {
-                        @Override
-                        public void onSuccess(ResponseBody responseBody) {
-                            Logger.logD(TAG, "success" + responseBody);
-                            try {
-                                imagesDAO.updateUnsyncedPatientProfile(p.getPerson(), "PP");
-                            } catch (DAOException e) {
-                                FirebaseCrashlytics.getInstance().recordException(e);
-                            }
-//                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Uploaded Patient Profile", 4, IntelehealthApplication.getAppContext());
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Logger.logD(TAG, "Onerror " + e.getMessage());
-//                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
-                        }
-                    });
-        }
-        sessionManager.setPullSyncFinished(true);
-//        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
-        return true;
-    }
-
-    public boolean obsImagesPush() {
-
-        sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
-        String encoded = sessionManager.getEncoded();
-        Gson gson = new Gson();
-        UrlModifiers urlModifiers = new UrlModifiers();
-        ImagesDAO imagesDAO = new ImagesDAO();
-        String url = urlModifiers.setObsImageUrl();
-        List<ObsPushDTO> obsImageJsons = new ArrayList<>();
-        try {
-            obsImageJsons = imagesDAO.getObsUnsyncedImages();
-            Log.e(TAG, "image request model" + gson.toJson(obsImageJsons));
-        } catch (DAOException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-        }
-
-        int i = 0;
-        for (ObsPushDTO p : obsImageJsons) {
-            //pass it like this
-            File file = null;
-            file = new File(AppConstants.IMAGE_PATH + p.getUuid() + ".jpg");
-            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            // MultipartBody.Part is used to send also the actual file name
-            MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-
-            Observable<ObsJsonResponse> obsJsonResponseObservable = AppConstants.apiInterface.OBS_JSON_RESPONSE_OBSERVABLE(url, "Basic " + encoded, body, p);
-            obsJsonResponseObservable.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableObserver<ObsJsonResponse>() {
-                        @Override
-                        public void onNext(ObsJsonResponse obsJsonResponse) {
-                            Logger.logD(TAG, "success" + obsJsonResponse);
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Logger.logD(TAG, "Onerror " + e.getMessage());
-//                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", IntelehealthApplication.getAppContext());
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            Logger.logD(TAG, "success");
-                            try {
-                                imagesDAO.updateUnsyncedObsImages(p.getUuid());
-                            } catch (DAOException e) {
-                                FirebaseCrashlytics.getInstance().recordException(e);
-                            }
-                        }
-                    });
-        }
-        sessionManager.setPushSyncFinished(true);
-//        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
-        return true;
-    }
     @NonNull
     private RequestBody createPartFromString(String description){
         if(description!=null) return RequestBody.create(MediaType.parse("text/plain"), description);
@@ -290,175 +187,81 @@ public class ImagesPushDAO {
         return true;
     }
 
-    public boolean azureAddDocsPush() throws DAOException {
+    public boolean imagePost() throws DAOException{
         sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
-//        SQLiteDatabase localdb = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
-//        localdb.execSQL("delete from tbl_azure_uploads");
-        String encoded = sessionManager.getEncoded();
-        Retrofit retrofit = AzureNetworkClient.getRetrofit();
+        Api api = ApiClient.createService(Api.class);
         ImagesDAO imagesDAO = new ImagesDAO();
         List<azureResults> imageQueue = new ArrayList<>();
-        List<uploadImage> imageGallery = new ArrayList<>();
-        try {
-            imageQueue = imagesDAO.getAzureDocsQueue();
-            imageGallery=imagesDAO.getAzureGalleryQueue();
-            Log.e(TAG, imageQueue.toString());
-        } catch (DAOException e) {
+        try{
+            imageQueue = imagesDAO.getAzureImageQueue();
+            Log.d(TAG, imageQueue.toString());
+        } catch(DAOException e){
             FirebaseCrashlytics.getInstance().recordException(e);
         }
-        //Make a list of patients who have images. These will be the uploaded ones
-        List<azureResults> imagesToUpload = new ArrayList<>();
+        int queueSize=imageQueue.size();
+        int finalQueueSize = queueSize;
+        final int[] totalUploaded = {0};
+        final boolean[] uploaded = {true};
 
-        for (uploadImage p : imageGallery){
-            File file = new File(p.getImagePath());
-            azureResults patient= new azureResults();
-            if (file.exists()){
-                patient.setLeftRight(p.getImageType());
-                patient.setChwName(p.getPrototype());
-                patient.setVisitId(p.getVisitId());
-                patient.setImagePath(p.getImagePath());
-                Log.d("galleryID",p.getVisitId());
-                for (azureResults q : imageQueue){
-                    Log.d("QUeueID", q.getVisitId());
-                    if (p.getVisitId().equals(q.getVisitId())){
-                        Log.d(TAG,"match");
-                        if (q.getDiagnosisRight()!=null) patient.setDiagnosisRight(q.getDiagnosisRight());
-                        if (q.getComplaintsRight()!=null) patient.setComplaintsRight(q.getComplaintsRight());
-                        patient.setPatientId(q.getPatientId());
-                        patient.setAge(q.getAge());
-                        patient.setSex(q.getSex());
-                        patient.setPinholeRight(q.getPinholeRight());
-                        patient.setVARight(q.getVARight());
-                        imagesToUpload.add(patient);
-                    }
-                }
+        //TO DO Add "if queue>0
+        int noteId = NotificationID.getID();
+        if(queueSize>0){
+            Toast.makeText(IntelehealthApplication.getAppContext(), IntelehealthApplication.getAppContext().getString(R.string.imagesQueueSize)+ queueSize, Toast.LENGTH_SHORT).show();
+            AppConstants.notificationUtils.imageUploading(queueSize + " Images Uploading", "Progress", noteId, IntelehealthApplication.getAppContext(), queueSize, 0);
 
-            }
-        }
+            List<MultipartBody.Part> eyeImageParts= new ArrayList<>();
+            Map<String, RequestBody> partMap = new HashMap<>();
+            for (azureResults image : imageQueue){
+                File file= new File(AppConstants.IMAGE_PATH + image.getImagePath());
+                if(file.isFile()){
+                    eyeImageParts.add(createFilePart("file", image.getImagePath()));
+                    partMap.put("visit_id", createPartFromString(image.getVisitId()));
+                    partMap.put("patient_id", createPartFromString(image.getPatientId()));
+                    partMap.put("type", createPartFromString(image.getLeftRight()));
+                    Observable<ResponseBody> azureObservable = api.uploadImageAsync(eyeImageParts, partMap);
+                    azureObservable.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new DisposableObserver<ResponseBody>() {
 
-        MultipartBody.Part[] eyeImageParts= new MultipartBody.Part[imagesToUpload.size()];
-        ArrayList<String> patientIds= new ArrayList<>();
-        ArrayList<String> visitIds = new ArrayList<>();
-        ArrayList<String> creatorIds= new ArrayList<>();
-        ArrayList<String> types= new ArrayList<>();
-        ArrayList<String> phs= new ArrayList<>();
-        ArrayList<String> vas= new ArrayList<>();
-        ArrayList<String> complaintList= new ArrayList<>();
-        ArrayList<String> sexes= new ArrayList<>();
-        ArrayList<String> ages= new ArrayList<>();
+                                @Override
+                                public void onNext(@NonNull ResponseBody responseBody) {
+                                    Log.d(TAG, "azure success next");
+                                }
 
-        int i = 0;
-        for (azureResults p : imagesToUpload) {
-            //pass it like this
-            File file = null;
-            file = new File(AppConstants.IMAGE_PATH + p.getImagePath());
-            RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            // MultipartBody.Part is used to send also the actual file name
-            eyeImageParts[i] = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-            patientIds.add(p.getPatientId());
-            visitIds.add(p.getVisitId());
-            creatorIds.add(p.getChwName());
-            types.add(p.getLeftRight());
-            if (p.getLeftRight() == "right") {
-                phs.add(p.getPinholeRight());
-                vas.add(p.getVARight());
-                complaintList.add(p.getComplaintsRight().toString());
-            } else {
-                phs.add(p.getPinholeLeft());
-                vas.add(p.getVALeft());
-                complaintList.add(p.getComplaintsLeft().toString());
-            }
-            i += 1;
-        }
-
-        RequestBody creatorId = RequestBody.create(MediaType.parse("text/plain"), creatorIds.toString());
-        RequestBody visitId= RequestBody.create(MediaType.parse("text/plain"), visitIds.toString());
-        RequestBody patientId= RequestBody.create(MediaType.parse("text/plain"), patientIds.toString());
-        RequestBody type= RequestBody.create(MediaType.parse("text/plain"), types.toString());
-
-        RequestBody sex = RequestBody.create(MediaType.parse("text/plain"), sexes.toString());
-        RequestBody age= RequestBody.create(MediaType.parse("text/plain"), ages.toString());
-        RequestBody visual_acuity = RequestBody.create(MediaType.parse("text/plain"), vas.toString());
-        RequestBody pinhole_acuity = RequestBody.create(MediaType.parse("text/plain"),phs.toString());
-        RequestBody complaints =RequestBody.create(MediaType.parse("text/plain"), complaintList.toString());
-
-        Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
-        AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
-        Observable<ResponseBody> azureObservable = uploadApis.uploadImageAsync(eyeImageParts, creatorId, visitId, patientId, type, visual_acuity, pinhole_acuity, sex, age, complaints);
-        //is this the right type for the observable...
-        azureObservable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<ResponseBody>() {
-
-
-                    @Override
-                    public void onNext(@NonNull ResponseBody responseBody) {
-                        Log.d(TAG, "azure success");
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Logger.logD(TAG, "Onerror Azure" + e.getMessage());
+                                @Override
+                                public void onError(Throwable e) {
+                                    Logger.logD(TAG, "Onerror Azure" + e.getMessage());
+                                    Toast.makeText(IntelehealthApplication.getAppContext(), IntelehealthApplication.getAppContext().getString(R.string.imageUploadFailed), Toast.LENGTH_SHORT).show();
 //                            AppConstants.notificationUtils.DownloadDone("Patient Profile", "Error Uploading Patient Profile", IntelehealthApplication.getAppContext());
-                    }
+                                    AppConstants.notificationUtils.imageUploading(finalQueueSize + " Images Uploading", "Upload Failed", noteId, IntelehealthApplication.getAppContext(), finalQueueSize, totalUploaded[0]);
+                                    uploaded[0] =false;
 
-                    @Override
-                    public void onComplete() {
-                        Logger.logD(TAG, "success");
-                        Logger.logD(TAG, "success");
-                        List<azureResults> azureQueue = null;
-                        try {
-                            azureQueue=imagesDAO.getAzureImageQueue();
-                        } catch (DAOException e) {
-                            e.printStackTrace();
-                        }
-                        for (azureResults q: azureQueue){
-                            try {
-                                imagesDAO.removeAzureSynced(q.getImagePath());
-                            } catch (DAOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
+                                }
 
-        sessionManager.setPushSyncFinished(true);
+                                @Override
+                                public void onComplete() {
+                                    Logger.logD(TAG, "Azure success");
+                                    Toast.makeText(IntelehealthApplication.getAppContext(), IntelehealthApplication.getAppContext().getString(R.string.imageUploadSuccess), Toast.LENGTH_SHORT).show();
+                                    try {
+                                        imagesDAO.removeAzureSynced(image.getImagePath());
+                                    } catch (DAOException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    totalUploaded[0] +=1;
+                                    AppConstants.notificationUtils.imageUploading(finalQueueSize + " Images Uploading", "Progress", noteId, IntelehealthApplication.getAppContext(), finalQueueSize, totalUploaded[0]);
+
+                                }
+                            });
+
+                }
 //        AppConstants.notificationUtils.DownloadDone("Patient Profile", "Completed Uploading Patient Profile", 4, IntelehealthApplication.getAppContext());
-
-        return true;
-
-    }
-
-    public void getImageIdFromServer(String visitId, String patientId, String type, azureResults patient){
-        Retrofit retrofit1 = AzureNetworkClient.getRetrofit();
-        AzureUploadAPI uploadApis = retrofit1.create(AzureUploadAPI.class);
-        String url="api/v1/image/"+patientId+"/"+visitId;
-        Call<List<azureResults>> response = uploadApis.getAzureImage(url);
-        response.enqueue(new Callback<List<azureResults>>() {
-            @Override
-            public void onResponse(Call<List<azureResults>> call, Response<List<azureResults>> response) {
-                    Log.d("Response", response.message());
-                    Log.d("Response", response.body().toString());
-                    for (azureResults result : response.body()) {
-                        Log.d("azureresult", result.toString());
-                        Log.d(TAG, "VisitId: " + patient.getVisitId() + " ImageID: " + result.getImageId());
-                        if (result.getLeftRight() == type)
-                            azureAddDiagnosis(result.getId(), patient);
-                    }
-
             }
 
+        }
+        return uploaded[0];
+   }
 
-            @Override
-            public void onFailure(Call<List<azureResults>> call, Throwable t) {
-                Log.d(TAG, String.valueOf(t));
-
-            }
-
-
-        });
-    }
 
 
     public boolean azureAddDiagnosis(String id, azureResults patient){
@@ -518,43 +321,5 @@ public class ImagesPushDAO {
 
     }
 
-
-
-    public boolean deleteObsImage() {
-        sessionManager = new SessionManager(IntelehealthApplication.getAppContext());
-        String encoded = sessionManager.getEncoded();
-        Gson gson = new Gson();
-        UrlModifiers urlModifiers = new UrlModifiers();
-        ImagesDAO imagesDAO = new ImagesDAO();
-        List<String> voidedObsImageList = new ArrayList<>();
-        try {
-            voidedObsImageList = imagesDAO.getVoidedImageObs();
-        } catch (DAOException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-        }
-        for (String voidedObsImage : voidedObsImageList) {
-            String url = urlModifiers.obsImageDeleteUrl(voidedObsImage);
-            Observable<Void> deleteObsImage = AppConstants.apiInterface.DELETE_OBS_IMAGE(url, "Basic " + encoded);
-            deleteObsImage.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableObserver<Void>() {
-                        @Override
-                        public void onNext(Void aVoid) {
-                            Logger.logD(TAG, "success" + aVoid);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Logger.logD(TAG, "Onerror " + e.getMessage());
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            Logger.logD(TAG, "successfully Deleted the images from server");
-                        }
-                    });
-        }
-        return true;
-    }
 
 }

@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -79,9 +78,9 @@ import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ImagesPushDAO;
 import app.insightfuleye.client.database.dao.PatientsDAO;
 import app.insightfuleye.client.database.dao.SyncDAO;
-import app.insightfuleye.client.models.Patient;
 import app.insightfuleye.client.models.dto.PatientAttributesDTO;
 import app.insightfuleye.client.models.dto.PatientDTO;
+import app.insightfuleye.client.models.pushRequestApiCall.Patient;
 import app.insightfuleye.client.utilities.DateAndTimeUtils;
 import app.insightfuleye.client.utilities.EditTextUtils;
 import app.insightfuleye.client.utilities.FileUtils;
@@ -101,7 +100,7 @@ public class IdentificationActivity extends AppCompatActivity {
     UuidGenerator uuidGenerator = new UuidGenerator();
     Calendar today = Calendar.getInstance();
     Calendar dob = Calendar.getInstance();
-    Patient patient1 = new Patient();
+    PatientDTO patient1 = new PatientDTO();
     private String patientUuid = "";
     private String mGender;
     String patientID_edit;
@@ -496,29 +495,28 @@ public class IdentificationActivity extends AppCompatActivity {
         }
 
         //setting the fields when user clicks edit details
-        mFirstName.setText(patient1.getFirst_name());
-        mMiddleName.setText(patient1.getMiddle_name());
-        mLastName.setText(patient1.getLast_name());
-        mDOB.setText(patient1.getDate_of_birth());
-        mPhoneNum.setText(patient1.getPhone_number());
+        mFirstName.setText(patient1.getFirstname());
+        mMiddleName.setText(patient1.getMiddlename());
+        mLastName.setText(patient1.getLastname());
+        mDOB.setText(patient1.getDateofbirth());
+        mPhoneNum.setText(patient1.getPhonenumber());
         mAddress1.setText(patient1.getAddress1());
         mAddress2.setText(patient1.getAddress2());
-        mCity.setText(patient1.getCity_village());
-        mPostal.setText(patient1.getPostal_code());
+        mCity.setText(patient1.getCityvillage());
+        mPostal.setText(patient1.getPostalcode());
         //mRelationship.setText(patient1.getSdw());
         //mOccupation.setText(patient1.getOccupation());
         //eyeCampID.setText(patient1.getEyecampid());
         //helath_scheme...
-        Log.d("Health_scheme", "Scheme: " + patient1.getHealth_scheme());
-        if (patient1.getHealth_scheme() != null && !patient1.getHealth_scheme().isEmpty()) {
+        if (patient1.getHealthScheme() != null && !patient1.getHealthScheme().isEmpty()) {
 
-            if (patient1.getHealth_scheme().equalsIgnoreCase("Mukhyamantri Amrutam scheme")) {
+            if (patient1.getHealthScheme().equalsIgnoreCase("Mukhyamantri Amrutam scheme")) {
                 ma_checkbox.setChecked(true);
-            } else if (patient1.getHealth_scheme().equalsIgnoreCase("Ayushman Bharat Card")) {
+            } else if (patient1.getHealthScheme().equalsIgnoreCase("Ayushman Bharat Card")) {
                 ab_checkbox.setChecked(true);
-            } else if (patient1.getHealth_scheme().equalsIgnoreCase("None of the above")) {
+            } else if (patient1.getHealthScheme().equalsIgnoreCase("None of the above")) {
                 none_checkbox.setChecked(true);
-            } else if (patient1.getHealth_scheme().equalsIgnoreCase
+            } else if (patient1.getHealthScheme().equalsIgnoreCase
                     ("Mukhyamantri Amrutam scheme, " + "Ayushman Bharat Card")) {
                 ma_checkbox.setChecked(true);
                 ab_checkbox.setChecked(true);
@@ -671,7 +669,7 @@ public class IdentificationActivity extends AppCompatActivity {
                         // setting state according database when user clicks edit details
 
                         if (patientID_edit != null)
-                            mState.setSelection(stateAdapter.getPosition(String.valueOf(patient1.getState_province())));
+                            mState.setSelection(stateAdapter.getPosition(String.valueOf(patient1.getStateprovince())));
                         else
                             mState.setSelection(stateAdapter.getPosition(state));
 
@@ -684,7 +682,7 @@ public class IdentificationActivity extends AppCompatActivity {
 
                         if (patientID_edit != null) {
 
-                            mState.setSelection(stateAdapter.getPosition(String.valueOf(patient1.getState_province())));
+                            mState.setSelection(stateAdapter.getPosition(String.valueOf(patient1.getStateprovince())));
                         }
                     } else if (country.matches("Philippines")) {
                         ArrayAdapter<CharSequence> stateAdapter = ArrayAdapter.createFromResource(IdentificationActivity.this,
@@ -693,7 +691,7 @@ public class IdentificationActivity extends AppCompatActivity {
                         mState.setAdapter(stateAdapter);
 
                         if (patientID_edit != null) {
-                            mState.setSelection(stateAdapter.getPosition(String.valueOf(patient1.getState_province())));
+                            mState.setSelection(stateAdapter.getPosition(String.valueOf(patient1.getStateprovince())));
                         } else {
                             mState.setSelection(stateAdapter.getPosition("Bukidnon"));
                         }
@@ -833,11 +831,11 @@ public class IdentificationActivity extends AppCompatActivity {
         });
         //if patient update then age will be set
         if (patientID_edit != null) {
-            mDOB.setText(DateAndTimeUtils.getFormatedDateOfBirthAsView(patient1.getDate_of_birth()));
+            mDOB.setText(DateAndTimeUtils.getFormatedDateOfBirthAsView(patient1.getDateofbirth()));
             //get year month days
-            String yrMoDays = DateAndTimeUtils.getAgeInYearMonth(patient1.getDate_of_birth(), context);
+            String yrMoDays = DateAndTimeUtils.getAgeInYearMonth(patient1.getDateofbirth(), context);
 
-            String[] ymdData = DateAndTimeUtils.getAgeInYearMonth(patient1.getDate_of_birth()).split(" ");
+            String[] ymdData = DateAndTimeUtils.getAgeInYearMonth(patient1.getDateofbirth()).split(" ");
             mAgeYears = Integer.valueOf(ymdData[0]);
             mAgeMonths = Integer.valueOf(ymdData[1]);
             mAgeDays = Integer.valueOf(ymdData[2]);
@@ -1043,7 +1041,7 @@ public class IdentificationActivity extends AppCompatActivity {
         });
 
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_upload);
         fab.setOnClickListener(v -> {
             if (patientID_edit != null) {
                 onPatientUpdateClicked(patient1);
@@ -1173,22 +1171,22 @@ public class IdentificationActivity extends AppCompatActivity {
         if (idCursor.moveToFirst()) {
             do {
                 patient1.setUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("uuid")));
-                patient1.setFirst_name(idCursor.getString(idCursor.getColumnIndexOrThrow("first_name")));
-                patient1.setMiddle_name(idCursor.getString(idCursor.getColumnIndexOrThrow("middle_name")));
-                patient1.setLast_name(idCursor.getString(idCursor.getColumnIndexOrThrow("last_name")));
-                patient1.setDate_of_birth(idCursor.getString(idCursor.getColumnIndexOrThrow("date_of_birth")));
+                patient1.setFirstname(idCursor.getString(idCursor.getColumnIndexOrThrow("first_name")));
+                patient1.setMiddlename(idCursor.getString(idCursor.getColumnIndexOrThrow("middle_name")));
+                patient1.setLastname(idCursor.getString(idCursor.getColumnIndexOrThrow("last_name")));
+                patient1.setDateofbirth(idCursor.getString(idCursor.getColumnIndexOrThrow("date_of_birth")));
                 patient1.setAddress1(idCursor.getString(idCursor.getColumnIndexOrThrow("address1")));
                 patient1.setAddress2(idCursor.getString(idCursor.getColumnIndexOrThrow("address2")));
-                patient1.setCity_village(idCursor.getString(idCursor.getColumnIndexOrThrow("city_village")));
-                patient1.setState_province(idCursor.getString(idCursor.getColumnIndexOrThrow("state_province")));
-                patient1.setPostal_code(idCursor.getString(idCursor.getColumnIndexOrThrow("postal_code")));
+                patient1.setCityvillage(idCursor.getString(idCursor.getColumnIndexOrThrow("city_village")));
+                patient1.setStateprovince(idCursor.getString(idCursor.getColumnIndexOrThrow("state_province")));
+                patient1.setPostalcode(idCursor.getString(idCursor.getColumnIndexOrThrow("postal_code")));
                 patient1.setCountry(idCursor.getString(idCursor.getColumnIndexOrThrow("country")));
-                patient1.setPhone_number(idCursor.getString(idCursor.getColumnIndexOrThrow("phone_number")));
+                patient1.setPhonenumber(idCursor.getString(idCursor.getColumnIndexOrThrow("phone_number")));
                 patient1.setGender(idCursor.getString(idCursor.getColumnIndexOrThrow("gender")));
                 //patient1.setSdw(idCursor.getString(idCursor.getColumnIndexOrThrow("sdw")));
                 //patient1.setOccupation(idCursor.getString(idCursor.getColumnIndexOrThrow("occupation")));
                 //patient1.setPatient_photo(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_photo")));
-                patient1.setHealth_scheme(idCursor.getString(idCursor.getColumnIndexOrThrow("health_scheme")));
+                patient1.setHealthScheme(idCursor.getString(idCursor.getColumnIndexOrThrow("health_scheme")));
                 //patient1.setEconomic_status(idCursor.getString(idCursor.getColumnIndexOrThrow("economic_status")));
                 //imagpatient1.setEyecampid(idCursor.getString(idCursor.getColumnIndexOrThrow("eyecampid")));
 
@@ -1212,7 +1210,7 @@ public class IdentificationActivity extends AppCompatActivity {
 //                    patient1.setCaste(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
 //                }
                 if (name.equalsIgnoreCase("Telephone Number")) {
-                    patient1.setPhone_number(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
+                    patient1.setPhonenumber(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
 /*                if (name.equalsIgnoreCase("Education Level")) {
                     patient1.setEducation_level(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
@@ -1230,7 +1228,7 @@ public class IdentificationActivity extends AppCompatActivity {
                     patient1.setSdw(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }*/
                 if(name.equalsIgnoreCase("Health Scheme Card")){
-                    patient1.setHealth_scheme(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
+                    patient1.setHealthScheme(idCursor1.getString(idCursor1.getColumnIndexOrThrow("value")));
                 }
 
             } while (idCursor1.moveToNext());
@@ -1895,7 +1893,7 @@ public class IdentificationActivity extends AppCompatActivity {
 
     }
 
-    public void onPatientUpdateClicked(Patient patientdto) {
+    public void onPatientUpdateClicked(PatientDTO patientdto) {
         PatientsDAO patientsDAO = new PatientsDAO();
         PatientAttributesDTO patientAttributesDTO = new PatientAttributesDTO();
         List<PatientAttributesDTO> patientAttributesDTOList = new ArrayList<>();
@@ -2328,21 +2326,21 @@ public class IdentificationActivity extends AppCompatActivity {
 //                mCurrentPhotoPath = patientdto.getPatient_photo();
 
 
-        patientdto.setFirst_name(StringUtils.getValue(mFirstName.getText().toString()));
-        patientdto.setMiddle_name(StringUtils.getValue(mMiddleName.getText().toString()));
-        patientdto.setLast_name(StringUtils.getValue(mLastName.getText().toString()));
-        patientdto.setPhone_number(StringUtils.getValue(mPhoneNum.getText().toString()));
+        patientdto.setFirstname(StringUtils.getValue(mFirstName.getText().toString()));
+        patientdto.setMiddlename(StringUtils.getValue(mMiddleName.getText().toString()));
+        patientdto.setLastname(StringUtils.getValue(mLastName.getText().toString()));
+        patientdto.setPhonenumber(StringUtils.getValue(mPhoneNum.getText().toString()));
         patientdto.setGender(StringUtils.getValue(mGender));
-        patientdto.setDate_of_birth(DateAndTimeUtils.getFormatedDateOfBirth(StringUtils.getValue(mDOB.getText().toString())));
+        patientdto.setDateofbirth(DateAndTimeUtils.getFormatedDateOfBirth(StringUtils.getValue(mDOB.getText().toString())));
         patientdto.setAddress1(StringUtils.getValue(mAddress1.getText().toString()));
         patientdto.setAddress2(StringUtils.getValue(mAddress2.getText().toString()));
-        patientdto.setCity_village(StringUtils.getValue(mCity.getText().toString()));
-        patientdto.setPostal_code(StringUtils.getValue(mPostal.getText().toString()));
+        patientdto.setCityvillage(StringUtils.getValue(mCity.getText().toString()));
+        patientdto.setPostalcode(StringUtils.getValue(mPostal.getText().toString()));
         patientdto.setCountry(StringUtils.getValue(mCountry.getSelectedItem().toString()));
         //patientdto.setPatient_photo(mCurrentPhotoPath);
         //patientdto.setEconomic_status(String.valueOf(latitude) + ", " + String.valueOf(longitude));
 //                patientdto.setEconomic(StringUtils.getValue(m));
-        patientdto.setState_province(StringUtils.getValue(patientdto.getState_province()));
+        patientdto.setStateprovince(StringUtils.getValue(patientdto.getStateprovince()));
         patientAttributesDTO = new PatientAttributesDTO();
         patientAttributesDTO.setUuid(UUID.randomUUID().toString());
         patientAttributesDTO.setPatientuuid(uuid);
@@ -2448,7 +2446,7 @@ public class IdentificationActivity extends AppCompatActivity {
                 Logger.logD(TAG, "updated");
                 Intent i = new Intent(getApplication(), PatientDetailActivity.class);
                 i.putExtra("patientUuid", uuid);
-                i.putExtra("patientName", patientdto.getFirst_name() + " " + patientdto.getLast_name());
+                i.putExtra("patientName", patientdto.getFirstname() + " " + patientdto.getLastname());
                 i.putExtra("tag", "newPatient");
                 i.putExtra("hasPrescription", "false");
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

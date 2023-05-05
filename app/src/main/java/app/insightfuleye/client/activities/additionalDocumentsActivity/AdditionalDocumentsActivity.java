@@ -54,7 +54,7 @@ public class AdditionalDocumentsActivity extends AppCompatActivity {
         topToolBar.setTitle(getString(R.string.title_activity_additional_documents));
         setSupportActionBar(topToolBar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_upload);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

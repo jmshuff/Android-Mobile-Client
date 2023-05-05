@@ -72,7 +72,10 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "modified_date TEXT," +
             "voided TEXT DEFAULT '0'," +
             "sync TEXT DEFAULT 'false'," +
-            "abha_number TEXT" +
+            "abha_number TEXT," +
+            "location_id TEXT," +
+            "patient_identifier TEXT," +
+            "patient_identifer_type TEXT" +
             ")";
 
 
@@ -166,50 +169,11 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
     public static final String drop_azure="DROP TABLE IF EXISTS tbl_azure_uploads";
     public static final String AZURE_UPLOADS= "CREATE TABLE IF NOT EXISTS tbl_azure_img_uploads(" +
             "imageName TEXT PRIMARY KEY," +
-            "imageName2 TEXT," +
             "patientId TEXT," +
             "visitId TEXT," +
-            "creatorId TEXT," +
-            "type TEXT," +
-            "VARight TEXT," +
-            "VALeft TEXT," +
-            "PinholeRight TEXT," +
-            "PinholeLeft TEXT," +
-            "age TEXT," +
-            "sex TEXT," +
-            "complaintsRight TEXT," +
-            "complaintsLeft TEXT," +
-            "patHist TEXT," +
-            "famHist TEXT" +
+            "type TEXT" +
             ")";
 
-    public static final String AZURE_ADDITIONAL_DOCS= "CREATE TABLE IF NOT EXISTS tbl_azure_additional_docs(" +
-            "imageName TEXT PRIMARY KEY," +
-            "imageName2 TEXT," +
-            "patientId TEXT," +
-            "visitId TEXT," +
-            "creatorId TEXT," +
-            "type TEXT," +
-            "VARight TEXT," +
-            "VALeft TEXT," +
-            "PinholeRight TEXT," +
-            "PinholeLeft TEXT," +
-            "age TEXT," +
-            "sex TEXT," +
-            "complaintsRight TEXT," +
-            "complaintsLeft TEXT," +
-            "diagnosisRight TEXT," +
-            "diagnosisLeft TEXT" +
-            ")";
-
-    public static final String drop_gall="DROP TABLE tbl_azure_gallery";
-
-    public static final String AZURE_GALLERY= "CREATE TABLE IF NOT EXISTS tbl_azure_gallery(" +
-            "imagePath TEXT PRIMARY KEY," +
-            "prototype TEXT," +
-            "type TEXT," +
-            "visitId TEXT" +
-            ")";
 
     public static final String drop_edit="DROP TABLE tbl_edit_node";
     public static final String CREATE_EDIT_TABLES = "CREATE TABLE IF NOT EXISTS tbl_edit_node(" +
@@ -301,8 +265,6 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_VISIT_ATTRIBUTES);
         db.execSQL(drop_azure);
         db.execSQL(AZURE_UPLOADS);
-        db.execSQL(AZURE_ADDITIONAL_DOCS);
-        db.execSQL(AZURE_GALLERY);
         db.execSQL(CREATE_EDIT_TABLES);
         db.execSQL(CREATE_IMAGE_TABLE);
         db.execSQL(CREATE_TAMIL_TABLE);

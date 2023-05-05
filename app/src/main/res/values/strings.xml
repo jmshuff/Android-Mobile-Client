@@ -684,6 +684,7 @@
     <string name="setup_login">Login</string>
     <string name="setup_hospital_location">Hospital</string>
     <string name="get_location_instruction">Select screening location</string>
+    <string name="no_complaints">No Complaints</string>
 
 
 </resources>

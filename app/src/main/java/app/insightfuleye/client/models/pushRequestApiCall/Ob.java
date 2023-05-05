@@ -5,38 +5,108 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Ob {
-    @SerializedName("uuid")
+
+    @SerializedName("encounter_id")
     @Expose
-    private String uuid;
-    @SerializedName("concept")
+    private String encounterId;
+    @SerializedName("patient_id")
     @Expose
-    private String concept;
-    @SerializedName("value")
+    private String patientId;
+    @SerializedName("visit_id")
     @Expose
-    private String value;
+    private String visitId;
+    @SerializedName("concept_id")
+    @Expose
+    private String conceptId;
+    @SerializedName("creator_id")
+    @Expose
+    private String creatorId;
+    @SerializedName("obs_string")
+    @Expose
+    private ObsString obsString;
+    @SerializedName("id")
+    @Expose
+    private String id;
 
-    public String getUuid() {
-        return uuid;
+    /**
+     * No args constructor for use in serialization
+     *
+     */
+    public Ob() {
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    /**
+     *
+     * @param visitId
+     * @param patientId
+     * @param obsString
+     * @param creatorId
+     * @param conceptId
+     * @param encounterId
+     */
+    public Ob(String encounterId, String patientId, String visitId, String conceptId, String creatorId, ObsString obsString) {
+        super();
+        this.encounterId = encounterId;
+        this.patientId = patientId;
+        this.visitId = visitId;
+        this.conceptId = conceptId;
+        this.creatorId = creatorId;
+        this.obsString = obsString;
     }
 
-    public String getConcept() {
-        return concept;
+    public String getEncounterId() {
+        return encounterId;
     }
 
-    public void setConcept(String concept) {
-        this.concept = concept;
+    public void setEncounterId(String encounterId) {
+        this.encounterId = encounterId;
     }
 
-    public String getValue() {
-        return value;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
+    public String getVisitId() {
+        return visitId;
+    }
+
+    public void setVisitId(String visitId) {
+        this.visitId = visitId;
+    }
+
+    public String getConceptId() {
+        return conceptId;
+    }
+
+    public void setConceptId(String conceptId) {
+        this.conceptId = conceptId;
+    }
+
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    public ObsString getObsString() {
+        return obsString;
+    }
+
+    public void setObsString(ObsString obsString) {
+        this.obsString = obsString;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

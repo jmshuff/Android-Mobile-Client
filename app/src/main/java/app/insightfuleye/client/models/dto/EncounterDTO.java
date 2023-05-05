@@ -5,22 +5,22 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class EncounterDTO {
-    @SerializedName("uuid")
+    @SerializedName("id")
     @Expose
     private String uuid;
-    @SerializedName("patient_uuid")
+    @SerializedName("patient_id")
     @Expose
     private String patientuuid;
-    @SerializedName("visituuid")
+    @SerializedName("visit_id")
     @Expose
     private String visituuid;
-    @SerializedName("encounter_type_uuid")
+    @SerializedName("encounter_type_id")
     @Expose
     private String encounterTypeUuid;
     @SerializedName("encounter_time")
     @Expose
     private String encounterTime;
-    @SerializedName("provider_uuid")
+    @SerializedName("provider_id")
     @Expose
     private String provideruuid;
     @SerializedName("syncd")

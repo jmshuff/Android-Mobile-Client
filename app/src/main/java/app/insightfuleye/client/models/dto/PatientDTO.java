@@ -59,7 +59,17 @@ public class PatientDTO {
     @SerializedName("abha_number")
     @Expose
     private String abhaNumber;
+    @SerializedName("location_id")
+    @Expose
+    private String locationId;
+    @SerializedName("patient_identifier")
+    @Expose
+    private String patientIdentifier;
+    @SerializedName("patient_identifier_type")
+    @Expose
+    private String patientIdentiferType;
 
+    private String healthScheme;
 
     private List<PatientAttributesDTO> patientAttributesDTOList;
 
@@ -205,11 +215,9 @@ public class PatientDTO {
     }
 
 
-
     public List<PatientAttributesDTO> getPatientAttributesDTOList() {
         return patientAttributesDTOList;
     }
-
 
     public void setPatientAttributesDTOList(List<PatientAttributesDTO> patientAttributesDTOList) {
         this.patientAttributesDTOList = patientAttributesDTOList;
@@ -221,5 +229,37 @@ public class PatientDTO {
 
     public void setAbhaNumber(String abhaNumber) {
         this.abhaNumber = abhaNumber;
+    }
+
+    public String getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
+    }
+
+    public String getPatientIdentifier() {
+        return patientIdentifier;
+    }
+
+    public void setPatientIdentifier(String patientIdentifier) {
+        this.patientIdentifier = patientIdentifier;
+    }
+
+    public String getPatientIdentiferType() {
+        return patientIdentiferType;
+    }
+
+    public void setPatientIdentiferType(String patientIdentiferType) {
+        this.patientIdentiferType = patientIdentiferType;
+    }
+
+    public String getHealthScheme() {
+        return healthScheme;
+    }
+
+    public void setHealthScheme(String healthScheme) {
+        this.healthScheme = healthScheme;
     }
 }

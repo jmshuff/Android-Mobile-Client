@@ -1,24 +1,28 @@
-
-package app.insightfuleye.client.models.uploadSurvey;
+package app.insightfuleye.client.models.pushRequestApiCall;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Ob {
+public class ObsString {
 
-    @SerializedName("concept")
-    @Expose
-    private String concept;
     @SerializedName("value")
     @Expose
     private String value;
 
-    public String getConcept() {
-        return concept;
+    /**
+     * No args constructor for use in serialization
+     *
+     */
+    public ObsString() {
     }
 
-    public void setConcept(String concept) {
-        this.concept = concept;
+    /**
+     *
+     * @param value
+     */
+    public ObsString(String value) {
+        super();
+        this.value = value;
     }
 
     public String getValue() {

@@ -6,13 +6,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class ObsDTO {
 
-    @SerializedName("uuid")
+    @SerializedName("id")
     @Expose
     private String uuid;
-    @SerializedName("encounteruuid")
+    @SerializedName("encounter_id")
     @Expose
     private String encounteruuid;
-    @SerializedName("conceptuuid")
+    @SerializedName("concept_id")
     @Expose
     private String conceptuuid;
     @SerializedName("value")
@@ -21,9 +21,13 @@ public class ObsDTO {
     @SerializedName("obsServerModifiedDate")
     @Expose
     private String obsServerModifiedDate;
-    @SerializedName("creator")
+    @SerializedName("creator_id")
     @Expose
     private String creator;
+    @SerializedName("patient_id")
+    @Expose
+    private String patientId;
+
     @SerializedName("voided")
     @Expose
     private Integer voided;
@@ -82,5 +86,13 @@ public class ObsDTO {
 
     public void setObsServerModifiedDate(String obsServerModifiedDate) {
         this.obsServerModifiedDate = obsServerModifiedDate;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 }

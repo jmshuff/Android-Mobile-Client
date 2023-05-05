@@ -8,13 +8,13 @@ import java.util.List;
 
 public class VisitDTO {
 
-    @SerializedName("patientuuid")
+    @SerializedName("patient_id")
     @Expose
     private String patientuuid;
-    @SerializedName("uuid")
+    @SerializedName("id")
     @Expose
     private String uuid;
-    @SerializedName("visit_type_uuid")
+    @SerializedName("visit_type_id")
     @Expose
     private String visitTypeUuid;
     @SerializedName("startdate")
@@ -23,10 +23,10 @@ public class VisitDTO {
     @SerializedName("enddate")
     @Expose
     private String enddate;
-    @SerializedName("locationuuid")
+    @SerializedName("location_id")
     @Expose
     private String locationuuid;
-    @SerializedName("creator_uuid")
+    @SerializedName("creator_id")
     @Expose
     private String creatoruuid;
     @SerializedName("syncd")

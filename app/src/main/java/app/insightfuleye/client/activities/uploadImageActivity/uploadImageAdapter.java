@@ -38,10 +38,14 @@ import app.insightfuleye.client.activities.additionalDocumentsActivity.Additiona
 import app.insightfuleye.client.activities.additionalDocumentsActivity.AdditionalDocumentViewHolder;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
+import app.insightfuleye.client.database.dao.EncounterDAO;
 import app.insightfuleye.client.database.dao.ImagesDAO;
 import app.insightfuleye.client.database.dao.ImagesPushDAO;
+import app.insightfuleye.client.database.dao.PatientsDAO;
+import app.insightfuleye.client.database.dao.VisitsDAO;
 import app.insightfuleye.client.models.DocumentObject;
 import app.insightfuleye.client.models.azureResults;
+import app.insightfuleye.client.models.hospitalImagingModel;
 import app.insightfuleye.client.utilities.StringUtils;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
@@ -49,20 +53,22 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
     int screen_height;
     int screen_width;
 
-    private List<azureResults> documentList = new ArrayList<>();
+    private List<hospitalImagingModel> documentList = new ArrayList<>();
     private Context context;
-    private String filePath;
     ImagesDAO imagesDAO = new ImagesDAO();
+    PatientsDAO patientsDAO = new PatientsDAO();
+    VisitsDAO visitsDAO = new VisitsDAO();
+    EncounterDAO encounterDAO = new EncounterDAO();
+
     private static final String TAG = uploadImageAdapter.class.getSimpleName();
 
-    public uploadImageAdapter(Context context, List<azureResults> documentList, String filePath) {
+    public uploadImageAdapter(Context context, List<hospitalImagingModel> documentList) {
         this.documentList = documentList;
         this.context = context;
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screen_height = displayMetrics.heightPixels;
         screen_width = displayMetrics.widthPixels;
-        this.filePath = filePath;
 
     }
 
@@ -76,17 +82,16 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
 
     @Override
     public void onBindViewHolder(final uploadImageViewHolder holder, final int position) {
-        ImagesDAO imagesDAO=new ImagesDAO();
 //        holder.getDocumentNameTextView().setText(documentList.get(position).getDocumentName());
         holder.getDocumentNameTextView().setText
-                ("Document - " + (position + 1));
+                (documentList.get(position).getPatientIdentifier());
 
-        final File image = new File(documentList.get(position).getImagePath());
+        final File image = new File(AppConstants.IMAGE_PATH + documentList.get(position).getImageName());
 
         Glide.with(context)
                 .load(image)
                 .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .thumbnail(0.1f)
                 .into(holder.getDocumentPhotoImageView());
 
@@ -94,7 +99,9 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
             @Override
             public void onClick(View v) {
                 Intent editIntent= new Intent(context, uploadImageInfoActivity.class);
-                editIntent.putExtra("visitId", documentList.get(position).getVisitId());
+                editIntent.putExtra("visitId", documentList.get(position).getVisitUuid());
+                editIntent.putExtra("patientId", documentList.get(position).getPatientUuid());
+                editIntent.putExtra("patientIdentifier", documentList.get(position).getPatientIdentifier());
                 context.startActivity(editIntent);
             }
         });
@@ -103,22 +110,26 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
             @Override
             public void onClick(View v) {
                 if (image.exists()) image.delete();
-                String imageName= documentList.get(position).getImagePath();
-                String imageId=documentList.get(position).getImageId();
-                String visitId=documentList.get(position).getVisitId();
-                documentList.remove(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, documentList.size());
                 try {
-                    imagesDAO.removeAzureAddDoc(visitId,imageName+ ".jpg", imageId + ".jpg");
+                    imagesDAO.removeAzureFromVisit(documentList.get(position).getVisitUuid());
+                    patientsDAO.removePatient(documentList.get(position).getPatientUuid());
+                    encounterDAO.removeEncounterAndObs(documentList.get(position).getEncounterHospitalImaging());
+                    visitsDAO.removeVisit(documentList.get(position).getVisitUuid());
+                    documentList.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, documentList.size());
+
+                    //TO DO remove adult initial
+
                 } catch (DAOException e) {
                     FirebaseCrashlytics.getInstance().recordException(e);
                 }
+
             }
         });
     }
 
-    public void add(azureResults doc) {
+    public void add(hospitalImagingModel doc) {
         boolean bool = documentList.add(doc);
         if (bool) Log.d(TAG, "add: Item added to list");
         notifyDataSetChanged();
@@ -179,7 +190,6 @@ public class uploadImageAdapter extends RecyclerView.Adapter<uploadImageViewHold
 
         dialog.show();
         IntelehealthApplication.setAlertDialogCustomTheme(context, dialog);
-
     }
 
 }

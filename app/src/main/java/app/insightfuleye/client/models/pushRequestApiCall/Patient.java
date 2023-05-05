@@ -8,27 +8,84 @@ import java.util.List;
 
 public class Patient {
 
-    @SerializedName("person")
+    @SerializedName("id")
     @Expose
-    private String person;
-    @SerializedName("identifiers")
+    private String id;
+    @SerializedName("patient_identifier")
     @Expose
-    private List<Identifier> identifiers = null;
+    private String patientIdentifier;
+    @SerializedName("patient_identifier_type_id")
+    @Expose
+    private String patientIdentifierTypeId;
+    @SerializedName("abha_no")
+    @Expose
+    private String abhaNo;
+    @SerializedName("visits")
+    @Expose
+    private List<Visit> visits;
 
-    public String getPerson() {
-        return person;
+    /**
+     * No args constructor for use in serialization
+     *
+     */
+    public Patient() {
     }
 
-    public void setPerson(String person) {
-        this.person = person;
+    /**
+     *
+     * @param abhaNo
+     * @param visits
+     * @param patientIdentifier
+     * @param id
+     * @param patientIdentifierTypeId
+     */
+    public Patient(String id, String patientIdentifier, String patientIdentifierTypeId, String abhaNo, List<Visit> visits) {
+        super();
+        this.id = id;
+        this.patientIdentifier = patientIdentifier;
+        this.patientIdentifierTypeId = patientIdentifierTypeId;
+        this.abhaNo = abhaNo;
+        this.visits = visits;
     }
 
-    public List<Identifier> getIdentifiers() {
-        return identifiers;
+    public String getId() {
+        return id;
     }
 
-    public void setIdentifiers(List<Identifier> identifiers) {
-        this.identifiers = identifiers;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getPatientIdentifier() {
+        return patientIdentifier;
+    }
+
+    public void setPatientIdentifier(String patientIdentifier) {
+        this.patientIdentifier = patientIdentifier;
+    }
+
+    public String getPatientIdentifierTypeId() {
+        return patientIdentifierTypeId;
+    }
+
+    public void setPatientIdentifierTypeId(String patientIdentifierTypeId) {
+        this.patientIdentifierTypeId = patientIdentifierTypeId;
+    }
+
+    public String getAbhaNo() {
+        return abhaNo;
+    }
+
+    public void setAbhaNo(String abhaNo) {
+        this.abhaNo = abhaNo;
+    }
+
+    public List<Visit> getVisits() {
+        return visits;
+    }
+
+    public void setVisits(List<Visit> visits) {
+        this.visits = visits;
     }
 
 }

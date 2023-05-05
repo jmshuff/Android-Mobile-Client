@@ -79,7 +79,7 @@ public class prototypeIterationActivity extends AppCompatActivity {
         numBulbs.setVisibility(View.GONE);
         numStrips.setVisibility(View.GONE);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab_upload);
 
         m10D.setOnClickListener(new View.OnClickListener() {
             @Override

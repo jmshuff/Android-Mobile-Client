@@ -5,12 +5,8 @@ import android.location.Location;
 
 import app.insightfuleye.client.models.CheckAppUpdateRes;
 import app.insightfuleye.client.models.DownloadMindMapRes;
-import app.insightfuleye.client.models.ObsImageModel.ObsJsonResponse;
-import app.insightfuleye.client.models.ObsImageModel.ObsPushDTO;
-import app.insightfuleye.client.models.Results;
 import app.insightfuleye.client.models.dto.ResponseDTO;
 import app.insightfuleye.client.models.loginProviderModel.LoginProviderModel;
-import app.insightfuleye.client.models.patientImageModelRequest.PatientProfile;
 import app.insightfuleye.client.models.pushRequestApiCall.PushRequestApiCall;
 import app.insightfuleye.client.models.pushResponseApiCall.PushResponseApiCall;
 import io.reactivex.Observable;
@@ -59,22 +55,9 @@ public interface ApiInterface {
     Observable<ResponseBody> PERSON_PROFILE_PIC_DOWNLOAD(@Url String url,
                                                          @Header("Authorization") String authHeader);
 
-    @POST
-    Single<ResponseBody> PERSON_PROFILE_PIC_UPLOAD(@Url String url,
-                                                   @Header("Authorization") String authHeader,
-                                                   @Body PatientProfile patientProfile);
-
     @GET
     Observable<ResponseBody> OBS_IMAGE_DOWNLOAD(@Url String url,
                                                 @Header("Authorization") String authHeader);
-
-    @Headers({"Accept: application/json"})
-    @POST
-    @Multipart
-    Observable<ObsJsonResponse> OBS_JSON_RESPONSE_OBSERVABLE(@Url String url,
-                                                             @Header("Authorization") String authHeader,
-                                                             @Part MultipartBody.Part image,
-                                                             @Part("json") ObsPushDTO obsJsonRequest);
 
     @DELETE
     Observable<Void> DELETE_OBS_IMAGE(@Url String url, @Header("Authorization") String authHeader);
