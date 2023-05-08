@@ -187,11 +187,20 @@ public class PatientsFrameJson {
 
                 Person person = new Person();
                 person.setBirthdate(patientDTOList.get(i).getDateofbirth());
-                String gender= (patientDTOList.get(i).getGender()=="M") ? "male" : "female";
-                person.setGender(gender);
+                person.setGender(patientDTOList.get(i).getGender());
                 person.setId(generateUuid()); //random uuid for person
-                person.setFirstName(patientDTOList.get(i).getFirstname());
-                person.setLastName(patientDTOList.get(i).getLastname());
+                if(patientDTOList.get(i)!=null){
+                    person.setFirstName(patientDTOList.get(i).getFirstname());
+                }
+                else{
+                    person.setFirstName("");
+                }
+                if(patientDTOList.get(i)!=null){
+                    person.setLastName(patientDTOList.get(i).getLastname());
+                }
+                else{
+                    person.setLastName("");
+                }
                 person.setLocationId(session.getLocationUuid());
                 person.setPersonTypeId("52deed97-364d-4ba3-8faf-7673d89f235a");
 

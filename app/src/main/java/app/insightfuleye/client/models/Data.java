@@ -10,7 +10,7 @@ import java.util.List;
 
 import app.insightfuleye.client.models.dto.LocationDTO;
 
-public class Data<T> {
+public class Data<LocationDTO> {
     @SerializedName("rows")
     @Expose
     private List<LocationDTO> rows;
