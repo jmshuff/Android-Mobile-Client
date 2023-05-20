@@ -56,6 +56,7 @@ public class UuidDictionary {
 
     //Patient Identifier Type
     public static final String IDENTIFIER_OPENMRS_ID = "05a29f94-c0ed-11e2-94be-8c13b969e334";
+    public static final String IDENTIFIER_VISILANT_ID = "1c416bfb-ea5b-44bd-b183-ffd1cde2b661";
 
     //Person Attribute Type
     public static final String ATTRIBUTE_PHONE_NUMBER = "14d4f066-15f5-102d-96e4-000c29c2a5d7";

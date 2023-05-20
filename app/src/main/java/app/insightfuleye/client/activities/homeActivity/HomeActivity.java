@@ -217,6 +217,8 @@ public class HomeActivity extends AppCompatActivity {
 
         if (sessionManager.isNewSession()) {
             //check for updates
+            if(!sessionManager.isFirstTimeLaunched())
+                inputLocation();
             mAppUpdateManager = AppUpdateManagerFactory.create(this);
 
             mAppUpdateManager.registerListener(installStateUpdatedListener);
@@ -358,11 +360,11 @@ public class HomeActivity extends AppCompatActivity {
                 }
 
                 public void onFinish() {
+                    inputLocation();
                     TempDialog.dismiss();
                     //Your Code ...
                     sessionManager.setFirstTimeLaunched(false);
                     sessionManager.setMigration(true);
-                    inputLocation();
                 }
             }.start();
 
@@ -371,7 +373,6 @@ public class HomeActivity extends AppCompatActivity {
 
         if (sessionManager.isReturningUser()) {
             syncUtils.syncForeground("");
-            inputLocation();
         }
 
         showProgressbar();
@@ -807,7 +808,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         registerReceiver(reMyreceive, filter);
-        checkAppVer();  //auto-update feature.
+        //checkAppVer();  //auto-update feature.
 //        lastSyncTextView.setText(getString(R.string.last_synced) + " \n" + sessionManager.getLastSyncDateTime());
         if (!sessionManager.getLastSyncDateTime().equalsIgnoreCase("- - - -")
                 && Locale.getDefault().toString().equals("en")) {

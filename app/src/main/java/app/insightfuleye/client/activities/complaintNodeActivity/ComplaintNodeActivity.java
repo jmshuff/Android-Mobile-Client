@@ -102,8 +102,8 @@ public class ComplaintNodeActivity extends AppCompatActivity {
         encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
         encounterDTO.setVisituuid(visitUuid);
         encounterDTO.setSyncd(false);
-        encounterDTO.setProvideruuid(sessionManager.getProviderID());
-        Log.d("DTO", "DTOcomp: " + encounterDTO.getProvideruuid());
+        encounterDTO.setCreatoruuid(sessionManager.getProviderID());
+        Log.d("DTO", "DTOcomp: " + encounterDTO.getCreatoruuid());
         encounterDTO.setVoided(0);
         try {
             encounterDAO.createEncountersToDB(encounterDTO);

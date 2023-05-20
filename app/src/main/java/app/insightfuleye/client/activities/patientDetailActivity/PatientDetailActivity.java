@@ -68,7 +68,6 @@ import app.insightfuleye.client.knowledgeEngine.Node;
 import app.insightfuleye.client.models.dto.EncounterDTO;
 import app.insightfuleye.client.models.dto.PatientDTO;
 import app.insightfuleye.client.models.dto.VisitDTO;
-import app.insightfuleye.client.models.pushRequestApiCall.Patient;
 import app.insightfuleye.client.utilities.DateAndTimeUtils;
 import app.insightfuleye.client.utilities.DownloadFilesUtils;
 import app.insightfuleye.client.utilities.FileUtils;
@@ -204,8 +203,8 @@ public class PatientDetailActivity extends AppCompatActivity {
                 encounterDTO.setEncounterTime(thisDate);
                 encounterDTO.setVisituuid(uuid);
                 encounterDTO.setSyncd(false);
-                encounterDTO.setProvideruuid(sessionManager.getProviderID());
-                Log.d("DTO", "DTO:detail " + encounterDTO.getProvideruuid());
+                encounterDTO.setCreatoruuid(sessionManager.getProviderID());
+                Log.d("DTO", "DTO:detail " + encounterDTO.getCreatoruuid());
                 encounterDTO.setVoided(0);
                 encounterDTO.setPrivacynotice_value(privacy_value_selected);//privacy value added.
 

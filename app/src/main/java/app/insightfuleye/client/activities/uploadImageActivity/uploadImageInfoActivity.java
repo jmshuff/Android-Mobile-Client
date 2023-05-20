@@ -51,7 +51,6 @@ import com.bumptech.glide.request.target.Target;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,7 +63,6 @@ import java.util.Locale;
 import java.util.UUID;
 
 import app.insightfuleye.client.R;
-import app.insightfuleye.client.activities.cameraActivity.CameraActivity;
 import app.insightfuleye.client.app.AppConstants;
 import app.insightfuleye.client.app.IntelehealthApplication;
 import app.insightfuleye.client.database.dao.EncounterDAO;
@@ -1094,14 +1092,19 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             int birthDay = calendar.get(Calendar.DAY_OF_MONTH);
 
             Locale.setDefault(Locale.ENGLISH);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             calendar.set(birthYear, birthMonth, birthDay);
             String dobString = simpleDateFormat.format(calendar.getTime());
             patientDTO.setDateofbirth(dobString);
         }
         patientDTO.setPatientIdentifier(visilantId);
+        patientDTO.setPatientIdentiferType(UuidDictionary.IDENTIFIER_VISILANT_ID);
+        patientDTO.setAbhaNumber("ABHA001");
         patientDTO.setLocationId(sessionManager.getLocationUuid());
         patientDTO.setUuid(patientuuid);
+        patientDTO.setFirstname(visilantId);
+        patientDTO.setCreatoruuid(sessionManager.getCreatorID());
+        patientDTO.setLastname("");
         try {
             patientsDAO.insertPatientToDB(patientDTO, patientuuid);
         } catch (DAOException e) {
@@ -1130,7 +1133,7 @@ public class uploadImageInfoActivity extends AppCompatActivity {
         String encounterUuid = uuidGenerator.UuidGenerator();
         encounterDTO.setPatientuuid(patientuuid);
         encounterDTO.setEncounterTime(thisDate);
-        encounterDTO.setProvideruuid(sessionManager.getCreatorID());
+        encounterDTO.setCreatoruuid(sessionManager.getCreatorID());
         encounterDTO.setUuid(encounterUuid);
         encounterDTO.setEncounterTypeUuid(UuidDictionary.ENCOUNTER_ADULTINITIAL);
         encounterDTO.setVisituuid(visituuid);
@@ -1247,6 +1250,8 @@ public class uploadImageInfoActivity extends AppCompatActivity {
             String dobString = simpleDateFormat.format(calendar.getTime());
             patientDTO.setDateofbirth(dobString);
         }
+        patientDTO.setFirstname("");
+        patientDTO.setLastname("");
         patientDTO.setPatientIdentifier(visilantId);
         patientDTO.setLocationId(sessionManager.getLocationUuid());
         patientDTO.setUuid(patientuuid);

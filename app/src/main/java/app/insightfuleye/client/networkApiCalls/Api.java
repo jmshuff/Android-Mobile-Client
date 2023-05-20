@@ -34,7 +34,7 @@ public interface Api {
     Observable<Signin> refreshToken(@Body PostSignIn postSignIn);
 
     @GET("/api/v2/location")
-    Observable<Results<Data<List<LocationDTO>>>> getLocations();
+    Observable<Results> getLocations();
 
     @POST("/api/v2/person")
     Observable<Results<Data>> postPatients(@Body Person person);

@@ -61,6 +61,9 @@ public class VisitsDAO {
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
             values.put("sync", visit.getSyncd());
             createdRecordsCount = db.insertWithOnConflict("tbl_visit", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            Logger.logD("visitdata", "datadumper" + values);
+
         } catch (SQLException e) {
             isCreated = false;
             throw new DAOException(e.getMessage(), e);
@@ -96,6 +99,7 @@ public class VisitsDAO {
 
             createdRecordsCount1 = db.insert("tbl_visit", null, values);
             db.setTransactionSuccessful();
+            Logger.logD("visitdata", "datadumper" + values);
             Logger.logD("created records", "created records count" + createdRecordsCount1);
         } catch (SQLException e) {
             isCreated = false;

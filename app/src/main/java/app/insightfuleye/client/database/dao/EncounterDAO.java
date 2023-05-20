@@ -58,7 +58,7 @@ public class EncounterDAO {
             values.put("patient_uuid", encounter.getPatientuuid());
             values.put("visituuid", encounter.getVisituuid());
             values.put("encounter_type_uuid", encounter.getEncounterTypeUuid());
-            values.put("provider_uuid", encounter.getProvideruuid());
+            values.put("provider_uuid", encounter.getCreatoruuid());
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
             values.put("sync", encounter.getSyncd());
             values.put("voided", encounter.getVoided());
@@ -86,7 +86,7 @@ public class EncounterDAO {
             values.put("visituuid", encounter.getVisituuid());
             values.put("encounter_time", encounter.getEncounterTime());
             values.put("encounter_type_uuid", encounter.getEncounterTypeUuid());
-            values.put("provider_uuid", encounter.getProvideruuid());
+            values.put("provider_uuid", encounter.getCreatoruuid());
             values.put("modified_date", AppConstants.dateAndTimeUtils.currentDateTime());
             values.put("sync", "false");
             values.put("voided", encounter.getVoided());
@@ -134,7 +134,7 @@ public class EncounterDAO {
                 encounterDTO.setPatientuuid(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_uuid")));
                 encounterDTO.setVisituuid(idCursor.getString(idCursor.getColumnIndexOrThrow("visituuid")));
                 encounterDTO.setEncounterTypeUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("encounter_type_uuid")));
-                encounterDTO.setProvideruuid(idCursor.getString(idCursor.getColumnIndexOrThrow("provider_uuid")));
+                encounterDTO.setCreatoruuid(idCursor.getString(idCursor.getColumnIndexOrThrow("provider_uuid")));
                 Log.d("ENCO","ENCO_PROV: "+idCursor.getString(idCursor.getColumnIndexOrThrow("provider_uuid")));
                 encounterDTO.setEncounterTime(idCursor.getString(idCursor.getColumnIndexOrThrow("encounter_time")));
                 Log.d("ENCO","ENCO_TIME: "+idCursor.getString(idCursor.getColumnIndexOrThrow("encounter_time")));
@@ -165,7 +165,7 @@ public class EncounterDAO {
                 encounterDTO.setPatientuuid(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_uuid")));
                 encounterDTO.setVisituuid(idCursor.getString(idCursor.getColumnIndexOrThrow("visituuid")));
                 encounterDTO.setEncounterTypeUuid(idCursor.getString(idCursor.getColumnIndexOrThrow("encounter_type_uuid")));
-                encounterDTO.setProvideruuid(idCursor.getString(idCursor.getColumnIndexOrThrow("provider_uuid")));
+                encounterDTO.setCreatoruuid(idCursor.getString(idCursor.getColumnIndexOrThrow("provider_uuid")));
                 encounterDTO.setEncounterTime(idCursor.getString(idCursor.getColumnIndexOrThrow("encounter_time")));
                 encounterDTO.setVoided(idCursor.getInt(idCursor.getColumnIndexOrThrow("voided")));
                 encounterDTO.setPrivacynotice_value(idCursor.getString(idCursor.getColumnIndexOrThrow("privacynotice_value")));
@@ -242,8 +242,8 @@ public class EncounterDAO {
             encounterDTO.setEncounterTypeUuid(emergency_uuid);
             encounterDTO.setEncounterTime(AppConstants.dateAndTimeUtils.currentDateTime());
             encounterDTO.setSyncd(false);
-            encounterDTO.setProvideruuid(sessionManager.getProviderID());
-            Log.d("DTO","DTOdao: "+ encounterDTO.getProvideruuid());
+            encounterDTO.setCreatoruuid(sessionManager.getProviderID());
+            Log.d("DTO","DTOdao: "+ encounterDTO.getCreatoruuid());
 
             encounterDAO.createEncountersToDB(encounterDTO);
 

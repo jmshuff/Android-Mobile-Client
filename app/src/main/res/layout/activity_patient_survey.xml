@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context="io.intelehealth.client.activities.patient_survey_activity.PatientSurveyActivity">
+    tools:context="io.insightfuleye.client.activities.patient_survey_activity.PatientSurveyActivity">
 
 
     <LinearLayout

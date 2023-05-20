@@ -39,11 +39,11 @@ public class SyncUtils {
             @Override
             public void run() {
                 Logger.logD(TAG, "Background Image Push Started");
-                try {
+/*                try {
                     imagesPushDAO.imagePost();
                 } catch (DAOException e) {
                     e.printStackTrace();
-                }
+                }*/
                 Logger.logD(TAG, "Background Image Pull ended");
             }
         }, 3000);
@@ -80,9 +80,6 @@ public class SyncUtils {
             }
         }, 3000);
 
-        //imagesPushDAO.patientProfileImagesPush();
-
-//        imagesPushDAO.obsImagesPush();
 
         /*
          * Handler is added for pushing image in sync foreground
@@ -95,11 +92,11 @@ public class SyncUtils {
             public void run() {
                 Logger.logD(TAG, "Image Push Started");
                 //imagesPushDAO.obsImagesPush();
-                try {
+/*                try {
                     imagesPushDAO.imagePost();
                 } catch (DAOException e) {
                     e.printStackTrace();
-                }
+                }*/
                 Logger.logD(TAG, "Image Pull ended");
             }
         }, 3000);

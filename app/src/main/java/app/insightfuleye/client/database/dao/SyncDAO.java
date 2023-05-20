@@ -366,6 +366,7 @@ public class SyncDAO {
 //        push only happen if any one data exists.
 
         if(patientRequestApiCall!=null && patientRequestApiCall.size()>0){
+            Log.d("API person size", String.valueOf(patientRequestApiCall.size()));
             //TODO add for loop
             for(int i=0; i<patientRequestApiCall.size(); i++) {
                 Api api = ApiClient.createService(Api.class);
@@ -407,7 +408,6 @@ public class SyncDAO {
             }
         }
         if(visitRequestApiCall.size()>0 && visitRequestApiCall!=null){
-            //TODO add for loop
             for(int i=0; i<visitRequestApiCall.size();i++) {
                 Api api = ApiClient.createService(Api.class);
                 Observable<Results<Data>> visitResponseApiObservable = api.postVisits(visitRequestApiCall.get(i));

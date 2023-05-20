@@ -1,4 +1,4 @@
-package io.intelehealth.client;
+package io.insightfuleye.client;
 
 import org.junit.Test;
 

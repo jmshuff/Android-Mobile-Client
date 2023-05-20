@@ -17,11 +17,15 @@ import app.insightfuleye.client.utilities.exception.DAOException;
 public class LocationDAO {
     private long createdRecordsCount = 0;
 
+
+
     public boolean insertLocations(List<LocationDTO> locationDTOS) throws DAOException {
         boolean isInserted = true;
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         try {
             db.beginTransaction();
+            Log.d("Locations to insert", String.valueOf(locationDTOS.size()));
+            Log.d("location name 1", locationDTOS.get(0).getName());
             for (LocationDTO location : locationDTOS) {
                 boolean isCreated= createLocation(location, db);
                 Log.d("LocationCreated", String.valueOf(isCreated));
@@ -29,9 +33,11 @@ public class LocationDAO {
             db.setTransactionSuccessful();
         } catch (SQLException e){
             isInserted=false;
+            e.printStackTrace();
             throw new DAOException(e.getMessage(), e);
         }finally {
             db.endTransaction();
+            db.close();
         }
         return isInserted;
     }

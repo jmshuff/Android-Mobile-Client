@@ -22,7 +22,7 @@ public class EncounterDTO {
     private String encounterTime;
     @SerializedName("provider_id")
     @Expose
-    private String provideruuid;
+    private String creatoruuid;
     @SerializedName("syncd")
     @Expose
     private Boolean syncd;
@@ -83,12 +83,12 @@ public class EncounterDTO {
         this.encounterTime = encounterTime;
     }
 
-    public String getProvideruuid() {
-        return provideruuid;
+    public String getCreatoruuid() {
+        return creatoruuid;
     }
 
-    public void setProvideruuid(String provideruuid) {
-        this.provideruuid = provideruuid;
+    public void setCreatoruuid(String creatoruuid) {
+        this.creatoruuid = creatoruuid;
     }
 
     public String getPrivacynotice_value() {

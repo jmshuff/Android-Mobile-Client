@@ -1,4 +1,4 @@
-package io.intelehealth.client;
+package io.insightfuleye.client;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;

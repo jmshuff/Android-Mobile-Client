@@ -354,8 +354,8 @@ public class SetupActivity extends AppCompatActivity {
                 if (authencated) {
                     sessionManager.setSetupComplete(true);
                     sessionManager.setChwname(signin.getData().getUser().getUsername());
-                    sessionManager.setCreatorID(signin.getData().getUser().getId());
-                    sessionManager.setProviderID(signin.getData().getUser().getPersonId());
+                    sessionManager.setCreatorID(signin.getData().getUser().getPersonId());
+                    //sessionManager.setProviderID(signin.getData().getUser().getPersonId());
                     sessionManager.setAuthToken(signin.getData().getToken());
                     sessionManager.setRefreshToken(signin.getData().getRefreshToken());
                     SQLiteDatabase sqLiteDatabase = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
@@ -401,11 +401,6 @@ public class SetupActivity extends AppCompatActivity {
                     synchronized(this){
                         getLocationFromServer();
                     }
-/*                    try {
-                        wait(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }*/
 
                     Log.i(TAG, "onPostExecute: Parse init");
                     Intent intent = new Intent(SetupActivity.this, HomeActivity.class);
@@ -418,7 +413,7 @@ public class SetupActivity extends AppCompatActivity {
 
             @Override
             public void onError(Throwable e) {
-
+                e.printStackTrace();
                 progress.dismiss();
                 DialogUtils dialogUtils = new DialogUtils();
                 dialogUtils.showerrorDialog(SetupActivity.this, "Error Login", getString(R.string.error_incorrect_password), "ok");
@@ -553,20 +548,19 @@ public class SetupActivity extends AppCompatActivity {
         }
         Api apiService = ApiClient.createService(Api.class);
         try {
-            Observable<Results<Data<List<LocationDTO>>>> resultsObservable = apiService.getLocations();
+            Observable<Results> resultsObservable = apiService.getLocations();
             resultsObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableObserver<Results<Data<List<LocationDTO>>>>() {
+                    .subscribe(new DisposableObserver<Results>() {
                         @Override
-                        public void onNext(Results<Data<List<LocationDTO>>> locationResults) {
+                        public void onNext(Results locationResults) {
                             if (locationResults.getData() != null) {
                                 //LocationDTO locationDTO= locationResults.getData().getRows().get(0);
 
                                 List<LocationDTO> items = locationResults.getData().getRows();
                                 System.out.println("# of locations server " + items.size());
-
-                                ArrayList<LocationDTO> insertList = new ArrayList<>();
+                                Log.d("locations", items.toString());
 
                                 LocationDAO locationDAO = new LocationDAO();
                                 try {
@@ -580,6 +574,7 @@ public class SetupActivity extends AppCompatActivity {
                                 Toast.makeText(SetupActivity.this, getString(R.string.error_location_not_fetched), Toast.LENGTH_SHORT).show();
                             }
                         }
+
 
                         @Override
                         public void onError(Throwable e) {

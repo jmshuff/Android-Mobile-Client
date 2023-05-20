@@ -2,13 +2,10 @@ package app.insightfuleye.client.utilities;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.gson.Gson;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +22,10 @@ import app.insightfuleye.client.models.dto.VisitDTO;
 import app.insightfuleye.client.models.pushRequestApiCall.Address;
 import app.insightfuleye.client.models.pushRequestApiCall.Attribute;
 import app.insightfuleye.client.models.pushRequestApiCall.Encounter;
-import app.insightfuleye.client.models.pushRequestApiCall.EncounterProvider;
-import app.insightfuleye.client.models.pushRequestApiCall.Identifier;
-import app.insightfuleye.client.models.pushRequestApiCall.Name;
 import app.insightfuleye.client.models.pushRequestApiCall.Ob;
 import app.insightfuleye.client.models.pushRequestApiCall.ObsString;
 import app.insightfuleye.client.models.pushRequestApiCall.Patient;
 import app.insightfuleye.client.models.pushRequestApiCall.Person;
-import app.insightfuleye.client.models.pushRequestApiCall.PushRequestApiCall;
 import app.insightfuleye.client.models.pushRequestApiCall.Visit;
 import app.insightfuleye.client.utilities.exception.DAOException;
 
@@ -203,6 +196,7 @@ public class PatientsFrameJson {
                 }
                 person.setLocationId(session.getLocationUuid());
                 person.setPersonTypeId("52deed97-364d-4ba3-8faf-7673d89f235a");
+                person.setCreatorId(patientDTOList.get(i).getCreatoruuid());
 
                 Address address = new Address();
                 address.setAddress1(patientDTOList.get(i).getAddress1());
@@ -229,9 +223,10 @@ public class PatientsFrameJson {
 //                patient.setAbhaNo(patientDTOList.get(i).getAbhaNumber());
 //                patient.setPatientIdentifier(patientDTOList.get(i).getPatientIdentifier());
 //                patient.setPatientIdentifierTypeId(patientDTOList.get(i).getPatientIdentiferType());
-                patient.setAbhaNo("ABHA001");
-                patient.setPatientIdentifier(patientDTOList.get(i).getVisilantId());
-                patient.setPatientIdentifierTypeId("1c416bfb-ea5b-44bd-b183-ffd1cde2b661");
+                patient.setAbhaNo(patientDTOList.get(i).getAbhaNumber());
+                patient.setPatientIdentifier(patientDTOList.get(i).getPatientIdentifier());
+                patient.setPatientIdentifierTypeId(patientDTOList.get(i).getPatientIdentiferType());
+                patient.setCreatoruuid(patientDTOList.get(i).getCreatoruuid());
                 person.setPatient(patient);
 
                 personRequestCallApi.add(person);
@@ -288,7 +283,7 @@ public class PatientsFrameJson {
             encounter.setEncounterTypeId(encounterDTO.getEncounterTypeUuid());//right know it is static
             encounter.setPatientId(encounterDTO.getPatientuuid());
             encounter.setVisitId(encounterDTO.getVisituuid());
-            encounter.setCreatorId(encounterDTO.getProvideruuid());
+            encounter.setCreatorId(encounterDTO.getCreatoruuid());
 
             if (!encounterDTO.getEncounterTypeUuid().equalsIgnoreCase(UuidDictionary.EMERGENCY)) {
                 List<Ob> obsList = new ArrayList<>();
@@ -305,6 +300,7 @@ public class PatientsFrameJson {
                             ob.setVisitId(encounterDTO.getVisituuid());
                             ob.setPatientId(encounterDTO.getPatientuuid());
                             ob.setConceptId(obs.getConceptuuid());
+                            ob.setCreatorId(encounterDTO.getCreatoruuid());
                             obsString.setValue(obs.getValue());
                             obsList.add(ob);
                         }

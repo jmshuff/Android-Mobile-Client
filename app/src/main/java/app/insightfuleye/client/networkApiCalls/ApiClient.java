@@ -18,7 +18,7 @@ public class ApiClient {
     //
 
 
-    private static OkHttpClient.Builder client = new OkHttpClient.Builder();
+    private static OkHttpClient.Builder httpClient;
     private static String apiBaseUrl = "https://devapi.visilant.org";    //testing server
 
     public static String getApiBaseUrl() {
@@ -31,10 +31,6 @@ public class ApiClient {
                     .baseUrl(apiBaseUrl)
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
 
-    private static Retrofit retrofit = builder.build();
-    static Retrofit getRetrofit(){
-        return retrofit;
-    }
     public static void changeApiBaseUrl(String newApiBaseUrl) {
         apiBaseUrl = newApiBaseUrl;
         builder = new Retrofit.Builder()
@@ -45,19 +41,20 @@ public class ApiClient {
     }
 
     public static <S> S createService(Class<S> serviceClass) {
+        if(httpClient== null){
+            httpClient = new OkHttpClient.Builder();
+            MyServiceInterceptor headerInceptor= new MyServiceInterceptor();
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            httpClient.addInterceptor(loggingInterceptor);
+            httpClient.addInterceptor(headerInceptor);
+            httpClient.connectTimeout(70, TimeUnit.SECONDS);
+            httpClient.readTimeout(70, TimeUnit.SECONDS);
+            httpClient.writeTimeout(70, TimeUnit.SECONDS);
 
-        MyServiceInterceptor headerInceptor= new MyServiceInterceptor();
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        client.addInterceptor(loggingInterceptor);
-        client.addInterceptor(headerInceptor);
-        client.connectTimeout(70, TimeUnit.SECONDS);
-        client.readTimeout(70, TimeUnit.SECONDS);
-        client.writeTimeout(70, TimeUnit.SECONDS);
-
-        if (retrofit == null) {
-            retrofit = builder.client(client.build()).build();
         }
+        OkHttpClient client = httpClient.build();
+        Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
     }
 

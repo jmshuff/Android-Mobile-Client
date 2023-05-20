@@ -75,7 +75,8 @@ public class InteleHealthDatabaseHelper extends SQLiteOpenHelper {
             "abha_number TEXT," +
             "location_id TEXT," +
             "patient_identifier TEXT," +
-            "patient_identifer_type TEXT" +
+            "patient_identifier_type TEXT," +
+            "creator_id TEXT" +
             ")";
 
 

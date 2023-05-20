@@ -23,6 +23,10 @@ public class Patient {
     @SerializedName("visits")
     @Expose
     private List<Visit> visits;
+    @SerializedName("creator_id")
+    @Expose
+    private String creatoruuid;
+
 
     /**
      * No args constructor for use in serialization
@@ -39,13 +43,14 @@ public class Patient {
      * @param id
      * @param patientIdentifierTypeId
      */
-    public Patient(String id, String patientIdentifier, String patientIdentifierTypeId, String abhaNo, List<Visit> visits) {
+    public Patient(String id, String patientIdentifier, String patientIdentifierTypeId, String abhaNo, String creatoruuid, List<Visit> visits) {
         super();
         this.id = id;
         this.patientIdentifier = patientIdentifier;
         this.patientIdentifierTypeId = patientIdentifierTypeId;
         this.abhaNo = abhaNo;
         this.visits = visits;
+        this.creatoruuid = creatoruuid;
     }
 
     public String getId() {
@@ -88,4 +93,11 @@ public class Patient {
         this.visits = visits;
     }
 
+    public String getCreatoruuid() {
+        return creatoruuid;
+    }
+
+    public void setCreatoruuid(String creatoruuid) {
+        this.creatoruuid = creatoruuid;
+    }
 }

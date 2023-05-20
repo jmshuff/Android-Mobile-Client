@@ -68,6 +68,10 @@ public class PatientDTO {
     @SerializedName("patient_identifier_type")
     @Expose
     private String patientIdentiferType;
+    @SerializedName("creator_id")
+    @Expose
+    private String creatoruuid;
+
 
     private String healthScheme;
 
@@ -261,5 +265,13 @@ public class PatientDTO {
 
     public void setHealthScheme(String healthScheme) {
         this.healthScheme = healthScheme;
+    }
+
+    public String getCreatoruuid() {
+        return creatoruuid;
+    }
+
+    public void setCreatoruuid(String creatoruuid) {
+        this.creatoruuid = creatoruuid;
     }
 }

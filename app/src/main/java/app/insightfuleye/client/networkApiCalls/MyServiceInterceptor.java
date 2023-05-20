@@ -136,8 +136,8 @@ public class MyServiceInterceptor implements Interceptor {
                 if (authencated) {
                     sessionManager.setSetupComplete(true);
                     sessionManager.setChwname(signin.getData().getUser().getUsername());
-                    sessionManager.setCreatorID(signin.getData().getUser().getId());
-                    sessionManager.setProviderID(signin.getData().getUser().getPersonId());
+                    sessionManager.setCreatorID(signin.getData().getUser().getPersonId());
+                    //sessionManager.setProviderID(signin.getData().getUser().getPersonId());
                     sessionManager.setAuthToken(signin.getData().getToken());
                     sessionManager.setRefreshToken(signin.getData().getRefreshToken());
                     SQLiteDatabase sqLiteDatabase = AppConstants.inteleHealthDatabaseHelper.getWriteDb();

@@ -19,6 +19,9 @@ public class ProviderDTO {
     @SerializedName("voided")
     @Expose
     private Integer voided;
+    @SerializedName("creator_id")
+    @Expose
+    private String creatoruuid;
 
     public String getUuid() {
         return uuid;

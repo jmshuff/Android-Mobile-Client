@@ -75,7 +75,8 @@ public class PatientsDAO {
             values.put("abha_number", patient.getAbhaNumber());
             values.put("location_id", patient.getLocationId());
             values.put("patient_identifier", patient.getPatientIdentifier());
-            values.put("patient_identifer_type", patient.getPatientIdentiferType());
+            values.put("patient_identifier_type", patient.getPatientIdentiferType());
+            values.put("creator_id", patient.getCreatoruuid());
             createdRecordsCount = db.insertWithOnConflict("tbl_patient", null, values, SQLiteDatabase.CONFLICT_REPLACE);
         } catch (SQLException e) {
             isCreated = false;
@@ -114,8 +115,9 @@ public class PatientsDAO {
             values.put("abha_number", patientDTO.getAbhaNumber());
             values.put("location_id", patientDTO.getLocationId());
             values.put("patient_identifier", patientDTO.getPatientIdentifier());
-            values.put("patient_identifer_type", patientDTO.getPatientIdentiferType());
+            values.put("patient_identifier_type", patientDTO.getPatientIdentiferType());
             values.put("sync", false);
+            values.put("creator_id", patientDTO.getCreatoruuid());
             patientAttributesList = patientDTO.getPatientAttributesDTOList();
             if (patientAttributesList != null)
                 insertPatientAttributes(patientAttributesList, db);
@@ -163,6 +165,7 @@ public class PatientsDAO {
             values.put("sync", false);
             values.put("abha_number", patientDTO.getAbhaNumber());
             values.put("patient_identifier", patientDTO.getPatientIdentifier());
+            values.put("creator_id", patientDTO.getCreatoruuid());
             if(patientAttributesDTOS!=null)
                 insertPatientAttributes(patientAttributesDTOS, db);
             Logger.logD("pulldata", "datadumper" + values);
@@ -391,6 +394,9 @@ public class PatientsDAO {
                     patientDTO.setAddress2(idCursor.getString(idCursor.getColumnIndexOrThrow("address2")));
                     patientDTO.setPostalcode(idCursor.getString(idCursor.getColumnIndexOrThrow("postal_code")));
                     patientDTO.setAbhaNumber(idCursor.getString(idCursor.getColumnIndexOrThrow("abha_number")));
+                    patientDTO.setPatientIdentifier(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_identifier")));
+                    patientDTO.setPatientIdentiferType(idCursor.getString(idCursor.getColumnIndexOrThrow("patient_identifier_type")));
+                    patientDTO.setCreatoruuid(idCursor.getString(idCursor.getColumnIndexOrThrow("creator_id")));
                     patientDTOList.add(patientDTO);
                 }
             }
@@ -496,16 +502,15 @@ public class PatientsDAO {
     }
 
     public String generateVisilantId(){
-        List<PatientDTO> patientDTOList = new ArrayList<>();
         SQLiteDatabase db = AppConstants.inteleHealthDatabaseHelper.getWriteDb();
         db.beginTransaction();
         int numericId=0;
         try {
             //consider just looking at the most recent entries instead of searching all
-            Cursor idCursor = db.rawQuery("SELECT visilant_id FROM tbl_patient", null);
+            Cursor idCursor = db.rawQuery("SELECT patient_identifier FROM tbl_patient", null);
             if (idCursor.getCount() != 0) {
                 while (idCursor.moveToNext()) {
-                    String visilantId=idCursor.getString(idCursor.getColumnIndexOrThrow("visilant_id"));
+                    String visilantId=idCursor.getString(idCursor.getColumnIndexOrThrow("patient_identifier"));
                     if(visilantId!=null && visilantId.length()>2){
                         try{
                             int temp= Integer.parseInt(visilantId.substring(2));

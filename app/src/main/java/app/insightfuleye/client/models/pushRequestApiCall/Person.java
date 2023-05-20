@@ -38,6 +38,9 @@ public class Person {
     @SerializedName("person_address")
     @Expose
     private Address address;
+    @SerializedName("creator_id")
+    @Expose
+    private String creatorId;
 
     /**
      * No args constructor for use in serialization
@@ -58,7 +61,7 @@ public class Person {
      * @param middleName
      * @param id
      */
-    public Person(String id, String firstName, String middleName, String lastName, String gender, String birthdate, String locationId, String personTypeId, Patient patient) {
+    public Person(String id, String firstName, String middleName, String lastName, String gender, String birthdate, String locationId, String personTypeId, String creatorId, Patient patient) {
         super();
         this.id = id;
         this.firstName = firstName;
@@ -69,6 +72,7 @@ public class Person {
         this.locationId = locationId;
         this.personTypeId = personTypeId;
         this.patient = patient;
+        this.creatorId=creatorId;
     }
 
     public String getId() {
@@ -149,5 +153,13 @@ public class Person {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 }
